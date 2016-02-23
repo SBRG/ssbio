@@ -1,5 +1,5 @@
 from Bio import PDB
-from Loader import Loader
+from loader import Loader
 l = Loader()
 
 def msms_output(filename):
@@ -49,4 +49,6 @@ if __name__ == '__main__':
     import glob
     files = glob.glob('test_structures/*')
     for f in files:
-        
+        print(f)
+        msms = msms_output(f)
+        print(residue_depth(msms))

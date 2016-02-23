@@ -1,3 +1,8 @@
-# IPython autosave 
+# IPython autosave
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
+
+.dir_bash_history
+*/.dir_bash_history
+
+*/__pycache__

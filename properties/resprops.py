@@ -1,4 +1,4 @@
-from Loader import Loader
+from loader import Loader
 from Bio import PDB
 l = Loader()
 
@@ -58,12 +58,16 @@ def residue_props(filename):
                 negative = negative + 1
             total = total + 1
 
-    props['nonpolar'] = float(nonpolar) / float(total)
-    props['polar'] = float(polar) / float(total)
-    props['positive'] = float(positive) / float(total)
-    props['negative'] = float(negative) / float(total)
+    props['ssb_per_NP'] = float(nonpolar) / float(total)
+    props['ssb_per_P'] = float(polar) / float(total)
+    props['ssb_per_pos'] = float(positive) / float(total)
+    props['ssb_per_neg'] = float(negative) / float(total)
 
     return props
 
 if __name__ == '__main__':
-    print(residue_props('test_structures/1u8f.pdb'))
+    import glob
+    files = glob.glob('test_structures/*')
+    for f in files:
+        print(f)
+        print(residue_props(f))

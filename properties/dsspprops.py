@@ -5,8 +5,31 @@ import pandas as pd
 
 from Bio.PDB.DSSP import *
 from Bio.PDB.Polypeptide import one_to_three
-from Loader import Loader
+from loader import Loader
 l = Loader()
+
+AAdict = {'CYS': 'polar',
+          'ILE': 'nonpolar',
+          'GLY': 'nonpolar',
+          'SER': 'polar',
+          'GLN': 'polar',
+          'LYS': 'positive',
+          'ASN': 'polar',
+          'PRO': 'nonpolar',
+          'ASP': 'negative',
+          'THR': 'polar',
+          'PHE': 'nonpolar',
+          'ALA': 'nonpolar',
+          'MET': 'nonpolar',
+          'HIS': 'positive',
+          'LEU': 'nonpolar',
+          'ARG': 'positive',
+          'TRP': 'nonpolar',
+          'VAL': 'nonpolar',
+          'GLU': 'negative',
+          'TYR': 'polar',
+          'MSE': 'polar',
+          'SEC': 'polar'}
 
 
 def dssp_dataframe(filename):
@@ -39,6 +62,12 @@ def dssp_dataframe(filename):
                   'O_NH_1_energy', 'NH_O_2_relidx', 'NH_O_2_energy',
                   'O_NH_2_relidx', 'O_NH_2_energy']
 
+    df['aa_three'] = df['aa'].apply(one_to_three)
+    df['max_acc'] = df['aa_three'].map(MAX_ACC.get)
+    df[['relative_expo', 'max_acc']] = df[
+        ['relative_expo', 'max_acc']].astype(float)
+    df['exposure_area'] = df['relative_expo'] * df['max_acc']
+
     return df
 
 
@@ -53,22 +82,9 @@ def calc_sasa(dssp_df):
     Input: PDB or CIF structure file
     Output: SASA (integer) of structure
     """
-    droplist = []
-    for j in dssp_df.index:
-        if dssp_df.loc[j, 'relative_expo'] == 'NA':
-            droplist.append(j)
-    if len(droplist) > 0:
-        dfad = dssp_df.drop(dssp_df.index[droplist])
-    else:
-        dfad = dssp_df
 
-    dfad['aa_three'] = dfad['aa'].apply(one_to_three)
-    dfad['max_acc'] = dfad['aa_three'].map(MAX_ACC.get)
-    dfad[['relative_expo', 'max_acc']] = dfad[['relative_expo', 'max_acc']].astype(float)
-    dfad['exposure_area'] = dfad['relative_expo'] * dfad['max_acc']
-
-    infodict = {'ssb_sasa': dfad.exposure_area.sum(),
-                'ssb_mean_rel_exposed': dfad.relative_expo.mean(),
+    infodict = {'ssb_sasa': dssp_df.exposure_area.sum(),
+                'ssb_mean_rel_exposed': dssp_df.relative_expo.mean(),
                 'ssb_size': len(dssp_df)}
 
     return infodict
@@ -130,11 +146,93 @@ def calc_sec_struct_composition(dssp_df):
     return expoinfo
 
 
+def calc_surface_buried(dssp_df):
+    SN = 0
+    BN = 0
+    SP = 0
+    SNP = 0
+    SPo = 0
+    SNe = 0
+    BNP = 0
+    BP = 0
+    BPo = 0
+    BNe = 0
+    Total = 0
+
+    sbinfo = {}
+
+    df_min = dssp_df[['aa_three', 'exposure_area']]
+
+    if len(df_min) == 0:
+        return sbinfo
+    else:
+        for i, r in df_min.iterrows():
+            res = r.aa_three
+            area = r.exposure_area
+            if res in AAdict:
+                if AAdict[res] == 'nonpolar' and area > 3:
+                    SNP = SNP + 1
+                    SN = SN + 1
+                elif AAdict[res] == 'polar' and area > 3:
+                    SP = SP + 1
+                    SN = SN + 1
+                elif AAdict[res] == 'positive' and area > 3:
+                    SPo = SPo + 1
+                    SN = SN + 1
+                elif AAdict[res] == 'negative' and area > 3:
+                    SNe = SNe + 1
+                    SN = SN + 1
+                elif AAdict[res] == 'positive' and area <= 3:
+                    BPo = BPo + 1
+                    BN = BN + 1
+                elif AAdict[res] == 'negative' and area <= 3:
+                    BNe = BNe + 1
+                    BN = BN + 1
+                elif AAdict[res] == 'polar' and area <= 3:
+                    BP = BP + 1
+                    BN = BN + 1
+                elif AAdict[res] == 'nonpolar' and area <= 3:
+                    BNP = BNP + 1
+                    BN = BN + 1
+        Total = float(BN + SN)
+        pSNP = float(SNP) / Total
+        pSP = float(SP) / Total
+        pSPo = float(SPo) / Total
+        pSNe = float(SNe) / Total
+        pBNP = float(BNP) / Total
+        pBP = float(BP) / Total
+        pBPo = float(BPo) / Total
+        pBNe = float(BNe) / Total
+        pBN = float(BN) / Total
+        pSN = float(SN) / Total
+        sbinfo['ssb_per_S_NP'] = pSNP
+        sbinfo['ssb_per_S_P'] = pSP
+        sbinfo['ssb_per_S_pos'] = pSPo
+        sbinfo['ssb_per_S_neg'] = pSNe
+        sbinfo['ssb_per_B_NP'] = pBNP
+        sbinfo['ssb_per_B_P'] = pBP
+        sbinfo['ssb_per_B_pos'] = pBPo
+        sbinfo['ssb_per_B_neg'] = pBNe
+        sbinfo['ssb_per_S'] = pSN
+        sbinfo['ssb_per_B'] = pBN
+
+        return sbinfo
+
+
+def all_dssp_props(filename):
+    t = dssp_dataframe(f)
+    sasa = calc_sasa(t)
+    sstr = calc_sec_struct_composition(t)
+    subu = calc_surface_buried(t)
+
+    sasa.update(sstr)
+    sasa.update(subu)
+
+    return sasa
+
 if __name__ == '__main__':
     import glob
     files = glob.glob('test_structures/*')
     for f in files:
-        t = dssp_dataframe(f)
         print(f)
-        print(calc_sasa(t))
-        print(calc_sec_struct_composition(t))
+        print(all_dssp_props(f))

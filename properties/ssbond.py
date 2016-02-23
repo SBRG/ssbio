@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 import pandas as pd
-from Loader import Loader
+from loader import Loader
 l = Loader()
 
 
@@ -19,22 +19,9 @@ def count_ss_bond(filename, threshold_new=5):
     return len(list(ss))
 
 
-def count_ss_bond_batch(filenames, threshold_new=5):
-    if isinstance(filenames, str):
-        filenames = [filenames]
-
-    results_list = []
-    for f in tqdm(filenames):
-        results = {}
-        results['ssb_file'] = os.path.basename(f)
-        results['ssb_cys_bridge'] = count_ss_bond(f)
-        results_list.append(results)
-
-    results_df = pd.DataFrame(results_list)
-
-    return results_df
-
 if __name__ == '__main__':
     import glob
-    files = glob.glob('properties/test_structures/*')
-    print(count_ss_bond_batch(files))
+    files = glob.glob('test_structures/*')
+    for f in files:
+        print(f)
+        print(count_ss_bond(f))
