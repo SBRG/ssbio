@@ -147,6 +147,9 @@ def calc_sec_struct_composition(dssp_df):
 
 
 def calc_surface_buried(dssp_df):
+    '''Calculates the percent of residues that are in the surface or buried,
+    as well as if they are polar or nonpolar. Returns a dictionary of this.
+    '''
     SN = 0
     BN = 0
     SP = 0
@@ -220,7 +223,12 @@ def calc_surface_buried(dssp_df):
 
 
 def all_dssp_props(filename):
-    t = dssp_dataframe(f)
+    '''Returns a large dictionary of SASA, secondary structure
+    composition, and surface/buried composition. Values are computed using DSSP.
+    Input: PDB or MMCIF filename
+    Output: Dictionary of values obtained from dssp
+    '''
+    t = dssp_dataframe(filename)
     sasa = calc_sasa(t)
     sstr = calc_sec_struct_composition(t)
     subu = calc_surface_buried(t)
