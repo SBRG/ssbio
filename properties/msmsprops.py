@@ -37,11 +37,11 @@ def residue_depth(anslist):
     if anslist != ['NA', 'NA', 'NA', 'NA']:
         redepth = [x[2] for x in anslist]
         cadepth = [x[3] for x in anslist]
-        depth_info['redepth'] = sum(redepth) / len(redepth)
-        depth_info['cadepth'] = sum(cadepth) / len(cadepth)
+        depth_info['ssb_avg_res_depth'] = sum(redepth) / len(redepth)
+        depth_info['ssb_ca_depth'] = sum(cadepth) / len(cadepth)
     else:
-        depth_info['redepth'] = None
-        depth_info['cadepth'] = None
+        depth_info['ssb_avg_res_depth'] = None
+        depth_info['ssb_ca_depth'] = None
 
     return depth_info
 
