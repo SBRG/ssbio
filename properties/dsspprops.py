@@ -4,6 +4,7 @@ from tqdm import tqdm
 import pandas as pd
 
 from Bio.PDB.DSSP import *
+from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
 from loader import Loader
 l = Loader()
@@ -62,6 +63,7 @@ def dssp_dataframe(filename):
                   'O_NH_1_energy', 'NH_O_2_relidx', 'NH_O_2_energy',
                   'O_NH_2_relidx', 'O_NH_2_energy']
 
+    df = df[df['aa'].isin(list(aa1))]
     df['aa_three'] = df['aa'].apply(one_to_three)
     df['max_acc'] = df['aa_three'].map(MAX_ACC.get)
     df[['relative_expo', 'max_acc']] = df[
@@ -240,7 +242,7 @@ def all_dssp_props(filename):
 
 if __name__ == '__main__':
     import glob
-    files = glob.glob('test_structures/*')
+    files = glob.glob('properties/test_structures/*')
     for f in files:
         print(f)
         print(all_dssp_props(f))
