@@ -37,6 +37,8 @@ def residue_depth(anslist):
     if anslist != ['NA', 'NA', 'NA', 'NA']:
         redepth = [x[2] for x in anslist]
         cadepth = [x[3] for x in anslist]
+        redepth = [x for x in redepth if x is not None]
+        cadepth = [x for x in cadepth if x is not None]
         depth_info['ssb_avg_res_depth'] = sum(redepth) / len(redepth)
         depth_info['ssb_ca_depth'] = sum(cadepth) / len(cadepth)
     else:
@@ -46,9 +48,11 @@ def residue_depth(anslist):
     return depth_info
 
 if __name__ == '__main__':
-    import glob
-    files = glob.glob('test_structures/*')
-    for f in files:
-        print(f)
-        msms = msms_output(f)
-        print(residue_depth(msms))
+    # import glob
+    # files = glob.glob('test_structures/*')
+    # for f in files:
+    #     print(f)
+    #     msms = msms_output(f)
+    #     print(residue_depth(msms))
+    msms = msms_output('properties/test_structures/1UPI.pdb')
+    print(residue_depth(msms))
