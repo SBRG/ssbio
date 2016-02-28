@@ -139,12 +139,13 @@ def write_to_pdb(struct, new_file_name):
     io.save(new_file_name)
 
 
-def monomer_mutation_function(corrected_df, pdb_file, custom_id=''):
+def monomer_mutation_function(corrected_df, pdb_file, custom_id='', custom_dir=''):
 
     if len(custom_id) == 0:
         custom_id = os.path.basename(pdb_file)[:4]
-
-    output_file = custom_id + '_modified.pdb'
+        output_file = os.path.basename(pdb_file)[:4] + '_modified.pdb'
+    else:
+        output_file = custom_id + '.pdb'
 
     # read in structure to parser
     struct = l.structure_reader(pdb_file)
@@ -159,9 +160,9 @@ def monomer_mutation_function(corrected_df, pdb_file, custom_id=''):
     structure_new = setup_pdb_for_amber_monomer(
         corrected_df, temp_pdb_file)
     #  write out new structure
-    write_to_pdb(structure_new, output_file)
+    write_to_pdb(structure_new, os.path.join(custom_dir, output_file))
 
-    return output_file
+    return os.path.join(custom_dir, output_file)
 
 
 if __name__ == '__main__':
