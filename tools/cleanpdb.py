@@ -45,11 +45,15 @@ class NotDisordered(PDB.Select):
         else:
             return False
 
-def clean_pdb(input_pdb, custom_dir=''):
-
+def clean_pdb(input_pdb):
+    """
+    Simple function to clean a PDB file by
+    1) adding a chain ID ('X' if there is none)
+    2) adding atom occupancies if there are none (default 1)
+    """
     # default is to keep atoms with alternate location ID 'A'
     filename = input_pdb.split('.pdb')[0]
-    occ_beta_added = os.path.join(custom_dir, filename + '_fix.pdb')
+    occ_beta_added = filename + '_fix.pdb'
 
     my_structure = l.structure_reader(input_pdb)
     struct = my_structure[0]
