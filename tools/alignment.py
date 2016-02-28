@@ -29,6 +29,13 @@ def run_alignment(id_a, faa_a, id_b, faa_b):
 
 
 def get_alignment_df(alignment_file):
+    '''
+    Creates an alignment dataframe indicating where matches, mutations, insertions, and deletions are.
+    Takes in a needle alignment file and returns a Pandas DataFrame.
+    Input: alignment_file - needle alignment file between two amino acid sequences
+    Output: alignment_df - Pandas DataFrame of the alignment.
+    '''
+
     alignments = list(AlignIO.parse(alignment_file, "emboss"))
     alignment_df = pd.DataFrame(columns=[
                                 'id_a', 'id_b', 'type', 'id_a_start', 'id_a_stop', 'count', 'id_a_aa', 'id_b_aa'])
