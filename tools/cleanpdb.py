@@ -45,33 +45,32 @@ class NotDisordered(PDB.Select):
         else:
             return False
 
-# def clean_pdb(input_pdb):
-#
-#     # default is to keep atoms with alternate location ID 'A'
-#     alt = 'A'
-#
-#     filename = input_pdb.split('.pdb')[0]
-#     occ_beta_added = filename + '_fix.pdb'
-#
-#     struct = parser.get_structure(filename, input_pdb)
-#
-#     # adding chain X if the chain column is empty
-#     # (http://comments.gmane.org/gmane.comp.python.bio.devel/10639)
-#     for x in struct.get_chains():
-#         if not x.id.strip():  # chain could be an empty string ' ' so strip it!
-#             x.id = 'X'
-#
-#     # adding occupancies if there are none
-#     # (http://comments.gmane.org/gmane.comp.python.bio.general/6289)
-#     for atom in struct.get_atoms():
-#         atom.set_occupancy(1)
-#
-#     # create PDBIO class for writing
-#     io.set_structure(struct)
-#     # save it
-#     io.save(occ_beta_added, select=NotDisordered(alt))
-#
-#     return occ_beta_added
+def clean_pdb(input_pdb):
+
+    # default is to keep atoms with alternate location ID 'A'
+    filename = input_pdb.split('.pdb')[0]
+    occ_beta_added = filename + '_fix.pdb'
+
+    my_structure = l.structure_reader(file_name)
+    struct = my_structure[0]
+
+    # adding chain X if the chain column is empty
+    # (http://comments.gmane.org/gmane.comp.python.bio.devel/10639)
+    for x in struct.get_chains():
+        if not x.id.strip():  # chain could be an empty string ' ' so strip it!
+            x.id = 'X'
+
+    # adding occupancies if there are none
+    # (http://comments.gmane.org/gmane.comp.python.bio.general/6289)
+    for atom in struct.get_atoms():
+        atom.set_occupancy(1)
+
+    # create PDBIO class for writing
+    io.set_structure(struct)
+    # save it
+    io.save(occ_beta_added, select=NotDisordered(alt))
+
+    return occ_beta_added
 
 def setup_pdb_for_amber_monomer(df, file_name):
     '''Takes in any PDB file and
