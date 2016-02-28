@@ -51,7 +51,7 @@ def clean_pdb(input_pdb):
     filename = input_pdb.split('.pdb')[0]
     occ_beta_added = filename + '_fix.pdb'
 
-    my_structure = l.structure_reader(file_name)
+    my_structure = l.structure_reader(input_pdb)
     struct = my_structure[0]
 
     # adding chain X if the chain column is empty
