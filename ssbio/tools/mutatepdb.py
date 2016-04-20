@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-##############################
-##  for standalone testing
-import sys
-import os.path as op
-new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
-if new_path not in sys.path:
-    sys.path.append(new_path)
-## end for standalone testing
-##############################
+# ##############################
+# ##  for standalone testing
+# import sys
+# import os.path as op
+# new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
+# if new_path not in sys.path:
+#     sys.path.append(new_path)
+# ## end for standalone testing
+# ##############################
 
 from Bio import PDB
 
@@ -99,5 +99,5 @@ if __name__ == '__main__':
         my_pdb = PDBIOExt(my_clean_pdb)
 
     my_mutation = MutatePDB(mutations)
-    my_mutated_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, custom_selection=my_mutation)
+    my_mutated_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, out_dir='mutated_pdbs', custom_selection=my_mutation)
     print('Mutated PDB at: {}'.format(my_mutated_pdb))

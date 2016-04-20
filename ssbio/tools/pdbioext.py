@@ -1,3 +1,4 @@
+import os
 import os.path as op
 from Bio import PDB
 from Bio.PDB import PDBIO
@@ -43,6 +44,8 @@ class PDBIOExt(PDBIO):
         out_file = '{}_{}{}'.format(filename, out_suffix, ext)
 
         if out_dir:
+            if not op.exists(out_dir):
+                os.mkdir(out_dir)
             out_file = op.join(out_dir, out_file)
 
         return out_file

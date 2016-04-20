@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
-##############################
-##  for standalone testing
-import sys
-import os.path as op
-
-new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
-if new_path not in sys.path:
-    sys.path.append(new_path)
-## end for standalone testing
-##############################
+# ##############################
+# ##  for standalone testing
+# import sys
+# import os.path as op
+#
+# new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
+# if new_path not in sys.path:
+#     sys.path.append(new_path)
+# ## end for standalone testing
+# ##############################
 
 
 import os
 import os.path as op
+from pkg_resources import resource_filename
 
 
 def prep_leap_folders(wd):
@@ -30,14 +31,14 @@ for i in *.pdb; do
     seq=`echo ${i}  | cut -d. -f1`
     curr_dir=`pwd`
 
-	cp ${i} temp.pdb
+    cp ${i} temp.pdb
 
     tleap -f leaprc
 
     rm temp.pdb
-	mv temp_mod.pdb xleap_modified/${seq}_xleap.pdb
-	mv temp_mod.prmtop amber_minimized/${seq}.prmtop
-	mv temp_mod.inpcrd amber_minimized/${seq}.inpcrd
+    mv temp_mod.pdb xleap_modified/${seq}_xleap.pdb
+    mv temp_mod.prmtop amber_minimized/${seq}.prmtop
+    mv temp_mod.inpcrd amber_minimized/${seq}.inpcrd
 
 done
 """
@@ -48,6 +49,8 @@ done
     return my_file
 
 def make_leaprc_file(wd):
+    frcmod = resource_filename('ssbio.etc', 'frcmod.ff99SB')
+
     leaprc = """logFile leap.log
 #
 # ----- leaprc for loading the ff99SB (Hornak & Simmerling) force field
@@ -129,7 +132,7 @@ addAtomTypes {
 #	Load the main parameter set.
 #
 parm99 = loadamberparams parm99.dat
-frcmod99SB = loadamberparams frcmod.ff99SB
+frcmod99SB = loadamberparams %s
 #
 #	Load DNA/RNA libraries
 #
@@ -245,7 +248,8 @@ relax wt
 savepdb wt temp_mod.pdb
 saveamberparm wt temp_mod.prmtop temp_mod.inpcrd
 quit
-"""
+""" % (frcmod)
+
     my_file = op.join(wd, 'leaprc')
     with open(my_file, 'w') as f:
         f.write(leaprc)
@@ -260,6 +264,8 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description='Run tleap on a folder of PDB files')
     p.add_argument('indir', help='Directory containing only PDB files which will run through leap')
     args = p.parse_args()
+
+
 
     prep_leap_folders(args.indir)
     leaprc = make_leaprc_file(args.indir)
