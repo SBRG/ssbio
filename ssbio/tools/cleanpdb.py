@@ -3,230 +3,170 @@
 ##############################
 ##  for standalone testing
 import sys
-new_path = '/home/nathan/Dropbox/Projects/ssbio/'
+import os.path as op
+new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
 if new_path not in sys.path:
     sys.path.append(new_path)
 ## end for standalone testing
 ##############################
 
-import os.path as op
 from Bio import PDB
-from Bio.PDB import PDBIO
-
-import ssbio.tools.iotools as iotools
 
 
-class NotDisordered(PDB.Select):
+class CleanPDB(PDB.Select):
+    """Selection rules to clean a PDB file
+
+    These rules aim to:
+    - Add missing chains to a PDB file
+    - Select a single chain if noted
+    - Remove alternate atom locations
+    - Add atom occupancies
+    - Add B (temperature) factors (default Biopython behavior)
     """
-    Class to select non disordered atoms and those with the correct
-    alternate location ID - http://biopython.org/wiki/Remove_PDB_disordered_atoms
-    """
 
-    # default is to not keep "alt" identifier
-    # default is to keep atoms with alternate location ID 'A'
-    def __init__(self, alt='A', keep_alt=False):
-        self.alt = alt
-        self.keep_alt = keep_alt
+    def __init__(self, remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
+                 remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=[]):
+        """Initialize the parameters which indicate what cleaning will occur
+
+        Args:
+            remove_atom_alt:
+            remove_atom_hydrogen:
+            keep_atom_alt_id:
+            add_atom_occ:
+            remove_res_hetero:
+            add_chain_id_if_empty:
+            keep_chains:
+        """
+        self.remove_atom_alt = remove_atom_alt
+        self.remove_atom_hydrogen = remove_atom_hydrogen
+        self.keep_atom_alt_id = keep_atom_alt_id
+        self.add_atom_occ = add_atom_occ
+        self.remove_res_hetero = remove_res_hetero
+        self.add_chain_id_if_empty = add_chain_id_if_empty
+        self.keep_chains = keep_chains
+
+    def accept_chain(self, chain):
+        # If the chain does not have an ID, add one to it and keep it
+        # http://comments.gmane.org/gmane.comp.python.bio.devel/10639
+        if self.add_chain_id_if_empty and not chain.id.strip():
+            chain.id = self.add_chain_id_if_empty
+            return True
+        # If a chain is specified and the current chain equals that specified chain, keep it
+        elif self.keep_chains and chain.id in self.keep_chains:
+            return True
+        # If a chain is specified but the current chain does not equal that specified chain, remove it
+        elif self.keep_chains and chain.id not in self.keep_chains:
+            return False
+        # If no chain is specified, keep all chains
+        else:
+            return True
+
+    def accept_residue(self, residue):
+        hetfield, resseq, icode = residue.get_id()
+        # If you want to remove residues that are not normal, remove them
+        if self.remove_res_hetero and hetfield[0] != ' ':
+            return False
+        else:
+            return True
 
     def accept_atom(self, atom):
-        if not atom.is_disordered():
-            return True
-        elif atom.get_altloc() == self.alt:
-            if not self.keep_alt:
+        # If the you want to remove hydrogens and the atom is a H, remove it
+        if self.remove_atom_hydrogen and atom.element == 'H':
+            return False
+        # If you want to remove alternate locations, and the alternate location is not the one you want to keep, remove it
+        elif self.remove_atom_alt and atom.is_disordered() and atom.get_altloc() != self.keep_atom_alt_id:
+            return False
+        else:
+            # Add occupancies if there are none and you want to
+            # http://comments.gmane.org/gmane.comp.python.bio.general/6289
+            if self.add_atom_occ and atom.occupancy is None:
+                atom.set_occupancy(1)
+            if self.remove_atom_alt:
                 atom.set_altloc(' ')
             return True
-        else:
-            return False
 
+# TODO: integrate add_ter_to_pdb
+def add_ter_to_pdb(infile, outfile_name=None):
+    '''
+    Adds 'TER' cards to a PDB file when encountering:
+    - a OXT atom - indicating the end of an amino acid chain
+    - a ATOM to HETATM change - indicating a cofactor or ligand
+    - a HETATM change to a new residue - indicating a new cofactor or ligand
+    Input: any PDB file
+    Output: the path to the fixed pdb file
+    '''
+    with open(infile,'r') as pdb_file:
+        lines = pdb_file.readlines()
 
-class CleanPDB:
-    """Various tools to clean PDB files.
+    # open new file to write to
+    if not outfile_name:
+        outfile = os.path.splitext(os.path.basename(infile))[0] + '_fix.pdb'
+    else:
+        outfile = outfile_name
 
-    These functions aim to:
-    - Add missing chains to a PDB file
-    - Add atom occupancies
-    - Add B (temperature) factors
-    - Select only chains of interest
-    - Mutate residues (to be run through AMBER leap)
-    """
-    def __init__(self, in_file):
-        """Return a CleanPDB object which is ready for cleaning.
+    with open(outfile,'w') as new_pdb_file:
 
-        Attributes are simply the input PDB file name and the first model.
+        for line in lines:
+            # grab residue name to compare with previous residue name
+            resname = line[17:20]
+            # if AMBER added an OXT, that is usually the end of the protein chain
+            if 'OXT' in line:
+#                 print '***END OF PROTEIN CHAIN***'
+                new_pdb_file.write(line)
+                new_pdb_file.write('TER\n')
 
-        Args:
-            in_file: PDB input file path
-        """
-        l = iotools.IOTools()
-        structure = l.structure_reader(in_file)
-        self.in_file = in_file
-        self.model = structure[0]
+            # TODO: this should be manual input
+            elif 'MG' in line:
+#                 print '***MG ION***'
+                new_pdb_file.write(line)
+                new_pdb_file.write('TER\n')
 
-    def _output_filepath(self, out_suffix, out_dir=None):
-        """Parses a PDB input filename and returns a output file path to write a modified file.
+            # if there is a change from ATOM to HETATM, that usually indicates the presence of a cofactor/ligand
+            # also check if the previous resname was different - could be a start of a new cofactor/ligand
+            elif 'HETATM' in line and ('ATOM' in lines[lines.index(line)-1] or resname != prev_resname):
+#                 print '***LIGAND OR COFACTOR NEXT***'
+                resname = line[17:20]
+                new_pdb_file.write('TER\n')
+                new_pdb_file.write(line)
+            else:
+                new_pdb_file.write(line)
+            prev_resname = resname
 
-        Args:
-            out_suffix (str): string to append to the filename of the new PDB file
-            out_dir (str): optional working directory where cleaned PDB file should be written to
-
-        Returns:
-            out_file (str): file path of the new PDB file
-        """
-
-        # Parsing the input filename
-        filename_full = op.basename(self.in_file)
-        filename, ext = op.splitext(filename_full)
-
-        # Assembling the new output filename
-        out_file = '{}_{}{}'.format(filename, out_suffix, ext)
-
-        if out_dir:
-            out_file = op.join(out_dir, out_file)
-
-        return out_file
-
-    def write_pdb(self, out_suffix='modified', out_dir=None, not_disordered=False):
-        """Write a new PDB file from a Biopython Model object and a given filename, appended with a suffix.
-
-        Set not_disordered to True to remove alternate locations of atoms.
-
-        Args:
-            out_suffix: string to append to new PDB file - default is "_modified"
-            out_dir: optional directory to output the file
-            not_disordered: optional flag to remove alternate locations of atoms
-
-        Returns:
-            out_file: filepath of new PDB file
-
-        """
-
-        # Prepare the output file path
-        out_file = self._output_filepath(out_suffix=out_suffix, out_dir=out_dir)
-
-        # IO object creation
-        io = PDBIO()
-        io.set_structure(self.model)
-
-        if not_disordered:
-            io.save(out_file, select=NotDisordered())
-        else:
-            io.save(out_file)
-
-        return out_file
-
-    def add_chain_id(self, chain_id='X', write_file=False):
-        """Add missing chain IDs - default is X
-
-        See: http://comments.gmane.org/gmane.comp.python.bio.devel/10639
-
-        Args:
-            chain_id: chain ID to add to empty chains
-            write_file: flag to write a PDB file
-
-        Returns:
-            model: New Biopython Model object with added chain IDs
-        """
-        for chain in self.model.get_chains():
-            if not chain.id.strip():  # chain could be an empty string ' ' so strip it!
-                chain.id = chain_id
-
-        if write_file:
-            self.write_pdb(out_suffix='chainAdded')
-
-        return self.model
-
-    def add_occupancies(self, write_outfile=False):
-        """Adding occupancies if there are none
-
-        See: http://comments.gmane.org/gmane.comp.python.bio.general/6289
-
-        Args:
-            write_outfile: flag to write a PDB file
-
-        Returns:
-            model: New Biopython Model object with added chain IDs
-
-        """
-        for atom in self.model.get_atoms():
-            if atom.occupancy is None:
-                atom.set_occupancy(1)
-
-        if write_outfile:
-            self.write_pdb(out_suffix='occupancyAdded')
-
-        return self.model
-
-    def strip_hydro_hetero(self, write_outfile=False):
-        """Remove all hydrogens and heteroatom residues (e.g. WAT or metal)
-
-        Args:
-            write_outfile: flag to write a PDB file
-
-        Returns:
-            model: New Biopython Model object with hydrogens and heteroatoms removed
-        """
-
-        for chain_object in self.model.get_chains():
-            for residue in list(chain_object):
-                # print(residue)
-                res_id = residue.id
-                if res_id[0] != ' ':
-                    chain_object.detach_child(res_id)
-                if len(chain_object) == 0:
-                    self.model.detach_child(chain_object.id)
-                for atom in residue.get_list():
-                    if atom.element == 'H':
-                        residue.detach_child(atom.id)
-
-        if write_outfile:
-            self.write_pdb(out_suffix='stripped')
-
-        return self.model
-
-    def clean_pdb(self, add_chain=True, add_occ=True, strip_hydro_hetero=True, not_disordered=True,
-                  out_suffix='clean', out_dir=None):
-        """All in one function to clean a PDB file and save a new file
-
-        This function does by default these functions to a PDB file:
-        1) Adding a chain ID ('X' if there is none)
-        2) Adding atom occupancies if there are none (default 1)
-        3) Removes all hetero atoms and hydrogens (e.g. water and metals/cofactors)
-        4) Save only the "A" alternate locations (removes disordered atoms)
-        5) Adds B-factors (default functionality of Bio.PDB)
-
-        Args:
-            add_chain: add chain ID if missing
-            add_occ: add occupancies if missing
-            strip_hydro_hetero: strip hydrogens and hetero atoms
-            not_disordered: save only alternate location A
-            out_suffix: string appended to new PDB file
-            out_dir: directory where new PDB file will be saved to
-
-        Returns:
-            cleaned_pdb: file path of new PDB file
-
-        """
-
-        if add_chain:
-            self.add_chain_id()
-        if add_occ:
-            self.add_occupancies()
-        if strip_hydro_hetero:
-            self.strip_hydro_hetero()
-
-        cleaned_pdb = self.write_pdb(out_suffix=out_suffix, out_dir=out_dir, not_disordered=not_disordered)
-
-        return cleaned_pdb
+    return outfile
 
 
 if __name__ == '__main__':
+    from ssbio.tools.pdbioext import PDBIOExt
+    import os
+    import glob
+    from tqdm import tqdm
     # load inputs from command line
     import argparse
     p = argparse.ArgumentParser(description='Cleans a PDB file')
-    p.add_argument('infile', help='PDB file you want to clean')
-    p.add_argument('--nostrip', '-ns', action='store_false')
-    p.add_argument('--keepalt', '-ka', action='store_false')
+    p.add_argument('infile', help='PDB file or folder you want to clean')
+    p.add_argument('--outsuffix', '-o', default='clean', help='Suffix appended to PDB file')
+    p.add_argument('--chain', '-c', help='Keep only specified chains')
+    p.add_argument('--keephydro', '-hy', action='store_false', help='Keep hydrogen atoms')
+    p.add_argument('--keephetero', '-ht', action='store_false', help='Keep hetero atoms')
+    # TODO: if this flag is present, the alternate positions seem to switch line positions
+    p.add_argument('--keepalt', '-ka', action='store_false', help='Keep alternate positions')
     args = p.parse_args()
 
-    my_pdb = CleanPDB(args.infile)
-    my_pdb.clean_pdb(strip_hydro_hetero=args.nostrip, not_disordered=args.keepalt)
+    if args.chain:
+        chains = args.chain.split(',')
+    else:
+        chains = args.chain
+
+    if op.isdir(args.infile):
+        os.chdir(args.infile)
+        pdbs = glob.glob('*')
+    else:
+        pdbs = [args.infile]
+
+    for pdb in tqdm(pdbs):
+        # print('Cleaning PDB: {}'.format(pdb))
+        my_pdb = PDBIOExt(pdb)
+        my_cleaner = CleanPDB(remove_atom_alt=args.keepalt, remove_atom_hydrogen=args.keephydro, keep_atom_alt_id='A', add_atom_occ=True,
+                              remove_res_hetero=args.keephetero, add_chain_id_if_empty='X', keep_chains=chains)
+        my_clean_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, custom_selection=my_cleaner)
+        # print('Clean PDB at: {}'.format(my_clean_pdb))
