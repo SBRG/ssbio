@@ -10,5 +10,6 @@ setup(
     package_data={'ssbio': ['ssbio/etc/*']},
     license='MIT license',
     scripts = ['ssbio/tools/cleanpdb.py', 'ssbio/tools/mutatepdb.py', 'ssbio/tools/tleap.py'],
-    long_description=open('README.md').read(), requires=['biopython']
+    long_description=open('README.md').read(),
+    install_requires=['biopython','numpy']
 )
