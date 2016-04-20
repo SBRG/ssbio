@@ -1,16 +1,12 @@
 ## Install
-Clone this repository to any location and run:
+Clone this repository (git clone https://github.com/nmih/ssbio.git) to any location and run:
 ```bash
 $ python setup.py install
 ```
 ### Requirements
 * Biopython
-
-To install Biopython, run:
-```bash
-$ sudo pip install biopython
-```
-
+* Numpy
+* tqdm
 
 ## Clean PDB files - cleanpdb.py
 ### Description
