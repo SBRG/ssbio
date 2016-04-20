@@ -159,10 +159,10 @@ if __name__ == '__main__':
     else:
         chains = args.chain
 
-    if isinstance(args.infile, str):
-        if op.isdir(args.infile):
-            os.chdir(args.infile)
-        pdbs = glob.glob('*')
+    # TODO: improve arg parsing for files/dirs
+    if len(args.infile) == 1 and op.isdir(args.infile[0]):
+        os.chdir(args.infile[0])
+        pdbs = glob.glob('*.pdb')
     else:
         pdbs = args.infile
 

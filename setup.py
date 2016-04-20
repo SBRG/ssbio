@@ -11,5 +11,5 @@ setup(
     license='MIT license',
     scripts = ['ssbio/tools/cleanpdb.py', 'ssbio/tools/mutatepdb.py', 'ssbio/tools/tleap.py'],
     long_description=open('README.md').read(),
-    install_requires=['biopython','numpy']
+    install_requires=['biopython','numpy','tqdm']
 )
