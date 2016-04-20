@@ -5,6 +5,9 @@
 .dir_bash_history
 */.dir_bash_history
 
+.pyc
+*/.pyc
+
 __pycache__
 */__pycache__
 
