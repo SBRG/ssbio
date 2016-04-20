@@ -167,6 +167,8 @@ if __name__ == '__main__':
         pdbs = args.infile
 
     for pdb in tqdm(pdbs):
+        if op.isdir(pdb):
+            continue
         # print('Cleaning PDB: {}'.format(pdb))
         my_pdb = PDBIOExt(pdb)
         my_cleaner = CleanPDB(remove_atom_alt=args.keepalt, remove_atom_hydrogen=args.keephydro, keep_atom_alt_id='A', add_atom_occ=True,
