@@ -1,10 +1,18 @@
 ## Install
+Clone this repository to any location and run:
 ```bash
 $ python setup.py install
 ```
+### Requirements
+* Biopython
+
+To install Biopython, run:
+```bash
+$ sudo pip install biopython
+```
 
 
-## Clean PDB files
+## Clean PDB files - cleanpdb.py
 ### Description
 This script will automatically:
 
@@ -32,7 +40,7 @@ $ cleanpdb.py *.pdb
 $ cleanpdb.py /path/to/pdb/files
 ```
 
-## Mutate a PDB file
+## Mutate a PDB file - mutatepdb.py
 ### Description
 This script will automatically:
 
@@ -61,7 +69,7 @@ This will keep only the chains which are being mutated, as well as do the defaul
 $ mutatepdb.py 1kf6.pdb A.3.ALA,B.3.ALA --clean
 ```
 
-## Run tleap to prepare files for AMBER MD
+## Run tleap to prepare files for AMBER MD - tleap.py
 ### Description
 This script will automatically:
 
