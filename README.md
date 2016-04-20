@@ -7,11 +7,11 @@ $ python setup.py install
 ## Clean PDB files
 ### Description
 This script will automatically:
-    - Add missing chains to a PDB file
-    - Select a single chain if noted
-    - Remove alternate atom locations
-    - Add atom occupancies
-    - Add B (temperature) factors (default Biopython behavior)
+    * Add missing chains to a PDB file
+    * Select a single chain if noted
+    * Remove alternate atom locations
+    * Add atom occupancies
+    * Add B (temperature) factors (default Biopython behavior)
 Cleaned PDBs will be in a clean_pdbs folder where the script is executed.
 #### Example: script help
 ```bash
@@ -33,8 +33,8 @@ $ cleanpdb.py /path/to/pdb/files
 ## Mutate a PDB file
 ### Description
 This script will automatically:
-    - Mutate one PDB file with a specified chain and residue number to a new amino acid
-    - Remove the heavy atoms of the old residue
+    * Mutate one PDB file with a specified chain and residue number to a new amino acid
+    * Remove the heavy atoms of the old residue
 The mutated PDB will be in a mutated_pdbs folder. The residue will only change names to the mutated residue, heavy atoms will not be added (run tleap.py for that!).
 
 Specify your mutation in the form of:
@@ -60,9 +60,9 @@ $ mutatepdb.py 1kf6.pdb A.3.ALA,B.3.ALA --clean
 ## Run tleap to prepare files for AMBER MD
 ### Description
 This script will automatically:
-    - Run tleap for all .pdb files in a folder
-    - Create a xleap_modified and amber_minimized folder with files ready for MD simulation
-Caution - this will most likely fail if PDB files are not cleaned.
+    * Run tleap for all .pdb files in a folder
+    * Create a xleap_modified and amber_minimized folder with files ready for MD simulation
+Caution: this will most likely fail if PDB files are not cleaned.
 ### Requirements
 AMBERTools needs to be installed on your computer for tleap to run properly. For instructions see: http://jswails.wikidot.com/installing-amber14-and-ambertools14
 Test the installation by running
