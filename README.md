@@ -8,7 +8,7 @@ $ python setup.py install
 * Numpy
 * tqdm
 
-## Clean PDB files - cleanpdb.py
+## Clean PDB files - cleanpdb
 ### Description
 This script will automatically:
 
@@ -21,19 +21,19 @@ This script will automatically:
 Cleaned PDBs will be in a clean_pdbs folder where the script is executed.
 #### Example: script help
 ```bash
-$ cleanpdb.py --help
+$ cleanpdb --help
 ```
 #### Example: clean one PDB file
 ```bash
-$ cleanpdb.py 1kf6.pdb
+$ cleanpdb 1kf6.pdb
 ```
 #### Example: clean multiple PDB files
 ```bash
-$ cleanpdb.py *.pdb
+$ cleanpdb *.pdb
 ```
 #### Example: clean a whole directory of PDB
 ```bash
-$ cleanpdb.py /path/to/pdb/files
+$ cleanpdb /path/to/pdb/files
 ```
 
 ## Mutate a PDB file - mutatepdb.py
