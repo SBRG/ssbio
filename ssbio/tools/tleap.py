@@ -261,6 +261,8 @@ if __name__ == '__main__':
     import subprocess
     import argparse
 
+    # TODO: move main function to standalone tleapauto script
+
     p = argparse.ArgumentParser(description='Run tleap on a folder of PDB files')
     p.add_argument('indir', help='Directory containing only PDB files which will run through leap')
     args = p.parse_args()

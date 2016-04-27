@@ -77,6 +77,7 @@ def parse_mutation_input(instr):
     return second_split
 
 if __name__ == '__main__':
+    # TODO: move main function to standalone mutatepdb script
     import tempfile
     from ssbio.tools.pdbioext import PDBIOExt
     from ssbio.tools.cleanpdb import CleanPDB

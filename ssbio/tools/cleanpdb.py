@@ -1,15 +1,3 @@
-#!/usr/bin/env python
-
-# ##############################
-# ##  for standalone testing
-# import sys
-
-# new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
-# if new_path not in sys.path:
-#     sys.path.append(new_path)
-# ## end for standalone testing
-# ##############################
-
 import os.path as op
 from Bio import PDB
 
@@ -137,41 +125,4 @@ def add_ter_to_pdb(infile, outfile_name=None):
 
 
 if __name__ == '__main__':
-    from ssbio.tools.pdbioext import PDBIOExt
-    import os
-    import glob
-    from tqdm import tqdm
-    # load inputs from command line
-    import argparse
-    p = argparse.ArgumentParser(description='Cleans a PDB file')
-    p.add_argument('infile', help='PDB file or folder you want to clean', nargs='+', type=str)
-    p.add_argument('--outsuffix', '-o', default='clean', help='Suffix appended to PDB file')
-    p.add_argument('--chain', '-c', help='Keep only specified chains')
-    p.add_argument('--keephydro', '-hy', action='store_false', help='Keep hydrogen atoms')
-    p.add_argument('--keephetero', '-ht', action='store_false', help='Keep hetero atoms')
-    # TODO: if this flag is present, the alternate positions seem to switch line positions
-    p.add_argument('--keepalt', '-ka', action='store_false', help='Keep alternate positions')
-    args = p.parse_args()
-
-    out_dir = 'clean_pdbs'
-    if args.chain:
-        chains = args.chain.split(',')
-    else:
-        chains = args.chain
-
-    # TODO: improve arg parsing for files/dirs
-    if len(args.infile) == 1 and op.isdir(args.infile[0]):
-        os.chdir(args.infile[0])
-        pdbs = glob.glob('*.pdb')
-    else:
-        pdbs = args.infile
-
-    for pdb in tqdm(pdbs):
-        if op.isdir(pdb):
-            continue
-        # print('Cleaning PDB: {}'.format(pdb))
-        my_pdb = PDBIOExt(pdb)
-        my_cleaner = CleanPDB(remove_atom_alt=args.keepalt, remove_atom_hydrogen=args.keephydro, keep_atom_alt_id='A', add_atom_occ=True,
-                              remove_res_hetero=args.keephetero, add_chain_id_if_empty='X', keep_chains=chains)
-        my_clean_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, out_dir=out_dir, custom_selection=my_cleaner)
-    print('Clean PDBs at: {}'.format(out_dir))
+    pass
