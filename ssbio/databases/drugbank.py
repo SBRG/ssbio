@@ -11,7 +11,7 @@ drugbank_xsd = 'http://www.drugbank.ca/docs/drugbank.xsd'
 
 
 def download_drugbank_db(username, password, outdir=os.getcwd()):
-    # TODO: obfuscate password
+    # TODO: obfuscate password?
     r = requests.get(drugbank_xml, auth=(username, password))
 
     if r.headers['Content-Type'] == 'text/html; charset=utf-8':
