@@ -10,7 +10,6 @@ COPY install-irkernel.R /home/install-irkernel.R
 
 RUN R --no-save < /home/install-irkernel.R
 
-RUN Rscript -e 'source("http://bioconductor.org/biocLite.R")'
-RUN Rscript -e 'biocLite("biomaRt")'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("biomaRt")'
 
 USER main
