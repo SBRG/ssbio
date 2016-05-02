@@ -1,7 +1,7 @@
 import unittest
 import os
 import tempfile
-from itasser import seqtools
+from ssbio.itasser import seqtools
 
 s = seqtools.SeqTools()
 
@@ -10,7 +10,7 @@ class Test(unittest.TestCase):
     """Unit tests for seqtools."""
 
     def test_load_fasta_file(self):
-        sequences = s.load_fasta_file('X5D299-1.faa')
+        sequences = s.load_fasta_file('sequences/X5D299-1.faa')
         self.assertEqual(len(sequences), 1)
         self.assertEqual(sequences[0].id, 'X5D299-1')
         self.assertRaises(IOError, s.load_fasta_file, 'NOTAFILE.faa')

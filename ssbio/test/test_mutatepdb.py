@@ -1,10 +1,11 @@
 import os.path as op
-import unittest
 import tempfile
+import unittest
 
-from ssbio.tools.pdbioext import PDBIOExt
-from ssbio.tools.cleanpdb import CleanPDB
-from ssbio.tools.mutatepdb import MutatePDB
+from ssbio.structure.cleanpdb import CleanPDB
+from ssbio.structure.pdbioext import PDBIOExt
+
+from ssbio.structure.mutatepdb import MutatePDB
 
 
 class TestMutatePDB(unittest.TestCase):

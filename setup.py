@@ -5,11 +5,13 @@ setup(
     version='0.1',
     author='Nathan Mih',
     author_email='nmih@ucsd.edu',
+    license='MIT',
+    url='http://github.com/nmih/ssbio',
+    description='Various tools and functions to enable structural systems biology',
     packages=find_packages(),
     package_dir={'ssbio': 'ssbio'},
     package_data={'ssbio': ['ssbio/etc/*']},
-    license='MIT license',
-    scripts = ['ssbio/tools/cleanpdb', 'ssbio/tools/mutatepdb.py', 'ssbio/tools/tleap.py', 'ssbio/databases/drugbank.py'],
+    scripts = ['ssbio/structure/cleanpdb', 'ssbio/structure/mutatepdb.py', 'ssbio/structure/tleap.py', 'ssbio/databases/drugbank.py'],
     long_description=open('README.md').read(),
     install_requires=['biopython','numpy','tqdm','pandas','requests']
 )

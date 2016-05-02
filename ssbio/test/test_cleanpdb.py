@@ -1,9 +1,11 @@
 import os.path as op
-import unittest
 import tempfile
+import unittest
 
-from ssbio.tools.pdbioext import PDBIOExt
-from ssbio.tools.cleanpdb import CleanPDB
+from ssbio.structure.pdbioext import PDBIOExt
+
+from ssbio.structure.cleanpdb import CleanPDB
+
 
 class TestCleanPDB(unittest.TestCase):
     """Unit tests for CleanPDB

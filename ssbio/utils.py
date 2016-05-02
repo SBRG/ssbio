@@ -13,7 +13,7 @@ def force_string(val=None):
         return ''
     return val if isinstance(val, str) else ';'.join(val)
 
-def listn(val=None):
+def force_list(val=None):
     """Force a list representation of an object
 
     Args:
@@ -25,6 +25,9 @@ def listn(val=None):
     if val is None:
         return []
     return val if isinstance(val, list) else [val]
+
+def flatlist_dropdup(list_of_lists):
+    return list(set([str(item) for sublist in list_of_lists for item in sublist]))
 
 class Date():
     def __init__(self):

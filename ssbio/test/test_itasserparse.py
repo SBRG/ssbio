@@ -1,5 +1,5 @@
 import unittest
-from itasser import itasserparse
+from ssbio.itasser import itasserparse
 
 
 class Test(unittest.TestCase):
