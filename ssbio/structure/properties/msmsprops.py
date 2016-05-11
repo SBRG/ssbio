@@ -1,10 +1,9 @@
 from Bio import PDB
-from loader import Loader
-l = Loader()
+from ssbio.structure.pdbioext import PDBIOExt
 
 def msms_output(filename):
-    my_structure = l.structure_reader(filename)
-    model = my_structure[0]
+    my_structure = PDBIOExt(filename)
+    model = my_structure.first_model
     rd = PDB.ResidueDepth(model, filename)
 
     akeys = list(rd)
@@ -48,11 +47,39 @@ def residue_depth(anslist):
     return depth_info
 
 if __name__ == '__main__':
-    # import glob
-    # files = glob.glob('test_structures/*')
-    # for f in files:
-    #     print(f)
-    #     msms = msms_output(f)
-    #     print(residue_depth(msms))
-    msms = msms_output('properties/test_structures/1UPI.pdb')
-    print(residue_depth(msms))
+    import argparse
+    from tqdm import tqdm
+    from ssbio import utils
+    import pandas as pd
+
+    p = argparse.ArgumentParser(description='Runs MSMS on a PDB file or folder')
+    p.add_argument('infile', help='PDB file or folder', type=str)
+    args = p.parse_args()
+
+    print(args.infile)
+    infiles = utils.input_list_parser(args.infile)
+
+    msmsinfo = []
+    redinfo = []
+
+    msms_errors = []
+
+    for f in tqdm(infiles, leave=True):
+        try:
+            msms_stuff = msms_output(f)
+        except:
+            msms_errors.append(f)
+            continue
+
+        msmsinfo.append([f, msms_stuff])
+
+        red_dict = residue_depth(msms_stuff)
+        red_dict['ssb_file'] = f
+        redinfo.append(red_dict)
+
+    DF_PROP_MSMS = pd.DataFrame(msmsinfo)
+    DF_PROP_MSMS.columns = ['ssb_file', 'ssb_msms']
+    DF_PROP_MSMS.to_csv('DF_PROP_MSMS.csv')
+
+    print('Errors with: {}'.format(msms_errors))
+    print('Saved DF at: {}'.format('DF_PROP_MSMS.csv'))

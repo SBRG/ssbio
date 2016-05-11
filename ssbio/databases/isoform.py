@@ -1,8 +1,36 @@
 import warnings
 from Bio import SeqIO
-
-
 import pandas as pd
+
+def standard_isoform_id(uni_iso):
+    iso_num = uni_iso.split('-')[1]
+    return iso_num.isdigit()
+
+def gene_isos_to_uniprot(gene, isos, reviewed_uni_isos, unreviewed_uni_isos):
+    mapping = {}
+    reviewed_uni_isos = sorted(reviewed_uni_isos)
+    unreviewed_uni_isos = sorted(unreviewed_uni_isos)
+    combolist = reviewed_uni_isos+unreviewed_uni_isos
+
+    for x in combolist:
+        if not standard_isoform_id(x):
+            raise ValueError('Strange isoform ID: {}'.format(x))
+
+    # check if the number of reported isoforms is less than or equal to what's available
+    if len(isos) <= len(combolist):
+        for i,iso in enumerate(isos):
+            mapping[iso] = combolist[i]
+        return mapping
+    # if there are more isoforms in the model than available in uniprot, just return None for that specific gene
+    elif len(isos) > len(combolist):
+        for i, iso in enumerate(isos):
+            try:
+                mapping[iso] = combolist[i]
+            except:
+                mapping[iso] = None
+        return mapping
+
+
 def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
     '''
     Input: a gene, its isoforms - 314, [1,2]
@@ -25,7 +53,7 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
 
     ##TODO: please draw a diagram or something to explain what's going on here
     '''
-    g_to_u_df = mapping_df[mapping_df.m_gene == gene]
+    g_to_u_df = mapping_df[mapping_df.m_gene_entrez == gene]
     g_to_u_all = g_to_u_df.u_uniprot_acc.unique().tolist()
     g_to_u_reviewed = g_to_u_df[g_to_u_df.u_reviewed == True].u_uniprot_acc.unique().tolist()
     g_to_u_unreviewed = g_to_u_df[g_to_u_df.u_reviewed == False].u_uniprot_acc.unique().tolist()
@@ -50,13 +78,14 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
             # for each of the recon 2 isoform ids...
             for isoform_id in isoforms:
                 # create a hypothetical uniprot isoform
-                ssb_uni_isoform = g_to_u_reviewed_match + '-' + isoform_id
+                ssb_uni_isoform = str(g_to_u_reviewed_match) + '-' + str(isoform_id)
                 # check to see if it exists
                 if ssb_uni_isoform in mapped_uni_isoforms:
-                    mapping_dict[gene + '.' + isoform_id] = ssb_uni_isoform
-                # if it doesn't, and there is only one isoform, that means there is an issue with the metadata retrieval. Take the original uniprot ID as the mapping
+                    mapping_dict[str(gene) + '.' + str(isoform_id)] = ssb_uni_isoform
+                # if it doesn't, and there is only one isoform, that means there is an issue with the
+                # metadata retrieval. Take the original uniprot ID as the mapping
                 elif len(isoforms) == 1:
-                    mapping_dict[gene + '.' + isoform_id] = g_to_u_reviewed_match + '-' + isoform_id
+                    mapping_dict[str(gene) + '.' + str(isoform_id)] = g_to_u_reviewed_match + '-' + isoform_id
                 else:
                     warnings.warn('TODO: unknown error', UserWarning)
                     return None
@@ -95,14 +124,14 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
                     # first map to reviewed entries
                     ssb_uni_isoform = g_to_u_reviewed_match + '-' + isoform_id
                     if ssb_uni_isoform in mapped_uni_isoforms:
-                        mapping_dict[gene + '.' + isoform_id] = ssb_uni_isoform
+                        mapping_dict[str(gene) + '.' + str(isoform_id)] = ssb_uni_isoform
 
                     # then map to longest unreviewed
                     else:
                         if len(sorted_unrev_uni) == 0:
                             break
                         # print sorted_unrev_uni
-                        mapping_dict[gene + '.' + isoform_id] = sorted_unrev_uni[-1]
+                        mapping_dict[str(gene) + '.' + str(isoform_id)] = sorted_unrev_uni[-1]
                         sorted_unrev_uni.pop(-1)
 #                 print mapping_dict
                 return mapping_dict
@@ -115,12 +144,12 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
                     ssb_uni_isoform = g_to_u_reviewed_match + '-' + isoform_id
                     # check to see if it exists
                     if ssb_uni_isoform in mapped_uni_isoforms:
-                        mapping_dict[gene + '.' + isoform_id] = ssb_uni_isoform
+                        mapping_dict[str(gene) + '.' + str(isoform_id)] = ssb_uni_isoform
                     # if it doesn't, and there is only one isoform, that means there is an issue with the metadata retrieval. Take the original uniprot ID as the mapping
                     elif len(isoforms) == 1:
-                        mapping_dict[gene + '.' + isoform_id] = g_to_u_reviewed_match
+                        mapping_dict[str(gene) + '.' + str(isoform_id)] = g_to_u_reviewed_match
                     else:
-                        mapping_dict[gene + '.' + isoform_id] = None
+                        mapping_dict[str(gene) + '.' + str(isoform_id)] = None
                 return mapping_dict
         # if we just have a reviewed entry, and it has not enough isoforms
         # just map as many as we can
@@ -130,12 +159,12 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
                 ssb_uni_isoform = g_to_u_reviewed_match + '-' + isoform_id
                 # check to see if it exists
                 if ssb_uni_isoform in mapped_uni_isoforms:
-                    mapping_dict[gene + '.' + isoform_id] = ssb_uni_isoform
+                    mapping_dict[str(gene) + '.' + str(isoform_id)] = ssb_uni_isoform
                 # if it doesn't, and there is only one isoform, that means there is an issue with the metadata retrieval. Take the original uniprot ID as the mapping
                 elif len(isoforms) == 1:
-                    mapping_dict[gene + '.' + isoform_id] = g_to_u_reviewed_match
+                    mapping_dict[str(gene) + '.' + str(isoform_id)] = g_to_u_reviewed_match
                 else:
-                    mapping_dict[gene + '.' + isoform_id] = None
+                    mapping_dict[str(gene) + '.' + str(isoform_id)] = None
             return mapping_dict
     elif len(g_to_u_reviewed) == 0 and len(g_to_u_unreviewed) >= len(isoforms):
         mapping_dict = {}
@@ -147,14 +176,14 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
             
         sorted_unrev_uni = [y[0] for y in sorted(mini_len_dict.items(), key=lambda x: x[1])]
         for isoform_id in isoforms:
-            mapping_dict[gene + '.' + isoform_id] = sorted_unrev_uni[-1]
+            mapping_dict[str(gene) + '.' + str(isoform_id)] = sorted_unrev_uni[-1]
             sorted_unrev_uni.pop(-1)
         return mapping_dict
         
         
 
 import glob
-SEQ_SUNPRO_FILES = '/home/nathan/projects/GEM-PRO/SUNPRO/refseq_sequences/'
+SEQ_SUNPRO_FILES = '/home/nathan/projects/homology_models/HSAPIENS/SUNPRO/refseq_sequences/'
 available_refseq_files = glob.glob(SEQ_SUNPRO_FILES + '*.faa')
 available_refseq = {}
 for f in available_refseq_files:
@@ -180,7 +209,7 @@ def gene_to_refseq(gene, isoforms, mapping_df):#, metadata_df):
     '''
 
     isoforms = sorted(isoforms)
-    g_to_many_df = mapping_df[mapping_df.m_gene_noiso == gene]
+    g_to_many_df = mapping_df[mapping_df.bm_entrez == gene]
     g_to_r = g_to_many_df[pd.notnull(g_to_many_df.bm_refseq)].bm_refseq.unique().tolist()
 
     if len(g_to_r) == 0:
@@ -200,15 +229,15 @@ def gene_to_refseq(gene, isoforms, mapping_df):#, metadata_df):
                     refseq_seqs.append(record.seq)
             handle.close()
     sorted_refseqs = [y[0] for y in sorted(refseq_lengths.items(), key=lambda x: x[1])]
-    if len(refseq_lengths.keys()) >= len(isoforms):
+    if len(list(refseq_lengths.keys())) >= len(isoforms):
         mapping_dict = {}
         for iso in isoforms:
-            mapping_dict[gene + '.' + iso] = sorted_refseqs.pop(-1)
+            mapping_dict[str(gene) + '.' + str(iso)] = sorted_refseqs.pop(-1)
         return mapping_dict
     
     # if the number of refseq ids is less than the number of isoforms
     # we should not remove the sequences if they are the same - they are just probably protein sequences with different UTRs or something
-    elif len(refseq_lengths.keys()) < len(isoforms):
+    elif len(list(refseq_lengths.keys())) < len(isoforms):
         
         # redo the above code but add even if the sequence is in there
         refseq_lengths = {}
@@ -230,7 +259,7 @@ def gene_to_refseq(gene, isoforms, mapping_df):#, metadata_df):
         mapping_dict = {}
         for iso in isoforms:
             if len(sorted_refseqs) == 0:
-                mapping_dict[gene + '.' + iso] = None
+                mapping_dict[str(gene) + '.' + str(iso)] = None
             else:
-                mapping_dict[gene + '.' + iso] = sorted_refseqs.pop(-1)
+                mapping_dict[str(gene) + '.' + str(iso)] = sorted_refseqs.pop(-1)
         return mapping_dict

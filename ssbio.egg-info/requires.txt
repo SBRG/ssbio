@@ -1,0 +1,5 @@
+biopython
+numpy
+tqdm
+pandas
+requests

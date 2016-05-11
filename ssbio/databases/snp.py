@@ -16,6 +16,7 @@ def download(url, file_name):
     return file_name
 
 def download_parse_uniprot_humsavar(wd):
+    # TODO: this is not functional as of now - the whitespace separator doesn't work for the last column
     baseURL = "http://www.uniprot.org/docs/"
     filename = "humsavar.txt"
 
@@ -47,12 +48,6 @@ def download_parse_uniprot_variation(wd):
     outfile_pandas = op.join(wd, 'homo_sapiens_variation.csv')
     uniprot_snps_new_df.to_csv(outfile_pandas)
     return outfile_pandas
-
-def parse_uniprot_humsavar(humsavar):
-    return pd.read_table(humsavar, skiprows=30, skipfooter=4, delimiter='\t',
-                         header=None, engine='python').rename(columns={0: 'u_gene_name', 1: 'u_uniprot_acc',
-                                                                       2: 'u_ft_id', 3: 'u_var', 4: 'u_var_type',
-                                                                       5: 'u_dbsnp', 6: 'u_disease'})
 
 class SNP:
     """Return SNP data for a provided gene ID.

@@ -15,7 +15,7 @@ class TestMutatePDB(unittest.TestCase):
     def test_mutate_pdb(self):
         files = [('1kf6.pdb', '1kf6_mutated_tester.pdb')]
 
-        working_dir = 'structures'
+        working_dir = 'test_structures'
         out_suffix = 'mutated'
         muts = [('A',0,'Y')]
 
@@ -43,7 +43,7 @@ class TestMutatePDB(unittest.TestCase):
     def test_clean_and_mutate_pdb(self):
         files = [('1kf6.pdb', '1kf6_clean_mutated_tester.pdb')]
 
-        working_dir = 'structures'
+        working_dir = 'test_structures'
         out_suffix = 'mutated'
         muts = [('A', 0, 'Y')]
 

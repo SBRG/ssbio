@@ -38,17 +38,3 @@ def suppress_stdout():
 # from matplotlib import font_manager as fm
 # proptease = fm.FontProperties()
 
-
-def flatlist_dropdup(list_of_lists):
-    return list(set([str(item) for sublist in list_of_lists for item in sublist]))
-
-
-def de_unicodeify(data):
-    if isinstance(data, basestring):
-        return str(data)
-    elif isinstance(data, collections.Mapping):
-        return dict(map(de_unicodeify, data.iteritems()))
-    elif isinstance(data, collections.Iterable):
-        return type(data)(map(de_unicodeify, data))
-    else:
-        return data

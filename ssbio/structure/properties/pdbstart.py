@@ -1,16 +1,16 @@
 import os
-from loader import Loader
-l = Loader()
+from ssbio.structure.pdbioext import PDBIOExt
 
 def get_pdb_res_starts(pdb_file):
     '''
     this uses biopython to get the first residue number in a pdb file.
     returns a list of tuples of pdb, chain, resnum.
     '''
-    my_structure = l.structure_reader(pdb_file)
+    my_structure = PDBIOExt(pdb_file)
+    model = my_structure.first_model
 
     start_residues = []
-    for chain in my_structure[0]:
+    for chain in model:
         residues = chain.get_residues()
         start_residues.append((os.path.basename(pdb_file), chain.get_id(), next(residues).get_id()[1]))
 

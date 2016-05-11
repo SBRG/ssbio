@@ -1,0 +1,472 @@
+___________________________________________________________________________
+
+
+ AMBER99-based Lennard-Jones parameters for van der Waals
+ energy potential.
+
+
+ The radius corresponds to half the equilibrium distance
+ (in Angstroms) between atoms.
+
+ The well depth corresponds to the energy (in kcal/mol)
+ at the equilibrium distance.
+
+ Lennard-Jones parameters are derived as follows:
+
+ sqrt(A) = sqrt [e * b/(a-b) * (2r)^a]
+ sqrt(B) = sqrt [e * a/(a-b) * (2r)^b]
+
+ where:
+        r = radius
+        e = well depth
+        a = repulsive exponent
+        b = attractive exponent
+
+
+ P. Therese Downing (07/02)
+ Robert Rizzo (06/05)  added radii for GB calculations
+ P. Therese Lang (07/06):  added full list of Aqvist ions 
+			   (J. Phys. Chem. v94 p8021).
+___________________________________________________________________________
+
+_____________________________________
+name            Carbon
+atom_model      either
+radius          1.908
+well_depth      0.086
+heavy_flag      1
+valence         4
+gbradii		1.70
+gbscale		0.72
+
+definition      C
+_____________________________________
+name            Carbon_All_sp3
+atom_model      all
+radius          1.908
+well_depth      0.1094
+heavy_flag      1
+valence         4
+gbradii		1.70
+gbscale		0.72
+
+definition      C.3
+_____________________________________
+name            Hydrogen
+atom_model      either
+radius          0.600
+well_depth      0.0157
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H
+_____________________________________
+name            Hydrogen_hydroxyl
+atom_model      either
+radius          0.1
+well_depth      0.001
+heavy_flag      0
+valence         1
+gbradii		0.80
+gbscale		0.85
+
+definition      H ( O )
+_____________________________________
+name		Hydrogen_thiol
+atom_model	all
+radius		0.600
+well_depth	0.0157
+heavy_flag	0
+valence		1
+gbradii		0.80
+gbscale		0.85
+
+definition	H ( S )
+_____________________________________
+name            Hydrogen_Aliphatic
+atom_model      all
+radius          1.487
+well_depth      0.0157
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.3 )
+_____________________________________
+name            Hydrogen_Semipolar
+atom_model      all
+radius          1.387
+well_depth      0.0157
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.3 ( O ) )
+definition      H ( C.3 ( N ) )
+definition      H ( C.3 ( S ) )
+definition      H ( C.3 ( F ) )
+definition      H ( C.3 ( Cl ) )
+definition      H ( C.3 ( Br ) )
+_____________________________________
+name            Hydrogen_2_Semipolar
+atom_model      all
+radius          1.287
+well_depth      0.0157
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.3 ( 2 O) )
+definition      H ( C.3 ( 2 N) )
+definition      H ( C.3 ( 2 S) )
+definition      H ( C.3 ( N ) ( O ) )
+definition      H ( C.3 ( S ) ( O ) )
+definition      H ( C.3 ( S ) ( N ) )
+definition      H ( C.3 ( 2 F ) )
+definition      H ( C.3 ( 2 Cl ) )
+definition      H ( C.3 ( 2 Br ) )
+_____________________________________
+name            Hydrogen_1-3_Charged
+atom_model      all
+radius          1.100
+well_depth      0.0157
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.3 ( N.4 ) )
+_____________________________________
+name            Hydrogen_sp2
+atom_model      all
+radius          1.459
+well_depth      0.0150
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.ar )
+definition      H ( C.2 )
+_____________________________________
+name            Hydrogen_Ar_Sp
+atom_model      all
+radius          1.409
+well_depth      0.0150
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.ar ( O ) )
+definition      H ( C.ar ( N ) )
+definition      H ( C.2 ( O ) )
+definition      H ( C.2 ( N ) )
+_____________________________________
+name            Hydrogen_Ar_2_Sp
+atom_model      all
+radius          1.359
+well_depth      0.0150
+heavy_flag      0
+valence         1
+gbradii		1.30
+gbscale		0.85
+
+definition      H ( C.ar ( 2 O ) )
+definition      H ( C.ar ( 2 N ) )
+definition      H ( C.ar ( N ) ( O ) )
+definition      H ( C.2 ( 2 O ) )
+definition      H ( C.2 ( 2 N ) )
+definition      H ( C.2 ( N ) ( O ) )
+_____________________________________
+name		Hydrogen_alkyne
+atom_model	all
+radius		1.459
+well_depth	0.015
+heavy_flag	0
+valence		1
+gbradii		1.30
+gbscale		0.85
+
+definition	H ( C.1 )
+_____________________________________
+name            Nitrogen
+atom_model      either
+radius          1.824
+well_depth      0.170
+heavy_flag      1
+valence         4
+gbradii		1.55
+gbscale		0.79
+
+definition      N
+_____________________________________
+name            Oxygen
+atom_model      either
+radius          1.6612
+well_depth      0.210
+heavy_flag      1
+valence         2
+gbradii		1.50
+gbscale		0.85
+
+definition      O
+_____________________________________
+name            Oxygen_ether
+atom_model      either
+radius          1.6837
+well_depth      0.170
+heavy_flag      1
+valence         2
+gbradii		1.50
+gbscale		0.85
+
+definition      O.3
+_____________________________________
+name            Oxygen_alcohol
+atom_model      either
+radius          1.721
+well_depth      0.2104
+heavy_flag      1
+valence         2
+gbradii		1.50
+gbscale		0.85
+
+definition      O.3 ( H )
+_____________________________________
+name		Oxygen_TIP3_water
+atom_model	all
+radius		1.7683
+well_depth	0.1520
+heavy_flag	1
+valence		2
+gbradii		1.50
+gbscale		0.85
+
+definition	O.3 ( 2 H )
+_____________________________________
+name            Sulfur
+atom_model      either
+radius          2.000
+well_depth      0.250
+heavy_flag      1
+valence         6
+gbradii		1.80
+gbscale		0.96
+
+definition      S
+_____________________________________
+name            Phosphorus
+atom_model      either
+radius          2.100
+well_depth      0.200
+heavy_flag      1
+valence         5
+gbradii		1.85
+gbscale		0.86
+
+definition      P
+_____________________________________
+name            Fluorine
+atom_model      either
+radius          1.750
+well_depth      0.061
+heavy_flag      1
+valence         1
+gbradii		1.50
+gbscale		0.88
+
+definition      F
+_____________________________________
+name            Chlorine
+atom_model      either
+radius          1.948
+well_depth      0.265
+heavy_flag      1
+valence         1
+gbradii		1.70
+gbscale		0.80
+
+definition      Cl
+_____________________________________
+name            Bromine
+atom_model      either
+radius          2.220
+well_depth      0.320
+heavy_flag      1
+valence         4
+gbradii		1.85
+gbscale		0.80
+
+definition      Br
+_____________________________________
+name            Silicon
+atom_model      either
+radius          2.220
+well_depth      0.320
+heavy_flag      1
+valence         4
+gbradii		2.10
+gbscale		0.80
+
+definition      Si
+_____________________________________
+name            Iodine
+atom_model      either
+radius          2.350
+well_depth      0.400
+heavy_flag      1
+valence         1
+gbradii		1.98
+gbscale		0.80
+
+definition      I
+_____________________________________
+name            Potassium+
+atom_model      either
+radius          2.658
+well_depth      0.000328
+heavy_flag      1
+valence         0
+gbradii		2.75
+gbscale		0.80
+
+definition      K
+_____________________________________
+name            Sodium+
+atom_model      either
+radius          1.868
+well_depth      0.00277
+heavy_flag      1
+valence         1
+gbradii		2.27
+gbscale		0.80
+
+definition      Na
+_____________________________________
+name            Mg++
+atom_model      either
+radius          0.787
+well_depth      0.875
+heavy_flag      1
+valence         6
+gbradii		1.73
+gbscale		0.80
+
+definition      Mg
+_____________________________________
+name            Li+
+atom_model      either
+radius          1.137
+well_depth      0.0183
+heavy_flag      1
+valence         0
+gbradii		1.82
+gbscale		0.80
+
+definition      Li
+_____________________________________
+name		Rubidium
+atom_model	all
+radius		2.956
+well_depth	0.00017
+heavy_flag	1
+valence		1
+gbradii		0.000
+gbscale		0.000
+
+definition 	Rb
+_____________________________________
+name		Cesium
+atom_model	all
+radius		3.395
+well_depth	0.0000806
+heavy_flag	1
+valence		1
+gbradii		0.000
+gbscale		0.000
+
+definition	Cs
+____________________________________
+name		Calcium2+
+atom_model	all
+radius		1.326
+well_depth	0.4497
+heavy_flag	1
+valence		10
+gbradii		1.70
+gbscale		0.72
+
+definition	Ca
+____________________________________
+name		Zinc
+atom_model	all
+radius		1.10
+well_depth	0.0125
+heavy_flag	1
+valence		8
+gbradii		1.39
+gbscale		0.80
+
+definition 	Zn
+_____________________________________
+name 		Iron
+atom_model	all
+radius 		1.2
+well_depth	0.05
+heavy_flag	1
+valence		8
+gbradii		1.50
+gbscale		0.80
+
+definition      Fe
+_____________________________________
+name 		Strontium++
+atom_model	all
+radius 		1.742
+well_depth	0.118
+heavy_flag	1
+valence		8
+gbradii		0.00
+gbscale		0.00
+
+definition      Sr
+_____________________________________
+name 		Barium++
+atom_model	all
+radius 		2.124
+well_depth	0.047
+heavy_flag	1
+valence		8
+gbradii		0.00
+gbscale		0.00
+
+definition      Ba
+_____________________________________
+name            Vanadium
+atom_model      either
+radius          2.100
+well_depth      0.320
+heavy_flag      1
+valence         6
+gbradii		1.50
+gbscale		0.80
+
+definition      V
+_____________________________________
+name            Dummy
+atom_model      either
+radius          0.000
+well_depth      0.000
+heavy_flag      0
+valence         10
+gbradii		0.000
+gbscale		0.000
+
+definition      Du
+_____________________________________

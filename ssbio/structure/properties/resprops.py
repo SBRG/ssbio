@@ -1,6 +1,5 @@
-from loader import Loader
+from ssbio.structure.pdbioext import PDBIOExt
 from Bio import PDB
-l = Loader()
 
 AAdict = {'CYS': 'polar',
           'ILE': 'nonpolar',
@@ -35,16 +34,16 @@ def residue_props(filename):
     Output: Dictonary of percentage (float) of properties
     """
 
-    my_structure = l.structure_reader(filename)
+    my_structure = PDBIOExt(filename)
+    model = my_structure.first_model
 
     props = {}
-    model = my_structure[0]
     polar = 0
     nonpolar = 0
     positive = 0
     negative = 0
     total = 0
-    res_list = PDB.Selection.unfold_entities(my_structure, 'R')
+    res_list = PDB.Selection.unfold_entities(model, 'R')
 
     for j in res_list:
         if j.resname in AAdict:

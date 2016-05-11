@@ -1,0 +1,2 @@
+#!/bin/bash
+nohup $AMBERHOME/bin/MMPBSA.py -O -i {{ input_scripts_dir }}/{{ mmpbsa_input_params }}.in -o FINAL_RESULTS_{{ mmpbsa_input_params }}.dat -sp {{ complex_solv_prmtop_path }} -cp {{ complex_gas_prmtop_path }} -rp {{ receptor_gas_prmtop_path }} -lp {{ ligand_gas_prmtop_path }} -y {{ trajectory_path }} > {{ date }}-{{ mmpbsa_input_params }}.out &

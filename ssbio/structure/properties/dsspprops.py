@@ -6,8 +6,8 @@ import pandas as pd
 from Bio.PDB.DSSP import *
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
-from loader import Loader
-l = Loader()
+from ssbio.structure.pdbioext import PDBIOExt
+import cachetools
 
 AAdict = {'CYS': 'polar',
           'ILE': 'nonpolar',
@@ -32,7 +32,7 @@ AAdict = {'CYS': 'polar',
           'MSE': 'polar',
           'SEC': 'polar'}
 
-
+@cachetools.func.ttl_cache(maxsize=300)
 def dssp_dataframe(filename):
     """
     Calculation of various properties utilizing the DSSP program.
@@ -45,9 +45,8 @@ def dssp_dataframe(filename):
     Output: Dictionary of properties
     """
 
-    my_structure = l.structure_reader(filename)
-
-    model = my_structure[0]
+    my_structure = PDBIOExt(filename)
+    model = my_structure.first_model
     try:
         dssp = PDB.DSSP(model, filename)
     except:

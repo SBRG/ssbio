@@ -1,15 +1,5 @@
 #!/usr/bin/env python
 
-# ##############################
-# ##  for standalone testing
-# import sys
-# import os.path as op
-# new_path = op.join(op.expanduser('~'), 'Dropbox/Projects/ssbio')
-# if new_path not in sys.path:
-#     sys.path.append(new_path)
-# ## end for standalone testing
-# ##############################
-
 from Bio import PDB
 
 from Bio.PDB.Polypeptide import aa1
