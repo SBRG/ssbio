@@ -85,7 +85,7 @@ class ITASSERPrep():
         script.write('#!/bin/bash -l\n')
 
         if self.runtype == 'torque':
-            script.write('#PBS -l walltime=12:00:00\n')
+            script.write('#PBS -l walltime=26:00:00\n')
             script.write('#PBS -q regular\n')
             script.write('#PBS -N {i[seqname]}\n'.format(i=itasser))
             script.write('#PBS -o {i[seqname]}.out\n'.format(i=itasser))

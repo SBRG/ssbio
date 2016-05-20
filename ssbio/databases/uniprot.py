@@ -39,7 +39,7 @@ def uniprot_reviewed_checker(uniprot_id):
         True or False
     """
     if not uniprot_valid_id(uniprot_id):
-        raise ValueError
+        return False
 
     query_string = 'id:' + uniprot_id
 
