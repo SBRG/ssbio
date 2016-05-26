@@ -5,6 +5,11 @@ Clone this repository (git clone https://github.com/nmih/ssbio.git) to any locat
 ```bash
 $ python setup.py install
 ```
+or run in develop mode if you want to make changes to the code:
+```bash
+$ python setup.py develop
+```
+
 ### Requirements
 * Biopython
 * Numpy
