@@ -2,6 +2,8 @@ import warnings
 from Bio import SeqIO
 import pandas as pd
 
+from ssbio.databases import uniprot
+
 def standard_isoform_id(uni_iso):
     iso_num = uni_iso.split('-')[1]
     return iso_num.isdigit()
@@ -10,7 +12,7 @@ def gene_isos_to_uniprot(gene, isos, reviewed_uni_isos, unreviewed_uni_isos):
     mapping = {}
     reviewed_uni_isos = sorted(reviewed_uni_isos)
     unreviewed_uni_isos = sorted(unreviewed_uni_isos)
-    combolist = reviewed_uni_isos+unreviewed_uni_isos
+    combolist = unique_uniprot_isoforms(reviewed_uni_isos, unreviewed_uni_isos)
 
     for x in combolist:
         if not standard_isoform_id(x):
@@ -30,6 +32,28 @@ def gene_isos_to_uniprot(gene, isos, reviewed_uni_isos, unreviewed_uni_isos):
                 mapping[iso] = None
         return mapping
 
+def unique_uniprot_isoforms(rev_isos, unrev_isos):
+    """Filter out a list of uniprot isoforms"""
+    final_list_of_unique_isoforms = []
+
+    rev_isos = sorted(rev_isos)
+    unrev_isos = sorted(unrev_isos)
+
+    if len(unrev_isos) == 0:
+        return rev_isos
+
+    for unrev in unrev_isos:
+        unique_unrev = True
+        unrev_seq = uniprot.get_fasta(unrev)
+        for rev in rev_isos:
+            final_list_of_unique_isoforms.append(rev)
+            if unrev_seq == uniprot.get_fasta(rev):
+                unique_unrev = False
+                break
+        if unique_unrev:
+            final_list_of_unique_isoforms.append(unrev)
+
+    return final_list_of_unique_isoforms
 
 def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
     '''

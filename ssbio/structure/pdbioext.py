@@ -25,11 +25,12 @@ class PDBIOExt(PDBIO):
         self.structure = structure
         self.first_model = structure[0]
 
-    def _output_filepath(self, out_suffix, out_dir=None):
+    def _output_filepath(self, custom_name='', custom_ext='', out_suffix='', out_dir=None):
         """Returns an output file path based on the input filename to write a modified file.
 
         Args:
-            out_suffix (str): string to append to the filename of the new PDB file
+            custom_name (str): optional custom name to name the file
+            out_suffix (str): optional string to append to the filename of the new PDB file
             out_dir (str): optional working directory where cleaned PDB file should be written to
 
         Returns:
@@ -40,8 +41,17 @@ class PDBIOExt(PDBIO):
         filename_full = op.basename(self.in_file)
         filename, ext = op.splitext(filename_full)
 
+        # TODO: improve logic here
+        if custom_name:
+            filename = custom_name
+        if custom_ext:
+            ext = custom_ext
+
         # Assembling the new output filename
-        out_file = '{}_{}{}'.format(filename, out_suffix, ext)
+        if out_suffix:
+            out_file = '{}_{}{}'.format(filename, out_suffix, ext)
+        else:
+            out_file = '{}{}'.format(filename, ext)
 
         if out_dir:
             if not op.exists(out_dir):
@@ -50,7 +60,7 @@ class PDBIOExt(PDBIO):
 
         return out_file
 
-    def write_pdb(self, out_suffix='new', out_dir=None, custom_selection=None):
+    def write_pdb(self, custom_name='', custom_ext='', out_suffix='new', out_dir=None, custom_selection=None):
         """Write a new PDB file for the first model of this Structure appended with a suffix.
 
         Set custom_selection to a PDB.Select class for custom SMCRA selections
@@ -66,7 +76,7 @@ class PDBIOExt(PDBIO):
         """
 
         # Prepare the output file path
-        out_file = self._output_filepath(out_suffix=out_suffix, out_dir=out_dir)
+        out_file = self._output_filepath(custom_name=custom_name, custom_ext=custom_ext, out_suffix=out_suffix, out_dir=out_dir)
         self.set_structure(self.first_model)
         self.save(out_file, custom_selection)
 

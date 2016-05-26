@@ -29,6 +29,7 @@ class MutatePDB(PDB.Select):
     def standard_resname(self, res):
         resname3 = res.upper()
         if resname3 not in list(aa3) and resname3 not in list(aa1):
+            # TODO: mutation to selenocysteine (U;SEC) is not working
             raise ValueError("Unrecognised residue {}".format(res))
         if len(resname3) == 1:
             resname3 = one_to_three(resname3)

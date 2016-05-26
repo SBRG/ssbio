@@ -2,6 +2,8 @@ from bioservices.uniprot import UniProt
 import requests
 from collections import defaultdict
 import libsbml
+
+
 reader = libsbml.SBMLReader()
 
 bsup = UniProt()
@@ -34,7 +36,6 @@ def kegg_mapper(kegg_organism, map_db='uniprot'):
         id_mapper[orig_id] = conv_id
 
     return id_mapper
-
 
 def bioservices_uniprot_mapper(map_from, map_to, ident):
     return dict(bsup.mapping(fr=map_from, to=map_to, query=ident))

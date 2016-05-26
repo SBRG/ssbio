@@ -255,7 +255,7 @@ if __name__ == '__main__':
     p.add_argument('indir', help='Directory containing only PDB files which will run through leap')
     args = p.parse_args()
 
-
+    # TODO: add prep md runs
 
     prep_leap_folders(args.indir)
     leaprc = make_leaprc_file(args.indir)

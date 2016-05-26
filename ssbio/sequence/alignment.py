@@ -2,7 +2,7 @@ from Bio.Emboss.Applications import NeedleCommandline
 from Bio import AlignIO
 import os
 import pandas as pd
-
+from collections import defaultdict
 
 def run_alignment(id_a, faa_a, id_b, faa_b):
     '''
@@ -133,7 +133,7 @@ def get_alignment_df(alignment_file):
                     insertion_counter = 0
                 idx_start = new_i + 1
 
-            # TODO: HEY. THIS NEEDS TO BE OUTSIDE THE FOR LOOP
+            # TODO: test if this should be outside the for loop
             if aa_flag == 'mutation':
                 appender = {}
                 appender['id_a'] = a_seq_id
@@ -252,22 +252,22 @@ def get_alignment_allpos_df(alignment_file, a_seq_id=None, b_seq_id=None):
     return alignment_df
 
 
-def run_alignment_needleall(a_id, a_faa, b_id, b_faa):
-
-    from Bio.Emboss.Applications import NeedleallCommandline
-    import os.path
-
-    alignment_file = "%s-%s_align.txt" % (a_id, b_id)
-
-    if os.path.isfile(alignment_file):
-        print 'Alignment %s file already exists' % alignment_file
-        return alignment_file
-
-    else:
-        print '**RUNNING ALIGNMENT FOR %s AND %s**' % (a_id, b_id)
-        needle_cline = NeedleallCommandline(asequence=a_faa, bsequence=b_faa, gapopen=10, gapextend=0.5, outfile=alignment_file)
-        stdout, stderr = needle_cline()
-        return alignment_file
+# def run_alignment_needleall(a_id, a_faa, b_id, b_faa):
+#
+#     from Bio.Emboss.Applications import NeedleallCommandline
+#     import os.path
+#
+#     alignment_file = "%s-%s_align.txt" % (a_id, b_id)
+#
+#     if os.path.isfile(alignment_file):
+#         # print 'Alignment %s file already exists' % alignment_file
+#         return alignment_file
+#
+#     else:
+#         print '**RUNNING ALIGNMENT FOR %s AND %s**' % (a_id, b_id)
+#         needle_cline = NeedleallCommandline(asequence=a_faa, bsequence=b_faa, gapopen=10, gapextend=0.5, outfile=alignment_file)
+#         stdout, stderr = needle_cline()
+#         return alignment_file
 
 
 def needle_reader(fl):

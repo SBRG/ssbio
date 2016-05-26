@@ -28,6 +28,12 @@ def uniprot_valid_id(instring):
     else:
         return False
 
+@cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
+def get_fasta(ident):
+    # TODO: bioservices keeps printing out "will be moved to biokit" - is biokit complete?
+    with utils.suppress_stdout():
+        return bsup.get_fasta_sequence(ident)
+
 @cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
 def uniprot_reviewed_checker(uniprot_id):
     """Check if a single uniprot ID is reviewed or not.

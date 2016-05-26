@@ -31,6 +31,8 @@ class ITASSERPrep():
         self.runtype = runtype
         self.light = light
 
+        self.model_exists = op.exists(op.join(self.data_dir, 'model1.pdb'))
+
         additional_options = ''
         if binding_site_pred:
             additional_options += '-LBS true '
@@ -84,8 +86,9 @@ class ITASSERPrep():
         script = open(outfile, 'w')
         script.write('#!/bin/bash -l\n')
 
+        # TODO: walltime should be adjustable
         if self.runtype == 'torque':
-            script.write('#PBS -l walltime=26:00:00\n')
+            script.write('#PBS -l walltime=60:00:00\n')
             script.write('#PBS -q regular\n')
             script.write('#PBS -N {i[seqname]}\n'.format(i=itasser))
             script.write('#PBS -o {i[seqname]}.out\n'.format(i=itasser))

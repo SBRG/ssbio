@@ -7,7 +7,6 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 from Bio.PDB.PDBParser import PDBParser
 from Bio.PDB import PDBIO
-from Bio.PDB import Polypeptide
 import time
 
 import os.path as op
@@ -164,7 +163,7 @@ def _sifts_mapping():
     SIFTS['SP_BEG_INT'] = SIFTS['SP_BEG'].replace(to_replace=r'[^\d-]+', value='', regex=True)
     SIFTS['OFFSET'] = SIFTS['SP_BEG_INT'].astype(int) - SIFTS['PDB_BEG_INT'].astype(int)
 
-    return SIFTS
+    return SIFTS.sort_index()
 
 def sifts_pdb_chain_to_uniprot(pdb,chain):
     return _sifts_mapping().ix[(pdb.lower(),chain.upper())]['SP_PRIMARY'].unique().tolist()
@@ -260,56 +259,7 @@ def top_pdb_blast_hit(seq, evalue = 0.001):
 #         # dictionary of chain IDs and their sequences as strings
 #         self.sequences = seqs
 #
-#     def get_pdb_seq(structure):
-#         '''
-#         Takes in a Biopython structure object and returns a list of the
-#         structure's sequences
-#         :param structure: Biopython structure object
-#         :return: Dictionary of sequence strings with chain IDs as the key
-#         '''
-#
-#         structure_seqs = {}
-#
-#         # loop over each chain of the PDB
-#         for chain in structure[0]:
-#
-#             chain_it = iter(chain)
-#
-#             chain_seq = ''
-#             tracker = 0
-#
-#             # loop over the residues
-#             for res in chain.get_residues():
-#                 # NOTE: you can get the residue number too
-#                 res_num = res.id[1]
-#
-#                 # double check if the residue name is a standard residue
-#                 # if it is not a standard residue (ie. selenomethionine),
-#                 # it will be filled in with an X on the next iteration)
-#                 if Polypeptide.is_aa(res, standard=True):
-#                     full_id = res.get_full_id()
-#                     end_tracker = full_id[3][1]
-#                     i_code = full_id[3][2]
-#                     aa = Polypeptide.three_to_one(res.get_resname())
-#
-#                     # tracker to fill in X's
-#                     if end_tracker != (tracker + 1):   # and first == False:
-#                         if i_code != ' ':
-#                             chain_seq += aa
-#                             tracker = end_tracker + 1
-#                             continue
-#                         else:
-#                             chain_seq += 'X' * (end_tracker - tracker - 1)
-#
-#                     chain_seq += aa
-#                     tracker = end_tracker
-#
-#                 else:
-#                     continue
-#
-#             structure_seqs[chain.get_id()] = chain_seq
-#
-#         return structure_seqs
+
 #
 #
 #     def pdb_current_checker(self, pdb_ids):

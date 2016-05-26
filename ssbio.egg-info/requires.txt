@@ -3,3 +3,5 @@ numpy
 tqdm
 pandas
 requests
+cachetools
+bioservices
