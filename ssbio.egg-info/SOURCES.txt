@@ -35,6 +35,7 @@ ssbio/sequence/alignment.py
 ssbio/sequence/fasta.py
 ssbio/sequence/properties/__init__.py
 ssbio/sequence/properties/aggregation_propensity.py
+ssbio/sequence/properties/kinetic_folding_rate.py
 ssbio/sequence/properties/thermostability.py
 ssbio/structure/__init__.py
 ssbio/structure/cleanpdb
@@ -46,7 +47,6 @@ ssbio/structure/properties/__init__.py
 ssbio/structure/properties/complex.py
 ssbio/structure/properties/distances.py
 ssbio/structure/properties/dsspprops.py
-ssbio/structure/properties/kinetic_folding_rate.py
 ssbio/structure/properties/msmsprops.py
 ssbio/structure/properties/pdbstart.py
 ssbio/structure/properties/quality.py

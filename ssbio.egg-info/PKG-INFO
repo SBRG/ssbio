@@ -13,10 +13,10 @@ Description: [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo
         ```bash
         $ python setup.py install
         ```
-        ### Requirements
-        * Biopython
-        * Numpy
-        * tqdm
+        or run in develop mode if you want to make changes to the code:
+        ```bash
+        $ python setup.py develop
+        ```
         
         ## Clean PDB files - cleanpdb
         ### Description

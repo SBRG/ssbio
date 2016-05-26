@@ -5,3 +5,4 @@ pandas
 requests
 cachetools
 bioservices
+prody
