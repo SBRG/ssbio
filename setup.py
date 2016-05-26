@@ -11,7 +11,7 @@ setup(
     packages=find_packages(),
     package_dir={'ssbio': 'ssbio'},
     package_data={'ssbio': ['ssbio/etc/*']},
-    scripts = ['ssbio/structure/cleanpdb', 'ssbio/structure/mutatepdb.py', 'ssbio/structure/tleap.py',
+    scripts = ['ssbio/scripts/cleanpdb', 'ssbio/structure/mutatepdb.py', 'ssbio/structure/tleap.py',
                'ssbio/databases/drugbank.py', 'ssbio/structure/properties/msmsprops.py',
                'ssbio/dock/dock.py'],
     long_description=open('README.md').read(),
