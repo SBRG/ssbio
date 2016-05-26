@@ -21,5 +21,6 @@ setup(
                       'pandas',
                       'requests',
                       'cachetools',
-                      'bioservices']
+                      'bioservices',
+                      'prody']
 )

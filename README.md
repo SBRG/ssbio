@@ -10,11 +10,6 @@ or run in develop mode if you want to make changes to the code:
 $ python setup.py develop
 ```
 
-### Requirements
-* Biopython
-* Numpy
-* tqdm
-
 ## Clean PDB files - cleanpdb
 ### Description
 This script will automatically:
