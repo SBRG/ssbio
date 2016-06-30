@@ -18,8 +18,10 @@ try:
 except ImportError:
     from cookielib import CookieJar
 
+import glob
 import time
 import cachetools
+import requests
 
 
 # author: Ke Chen
@@ -64,40 +66,53 @@ class AMYLPRED():
         #        consider remove this from list to save computational time?
         #        will need redo statistics
         Methods = ['AGGRESCAN', 'NETCSSP', 'PAFIG', 'APD', 'AMYLPATTERN',
-                   'SECSTR', 'BSC', 'WALTZ', 'CONFENERGY', 'TANGO', 'AMYLMUTS']
+                   'SECSTR', 'BSC', 'WALTZ', 'CONFENERGY', 'TANGO']#, 'AMYLMUTS']
 
         # TODO: can each method be cached?
+
 
         output = {}
         timeCounts = 0
         for met in Methods:
-            values = {'seq_data': seq, 'method': met}
-            data = urlencode(values)
-            data = data.encode('ASCII')
-            # url_input = "http://aias.biol.uoa.gr/AMYLPRED2/input.php"
-            url_input = "http://aias.biol.uoa.gr/cgi-bin/AMYLPRED2/amylpred2.pl"
-            response = opener.open(url_input, data)
-            result = str(response.read())
-            ind = str.find(result, 'Job ID')
-            result2 = result[ind:ind + 50]
-            ind1 = str.find(result2, ':')
-            ind2 = str.find(result2, '<BR>')
-            job_id = result2[ind1 + 2:ind2]
 
-            # waiting for the calculation to complete
-            url_result = 'http://aias.biol.uoa.gr/AMYLPRED2/tmp/' + job_id + '.txt'
-            print(url_result)
-            print("Waiting for %s results" % met, end='.')
-            while True:
-                result = urlopen(url_result).read()
-                if not result:
-                    time.sleep(1)
-                    timeCounts += 1
-                    print('.', end='')
-                else:
-                    break
+            # first check if there is an existing results file
+            existing_results = glob.glob('*_{}.txt'.format(met))
+            if existing_results:
+                results_file = existing_results[0]
+            else:
+                values = {'seq_data': seq, 'method': met}
+                data = urlencode(values)
+                data = data.encode('ASCII')
+                # url_input = "http://aias.biol.uoa.gr/AMYLPRED2/input.php"
+                url_input = "http://aias.biol.uoa.gr/cgi-bin/AMYLPRED2/amylpred2.pl"
+                response = opener.open(url_input, data)
+                result = str(response.read())
+                ind = str.find(result, 'Job ID')
+                result2 = result[ind:ind + 50]
+                ind1 = str.find(result2, ':')
+                ind2 = str.find(result2, '<BR>')
+                job_id = result2[ind1 + 2:ind2]
+
+                # waiting for the calculation to complete
+                url_result = 'http://aias.biol.uoa.gr/AMYLPRED2/tmp/' + job_id + '.txt'
+                print(url_result)
+                print("Waiting for %s results" % met, end='.')
+                while True:
+                    result = urlopen(url_result).read()
+                    if not result:
+                        time.sleep(1)
+                        timeCounts += 1
+                        print('.', end='')
+                    else:
+                        response = requests.get(url_result)
+                        break
+                # TODO: utilize saved file as cached resultr
+                results_file = "{}_{}.txt".format(url_result.split('/')[-1].strip('.txt'), met)
+                with open(results_file, "wb") as handle:
+                    for data in response.iter_content():
+                        handle.write(data)
             print("")
-            method, hits = self.get_method_hits(url_result, met)
+            method, hits = self.get_method_hits(results_file, met)
             # if method.lower() == met.lower():
             output[met] = hits
             # elif method == 'Beta-strand contiguity' and met == 'BSC':
@@ -106,8 +121,8 @@ class AMYLPRED():
         print("Time Spent: %d seconds" % (timeCounts))
         return output
 
-    def get_method_hits(self, url_result, met):
-        result = str(urlopen(url_result).read())
+    def get_method_hits(self, results_file, met):
+        result = str(open(results_file).read())
         ind_s = str.find(result, 'HITS')
         ind_e = str.find(result, '**NOTE')
         tmp = result[ind_s + 10:ind_e].strip(" ")

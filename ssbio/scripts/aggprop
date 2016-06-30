@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+import argparse
+import glob
+import os
+import os.path as op
+import pandas as pd
+from tqdm import tqdm
+from ssbio import utils
+date = utils.Date()
+
+import ssbio.sequence.properties.aggregation_propensity as agg
+import ssbio.sequence.fasta as fasta
+
+def input_parser(args):
+    """Parse command line inputs
+    """
+    pass
+
+if __name__ == '__main__':
+    # load inputs from command line
+
+    p = argparse.ArgumentParser(description='Run AMYLPRED2 on a FASTA file or a folder of FASTA files.')
+    p.add_argument('email', help='http://aias.biol.uoa.gr/AMYLPRED2/login.php Email')
+    p.add_argument('password', help='Password')
+    p.add_argument('infile', help='FASTA file or directory of FASTA files.')
+    args = p.parse_args()
+
+    curr_dir = os.getcwd()
+    # initialize the class with your email and password for the site
+    agg_predictions = agg.AMYLPRED(args.email, args.password)
+
+    prop_dir = 'properties'
+    if not op.exists(prop_dir):
+        os.mkdir(prop_dir)
+
+    agg_prop_dir = op.join(prop_dir,'aggregation_propensity')
+    if not op.exists(agg_prop_dir):
+        os.mkdir(agg_prop_dir)
+
+    # TODO: improve arg parsing for files/dirs
+    # TODO: this was all done in a rush - current dir and infile should be improved
+    if len(args.infile) == 1 and op.isdir(args.infile[0]):
+        os.chdir(args.infile[0])
+        files = glob.glob('*')
+    else:
+        files = args.infile
+
+    results = []
+
+    for file in tqdm(files):
+        if op.isdir(file):
+            continue
+
+        # load the sequence file, also the ID
+        seq_records = fasta.load_fasta_file(file)
+        seq_id = op.splitext(op.basename(file))[0]
+
+        seq_folder = op.join(agg_prop_dir, seq_id)
+        if not op.exists(seq_folder):
+            os.mkdir(seq_folder)
+
+        os.chdir(seq_folder)
+        # TODO: seems useless to return seqrecords to just convert them to strings
+        for seq_record in seq_records:
+            agg_index = agg_predictions.get_aggregation_propensity(str(seq_record.seq))
+            result = {'id':seq_id, 'agg_index':agg_index}
+            results.append(result)
+        os.chdir(curr_dir)
+
+    agg_df = pd.DataFrame(results)
+    agg_df.to_csv(op.join(prop_dir, '{}_aggprop_results.csv'.format(date.short_date)))
+    print('Saved results in properties/aggregation_propensity and summarized in aggprop_results.csv')
