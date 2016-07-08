@@ -159,8 +159,10 @@ def _sifts_mapping():
     SIFTS = pd.read_csv(decompressed_file, skiprows=1, index_col=['PDB','CHAIN'])
     # clean up some columns (some numbers have alternate IDs in them (ie. 15A)
     SIFTS['PDB_BEG_INT'] = SIFTS['PDB_BEG'].replace(to_replace=r'[^\d-]+', value='', regex=True)
+    SIFTS['PDB_BEG_INT'] = SIFTS['PDB_BEG_INT'].astype(int)
     SIFTS['SP_BEG_INT'] = SIFTS['SP_BEG'].replace(to_replace=r'[^\d-]+', value='', regex=True)
-    SIFTS['OFFSET'] = SIFTS['SP_BEG_INT'].astype(int) - SIFTS['PDB_BEG_INT'].astype(int)
+    SIFTS['SP_BEG_INT'] = SIFTS['SP_BEG_INT'].astype(int)
+    SIFTS['OFFSET'] = SIFTS['SP_BEG_INT'] - SIFTS['PDB_BEG_INT']
 
     return SIFTS.sort_index()
 
