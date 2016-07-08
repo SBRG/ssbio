@@ -1,6 +1,5 @@
 # TODO: 160501 - copied from ssbio_new - please ORGANIZE!
 
-
 from Bio import PDB
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -164,6 +163,9 @@ def _sifts_mapping():
     SIFTS['OFFSET'] = SIFTS['SP_BEG_INT'].astype(int) - SIFTS['PDB_BEG_INT'].astype(int)
 
     return SIFTS.sort_index()
+
+def SIFTS():
+    return _sifts_mapping()
 
 def sifts_pdb_chain_to_uniprot(pdb,chain):
     return _sifts_mapping().ix[(pdb.lower(),chain.upper())]['SP_PRIMARY'].unique().tolist()
