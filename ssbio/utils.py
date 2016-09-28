@@ -6,6 +6,44 @@ import pandas as pd
 from contextlib import contextmanager
 import sys, os
 
+import os
+import sys
+import time
+import collections
+from collections import defaultdict
+from contextlib import contextmanager
+
+try:
+    from IPython.display import clear_output
+    have_ipython = True
+except ImportError:
+    have_ipython = False
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
+def dict_head(d, disp=5):
+    """Return the head of a dictionary.
+
+    Returns the first 5 key/value pairs in a dictionary
+
+    Args:
+        d: dictionary to get head
+        disp: number of elements to display
+
+    Returns:
+        Dict
+
+    """
+    return {k: d[k] for k in list(d.keys())[:disp]}
+
 def input_parser(args):
     """Parse command line inputs
     """
@@ -84,7 +122,7 @@ def flatlist_dropdup(list_of_lists):
 def chunks(l, n):
     """ Yield successive n-sized chunks from l.
     """
-    for i in xrange(0, len(l), n):
+    for i in range(0, len(l), n):
         yield l[i:i+n]
 
 def combinations(iterable, r):
