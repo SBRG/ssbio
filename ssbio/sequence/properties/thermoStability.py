@@ -43,95 +43,95 @@ def sum_of_dCp(seq):
     return dCp_sum
 
 
-def calculate_oobatake_dH(seq, T):
+def calculate_oobatake_dH(seq, temp):
     """Get dH in units cal/mol
 
     Args:
         seq: amino acid sequence
-        T: temperature in degrees C
+        temp: temperature in degrees C
 
     Returns:
         dH
 
     """
     dH = 0
-    T = T + 273.15
+    temp = temp + 273.15
     T0 = 298.15
     for aa in seq:
         H0 = oobatake_dictionary[aa]['dH'] * 1000
         dH += H0
-    return dH + sum_of_dCp(seq) * (T - T0)
+    return dH + sum_of_dCp(seq) * (temp - T0)
 
 
-def calculate_oobatake_dS(seq, T):
+def calculate_oobatake_dS(seq, temp):
     """Get dS in units cal/mol
 
     Args:
         seq: amino acid sequence
-        T: temperature in degrees C
+        temp: temperature in degrees C
 
     Returns:
         dS
 
     """
     dS = 0
-    T = T + 273.15
+    temp = temp + 273.15
     T0 = 298.15
     dCp_sum = sum_of_dCp(seq)
     for aa in seq:
         S0 = oobatake_dictionary[aa]['dS']
         dS += S0
-    return dS + dCp_sum * math.log(T / T0)
+    return dS + dCp_sum * math.log(temp / T0)
 
 
 @cachetools.func.ttl_cache(maxsize=256)
-def calculate_oobatake_dG(seq, T):
+def calculate_oobatake_dG(seq, temp):
     """Get dG in units cal/mol
 
     Args:
         seq: amino acid sequence
-        T: temperature in degrees C
+        temp: temperature in degrees C
 
     Returns:
         dG
 
     """
     T0 = 298.15
-    dH = calculate_oobatake_dH(seq, T)
-    dS = calculate_oobatake_dS(seq, T)
-    dG = dH - (T + 273.15) * dS
+    dH = calculate_oobatake_dH(seq, temp)
+    dS = calculate_oobatake_dS(seq, temp)
+    dG = dH - (temp + 273.15) * dS
 
     # 563.552 - a correction for N- and C-terminal group (approximated from 7 examples in the paper)
     return dG - 563.552
 
 
 @cachetools.func.ttl_cache(maxsize=128)
-def calculate_dill_dG(seq_len, T):
+def calculate_dill_dG(seq_len, temp):
     """Get dG using Dill method in units J/mol
 
     Args:
         seq_len: length of amino acid sequence
-        T: temperature in degrees C
+        temp: temperature in degrees C
 
     Returns:
         dG in J/mol
     """
     Th = 373.5  # this quantity affects the up-and-down of the dG vs temperature curve (dG values)
     Ts = 385  # this quantity affects the left-and-right
-    T = T + 273.15
+    temp = temp + 273.15
     dH = (4.0 * seq_len + 143) * 1000
     dS = 13.27 * seq_len + 448
     dCp = (0.049 * seq_len + 0.85) * 1000
-    dG = dH + dCp * (T - Th) - T * dS - T * dCp * math.log(float(T) / Ts)
+    dG = dH + dCp * (temp - Th) - temp * dS - temp * dCp * math.log(float(temp) / Ts)
     return dG
 
 @cachetools.func.ttl_cache(maxsize=500)
-def get_dG_at_T(seq, T):
+def get_dG_at_T(seq, temp):
     """Predict dG at temperature T
 
     Args:
         seq: sequence string
-        T: temperature
+        temp: temperature
 
     Returns:
         free energy of unfolding dG (cal/mol)
@@ -147,13 +147,13 @@ def get_dG_at_T(seq, T):
     if len(stable) == 0:
         # if oobatake dG < 0 for all tempertures [20,50], use Dill dG
         # and convert the number from J/mol to cal/mol
-        dG = 0.238846 * calculate_dill_dG(len(seq), T)
+        dG = 0.238846 * calculate_dill_dG(len(seq), temp)
         method='Dill'
     else:
-        dG = oobatake[T]
+        dG = oobatake[temp]
         method='Oobatake'
 
-    keq = math.exp(-1 * dG / (r_cal * (T + 273.15)))
+    keq = math.exp(-1 * dG / (r_cal * (temp + 273.15)))
 
     return dG, keq, method
 

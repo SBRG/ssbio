@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+import argparse
+import glob
+import os
+import os.path as op
+import pandas as pd
+from tqdm import tqdm
+from ssbio import utils
+date = utils.Date()
+
+import ssbio.sequence.properties.thermostability as ts
+import ssbio.sequence.fasta as fasta
+
+def input_parser(args):
+    """Parse command line inputs
+    """
+    pass
+
+if __name__ == '__main__':
+    # load inputs from command line
+
+    p = argparse.ArgumentParser(description='Run thermostability calculations on a FASTA file or a folder of FASTA files.')
+    p.add_argument('infile', help='FASTA file or directory of FASTA files.')
+    p.add_argument('--temp', '-t', default=37)
+    args = p.parse_args()
+
+
+    prop_dir = 'properties'
+    if not op.exists(prop_dir):
+        os.mkdir(prop_dir)
+
+    # TODO: improve arg parsing for files/dirs
+    if len(args.infile) == 1 and op.isdir(args.infile[0]):
+        os.chdir(args.infile[0])
+        files = glob.glob('*')
+    else:
+        files = args.infile
+
+    results = []
+
+    for file in tqdm(files):
+        if op.isdir(file):
+            continue
+
+        # load the sequence file, also the ID
+        seq_records = fasta.load_fasta_file(file)
+        seq_id = op.splitext(op.basename(file))[0]
+
+        # TODO: seems useless to return seqrecords to just convert them to strings
+        for seq_record in seq_records:
+            res = ts.get_dG_at_T(str(seq_record.seq), temp=args.temp)
+            result = {'id':seq_id, 'dg':res[0], 'keq':res[1], 'method':res[2]}
+            results.append(result)
+
+    agg_df = pd.DataFrame(results)
+    agg_df.to_csv(op.join(prop_dir, '{}_thermo_results.csv'.format(date.short_date)))
+    print('Saved results in thermo_results.csv')

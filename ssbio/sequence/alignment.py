@@ -2,6 +2,7 @@ from Bio.Emboss.Applications import NeedleCommandline
 from Bio import AlignIO
 import os
 import pandas as pd
+import numpy as np
 from collections import defaultdict
 
 def run_alignment(id_a, faa_a, id_b, faa_b):

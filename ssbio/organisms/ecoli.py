@@ -4,12 +4,14 @@ import warnings
 import cachetools
 from tqdm import tqdm
 
-import ssbio.databases.identifiers
 import ssbio.databases.uniprot
 import ssbio.sequence.properties.aggregation_propensity as agg
 import ssbio.sequence.properties.kinetic_folding_rate as kfr
 import ssbio.sequence.properties.thermostability as ts
 
+from bioservices.uniprot import UniProt
+
+bsup = UniProt()
 
 def convert_bnumber_to_uniprot(bnumber):
     """Map an E. coli locus id (ie. b0003) to its reviewed UniProt ID
@@ -20,7 +22,7 @@ def convert_bnumber_to_uniprot(bnumber):
     Returns:
         UniProt ID (reviewed only) - in most cases there should only be one
     """
-    genes_to_uniprots = ssbio.databases.identifiers.bioservices_uniprot_mapper('ENSEMBLGENOME_ID', 'ACC', bnumber)
+    genes_to_uniprots = dict(bsup.mapping(fr='ENSEMBLGENOME_ID', to='ACC', query=bnumber))
     reviewed_uniprots = [x for x in genes_to_uniprots[bnumber] if ssbio.databases.uniprot.uniprot_reviewed_checker(x)]
     if len(reviewed_uniprots) > 1:
         warnings.warn('{}: more than one reviewed UniProt entry. Returning first mapped ID.'.format(bnumber))
@@ -36,7 +38,7 @@ def convert_bnumbers_to_uniprot_batch(bnumbers):
         Dictionary of locus ID to UniProt ID (reviewed only) - in most cases there should only be one
     """
     final_mapping = {}
-    genes_to_uniprots = ssbio.databases.identifiers.bioservices_uniprot_mapper('ENSEMBLGENOME_ID', 'ACC', bnumbers)
+    genes_to_uniprots = dict(bsup.mapping(fr='ENSEMBLGENOME_ID', to='ACC', query=bnumbers))
     for k,v in genes_to_uniprots.items():
         reviewed_uniprots = [x for x in v if ssbio.databases.uniprot.uniprot_reviewed_checker(x)]
         if len(reviewed_uniprots) > 1:
