@@ -46,6 +46,14 @@ class TestPDB(unittest.TestCase):
         for k,v in mapping.items():
             self.assertEqual(ssbio.databases.pdb.sifts_pdb_chain_to_uniprot(k[0], k[1]), v)
 
+    def test_sifts_uniprot_resnum_to_pdb(self):
+        mapping = {('', '', ''): ('', ''),
+                   ('', '', ''): ('', ''),
+                   ('', '', ''): ('', ''),
+                   ('', '', ''): ('', ''),
+                   ('', '', ''): ('', ''),
+                   ('', '', ''): ('', '')}
+
     # TODO: this result changes based on pdb database
     # def test_top_pdb_blast_hit(self):
     #     seq = 'VLSPADKTNVKAAWGVKALSPADKTNVKAALTAVAHVDDMPNAL'
@@ -57,3 +65,7 @@ class TestPDB(unittest.TestCase):
     #                  'hit_percent_ident': 0.81818181818181823,
     #                  'hit_score': '76'}
     #     self.assertEqual(ssbio.databases.pdb.top_pdb_blast_hit(seq,evalue=evalue), results)
+
+
+    if __name__ == '__main__':
+        unittest.main()

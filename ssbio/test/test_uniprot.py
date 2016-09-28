@@ -22,11 +22,11 @@ class TestUniProt(unittest.TestCase):
 
         # test if the non-theoretical pdbs return False when checked to be in the theoretical list
         for pdb in invalid_ids:
-            self.assertFalse(ssbio.databases.uniprot.uniprot_valid_id(pdb))
+            self.assertFalse(ssbio.databases.uniprot.is_valid_uniprot_id(pdb))
 
         # test if the theoretical pdbs return True when checked to be in the theoretical list
         for pdb in valid_ids:
-            self.assertTrue(ssbio.databases.uniprot.uniprot_valid_id(pdb))
+            self.assertTrue(ssbio.databases.uniprot.is_valid_uniprot_id(pdb))
 
     def test_uniprot_reviewed_checker(self):
         status = {'I1Z9G4': False,
