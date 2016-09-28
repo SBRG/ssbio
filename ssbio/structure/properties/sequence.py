@@ -23,6 +23,13 @@ def get_pdb_seq(pdb_file):
         tracker = 0
 
         # loop over the residues
+        # TODO: how to deal with insertion codes?
+        # see: pdb id 9LPR, 15A and 15B in this case are both written as a unique amino acid
+        # what should happen is: 15B is ignored and not written out
+        # TODO: how to deal with hetatms?
+        # see: pdb id 9WGA, res1 is a hetatm, and is written as an X
+        # what should happen is:....unknown. ignore? or write?
+        # but wait, what about MSE? write as met?
         for res in chain.get_residues():
             # NOTE: you can get the residue number too
             res_num = res.id[1]

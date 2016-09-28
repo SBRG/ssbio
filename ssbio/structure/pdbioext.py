@@ -15,7 +15,7 @@ class PDBIOExt(PDBIO):
     """
 
     def __init__(self, in_file):
-        super().__init__()
+        super(PDBIO, self).__init__()
         self.in_file = in_file
 
         if '.cif' in self.in_file:
@@ -24,6 +24,9 @@ class PDBIOExt(PDBIO):
             structure = pdbp.get_structure('mypdb', self.in_file)
         self.structure = structure
         self.first_model = structure[0]
+
+        # TODO: need to properly learn about extending a class
+        self.use_model_flag=0
 
     def _output_filepath(self, custom_name='', custom_ext='', out_suffix='', out_dir=None):
         """Returns an output file path based on the input filename to write a modified file.
