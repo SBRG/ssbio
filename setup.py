@@ -22,5 +22,6 @@ setup(
                       'requests',
                       'cachetools',
                       'bioservices',
-                      'prody']
+                      'prody',
+                      'xmltodict']
 )
