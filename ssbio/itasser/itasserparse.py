@@ -1,5 +1,20 @@
 import pandas as pd
 
+def parse_init_dat(infile):
+    """Parse the main init.dat file which contains the modeling results
+
+    The first line of the file init.dat contains stuff like:
+    "120 easy  40   8"
+    # TODO: what is this?
+
+    Args:
+        infile:
+
+    Returns:
+
+    """
+    return
+
 def parse_bsites_inf(infile):
     """Parse the Bsites.inf output file of COACH and returns a dataframe
 

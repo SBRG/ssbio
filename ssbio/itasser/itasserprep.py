@@ -12,7 +12,7 @@ class ITASSERPrep():
 
     def __init__(self, ident, seq_str,
                  root_dir, itasser_loc, itlib_loc, data_dir='', light='true', runtype='local', print_exec=False,
-                 binding_site_pred=False, ec_pred=False, go_pred=False,
+                 binding_site_pred=False, ec_pred=False, go_pred=False, project_id=None,
                  slurm_email='', slurm_username='', slurm_walltime='48:00:00',
                  slurm_queue='shared'):
         self.ident = ident
@@ -21,6 +21,7 @@ class ITASSERPrep():
         self.root_dir = root_dir
         if not os.path.exists(root_dir):
             os.makedirs(root_dir)
+        # TODO: whats the diff between root and data dir?
         if not data_dir:
             self.data_dir = self.prep_folders(seq_str)
         elif data_dir:
@@ -51,6 +52,7 @@ class ITASSERPrep():
             self.slurm_username = slurm_username
             self.slurm_walltime = slurm_walltime
             self.slurm_queue = slurm_queue
+            self.project_id = project_id
 
             self.prep_script_slurm(itasser_loc=itasser_loc,
                                    itlib_loc=itlib_loc)
@@ -134,6 +136,7 @@ class ITASSERPrep():
                    'java_home': java_home,
                    'light': self.light,
                    'additional_options': self.additional_options,
+                   'project_id':self.project_id,
                    'slurm_walltime': self.slurm_walltime,
                    'slurm_queue': self.slurm_queue,
                    'slurm_email': self.slurm_email}
@@ -142,6 +145,7 @@ class ITASSERPrep():
 
         slurm.write('#!/bin/bash -l\n')
         slurm.write('#SBATCH -p shared\n')
+        slurm.write('#SBATCH -A {i[project_id]}\n'.format(i=itasser))
         slurm.write('#SBATCH -t {i[slurm_walltime]}\n'.format(i=itasser))
         slurm.write('#SBATCH --mem=8GB\n')
         slurm.write('#SBATCH -J {i[seqname]}\n'.format(i=itasser))
