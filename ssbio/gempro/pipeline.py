@@ -7,12 +7,22 @@ import warnings
 from cobra.io import load_matlab_model
 from cobra.io.sbml import create_cobra_model_from_sbml_file
 
+from Bio import SeqIO
+
+from bioservices.uniprot import UniProt
+
+bsup = UniProt()
+
 from ssbio import utils
-from ssbio.cobra.utils import is_spontaneous
-from ssbio.databases.identifiers import bioservices_uniprot_mapper
+from ssbio.cobra.utils import is_spontaneous, true_num_reactions, true_num_genes
+
 date = utils.Date()
 
-from ssbio.databases.kegg import get_kegg_aa_seq
+import ssbio.databases.kegg
+import ssbio.databases.uniprot
+import ssbio.databases.pdb
+import pandas as pd
+
 from tqdm import tqdm
 import requests
 
@@ -32,18 +42,17 @@ class GEMPRO():
     Each step may generate a report and also request additional files if mappings are incomplete
     """
 
-    def __init__(self, gem_file, gem_name, root_dir):
+    def __init__(self, gem_name, root_dir):
         self.root_dir = root_dir
-        self.gem_file_temp = gem_file
         self.model_dir = op.join(root_dir, gem_name)
         # model_files - directory where original gems and gem-related files are stored
         self.model_files = op.join(self.model_dir, 'model_files')
 
     def prep_folders(self):
-        """Take in a sequence string and prepares the folder for it to run ITASSER
+        """Prepare all folders for a GEM-PRO project
         """
-        # data_frames - directory where all data frames will be stored (all stages)
-        self.data_frames = op.join(self.model_dir, 'data_frames')
+        # data - directory where all data frames will be stored (all stages)
+        self.data = op.join(self.model_dir, 'data')
 
         # notebooks - directory where ipython notebooks will be stored for manual analyses
         self.notebooks = op.join(self.model_dir, 'notebooks')
@@ -56,133 +65,247 @@ class GEMPRO():
 
         # struct_files - directory where structure related files will be downloaded/are located
         self.struct_files = op.join(self.model_dir, 'structure_files')
-        self.struct_exp_files = op.join(self.struct_files, 'experimental')
-        self.struct_homology_files = op.join(self.struct_files, 'homology_models')
+        self.struct_single_chain = op.join(self.struct_files, 'by_gene')
 
         # seq_files - sequence related files are stored here
         self.seq_files = op.join(self.model_dir, 'sequence_files')
 
-        self.seq_main_files = op.join(self.seq_files, 'amino_acid_sequences')
-        self.seq_main_metadata = op.join(self.seq_files, 'amino_acid_metadata')
-
-        self.seq_align_files = op.join(self.seq_files, 'alignment')
-
-        self.seq_pdb_files = op.join(self.seq_files, 'pdb_sequences')
-        self.seq_homology_files = op.join(self.seq_files, 'homology_model_sequences')
-
-        for directory in [self.model_dir, self.data_frames, self.notebooks, self.figures, self.missing,
-                          self.model_files, self.struct_files, self.struct_exp_files,
-                          self.struct_homology_files, self.seq_files, self.seq_main_files,
-                          self.seq_main_metadata, self.seq_align_files, self.seq_pdb_files,
-                          self.seq_homology_files]:
+        for directory in [self.model_dir, self.data, self.notebooks, self.figures, self.missing,
+                          self.model_files, self.struct_files, self.struct_single_chain, self.seq_files]:
             if not op.exists(directory):
                 os.makedirs(directory)
                 print('[PREP] Created directory: {}'.format(directory))
             else:
                 print('[PREP] Directory already exists: {}'.format(directory))
 
-        if not op.exists(op.join(self.model_files, op.basename(self.gem_file_temp))):
-            shutil.copy(self.gem_file_temp, self.model_files)
-        self.gem_file = op.join(self.model_files, op.basename(self.gem_file_temp))
-
-    def load_model(self):
+    def load_model(self, gem_file, file_type):
         """Load the GEM using COBRApy. Accept SBML or MAT files as input
+
+        Args:
+            file_type: if your model is in "SBML" (or "XML"), or "Matlab" formats
 
         Returns: None - loads the model in the GEMPRO object instance
 
         """
-        extension = op.splitext(self.gem_file)[1]
-        # TODO: auto parsing should not be done -- explicit is better than implicit
-        # TODO: improved parsing of input file?
-        if extension.lower() == '.xml':
-            self.model = create_cobra_model_from_sbml_file(self.gem_file, print_time=False)
-            print('[PREP] Loaded model: {}'.format(self.gem_file))
-        elif extension.lower() == '.mat':
-            self.model = load_matlab_model(self.gem_file)
-            print('[PREP] Loaded model: {}'.format(self.gem_file))
+        extension = op.splitext(gem_file)[1]
+        if file_type.replace('.', '').lower() == 'xml' or file_type.replace('.', '').lower() == 'sbml':
+            self.model = create_cobra_model_from_sbml_file(gem_file, print_time=False)
+            print('[PREP] Loaded model: {}'.format(gem_file))
+        elif extension.replace('.', '').lower() == 'mat':
+            self.model = load_matlab_model(gem_file)
+            print('[PREP] Loaded model: {}'.format(gem_file))
+
+        # place a copy of the current used model in model_files
+        if not op.exists(op.join(self.model_files, op.basename(gem_file))):
+            shutil.copy(gem_file, self.model_files)
+            print('[PREP] Copied model file to model_files')
+        self.gem_file = op.join(self.model_files, op.basename(gem_file))
 
         # obtain list of all gene ids, excluding spontaneous things
         # TODO: account for isoforms
-        self.genes = [x.id for x in self.model.genes]
-        self.genes_filtered = [y for y in self.genes if not is_spontaneous(y)]
+        self.genes_unfiltered = [x.id for x in self.model.genes]
+        self.genes = [y for y in self.genes_unfiltered if not is_spontaneous(y)]
 
-    def kegg_download_all_sequences(self, kegg_organism):
-        """Download all sequences from KEGG for all genes in the model
+        # print information on the number of things
+        print('[MODEL] Number of reactions: {}'.format(len(self.model.reactions)))
+        print('[MODEL] Number of reactions linked to a gene: {}'.format(true_num_reactions(self.model)))
+        print('[MODEL] Number of genes (excluding spontaneous): {}'.format(true_num_genes(self.model)))
+        print('[MODEL] Number of metabolites: {}'.format(len(self.model.metabolites)))
+
+    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_list=None):
+        """Map all genes in the model to UniProt IDs using the KEGG service. Also download all metadata and sequences
 
         Args:
-            kegg_organism:
+            kegg_organism_code: the three letter KEGG code of your organism
+
+        Returns: path to metadata/mapping dataframe
+
+        """
+
+        # all data will be stored in a dataframe
+        kegg_pre_df = []
+
+        # first map all of the organism's genes to UniProt
+        kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
+
+        self.kegg_missing_genes = []
+
+        if custom_gene_list:
+            genes_to_map = custom_gene_list
+        else:
+            genes_to_map = self.genes
+
+        for g in tqdm(genes_to_map):
+            kegg_dict = {}
+            kegg_dict['k_kegg_id'] = g
+
+            # make the gene specific folder under the sequence_files directory
+            gene_folder = op.join(self.seq_files, g)
+            if not op.exists(gene_folder):
+                os.mkdir(gene_folder)
+
+            # download kegg metadata
+            metadata_file = ssbio.databases.kegg.download_kegg_gene_metadata(organism_code=kegg_organism_code,
+                                                                             gene_id=g,
+                                                                             out_dir=gene_folder)
+
+            # download kegg sequence
+            sequence_file = ssbio.databases.kegg.download_kegg_aa_seq(organism_code=kegg_organism_code,
+                                                                      gene_id=g,
+                                                                      out_dir=gene_folder)
+
+            # if there is no FASTA for this gene, consider it missing
+            if sequence_file:
+                kegg_dict['k_seq_file'] = op.basename(sequence_file)
+                kegg_dict['k_seq_len'] = len(SeqIO.read(open(sequence_file), "fasta"))
+            else:
+                self.kegg_missing_genes.append(g)
+
+            if metadata_file:
+                kegg_dict['k_metadata_file'] = op.basename(metadata_file)
+
+            if g in kegg_to_uniprot.keys():
+                kegg_dict['k_uniprot_acc'] = kegg_to_uniprot[g]
+
+            kegg_pre_df.append(kegg_dict)
+
+        # save a log file for the genes that could not be mapped
+        if self.kegg_missing_genes:
+            err_file = op.join(self.missing, '{}_kegg_mapping.err'.format(date.short_date))
+            warnings.warn(
+                '{} genes were not able to be mapped to a Kegg entry. Please see {} for a list of these genes'.format(
+                    len(self.kegg_missing_genes),
+                    err_file))
+            with open(err_file, mode='wt', encoding='utf-8') as myfile:
+                myfile.write('\n'.join(self.kegg_missing_genes))
+
+        # save a dataframe of the file mapping info
+        # TODO: add more info from kegg metadata parsing
+        self.kegg_df = pd.DataFrame(kegg_pre_df)[['k_kegg_id','k_uniprot_acc','k_metadata_file','k_seq_file','k_seq_len']]
+        kegg_df_outfile = op.join(self.data, '{}-kegg_df.csv'.format(date.short_date))
+        self.kegg_df.to_csv(kegg_df_outfile)
+        print('[INFO] Saved KEGG information at {}'.format(kegg_df_outfile))
+
+        return kegg_df_outfile
+
+    def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_list=None):
+        """Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.
+
+        Common model gene sources are:
+            Ensembl Genomes - ENSEMBLGENOME_ID
+            Entrez Gene (GeneID) - P_ENTREZGENEID
+            RefSeq Protein - P_REFSEQ_AC
+
+        Args:
+            model_gene_source: the database source of your model gene IDs, see http://www.uniprot.org/help/programmatic_access
+
+        Returns: path to metadata/mapping dataframe
+
+        """
+
+        if custom_gene_list:
+            genes_to_map = custom_gene_list
+        else:
+            genes_to_map = self.genes
+
+        genes_to_uniprots = bsup.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
+        self.uniprot_missing_genes = list(set(genes_to_map).difference(genes_to_uniprots.keys()))
+
+        # save a log file for the genes that could not be mapped
+        if self.uniprot_missing_genes:
+            err_file = op.join(self.missing, '{}_uniprot_mapping.err'.format(date.short_date))
+            warnings.warn(
+                '[INFO] {} genes were not able to be mapped to a UniProt entry. Please see {} for a list of these genes'.format(
+                    len(self.uniprot_missing_genes),
+                    err_file))
+            with open(err_file, mode='wt', encoding='utf-8') as myfile:
+                myfile.write('\n'.join(self.uniprot_missing_genes))
+
+        # all data will be stored in a dataframe
+        uniprot_pre_df = []
+
+        for g, v in tqdm(genes_to_uniprots.items()):
+            for mapped_uniprot in v:
+                uniprot_dict = {}
+                uniprot_dict['m_gene'] = g
+                uniprot_dict['u_uniprot_acc'] = mapped_uniprot
+
+                # make the gene specific folder under the sequence_files directory
+                gene_folder = op.join(self.seq_files, g)
+                if not op.exists(gene_folder):
+                    os.mkdir(gene_folder)
+
+                # download uniprot metadata
+                metadata_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot, filetype='txt',
+                                                                              outdir=gene_folder)
+
+                # download uniprot sequence
+                sequence_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot, filetype='fasta',
+                                                                              outdir=gene_folder)
+
+                uniprot_dict['u_seq_file'] = op.basename(sequence_file)
+                uniprot_dict['u_seq_len'] = len(SeqIO.read(open(sequence_file), "fasta"))
+                uniprot_dict['u_metadata_file'] = op.basename(metadata_file)
+
+                uniprot_pre_df.append(uniprot_dict)
+
+        # save a dataframe of the file mapping info
+        # TODO: add more info from uniprot metadata parsing
+        self.uniprot_df = pd.DataFrame(uniprot_pre_df)[
+            ['m_gene', 'u_uniprot_acc', 'u_metadata_file', 'u_seq_file', 'u_seq_len']]
+        uniprot_df_outfile = op.join(self.data, '{}-uniprot_df.csv'.format(date.short_date))
+        self.uniprot_df.to_csv(uniprot_df_outfile)
+        print('[INFO] Saved KEGG information at {}'.format(uniprot_df_outfile))
+
+        return uniprot_df_outfile
+
+
+    def combine_kegg_uniprot_manual(self):
+        """Combine information from KEGG, UniProt, and manual mappings.
 
         Returns:
 
         """
-        self.gene_to_protein_fasta = {}
-        self.genes_to_kegg_missing = []
-        for g in tqdm(self.genes_filtered):
-            outfile = op.join(self.seq_main_files, '{}-{}.faa'.format(kegg_organism, g))
-            if op.exists(outfile):
-                self.gene_to_protein_fasta[g] = outfile
+        pass
+
+    def blast_seqs_to_pdb(self, custom_df, evalue=0.001, link=False):
+        """BLAST each gene sequence to the PDB. Results are saved as dataframes in the structure_files folder.
+
+        Returns: Path to summary results dataframe which details best hit for each gene.
+
+        """
+
+        top_blast_pre_df = []
+
+        for i,r in tqdm(custom_df.iterrows()):
+            g = r['m_gene']
+            seq = r['u_seq']
+
+            # make the gene specific folder under the structure_files directory
+            gene_folder = op.join(self.struct_single_chain, str(g))
+            if not op.exists(gene_folder):
+                os.mkdir(gene_folder)
+
+            blast_df = ssbio.databases.pdb.blast_pdb(seq, evalue=evalue, link=link)
+            if blast_df.empty:
                 continue
             else:
-                try:
-                    outfile = get_kegg_aa_seq(kegg_organism, g, out_dir=self.seq_main_files)
-                    self.gene_to_protein_fasta[g] = outfile
-                except requests.exceptions.HTTPError:
-                    self.genes_to_kegg_missing.append(g)
+                # save the blast_df
+                blast_df.to_csv(op.join(gene_folder, str(g) + '_blast_df.csv'))
+                # save the top blast hit
+                top_hit = blast_df.loc[0].to_dict()
+                top_hit['m_gene'] = g
+                top_blast_pre_df.append(top_hit)
 
-        if self.genes_to_kegg_missing:
-            err_file = op.join(self.missing, '{}_kegg_seq_missing.err'.format(date.short_date))
-            warnings.warn(
-                '[INFO] Some genes were not able to be mapped to a Kegg entry. Please see {} for a list of these genes'.format(
-                    err_file))
-            with open(err_file, mode='wt', encoding='utf-8') as myfile:
-                myfile.write('\n'.join(self.genes_to_kegg_missing))
+        top_blast_df = pd.DataFrame(top_blast_pre_df)
+        reorg = ['m_gene','hit_pdb', 'hit_pdb_chain', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident']
+        self.top_blast_df = top_blast_df[reorg]
+        top_blast_df_outfile = op.join(self.data, '{}-pdb_blast_df.csv'.format(date.short_date))
+        self.top_blast_df.to_csv(top_blast_df_outfile)
 
-    def blast_pdb_hits(self):
-        """Create a dataframe of best PDB hits to each gene's sequence
-
-        Returns: Path to results dataframe
-
-        """
-        for g,kg in self.gene_to_protein_fasta:
-            fasta_file = op.join(self.seq_main_files, kg)
-            top_pdb_blast_hit()
-
-    def set_gene_source(self, db, uniprot_mapping_from=None, isoform_presence=False):
-
-        self.uniprot_mapping_from = uniprot_mapping_from
-        self.isoform_presence = isoform_presence
-        if self.isoform_presence == True:
-            warnings.warn('Isoform automatic mapping is in beta!')
-
-    def gene_id_mapping(self):
-        """Take all genes present in the model and map to UniProt and PDB IDs
-
-        Currenty uses the UniProt mapping service through the bioservices package.
-
-        Returns: Path to mapping dataframe
-
-        """
-        # allow for input of manual mapping files
-        # format should be csv of
-        # MODEL_NAME, MAPPED_SOURCE1[, MAPPED_SOURCE2, ...]
-        # MODEL_GENE, MAPPED_GENE1[, MAPPED_GENEID2, ...]
+        return top_blast_df_outfile
 
 
-
-        # mapping gene IDs to uniprot IDs
-        self.genes_to_uniprots = bioservices_uniprot_mapper(self.uniprot_mapping_from, 'ACC', genes_filtered)
-        self.genes_to_uniprots_missing = list(set(genes_filtered).difference(self.genes_to_uniprots.keys()))
-
-        # report genes unable to be mapped
-        if self.genes_to_uniprots_missing:
-            err_file = op.join(self.missing, '{}_uniprot_mapping_missing.err'.format(date.short_date))
-            warnings.warn(
-                '[INFO] Some genes were not able to be mapped to a UniProt entry. Please see {} for a list of these genes'.format(
-                    err_file))
-            with open(err_file, mode='wt', encoding='utf-8') as myfile:
-                myfile.write('\n'.join(self.genes_to_uniprots_missing))
-
-            # TODO: accept manual input of a file with the correct mappings?
 
     def run_pipeline(self):
         """Run the entire GEM-PRO pipel ine.
