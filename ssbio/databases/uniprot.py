@@ -1,10 +1,17 @@
 import pandas as pd
+
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
 
+try:
+    import urllib.request as urlrequest
+except ImportError:
+    import urllib as urlrequest
+
 import bioservices
+
 bsup = bioservices.uniprot.UniProt()
 
 from dateutil.parser import parse as dateparse
@@ -15,28 +22,50 @@ import cachetools
 from ssbio import utils
 import requests
 import os.path as op
-import urllib.request
 import os
 
 SEVEN_DAYS = 60 * 60 * 24 * 7
 
-def uniprot_valid_id(instring):
-    # regex from: http://www.uniprot.org/help/accession_numbers
+
+def is_valid_uniprot_id(instring):
+    """Check if a string is a valid UniProt ID.
+
+    See regex from: http://www.uniprot.org/help/accession_numbers
+
+    Args:
+        instring: any string identifier
+
+    Returns: True if the string is a valid UniProt ID
+
+    """
     valid_id = re.compile("[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}")
     if valid_id.match(str(instring)):
         return True
     else:
         return False
 
+
 @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
-def get_fasta(ident):
-    # TODO: bioservices keeps printing out "will be moved to biokit" - is biokit complete?
+def get_fasta(uniprot_id):
+    """Get the protein sequence for a UniProt ID as a string.
+
+    Args:
+        ident: a UniProt ID
+
+    Returns: string of the protein (amino acid) sequence
+
+    """
+    if not is_valid_uniprot_id(uniprot_id):
+        raise ValueError("Invalid UniProt ID!")
+
+    # silencing the "Will be moved to Biokit" message
     with utils.suppress_stdout():
-        return bsup.get_fasta_sequence(ident)
+        return bsup.get_fasta_sequence(uniprot_id)
+
 
 @cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
 def uniprot_reviewed_checker(uniprot_id):
-    """Check if a single uniprot ID is reviewed or not.
+    """Check if a single UniProt ID is reviewed or not.
 
     Args:
         uniprot_id:
@@ -44,8 +73,8 @@ def uniprot_reviewed_checker(uniprot_id):
     Returns:
         True or False
     """
-    if not uniprot_valid_id(uniprot_id):
-        return False
+    if not is_valid_uniprot_id(uniprot_id):
+        raise ValueError("Invalid UniProt ID!")
 
     query_string = 'id:' + uniprot_id
 
@@ -60,6 +89,7 @@ def uniprot_reviewed_checker(uniprot_id):
 
     return uni_rev_dict_adder[uniprot_id]
 
+
 # @cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
 def uniprot_reviewed_checker_batch(uniprot_ids):
     """Batch check if uniprot IDs are reviewed or not
@@ -72,8 +102,8 @@ def uniprot_reviewed_checker_batch(uniprot_ids):
     """
     uniprot_ids = utils.force_list(uniprot_ids)
 
-    invalid_ids = [i for i in uniprot_ids if not uniprot_valid_id(i)]
-    uniprot_ids = [i for i in uniprot_ids if uniprot_valid_id(i)]
+    invalid_ids = [i for i in uniprot_ids if not is_valid_uniprot_id(i)]
+    uniprot_ids = [i for i in uniprot_ids if is_valid_uniprot_id(i)]
 
     if invalid_ids:
         warnings.warn("Invalid UniProt IDs {} will be ignored".format(invalid_ids))
@@ -84,12 +114,12 @@ def uniprot_reviewed_checker_batch(uniprot_ids):
 
     uni_rev_dict = {}
 
-    if rest>0:
-        N+=1
-    for i in range(0,N):
-        i1 = i*Nmax
-        i2 = (i+1)*Nmax
-        if i2>len(uniprot_ids):
+    if rest > 0:
+        N += 1
+    for i in range(0, N):
+        i1 = i * Nmax
+        i2 = (i + 1) * Nmax
+        if i2 > len(uniprot_ids):
             i2 = len(uniprot_ids)
 
         query = uniprot_ids[i1:i2]
@@ -115,6 +145,7 @@ def uniprot_reviewed_checker_batch(uniprot_ids):
 
     return uni_rev_dict
 
+
 def uniprot_ec(uniprot_id):
     r = requests.post('http://www.uniprot.org/uniprot/?query=%s&columns=ec&format=tab' % uniprot_id)
 
@@ -125,31 +156,43 @@ def uniprot_ec(uniprot_id):
 
     return ec
 
+
 def uniprot_sites(uniprot_id):
     r = requests.post('http://www.uniprot.org/uniprot/%s.gff' % uniprot_id)
     gff = StringIO(r.content.decode('utf-8'))
 
     try:
-        gff_df = pd.read_table(gff, sep='\t',skiprows=2,header=None)
+        gff_df = pd.read_table(gff, sep='\t', skiprows=2, header=None)
     except ValueError:
         return pd.DataFrame()
 
-    gff_df.drop([0,1,5,6,7,9], axis=1, inplace=True)
-    gff_df.columns = ['type','seq_start','seq_end','notes']
+    gff_df.drop([0, 1, 5, 6, 7, 9], axis=1, inplace=True)
+    gff_df.columns = ['type', 'seq_start', 'seq_end', 'notes']
 
     return gff_df
 
-def download_uniprot_metadata(uniprot_id, outdir=''):
-    url = 'http://www.uniprot.org/uniprot/{}.txt'.format(uniprot_id)
-    outfile = '{}.txt'.format(uniprot_id)
+
+def download_uniprot_file(uniprot_id, filetype, outdir=''):
+    """Download any UniProt file for a UniProt ID/ACC
+
+    Args:
+        uniprot_id:
+        filetype: txt, fasta, xml, rdf, or gff
+        outdir:
+
+    Returns:
+
+    """
+    url = 'http://www.uniprot.org/uniprot/{}.{}'.format(uniprot_id, filetype)
+    outfile = '{}.{}'.format(uniprot_id, filetype)
     if outdir:
         outfile = op.join(outdir, outfile)
-        if not op.exists(outdir):
-            os.mkdir(outdir)
 
     if not op.exists(outfile):
-        urllib.request.urlretrieve(url, outfile)
+        urlrequest.urlretrieve(url, outfile)
+
     return outfile
+
 
 def parse_uniprot_txt_file(infile):
     """
@@ -278,6 +321,7 @@ def parse_uniprot_txt_file(infile):
 
     return metadata_by_seqid
 
+
 def reparse_uniprot_txt_file(infile):
     uniprot_metadata_dict = {}
 
@@ -313,6 +357,7 @@ def reparse_uniprot_txt_file(infile):
             metadata_key]['pfam']
 
     return uniprot_metadata_dict
+
 
 # def uniprot_metadata_batch(uniprot_ids, outdir=None):
 #     '''
