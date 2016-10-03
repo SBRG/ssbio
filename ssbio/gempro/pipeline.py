@@ -3,6 +3,7 @@ import os
 import os.path as op
 import shutil
 import warnings
+import glob
 
 from cobra.io import load_matlab_model
 from cobra.io.sbml import create_cobra_model_from_sbml_file
@@ -112,7 +113,7 @@ class GEMPRO():
         print('[MODEL] Number of genes (excluding spontaneous): {}'.format(true_num_genes(self.model)))
         print('[MODEL] Number of metabolites: {}'.format(len(self.model.metabolites)))
 
-    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_list=None):
+    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None):
         """Map all genes in the model to UniProt IDs using the KEGG service. Also download all metadata and sequences
 
         Args:
@@ -130,14 +131,15 @@ class GEMPRO():
 
         self.kegg_missing_genes = []
 
-        if custom_gene_list:
-            genes_to_map = custom_gene_list
-        else:
-            genes_to_map = self.genes
+        for g in tqdm(self.genes):
 
-        for g in tqdm(genes_to_map):
+            if custom_gene_mapping:
+                kegg_g = custom_gene_mapping[g]
+            else:
+                kegg_g = g
+
             kegg_dict = {}
-            kegg_dict['k_kegg_id'] = g
+            kegg_dict['k_kegg_id'] = kegg_g
 
             # make the gene specific folder under the sequence_files directory
             gene_folder = op.join(self.seq_files, g)
@@ -146,12 +148,12 @@ class GEMPRO():
 
             # download kegg metadata
             metadata_file = ssbio.databases.kegg.download_kegg_gene_metadata(organism_code=kegg_organism_code,
-                                                                             gene_id=g,
+                                                                             gene_id=kegg_g,
                                                                              out_dir=gene_folder)
 
             # download kegg sequence
             sequence_file = ssbio.databases.kegg.download_kegg_aa_seq(organism_code=kegg_organism_code,
-                                                                      gene_id=g,
+                                                                      gene_id=kegg_g,
                                                                       out_dir=gene_folder)
 
             # if there is no FASTA for this gene, consider it missing
@@ -164,8 +166,8 @@ class GEMPRO():
             if metadata_file:
                 kegg_dict['k_metadata_file'] = op.basename(metadata_file)
 
-            if g in kegg_to_uniprot.keys():
-                kegg_dict['k_uniprot_acc'] = kegg_to_uniprot[g]
+            if kegg_g in kegg_to_uniprot.keys():
+                kegg_dict['k_uniprot_acc'] = kegg_to_uniprot[kegg_g]
 
             kegg_pre_df.append(kegg_dict)
 
@@ -181,7 +183,8 @@ class GEMPRO():
 
         # save a dataframe of the file mapping info
         # TODO: add more info from kegg metadata parsing
-        self.kegg_df = pd.DataFrame(kegg_pre_df)[['k_kegg_id','k_uniprot_acc','k_metadata_file','k_seq_file','k_seq_len']]
+        self.kegg_df = pd.DataFrame(kegg_pre_df)[
+            ['k_kegg_id', 'k_uniprot_acc', 'k_metadata_file', 'k_seq_file', 'k_seq_len']]
         kegg_df_outfile = op.join(self.data, '{}-kegg_df.csv'.format(date.short_date))
         self.kegg_df.to_csv(kegg_df_outfile)
         print('[INFO] Saved KEGG information at {}'.format(kegg_df_outfile))
@@ -240,7 +243,8 @@ class GEMPRO():
                                                                               outdir=gene_folder)
 
                 # download uniprot sequence
-                sequence_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot, filetype='fasta',
+                sequence_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot,
+                                                                              filetype='fasta',
                                                                               outdir=gene_folder)
 
                 uniprot_dict['u_seq_file'] = op.basename(sequence_file)
@@ -259,7 +263,6 @@ class GEMPRO():
 
         return uniprot_df_outfile
 
-
     def combine_kegg_uniprot_manual(self):
         """Combine information from KEGG, UniProt, and manual mappings.
 
@@ -277,7 +280,7 @@ class GEMPRO():
 
         top_blast_pre_df = []
 
-        for i,r in tqdm(custom_df.iterrows()):
+        for i, r in tqdm(custom_df.iterrows()):
             g = r['m_gene']
             seq = r['u_seq']
 
@@ -298,14 +301,106 @@ class GEMPRO():
                 top_blast_pre_df.append(top_hit)
 
         top_blast_df = pd.DataFrame(top_blast_pre_df)
-        reorg = ['m_gene','hit_pdb', 'hit_pdb_chain', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident']
+        reorg = ['m_gene', 'hit_pdb', 'hit_pdb_chain', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident']
         self.top_blast_df = top_blast_df[reorg]
         top_blast_df_outfile = op.join(self.data, '{}-pdb_blast_df.csv'.format(date.short_date))
         self.top_blast_df.to_csv(top_blast_df_outfile)
 
         return top_blast_df_outfile
 
+    def organize_itasser_models(self, raw_dir):
+        """Reorganize the raw information from I-TASSER modeling.
 
+        - Copies the model1.pdb file to the matching gene folder in structure_files/by_gene/
+        - Parses modeling information such as C-scores, template, etc
+        - Also will parse binding site (COACH) information if it exists
+
+        TODO: what else to parse?
+        TODO: finish summary df stuff
+
+        Returns: path to summary results dataframe
+        """
+        hom_pre_df = []
+
+        mode11_counter = 0
+        model1_bsites_counter = 0
+
+        for g in tqdm(self.genes):
+            hom_dict = {}
+            g_files = glob.glob(op.join(raw_dir, g + '*'))
+
+            ### homology model results
+            model_folder = op.join(raw_dir, g)
+            # best homology model is "model1.pdb"
+            model1_file = op.join(model_folder, 'model1.pdb')
+            init_dat = 'init.dat'
+            init_dat_path = op.join(model_folder, init_dat)
+
+            ### coach (binding site prediction) results
+            model1_coach_folder = op.join(model_folder, 'model1', 'coach')
+            bsites_inf = 'Bsites.inf'
+            bsites_inf_path = op.join(model1_coach_folder, bsites_inf)
+            ec = 'EC.dat'
+            ec_path = op.join(model1_coach_folder, ec)
+            go_mf = 'GO_MF.dat'
+            go_mf_path = op.join(model1_coach_folder, go_mf)
+            go_bp = 'GO_BP.dat'
+            go_bp_path = op.join(model1_coach_folder, go_bp)
+            go_cc = 'GO_CC.dat'
+            go_cc_path = op.join(model1_coach_folder, go_cc)
+
+            # if the homology model has been completed
+            if op.exists(model1_file):
+                # make the destination gene folder
+                dest_gene_dir = op.join(self.struct_single_chain, g)
+                if not op.exists(dest_gene_dir):
+                    os.mkdir(dest_gene_dir)
+
+                # the new model file will be named by the gene
+                dest = op.join(dest_gene_dir, '{}.pdb'.format(g))
+                if not op.exists(dest):
+                    shutil.copy2(model1_file, dest)
+                hom_dict['m_gene'] = g
+                hom_dict['i_model'] = '{}.pdb'.format(g)
+                hom_pre_df.append(hom_dict)
+                mode11_counter += 1
+
+            # if the binding site predictions have been completed
+            if op.exists(model1_coach_folder):
+                # make the destination folder
+                dest_coach_dir = op.join(self.struct_single_chain, g, 'coach')
+                if not op.exists(dest_coach_dir):
+                    os.mkdir(dest_coach_dir)
+
+                new_bsites_inf = op.join(dest_coach_dir, bsites_inf)
+                if op.exists(bsites_inf_path):
+                    if not op.exists(new_bsites_inf):
+                        shutil.copy2(bsites_inf_path, new_bsites_inf)
+                model1_bsites_counter += 1
+
+                new_ec = op.join(dest_coach_dir, ec)
+                if op.exists(ec_path) and not op.exists(new_ec):
+                    shutil.copy2(ec_path, new_ec)
+
+                new_go_mf = op.join(dest_coach_dir, go_mf)
+                if op.exists(go_mf_path) and not op.exists(new_go_mf):
+                    shutil.copy2(go_mf_path, new_go_mf)
+
+                new_go_bp = op.join(dest_coach_dir, go_bp)
+                if op.exists(go_bp_path) and not op.exists(new_go_bp):
+                    shutil.copy2(go_bp_path, new_go_bp)
+
+                new_go_cc = op.join(dest_coach_dir, go_cc)
+                if op.exists(go_cc_path) and not op.exists(new_go_cc):
+                    shutil.copy2(go_cc_path, new_go_cc)
+
+        print('[INFO] {} homology models completed and copied to {}.'.format(mode11_counter, self.struct_single_chain))
+        if model1_bsites_counter:
+            print('[INFO] {} binding site predictions completed and copied.'.format(model1_bsites_counter))
+
+        self.homology_df = pd.DataFrame(hom_pre_df)[['m_gene','i_model']]
+        self.homology_df.to_csv(op.join(self.data, '{}-homology_models_df.csv'.format(date.short_date)))
+        return op.join(self.data, '{}-homology_models_df.csv'.format(date.short_date))
 
     def run_pipeline(self):
         """Run the entire GEM-PRO pipel ine.
