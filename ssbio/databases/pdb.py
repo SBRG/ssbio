@@ -338,6 +338,8 @@ def blast_pdb(seq, evalue=0.001, link=False):
                 info_dict[i]['hit_evalue'] = hit_dict['Hsp_evalue']
                 info_dict[i]['hit_score'] = hit_dict['Hsp_score']
 
+                # TODO: what about sequence similarity?
+
             info_df = pd.DataFrame.from_dict(info_dict, orient='index')
             reorg = ['hit_pdb', 'hit_pdb_chain', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident']
             # print("Number of BLAST hits: {}".format(len(info_df)))
@@ -354,7 +356,7 @@ def top_pdb_blast_hit(seq, evalue=0.001):
         return None
     return blast_df.loc[0].to_dict()
 
-
+@cachetools.func.ttl_cache(maxsize=500)
 def best_structures(uniprot_id):
     """Utilize the PDBe REST API to return the rank-ordered list of PDB "best structures"
 

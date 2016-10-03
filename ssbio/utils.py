@@ -91,7 +91,7 @@ def split_list(a_list):
     half = len(a_list)//2
     return a_list[:half], a_list[half:]
 
-def input_list_parser(instring):
+def input_list_parser(instring, filetype=''):
     """Always return a list of files with varying input
 
     1. /path/to/folder -> list of files in folder (full paths)
@@ -105,6 +105,11 @@ def input_list_parser(instring):
     Returns:
 
     """
+    if filetype:
+        searchstring =
+    else:
+        searchstring = '*'
+
     if op.isdir(instring):
         os.chdir(instring)
         return glob.glob('*')

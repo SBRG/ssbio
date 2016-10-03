@@ -11,7 +11,7 @@ date = utils.Date()
 
 # TODO: what if i want to write one fasta file for multiple sequences?
 
-def write_fasta_file(seq_str, ident, description='{}-ssbioSeq'.format(date.short_date),
+def write_fasta_file(seq_str, ident, description='',
                      extension='faa', outpath=None, overwrite=False, ignore_alphabet=False):
     '''
     This writes a fasta file for a single sequence string.
@@ -25,7 +25,12 @@ def write_fasta_file(seq_str, ident, description='{}-ssbioSeq'.format(date.short
             ignore_alphabet (boolean): OPTIONAL check the alphabet to see if it contains valid amino acids.
     Output: Filename of fasta file
     '''
-    seq = load_seq_string(seq_str, ident=ident, desc=description, ignore_alphabet=ignore_alphabet)
+
+    if not description:
+        description_final = '{}-ssbioSeq'.format(date.short_date)
+    else:
+        description_final = '{}_{}-ssbioSeq'.format(description, date.short_date)
+    seq = load_seq_string(seq_str, ident=ident, desc=description_final, ignore_alphabet=ignore_alphabet)
     outfile = "{}.{}".format(ident, extension)
 
     if outpath:

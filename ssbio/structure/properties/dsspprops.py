@@ -49,7 +49,7 @@ def dssp_dataframe(filename):
     try:
         dssp = PDB.DSSP(model, filename)
     except:
-        return {}
+        return pd.DataFrame()
     akeys = list(dssp)
 
     if len(akeys) == 0:

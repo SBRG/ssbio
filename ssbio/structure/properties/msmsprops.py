@@ -1,7 +1,23 @@
 from Bio import PDB
 from ssbio.structure.pdbioext import PDBIOExt
+import os
+import os.path as op
+import pandas as pd
 
-def msms_output(filename):
+
+def msms_output(filename, outdir=None):
+    """Run MSMS (through Biopython) on a PDB file.
+
+    Saves the result dataframe
+
+    Args:
+        filename:
+
+    Returns:
+
+    """
+    basename = op.splitext(op.basename(filename))[0]
+
     my_structure = PDBIOExt(filename)
     model = my_structure.first_model
     rd = PDB.ResidueDepth(model, filename)
@@ -25,7 +41,16 @@ def msms_output(filename):
                 chain = 'X'
             anslist.append([chain, seqnum, re_depth, ca_depth])
 
-    return anslist
+    msms_df = pd.DataFrame(anslist)
+    msms_df = msms_df.rename(columns={0:'chain',1:'resnum',2:'res_depth',3:'ca_depth'})
+    if outdir:
+        outfile = op.join(outdir, basename + '_msms.df')
+    else:
+        outfile = basename + '_msms.df'
+
+    msms_df.to_csv(outfile)
+
+    return outfile
 
 def residue_depth(anslist):
     '''Computes the average residue and CA depth

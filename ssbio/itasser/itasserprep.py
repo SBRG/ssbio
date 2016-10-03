@@ -23,9 +23,9 @@ class ITASSERPrep():
             os.makedirs(root_dir)
         # TODO: whats the diff between root and data dir?
         if not data_dir:
-            self.data_dir = self.prep_folders(seq_str)
+            self.data_dir = self.prep_folders(seq_str, description=ident)
         elif data_dir:
-            orig_data_dir = self.prep_folders(seq_str)
+            orig_data_dir = self.prep_folders(seq_str, description=ident)
             self.data_dir = op.join(data_dir, op.basename(orig_data_dir))
 
         self.print_exec = print_exec
@@ -57,7 +57,7 @@ class ITASSERPrep():
             self.prep_script_slurm(itasser_loc=itasser_loc,
                                    itlib_loc=itlib_loc)
 
-    def prep_folders(self, seq):
+    def prep_folders(self, seq, description=''):
         """Take in a sequence string and prepares the folder for it to run ITASSER
         """
         itasser_dir = op.join(self.root_dir, self.ident)
@@ -67,6 +67,7 @@ class ITASSERPrep():
 
         fasta.write_fasta_file(seq_str=seq,
                                ident='seq',
+                               description=description,
                                extension='fasta',
                                outpath=itasser_dir)
         return itasser_dir
