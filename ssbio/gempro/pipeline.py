@@ -13,6 +13,7 @@ from Bio import SeqIO
 from bioservices.uniprot import UniProt
 
 bsup = UniProt()
+from bidict import bidict
 
 from ssbio import utils
 from ssbio.cobra.utils import is_spontaneous, true_num_reactions, true_num_genes
@@ -28,6 +29,10 @@ from tqdm import tqdm
 import requests
 
 from ssbio.databases.pdb import top_pdb_blast_hit
+
+from bioservices import KEGG
+
+bs_kegg = KEGG()
 
 
 class GEMPRO():
@@ -52,13 +57,13 @@ class GEMPRO():
     def prep_folders(self):
         """Prepare all folders for a GEM-PRO project
         """
-        # data - directory where all data frames will be stored (all stages)
+        # data - directory where all data will be stored
         self.data = op.join(self.model_dir, 'data')
 
         # notebooks - directory where ipython notebooks will be stored for manual analyses
         self.notebooks = op.join(self.model_dir, 'notebooks')
 
-        # # figures - directory where all figures will be stored (all stages)
+        # # figures - directory where all figures will be stored
         self.figures = op.join(self.model_dir, 'figures')
 
         # missing - directory where missing reports go
@@ -113,11 +118,16 @@ class GEMPRO():
         print('[MODEL] Number of genes (excluding spontaneous): {}'.format(true_num_genes(self.model)))
         print('[MODEL] Number of metabolites: {}'.format(len(self.model.metabolites)))
 
-    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None):
+    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the KEGG service. Also download all metadata and sequences
 
         Args:
-            kegg_organism_code: the three letter KEGG code of your organism
+            kegg_organism_code (str): The three letter KEGG code of your organism
+            custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,
+                custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
+                Dictionary keys must match model genes.
+            force_rerun (bool): Flag to indicate if function should be rerun (True) or if
+                cached files that match the format *_kegg_df.csv should be used instead (default, False).
 
         Returns: path to metadata/mapping dataframe
 
@@ -126,10 +136,34 @@ class GEMPRO():
         # all data will be stored in a dataframe
         kegg_pre_df = []
 
-        # first map all of the organism's genes to UniProt
+        # first map all of the organism's kegg genes to UniProt
         kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
 
         self.kegg_missing_genes = []
+
+        kegg_df_outfile = op.join(self.data, '{}-kegg_df.csv'.format(date.short_date))
+        err_file = op.join(self.missing, '{}-kegg_mapping.err'.format(date.short_date))
+
+        if not force_rerun:
+            # check for already saved mappings
+            # load the latest mapping if there are multiple
+            saved_dfs = utils.rank_dated_files('*-kegg_df.csv', self.data)
+            saved_err = utils.rank_dated_files('*-kegg_mapping.err', self.missing)
+
+            if saved_err:
+                to_load_err = saved_err[0]
+                err_date = op.basename(to_load_err).split('-')[0]
+
+                with open(to_load_err, mode='rt', encoding='utf-8') as error_file:
+                    self.kegg_missing_genes = error_file.read().splitlines()
+                    print('[INFO] Loaded KEGG mapping errors dated {}'.format(err_date))
+
+            if saved_dfs:
+                to_load_df = saved_dfs[0]
+                df_date = op.basename(to_load_df).split('-')[0]
+                self.kegg_df = pd.read_csv(to_load_df, index_col=0)
+                print('[INFO] Loaded KEGG mapping dataframe dated {}'.format(df_date))
+                return
 
         for g in tqdm(self.genes):
 
@@ -139,6 +173,7 @@ class GEMPRO():
                 kegg_g = g
 
             kegg_dict = {}
+            kegg_dict['m_gene'] = g
             kegg_dict['k_kegg_id'] = kegg_g
 
             # make the gene specific folder under the sequence_files directory
@@ -156,15 +191,27 @@ class GEMPRO():
                                                                       gene_id=kegg_g,
                                                                       out_dir=gene_folder)
 
-            # if there is no FASTA for this gene, consider it missing
-            if sequence_file:
+            # if there is no FASTA for this gene, consider it missing and do not add it to the dataframe
+            if not sequence_file:
+                self.kegg_missing_genes.append(g)
+                continue
+            else:
                 kegg_dict['k_seq_file'] = op.basename(sequence_file)
                 kegg_dict['k_seq_len'] = len(SeqIO.read(open(sequence_file), "fasta"))
-            else:
-                self.kegg_missing_genes.append(g)
 
             if metadata_file:
                 kegg_dict['k_metadata_file'] = op.basename(metadata_file)
+
+                # parse PDB mapping from metadata file
+                # in some cases, KEGG IDs do not map to a UniProt ID - this is to ensure we get the PDB mapping
+                with open(metadata_file) as mf:
+                    kegg_parsed = bs_kegg.parse(mf.read())
+                if 'STRUCTURE' in kegg_parsed.keys():
+                    kegg_dict['k_pdb_id'] = kegg_parsed['STRUCTURE']
+                    # TODO: there is a lot more you can get from the KEGG metadata file, examples below (consider saving it in the DF)
+                    # 'DBLINKS': {'NCBI-GeneID': '100763844', 'NCBI-ProteinID': 'XP_003514445'}
+                    # 'ORTHOLOGY': {'K00473': 'procollagen-lysine,2-oxoglutarate 5-dioxygenase 1 [EC:1.14.11.4]'},
+                    # 'PATHWAY': {'cge00310': 'Lysine degradation'},
 
             if kegg_g in kegg_to_uniprot.keys():
                 kegg_dict['k_uniprot_acc'] = kegg_to_uniprot[kegg_g]
@@ -173,50 +220,76 @@ class GEMPRO():
 
         # save a log file for the genes that could not be mapped
         if self.kegg_missing_genes:
-            err_file = op.join(self.missing, '{}_kegg_mapping.err'.format(date.short_date))
             warnings.warn(
-                '{} genes were not able to be mapped to a Kegg entry. Please see {} for a list of these genes'.format(
+                '{} genes were not able to be mapped to a KEGG entry. Please see {} for a list of these genes'.format(
                     len(self.kegg_missing_genes),
                     err_file))
             with open(err_file, mode='wt', encoding='utf-8') as myfile:
                 myfile.write('\n'.join(self.kegg_missing_genes))
 
         # save a dataframe of the file mapping info
-        # TODO: add more info from kegg metadata parsing
-        self.kegg_df = pd.DataFrame(kegg_pre_df)[
-            ['k_kegg_id', 'k_uniprot_acc', 'k_metadata_file', 'k_seq_file', 'k_seq_len']]
-        kegg_df_outfile = op.join(self.data, '{}-kegg_df.csv'.format(date.short_date))
+        cols = ['m_gene', 'k_kegg_id', 'k_uniprot_acc', 'k_pdb_id', 'k_metadata_file', 'k_seq_file',
+                'k_seq_len']
+        self.kegg_df = pd.DataFrame(kegg_pre_df)[cols].set_index('m_gene')
         self.kegg_df.to_csv(kegg_df_outfile)
         print('[INFO] Saved KEGG information at {}'.format(kegg_df_outfile))
 
         return kegg_df_outfile
 
-    def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_list=None):
+    def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.
 
-        Common model gene sources are:
-            Ensembl Genomes - ENSEMBLGENOME_ID
-            Entrez Gene (GeneID) - P_ENTREZGENEID
-            RefSeq Protein - P_REFSEQ_AC
-
         Args:
-            model_gene_source: the database source of your model gene IDs, see http://www.uniprot.org/help/programmatic_access
+            model_gene_source (str): the database source of your model gene IDs, see http://www.uniprot.org/help/programmatic_access
+                Common model gene sources are:
+                Ensembl Genomes - ENSEMBLGENOME_ID
+                Entrez Gene (GeneID) - P_ENTREZGENEID
+                RefSeq Protein - P_REFSEQ_AC
+            custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,
+                custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
+                Dictionary keys must match model genes.
+            force_rerun (bool): Flag to indicate if function should be rerun (True) or if
+                cached files that match the format *_uniprot_df.csv should be used instead (default, False).
 
         Returns: path to metadata/mapping dataframe
 
         """
 
-        if custom_gene_list:
-            genes_to_map = custom_gene_list
+        # allow model gene --> custom ID mapping
+        if custom_gene_mapping:
+            # create a reverse mapping dictionary to map from custom ID -> model gene later
+            rev_map = bidict(custom_gene_mapping)
+            genes_to_map = list(custom_gene_mapping.values())
         else:
             genes_to_map = self.genes
+
+        if not force_rerun:
+            # check for already saved mappings
+            # load the latest mapping if there are multiple
+            saved_dfs = utils.rank_dated_files('*-uniprot_df.csv', self.data)
+            saved_err = utils.rank_dated_files('*-uniprot_mapping.err', self.missing)
+
+            if saved_err:
+                to_load_err = saved_err[0]
+                err_date = op.basename(to_load_err).split('-')[0]
+
+                with open(to_load_err, mode='rt', encoding='utf-8') as error_file:
+                    self.uniprot_missing_genes = error_file.read().splitlines()
+                    print('[INFO] Loaded UniProt mapping errors dated {}'.format(err_date))
+
+            if saved_dfs:
+                to_load_df = saved_dfs[0]
+                df_date = op.basename(to_load_df).split('-')[0]
+                self.uniprot_df = pd.read_csv(to_load_df, index_col=0)
+                print('[INFO] Loaded UniProt mapping dataframe dated {}'.format(df_date))
+                return
 
         genes_to_uniprots = bsup.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
         self.uniprot_missing_genes = list(set(genes_to_map).difference(genes_to_uniprots.keys()))
 
         # save a log file for the genes that could not be mapped
         if self.uniprot_missing_genes:
-            err_file = op.join(self.missing, '{}_uniprot_mapping.err'.format(date.short_date))
+            err_file = op.join(self.missing, '{}-uniprot_mapping.err'.format(date.short_date))
             warnings.warn(
                 '[INFO] {} genes were not able to be mapped to a UniProt entry. Please see {} for a list of these genes'.format(
                     len(self.uniprot_missing_genes),
@@ -226,11 +299,16 @@ class GEMPRO():
 
         # all data will be stored in a dataframe
         uniprot_pre_df = []
-
         for g, v in tqdm(genes_to_uniprots.items()):
+            # TODO: reverse mapping to custom ids could probably be done in a better way
+            if custom_gene_mapping:
+                original_m_gene = rev_map[g]
+            else:
+                original_m_gene = g
+
             for mapped_uniprot in v:
                 uniprot_dict = {}
-                uniprot_dict['m_gene'] = g
+                uniprot_dict['m_gene'] = original_m_gene
                 uniprot_dict['u_uniprot_acc'] = mapped_uniprot
 
                 # make the gene specific folder under the sequence_files directory
@@ -248,27 +326,40 @@ class GEMPRO():
                                                                               outdir=gene_folder)
 
                 uniprot_dict['u_seq_file'] = op.basename(sequence_file)
-                uniprot_dict['u_seq_len'] = len(SeqIO.read(open(sequence_file), "fasta"))
                 uniprot_dict['u_metadata_file'] = op.basename(metadata_file)
+
+                # adding additional uniprot metadata
+                metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
+                uniprot_dict.update(metadata)
 
                 uniprot_pre_df.append(uniprot_dict)
 
         # save a dataframe of the file mapping info
-        # TODO: add more info from uniprot metadata parsing
-        self.uniprot_df = pd.DataFrame(uniprot_pre_df)[
-            ['m_gene', 'u_uniprot_acc', 'u_metadata_file', 'u_seq_file', 'u_seq_len']]
+        cols = ['m_gene', 'u_uniprot_acc', 'u_gene_name', 'u_reviewed', 'u_seq_len', 'u_kegg_id', 'u_refseq',
+                'u_ec_number', 'u_pfam', 'u_description', 'u_entry_version', 'u_seq_version', 'u_metadata_file',
+                'u_seq_file']
+        self.uniprot_df = pd.DataFrame(uniprot_pre_df)[cols].set_index('m_gene')
         uniprot_df_outfile = op.join(self.data, '{}-uniprot_df.csv'.format(date.short_date))
         self.uniprot_df.to_csv(uniprot_df_outfile)
-        print('[INFO] Saved KEGG information at {}'.format(uniprot_df_outfile))
+        print('[INFO] Saved UniProt information at {}'.format(uniprot_df_outfile))
 
         return uniprot_df_outfile
 
-    def combine_kegg_uniprot_manual(self):
+    def cosonlidate_mappings(self):
         """Combine information from KEGG, UniProt, and manual mappings.
 
         Returns:
 
         """
+        # compare gene -> uniprot mappings
+
+        # compare sequence lengths
+
+        # if different, compare sequences?
+
+        # sometimes KEGG won't map to a uniprot ID, but will map to a PDB - this needs to be saved somewhere
+
+
         pass
 
     def blast_seqs_to_pdb(self, custom_df, evalue=0.001, link=False):
@@ -398,7 +489,7 @@ class GEMPRO():
         if model1_bsites_counter:
             print('[INFO] {} binding site predictions completed and copied.'.format(model1_bsites_counter))
 
-        self.homology_df = pd.DataFrame(hom_pre_df)[['m_gene','i_model']]
+        self.homology_df = pd.DataFrame(hom_pre_df)[['m_gene', 'i_model']]
         self.homology_df.to_csv(op.join(self.data, '{}-homology_models_df.csv'.format(date.short_date)))
         return op.join(self.data, '{}-homology_models_df.csv'.format(date.short_date))
 
