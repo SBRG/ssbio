@@ -194,7 +194,7 @@ def download_uniprot_file(uniprot_id, filetype, outdir=''):
     return outfile
 
 
-def parse_uniprot_txt_file(infile):
+def old_parse_uniprot_txt_file(infile):
     """
     from: boscoh/uniprot github
     Parses the text of metadata retrieved from uniprot.org.
@@ -322,13 +322,13 @@ def parse_uniprot_txt_file(infile):
     return metadata_by_seqid
 
 
-def reparse_uniprot_txt_file(infile):
+def parse_uniprot_txt_file(infile):
     uniprot_metadata_dict = {}
 
-    metadata = parse_uniprot_txt_file(infile)
+    metadata = old_parse_uniprot_txt_file(infile)
     metadata_key = list(metadata.keys())[0]
 
-    uniprot_metadata_dict['u_seq'] = metadata[metadata_key]['sequence']
+    # uniprot_metadata_dict['u_seq'] = metadata[metadata_key]['sequence']
     uniprot_metadata_dict['u_seq_len'] = len(
         str(metadata[metadata_key]['sequence']))
     uniprot_metadata_dict['u_reviewed'] = metadata[
