@@ -21,6 +21,8 @@ except ImportError:
 
 @contextmanager
 def suppress_stdout():
+    """Suppress stout messages.
+    """
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
         sys.stdout = devnull
@@ -43,6 +45,20 @@ def dict_head(d, disp=5):
 
     """
     return {k: d[k] for k in list(d.keys())[:disp]}
+
+def rank_dated_files(pattern, dir):
+    """Search a directory for files that match a pattern. Return an ordered list of these files.
+
+    Args:
+        pattern: glob pattern to search for
+
+    Returns:
+        Rank-ordered list, usually by date (shortdate format, e.g. 161010).
+        The most recent file will be in position 0.
+
+    """
+    files = glob.glob(op.join(dir, pattern))
+    return sorted(files, reverse=True)
 
 def input_parser(args):
     """Parse command line inputs
@@ -106,7 +122,8 @@ def input_list_parser(instring, filetype=''):
 
     """
     if filetype:
-        searchstring =
+        # TODO
+        searchstring = '*'
     else:
         searchstring = '*'
 
