@@ -23,5 +23,6 @@ setup(
                       'cachetools',
                       'bioservices',
                       'prody',
-                      'xmltodict']
+                      'xmltodict',
+                      'bidict']
 )
