@@ -23,6 +23,7 @@ date = utils.Date()
 import ssbio.databases.kegg
 import ssbio.databases.uniprot
 import ssbio.databases.pdb
+import ssbio.sequence.fasta
 import pandas as pd
 
 from tqdm import tqdm
@@ -220,10 +221,8 @@ class GEMPRO():
 
         # save a log file for the genes that could not be mapped
         if self.kegg_missing_genes:
-            warnings.warn(
-                '{} genes were not able to be mapped to a KEGG entry. Please see {} for a list of these genes'.format(
-                    len(self.kegg_missing_genes),
-                    err_file))
+            print('[WARN] {} genes were not able to be mapped to a KEGG entry. Please see {} for a list of these genes'.format(
+                    len(self.kegg_missing_genes), err_file))
             with open(err_file, mode='wt', encoding='utf-8') as myfile:
                 myfile.write('\n'.join(self.kegg_missing_genes))
 
@@ -251,7 +250,8 @@ class GEMPRO():
             force_rerun (bool): Flag to indicate if function should be rerun (True) or if
                 cached files that match the format *_uniprot_df.csv should be used instead (default, False).
 
-        Returns: path to metadata/mapping dataframe
+        Returns:
+            Path to metadata/mapping dataframe
 
         """
 
@@ -290,16 +290,14 @@ class GEMPRO():
         # save a log file for the genes that could not be mapped
         if self.uniprot_missing_genes:
             err_file = op.join(self.missing, '{}-uniprot_mapping.err'.format(date.short_date))
-            warnings.warn(
-                '[INFO] {} genes were not able to be mapped to a UniProt entry. Please see {} for a list of these genes'.format(
-                    len(self.uniprot_missing_genes),
-                    err_file))
+            print('[WARN] {} genes were not able to be mapped to a UniProt entry. Please see {} for a list of these genes'.format(
+                    len(self.uniprot_missing_genes), err_file))
             with open(err_file, mode='wt', encoding='utf-8') as myfile:
                 myfile.write('\n'.join(self.uniprot_missing_genes))
 
         # all data will be stored in a dataframe
         uniprot_pre_df = []
-        for g, v in tqdm(genes_to_uniprots.items()):
+        for g,v in tqdm(genes_to_uniprots.items()):
             # TODO: reverse mapping to custom ids could probably be done in a better way
             if custom_gene_mapping:
                 original_m_gene = rev_map[g]
@@ -312,7 +310,7 @@ class GEMPRO():
                 uniprot_dict['u_uniprot_acc'] = mapped_uniprot
 
                 # make the gene specific folder under the sequence_files directory
-                gene_folder = op.join(self.seq_files, g)
+                gene_folder = op.join(self.seq_files, original_m_gene)
                 if not op.exists(gene_folder):
                     os.mkdir(gene_folder)
 
@@ -345,8 +343,126 @@ class GEMPRO():
 
         return uniprot_df_outfile
 
-    def cosonlidate_mappings(self):
+    def manual_uniprot_mapping(self, infile):
+        """Read a manual input file of model gene IDs --> UniProt IDs.
+
+        This allows for mapping of the missing genes, or overriding of automatic mappings.
+
+        Args:
+            infile: Path to .csv file with the headers:
+                m_gene - model gene ID
+                u_uniprot_acc - manually determined UniProt ID
+
+        """
+        # read the manual mapping file
+        man_df = pd.read_csv(infile)
+
+        # copy this manual mapping file to the GEMPRO "missing" directory for records
+        # shutil.copy(infile, op.join(self.missing, '{}-gene_to_uniprot.in'.format(date.short_date)))
+
+        uniprot_pre_df = []
+
+        # iterate over the rows
+        for i,r in man_df.iterrows():
+            g = r['m_gene']
+            u = r['u_uniprot_acc']
+
+            uniprot_dict = {}
+            uniprot_dict['m_gene'] = g
+            uniprot_dict['u_uniprot_acc'] = u
+
+            # make the gene folder
+            gene_folder = op.join(self.seq_files, g)
+            if not op.exists(gene_folder):
+                os.mkdir(gene_folder)
+
+            # download uniprot metadata
+            metadata_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=u, filetype='txt',
+                                                                          outdir=gene_folder)
+
+            # download uniprot sequence
+            sequence_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=u,
+                                                                          filetype='fasta',
+                                                                          outdir=gene_folder)
+
+            uniprot_dict['u_seq_file'] = op.basename(sequence_file)
+            uniprot_dict['u_metadata_file'] = op.basename(metadata_file)
+
+            # adding additional uniprot metadata
+            metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
+            uniprot_dict.update(metadata)
+
+            uniprot_pre_df.append(uniprot_dict)
+
+            # remove the entry from the missing genes list
+            if g in self.uniprot_missing_genes:
+                self.uniprot_missing_genes.remove(g)
+
+        # add all new entries to the uniprot_df
+        self.uniprot_df = self.uniprot_df.reset_index().append(uniprot_pre_df, ignore_index=True).set_index('m_gene')
+        uniprot_df_outfile = op.join(self.data, '{}-uniprot_df.csv'.format(date.short_date))
+        self.uniprot_df.to_csv(uniprot_df_outfile)
+
+        print('[INFO] Saved updated UniProt information at {}'.format(uniprot_df_outfile))
+        if self.uniprot_missing_genes:
+            err_file = op.join(self.missing, '{}-uniprot_mapping.err'.format(date.short_date))
+            warnings.warn(
+                '[WARN] {} genes were not able to be mapped to a UniProt entry. Please see {} for a list of these genes'.format(
+                    len(self.uniprot_missing_genes),
+                    err_file))
+            with open(err_file, mode='wt', encoding='utf-8') as myfile:
+                myfile.write('\n'.join(self.uniprot_missing_genes))
+
+    def manual_seq_mapping(self, infile):
+        """Read a manual input file of model gene IDs --> protein sequences
+
+        Args:
+            infile: Path to .csv file with the headers:
+                m_gene - model gene ID
+                m_sequence - manually specified protein sequence
+
+        Returns:
+            Path to mapping dataframe
+
+        """
+        # read the manual mapping file
+        man_df = pd.read_csv(infile)
+
+        manual_pre_df = []
+
+        # save the sequence information in individual FASTA files
+        for i,r in man_df.iterrows():
+            g = r['m_gene']
+            s = r['m_sequence']
+
+            # make the a manual_mapping_df with added info seq_len & seq_file
+            manual_dict = {}
+            manual_dict['m_gene'] = g
+            manual_dict['seq_len'] = len(s)
+
+            gene_folder = op.join(self.seq_files, g)
+            if not op.exists(gene_folder):
+                os.mkdir(gene_folder)
+
+            seq_file = ssbio.sequence.fasta.write_fasta_file(seq_str=s, ident=g, outdir=gene_folder)
+            manual_dict['seq_file'] = op.basename(seq_file)
+
+            manual_pre_df.append(manual_dict)
+
+        cols = ['m_gene', 'seq_len', 'u_seq_file']
+        self.manual_df = pd.DataFrame(manual_pre_df)[cols].set_index('m_gene')
+        manual_df_outfile = op.join(self.data, '{}-manual_df.csv'.format(date.short_date))
+        self.manual_df.to_csv(manual_df_outfile)
+        print('[INFO] Saved manually defined sequence information at {}'.format(manual_df_outfile))
+
+        return manual_df_outfile
+
+
+    def consolidate_mappings(self):
         """Combine information from KEGG, UniProt, and manual mappings.
+
+        Manual mappings override all existing mappings.
+        UniProt mappings override KEGG mappings.
 
         Returns:
 
