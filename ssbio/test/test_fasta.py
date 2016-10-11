@@ -30,17 +30,17 @@ class TestFasta(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as custom_dir:
             written_file_cusdir = fasta.write_fasta_file(
-                sequence, ident, outpath=custom_dir, overwrite=overwrite)
+                sequence, ident, outdir=custom_dir, overwrite=overwrite)
             self.assertEqual(written_file_cusdir, os.path.join(
                 custom_dir, ident + '.faa'))
 
             written_file_cusdirid = fasta.write_fasta_file(
-                sequence, custom_id, outpath=custom_dir, overwrite=overwrite)
+                sequence, custom_id, outdir=custom_dir, overwrite=overwrite)
             self.assertEqual(written_file_cusdirid, os.path.join(
                 custom_dir, custom_id + '.faa'))
 
             written_file_cusdiridext = fasta.write_fasta_file(
-                sequence, custom_id, outpath=custom_dir, extension=custom_ext, overwrite=overwrite)
+                sequence, custom_id, outdir=custom_dir, extension=custom_ext, overwrite=overwrite)
             self.assertEqual(written_file_cusdiridext, os.path.join(
                 custom_dir, custom_id + '.' + custom_ext))
 

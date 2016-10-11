@@ -23,7 +23,7 @@ def parse_bsites_inf(infile):
     For each site (cluster), there are three lines:
     Line 1: site number, c-score of coach prediction, cluster size
     Line 2: algorithm, PDB ID, ligand ID, center of binding site (cartesian coordinates),
-        c-score of the algorithm’s prediction, binding residues from single template
+        c-score of the algorithm’kegg prediction, binding residues from single template
     Line 3: Statistics of ligands in the cluster
 
     Args:
@@ -67,10 +67,10 @@ def parse_bsites_inf(infile):
             bsites_site_dict['pdb_ligand'] = line2[2]
             bsites_site_dict['binding_location_coords'] = tuple(float(x) for x in line2[3].split())
 
-            # TODO: what's the difference between this c-score and the cluster's c-score?
-            # how is the cluster's c-score computed? it's not the average c-score of all methods
+            # TODO: what'kegg the difference between this c-score and the cluster'kegg c-score?
+            # how is the cluster'kegg c-score computed? it'kegg not the average c-score of all methods
             # also why are some COFACTOR c-scores >1?
-            # 160411 - seems like the COFACTOR "BS-score" is being reported here, not it's c-score...
+            # 160411 - seems like the COFACTOR "BS-score" is being reported here, not it'kegg c-score...
             tmp_split = line2[4].split(' :')
             bsites_site_dict['c_score_method'] = tmp_split[0]
             bsites_site_dict['binding_residues'] = tmp_split[1]

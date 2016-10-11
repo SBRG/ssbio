@@ -12,7 +12,7 @@ date = utils.Date()
 # TODO: what if i want to write one fasta file for multiple sequences?
 
 def write_fasta_file(seq_str, ident, description='',
-                     extension='faa', outpath=None, overwrite=False, ignore_alphabet=False):
+                     extension='faa', outdir=None, overwrite=False, ignore_alphabet=False):
     '''
     This writes a fasta file for a single sequence string.
     It also checks if the file exists already and returns the filename.
@@ -20,7 +20,7 @@ def write_fasta_file(seq_str, ident, description='',
 
     Input:  seq_str (str) - amino acid string
             ident (str) - ID of the sequence
-            outpath (str) - desired PATH of file output
+            outdir (str) - desired directory of file output
             overwrite (bool) - if you want to overwrite existing files
             ignore_alphabet (boolean): OPTIONAL check the alphabet to see if it contains valid amino acids.
     Output: Filename of fasta file
@@ -33,10 +33,10 @@ def write_fasta_file(seq_str, ident, description='',
     seq = load_seq_string(seq_str, ident=ident, desc=description_final, ignore_alphabet=ignore_alphabet)
     outfile = "{}.{}".format(ident, extension)
 
-    if outpath:
-        if not op.exists(outpath):
-            os.mkdir(outpath)
-        outfile = op.join(outpath, outfile)
+    if outdir:
+        if not op.exists(outdir):
+            os.mkdir(outdir)
+        outfile = op.join(outdir, outfile)
 
     if op.isfile(outfile) and not overwrite:
         return outfile
@@ -49,7 +49,7 @@ def load_seq_string(seq_string, ident, name='', desc='', ignore_alphabet=False):
     """Load an amino acid sequence string.
 
     Args:
-        seq_string (str): A protein's amino acid sequence
+        seq_string (str): A protein'kegg amino acid sequence
         ident (str): Database identifier (ie. UniProt or PDB ID)
         name (str): OPTIONAL protein name (ie. gene name)
         desc (str): OPTIONAL description of this sequence (ie. catabolizes G6P)
@@ -91,4 +91,4 @@ def load_fasta_file(filename):
 
 
 if __name__ == '__main__':
-    print(write_fasta_file('ALALLALAL', ident='mypdb', outpath='/tmp/', overwrite=True))
+    print(write_fasta_file('ALALLALAL', ident='mypdb', outdir='/tmp/', overwrite=True))

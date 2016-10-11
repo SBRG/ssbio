@@ -10,9 +10,10 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   intro
-   tutorial
 
+   tutorial
+   test
+   python_api
 
 
 Indices and tables

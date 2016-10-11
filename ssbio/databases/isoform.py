@@ -18,7 +18,7 @@ def gene_isos_to_uniprot(gene, isos, reviewed_uni_isos, unreviewed_uni_isos):
         if not standard_isoform_id(x):
             raise ValueError('Strange isoform ID: {}'.format(x))
 
-    # check if the number of reported isoforms is less than or equal to what's available
+    # check if the number of reported isoforms is less than or equal to what'kegg available
     if len(isos) <= len(combolist):
         for i,iso in enumerate(isos):
             mapping[iso] = combolist[i]
@@ -75,7 +75,7 @@ def gene_to_uniprot(gene, isoforms, mapping_df, isoform_df, metadata_df):
         Output: None
     5. (Other) There are multiple reviewed entries. These must be manually handled.
 
-    ##TODO: please draw a diagram or something to explain what's going on here
+    ##TODO: please draw a diagram or something to explain what'kegg going on here
     '''
     g_to_u_df = mapping_df[mapping_df.m_gene_entrez == gene]
     g_to_u_all = g_to_u_df.u_uniprot_acc.unique().tolist()
@@ -237,7 +237,7 @@ def gene_to_refseq(gene, isoforms, mapping_df):#, metadata_df):
     g_to_r = g_to_many_df[pd.notnull(g_to_many_df.bm_refseq)].bm_refseq.unique().tolist()
 
     if len(g_to_r) == 0:
-#         warnings.warn('WARNING: no mapped RefSeq IDs for gene %s and isoforms %s' % (gene, isoforms))
+#         warnings.warn('WARNING: no mapped RefSeq IDs for gene %kegg and isoforms %kegg' % (gene, isoforms))
         return None
 
     # load the sequences of the isoforms, record their length. assign them to the isoforms based on length

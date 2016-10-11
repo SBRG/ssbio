@@ -68,9 +68,9 @@ def get_best_structures(uniprot_id):
         #
         # def ranker_averager(ro1, ro2):
         #     avg_rank = {}
-        #     for k in ro1:
-        #         avg = (float(ro1[k]) + float(ro2[k])) / 2
-        #         avg_rank[k] = avg
+        #     for kegg in ro1:
+        #         avg = (float(ro1[kegg]) + float(ro2[kegg])) / 2
+        #         avg_rank[kegg] = avg
         #
         #     order_by_avg_rank = sorted(avg_rank.iteritems(), key=operator.itemgetter(1))
         #     return order_by_avg_rank
@@ -143,7 +143,7 @@ def get_best_structures(uniprot_id):
         #
         #         pdb_fasta = SEQ_PDB_FILES + pdb_id + '.faa'
         #         if not os.path.exists(pdb_fasta):
-        #             warnings.warn('***WARNING: No PDB FASTA file found for %s. Please check if step 3.3 was run.***' % pdb_id)
+        #             warnings.warn('***WARNING: No PDB FASTA file found for %kegg. Please check if step 3.3 was run.***' % pdb_id)
         #             seq_pdb_align_errors.append((aligner_id, pdb_id))
         #             continue
         #
@@ -155,7 +155,7 @@ def get_best_structures(uniprot_id):
         #                 alignment_filename = ssbio.sequence.align.run_alignment(aligner_id, seq_fasta, pdb_id, pdb_fasta)
         #             except:
         #                 seq_pdb_align_errors.append((aligner_id, pdb_id))
-        #                 warnings.warn('***ERROR: with alignment of %s and %s***' % (aligner_id, pdb_id))
+        #                 warnings.warn('***ERROR: with alignment of %kegg and %kegg***' % (aligner_id, pdb_id))
         #                 alignment_scores[pdb_id] = 0
         #                 alignment_coverage[pdb_id] = 0
         #                 alignment_coverage_sim[pdb_id] = 0

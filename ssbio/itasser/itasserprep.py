@@ -69,7 +69,7 @@ class ITASSERPrep():
                                ident='seq',
                                description=description,
                                extension='fasta',
-                               outpath=itasser_dir)
+                               outdir=itasser_dir)
         return itasser_dir
 
     def prep_script_local(self, itasser_loc, itlib_loc, java_home='/usr/'):

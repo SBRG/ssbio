@@ -179,7 +179,7 @@ def get_alignment_df(alignment_file):
 # appender['start'], appender['stop'], appender['count'])
                     alignment_df = alignment_df.append(
                         appender, ignore_index=True)
-# print new_i + 1, ':', a, b, 'last=%s, now=%s' %
+# print new_i + 1, ':', a, b, 'last=%kegg, now=%kegg' %
 # (aa_flag_tracker,aa_flag)
 
             aa_flag_tracker = aa_flag
@@ -265,7 +265,7 @@ def get_alignment_allpos_df(alignment_file, a_seq_id=None, b_seq_id=None):
 #         return alignment_file
 #
 #     else:
-#         print '**RUNNING ALIGNMENT FOR %s AND %s**' % (a_id, b_id)
+#         print '**RUNNING ALIGNMENT FOR %kegg AND %kegg**' % (a_id, b_id)
 #         needle_cline = NeedleallCommandline(asequence=a_faa, bsequence=b_faa, gapopen=10, gapextend=0.5, outfile=alignment_file)
 #         stdout, stderr = needle_cline()
 #         return alignment_file

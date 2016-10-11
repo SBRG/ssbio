@@ -4,7 +4,7 @@ from ssbio.structure.pdbioext import PDBIOExt
 def get_pdb_seq(pdb_file):
     '''
     Takes in a structure file and returns a list of the
-    structure's sequences
+    structure'kegg sequences
     :param pdb_file: file path of pdb file
     :return: Dictionary of sequence strings with chain IDs as the key
     '''
@@ -43,7 +43,7 @@ def get_pdb_seq(pdb_file):
                 i_code = full_id[3][2]
                 aa = Polypeptide.three_to_one(res.get_resname())
 
-                # tracker to fill in X's
+                # tracker to fill in X'kegg
                 if end_tracker != (tracker + 1):   # and first == False:
                     if i_code != ' ':
                         chain_seq += aa

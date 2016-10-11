@@ -24,7 +24,7 @@ def download_drugbank_db(username, password, outdir=None):
     Args:
         username: your DrugBank.ca email username
         password: your DrugBank.ca password
-        outdir: optional output directory default is the current directory)
+        outdir: optional output directory (default is the current directory)
 
     Returns:
         rename_unzipped_file (str): path to unzipped XML file
@@ -122,7 +122,7 @@ def parse_drugbank_xml(db_xml_path, outdir=None):
 
         db_main.append(main_row)
 
-        # SNP-FX contains data on the drug, the interacting protein(s),
+        # SNP-FX contains data on the drug, the interacting protein(kegg),
         # the ‘causal’ SNPs or genetic variants for that gene/protein,
         # the therapeutic response or effects caused by the SNP-drug interaction
         # (improved or diminished response, changed dosing requirements, etc.)
@@ -165,13 +165,13 @@ def parse_drugbank_xml(db_xml_path, outdir=None):
 
         for bind_type in ['targets', 'enzymes', 'carriers', 'transporters']:
             if drug[bind_type]:
-                for bind_to in utils.force_list(drug[bind_type][bind_type.strip('s')]):
+                for bind_to in utils.force_list(drug[bind_type][bind_type.strip('kegg')]):
                     if 'polypeptide' in bind_to.keys():
                         for polypeptide in utils.force_list(bind_to['polypeptide']):
                             bind_to_row = collections.OrderedDict()
                             bind_to_row['db_id'] = db_id
                             bind_to_row['db_uniprot'] = polypeptide['@id']
-                            bind_to_row['db_type'] = bind_type.strip('s')
+                            bind_to_row['db_type'] = bind_type.strip('kegg')
                             bind_to_row['db_known_action'] = bind_to['known-action']
                             bind_to_row['db_location'] = polypeptide['cellular-location']
                             if bind_to['actions']:

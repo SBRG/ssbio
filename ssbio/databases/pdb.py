@@ -176,7 +176,7 @@ def _obsolete_pdb_mapping():
 
     Caches this list for up to seven days for quick access.
 
-    Returns: a dictionary mapping obsolete PDBs to a list of their replacement(s).
+    Returns: a dictionary mapping obsolete PDBs to a list of their replacement(kegg).
     If there is no replacement, it is marked as "obsolete"
     Example:
         {
@@ -373,7 +373,8 @@ def best_structures(uniprot_id):
 
     response = requests.get('https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/{}'.format(uniprot_id),
                             data={'key': 'value'})
-    response.raise_for_status()
+    if response.status_code == 404:
+        return {}
     return dict(response.json())[uniprot_id]
 
 #
