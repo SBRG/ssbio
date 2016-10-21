@@ -4,9 +4,7 @@ import os.path as op
 import shutil
 import warnings
 import glob
-
-from cobra.io import load_matlab_model
-from cobra.io.sbml import create_cobra_model_from_sbml_file
+import numpy as np
 
 from Bio import SeqIO
 
@@ -15,8 +13,8 @@ from bioservices.uniprot import UniProt
 bsup = UniProt()
 from bidict import bidict
 
+import ssbio.cobra.utils
 from ssbio import utils
-from ssbio.cobra.utils import is_spontaneous, true_num_reactions, true_num_genes
 
 date = utils.Date()
 
@@ -29,15 +27,19 @@ import pandas as pd
 from tqdm import tqdm
 import requests
 
-from ssbio.databases.pdb import top_pdb_blast_hit
+import ssbio.databases.pdb
+
+import sys
+import logging
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 from bioservices import KEGG
-
 bs_kegg = KEGG()
 
 
-class GEMPRO():
-    """Generic class to represent all information of a GEM-PRO for a GEM
+class GEMPRO(object):
+    """Generic class to represent all information of a GEM-PRO for a GEM.
 
     Main steps are:
     1. Preparation of folders
@@ -46,23 +48,32 @@ class GEMPRO():
     4. Homology modeling
     5. Representative structures
 
-    Each step may generate a report and also request additional files if mappings are incomplete
+    Each step may generate a report and also allow input of manual mappings if applicable.
     """
 
-    def __init__(self, gem_name, root_dir):
+    def __init__(self, gem_name, root_dir, gem_file_path=None, gem_file_type=None, genes=None):
+        """Initialize the GEM-PRO project with a GEM or a list of genes.
+
+        Specify the name of your project, along with the root directory where a folder with that name will be created.
+
+        Args:
+            gem_name:
+            root_dir:
+            gem_file_path:
+            gem_file_type:
+            genes:
+        """
         self.root_dir = root_dir
         self.model_dir = op.join(root_dir, gem_name)
+
         # model_files - directory where original gems and gem-related files are stored
         self.model_files = op.join(self.model_dir, 'model_files')
 
-    def prep_folders(self):
-        """Prepare all folders for a GEM-PRO project
-        """
         # data - directory where all data will be stored
         self.data = op.join(self.model_dir, 'data')
 
-        # notebooks - directory where ipython notebooks will be stored for manual analyses
-        self.notebooks = op.join(self.model_dir, 'notebooks')
+        # notebooks_dir - directory where ipython notebooks_dir will be stored for manual analyses
+        self.notebooks_dir = op.join(self.model_dir, 'notebooks')
 
         # # figures - directory where all figures will be stored
         self.figures = op.join(self.model_dir, 'figures')
@@ -74,48 +85,42 @@ class GEMPRO():
         # seq_files - sequence related files are stored here
         self.seq_files = op.join(self.model_dir, 'sequence_files')
 
-        for directory in [self.model_dir, self.data, self.notebooks, self.figures,
+        # Create directory tree
+        for directory in [self.model_dir, self.data, self.notebooks_dir, self.figures,
                           self.model_files, self.struct_files, self.struct_single_chain, self.seq_files]:
             if not op.exists(directory):
                 os.makedirs(directory)
-                print('[PREP] Created directory: {}'.format(directory))
+                log.info('Created directory: {}'.format(directory))
             else:
-                print('[PREP] Directory already exists: {}'.format(directory))
+                log.info('Directory already exists: {}'.format(directory))
 
-    def load_model(self, gem_file, file_type):
-        """Load the GEM using COBRApy. Accept SBML or MAT files as input
+        if gem_file_path and gem_file_type:
+            self.model = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type)
+            log.info('Loaded model: {}'.format(gem_file_path))
 
-        Args:
-            file_type: if your model is in "SBML" (or "XML"), or "Matlab" formats
+            # Place a copy of the current used model in model_files
+            if not op.exists(op.join(self.model_files, op.basename(gem_file_path))):
+                shutil.copy(gem_file_path, self.model_files)
+                log.debug('Copied model file to model_files')
+            self.gem_file = op.join(self.model_files, op.basename(gem_file_path))
 
-        Returns: None - loads the model in the GEMPRO object instance
+            # Obtain list of all gene ids, excluding spontaneous things
+            # TODO: account for isoforms
+            genes_unfiltered = [x.id for x in self.model.genes]
+            genes = [y for y in genes_unfiltered if not ssbio.cobra.utils.is_spontaneous(y)]
+            self.genes = list(set(genes))
 
-        """
-        extension = op.splitext(gem_file)[1]
-        if file_type.replace('.', '').lower() == 'xml' or file_type.replace('.', '').lower() == 'sbml':
-            self.model = create_cobra_model_from_sbml_file(gem_file, print_time=False)
-            print('[PREP] Loaded model: {}'.format(gem_file))
-        elif extension.replace('.', '').lower() == 'mat':
-            self.model = load_matlab_model(gem_file)
-            print('[PREP] Loaded model: {}'.format(gem_file))
+            # Log information on the number of things
+            log.info('Number of reactions: {}'.format(len(self.model.reactions)))
+            log.info(
+                'Number of reactions linked to a gene: {}'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
+            log.info(
+                'Number of genes (excluding spontaneous): {}'.format(ssbio.cobra.utils.true_num_genes(self.model)))
+            log.info('Number of metabolites: {}'.format(len(self.model.metabolites)))
 
-        # place a copy of the current used model in model_files
-        if not op.exists(op.join(self.model_files, op.basename(gem_file))):
-            shutil.copy(gem_file, self.model_files)
-            print('[PREP] Copied model file to model_files')
-        self.gem_file = op.join(self.model_files, op.basename(gem_file))
-
-        # obtain list of all gene ids, excluding spontaneous things
-        # TODO: account for isoforms
-        self.genes_unfiltered = [x.id for x in self.model.genes]
-        genes = [y for y in self.genes_unfiltered if not is_spontaneous(y)]
-        self.genes = list(set(genes))
-
-        # print information on the number of things
-        print('[MODEL] Number of reactions: {}'.format(len(self.model.reactions)))
-        print('[MODEL] Number of reactions linked to a gene: {}'.format(true_num_reactions(self.model)))
-        print('[MODEL] Number of genes (excluding spontaneous): {}'.format(true_num_genes(self.model)))
-        print('[MODEL] Number of metabolites: {}'.format(len(self.model.metabolites)))
+        if genes:
+            self.genes = genes
+            log.info('Number of genes: {}'.format(len(genes)))
 
     def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the KEGG service. Also download all metadata and sequences
@@ -132,7 +137,7 @@ class GEMPRO():
 
         """
 
-        # all data will be stored in a dataframe
+        # all data_dir will be stored in a dataframe
         kegg_pre_df = []
 
         # first map all of the organism's kegg genes to UniProt
@@ -146,11 +151,11 @@ class GEMPRO():
             saved_dfs = utils.rank_dated_files('*-kegg_df.csv', self.data)
 
             if saved_dfs:
-                to_load_df = saved_dfs[0]
-                df_date = op.basename(to_load_df).split('-')[0]
-                self.kegg_df = pd.read_csv(to_load_df, index_col=0)
+                kegg_df_outfile = saved_dfs[0]
+                df_date = op.basename(kegg_df_outfile).split('-')[0]
+                self.kegg_df = pd.read_csv(kegg_df_outfile, index_col=0)
                 self.kegg_missing = self.kegg_df[pd.isnull(self.kegg_df.k_kegg_id)].m_gene.unique().tolist()
-                print('[INFO] Loaded KEGG mapping dataframe dated {}'.format(df_date))
+                log.info('Loaded KEGG mapping dataframe dated {}'.format(df_date))
                 return
 
         for g in tqdm(list(set(self.genes))):
@@ -197,6 +202,8 @@ class GEMPRO():
                     # 'DBLINKS': {'NCBI-GeneID': '100763844', 'NCBI-ProteinID': 'XP_003514445'}
                     # 'ORTHOLOGY': {'K00473': 'procollagen-lysine,2-oxoglutarate 5-dioxygenase 1 [EC:1.14.11.4]'},
                     # 'PATHWAY': {'cge00310': 'Lysine degradation'},
+                else:
+                    kegg_dict['k_pdb_id'] = np.nan
 
             if kegg_g in kegg_to_uniprot.keys():
                 kegg_dict['k_uniprot_acc'] = kegg_to_uniprot[kegg_g]
@@ -207,11 +214,12 @@ class GEMPRO():
         cols = ['m_gene', 'k_kegg_id', 'k_uniprot_acc', 'k_seq_len', 'k_pdb_id', 'k_metadata_file', 'k_seq_file']
         self.kegg_df = pd.DataFrame(kegg_pre_df)[cols]
         self.kegg_df.to_csv(kegg_df_outfile)
-        print('[INFO] Saved KEGG information at {}'.format(kegg_df_outfile))
+
+        log.info('Saved KEGG information at {}'.format(kegg_df_outfile))
 
         # info on genes that could not be mapped
         self.kegg_missing = self.kegg_df[pd.isnull(self.kegg_df.k_kegg_id)].m_gene.unique().tolist()
-        print('[WARN] {} gene(s) could not be mapped. Inspect the "kegg_missing" attribute.'.format(
+        log.warning('{} gene(s) could not be mapped. Inspect the "kegg_missing" attribute.'.format(
                 len(self.kegg_missing)))
 
         return kegg_df_outfile
@@ -239,8 +247,8 @@ class GEMPRO():
         # allow model gene --> custom ID mapping
         if custom_gene_mapping:
             # create a reverse mapping dictionary to map from custom ID -> model gene later
-            rev_map = bidict(custom_gene_mapping)
             genes_to_map = list(custom_gene_mapping.values())
+            rev_map = bidict(custom_gene_mapping).inv
         else:
             genes_to_map = list(set(self.genes))
 
@@ -262,9 +270,10 @@ class GEMPRO():
         genes_to_uniprots = bsup.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
         self.uniprot_missing = list(set(genes_to_map).difference(genes_to_uniprots.keys()))
 
-        # all data will be stored in a dataframe
+
+        # all data_dir will be stored in a dataframe
         uniprot_pre_df = []
-        for g in tqdm(list(set(self.genes))):
+        for g in tqdm(genes_to_map):
             if custom_gene_mapping:
                 original_m_gene = rev_map[g]
             else:
@@ -281,7 +290,7 @@ class GEMPRO():
                 uniprot_dict['m_gene'] = original_m_gene
                 uniprot_pre_df.append(uniprot_dict)
             else:
-                for mapped_uniprot in genes_to_uniprots[original_m_gene]:
+                for mapped_uniprot in genes_to_uniprots[g]:
                     uniprot_dict = {}
                     uniprot_dict['m_gene'] = original_m_gene
                     uniprot_dict['u_uniprot_acc'] = mapped_uniprot
@@ -332,6 +341,8 @@ class GEMPRO():
 
         """
         # read the manual mapping file
+        # TODO: what happens if you use this function and uniprot_mapping has not been done ?
+
         man_df = pd.read_csv(infile)
 
         uniprot_pre_df = []
@@ -378,10 +389,8 @@ class GEMPRO():
 
         # add all new entries to the uniprot_df
         self.uniprot_df = self.uniprot_df.append(uniprot_pre_df, ignore_index=True)
-        uniprot_df_outfile = op.join(self.data, '{}-uniprot_df.csv'.format(date.short_date))
-        self.uniprot_df.to_csv(uniprot_df_outfile)
 
-        print('[INFO] Saved updated UniProt information at {}'.format(uniprot_df_outfile))
+        print('[INFO] Updated UniProt dataframe.')
 
     def manual_seq_mapping(self, infile):
         """Read a manual input file of model gene IDs --> protein sequences.
@@ -476,6 +485,7 @@ class GEMPRO():
             filter_uniprot = filter_uniprot.rename(columns={'u_uniprot_acc': 'm_uniprot_acc', 'u_seq_len': 'm_seq_len'})
 
             # these are unique kegg gene->uniprot mappings AND ones that contain a gene->pdb mapping
+            # NOTE: this will override any manual uniprot mappings that have a gene->pdb mapping
             a = filter_kegg[(pd.notnull(filter_kegg.k_pdb_id)) & (
                 ~filter_kegg.m_uniprot_acc.isin(filter_uniprot.m_uniprot_acc.tolist()))]
 
@@ -510,44 +520,164 @@ class GEMPRO():
         print('[INFO] Merged ID mapping information at {}'.format(mapping_df_outfile))
         return mapping_df_outfile
 
-    def blast_seqs_to_pdb(self, custom_df, evalue=0.001, link=False):
+    def map_uniprot_to_pdb(self, seq_ident_cutoff=0.95, force_rerun=False):
+        """Map UniProt IDs to a ranked list of PDB structures available.
+
+        Returns:
+            Path to PDB mapping dataframe
+
+        """
+        if not force_rerun:
+            # check for already saved mappings
+            # load the latest mapping if there are multiple
+            saved_dfs = utils.rank_dated_files('*-ranked_pdbs.csv', self.data)
+
+            if saved_dfs:
+                to_load_df = saved_dfs[0]
+                df_date = op.basename(to_load_df).split('-')[0]
+                self.ranked_pdbs_df = pd.read_csv(to_load_df, index_col=0)
+                print('[INFO] Loaded UniProt -> PDB mapping dataframe dated {}'.format(df_date))
+                return
+
+        best_structures_pre_df = []
+
+        for i, r in tqdm(self.mapping_df[pd.notnull(self.mapping_df.m_uniprot_acc)].iterrows()):
+            g = r['m_gene']
+            u = r['m_uniprot_acc']
+            best_structures = ssbio.databases.pdb.best_structures(u)
+            if best_structures:
+                rank = 1
+                for best_structure in best_structures:
+                    best_structure_dict = {}
+                    best_structure_dict['m_gene'] = g
+                    best_structure_dict['m_uniprot_acc'] = u
+                    best_structure_dict['pdb_id'] = best_structure['pdb_id']
+                    best_structure_dict['pdb_chain_id'] = best_structure['chain_id']
+                    best_structure_dict['experimental_method'] = best_structure['experimental_method']
+                    best_structure_dict['pdb_resolution'] = best_structure['resolution']
+                    best_structure_dict['pdb_start'] = best_structure['start']
+                    best_structure_dict['pdb_end'] = best_structure['end']
+                    best_structure_dict['seq_coverage'] = best_structure['coverage']
+                    best_structure_dict['unp_start'] = best_structure['unp_start']
+                    best_structure_dict['unp_end'] = best_structure['unp_end']
+                    best_structure_dict['tax_id'] = best_structure['tax_id']
+                    best_structure_dict['rank'] = rank
+                    best_structures_pre_df.append(best_structure_dict)
+                    rank += 1
+
+        cols = ['m_gene', 'm_uniprot_acc', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'pdb_resolution',
+                'pdb_start', 'pdb_end', 'seq_coverage', 'unp_start', 'unp_end', 'tax_id', 'rank']
+        self.ranked_pdbs_df = pd.DataFrame(best_structures_pre_df)[cols]
+        # filter for high % seq ident proteins only
+        # TODO: double check the seq_coverage number, does it provide the right %?
+        self.ranked_pdbs_df = self.ranked_pdbs_df[self.ranked_pdbs_df.seq_coverage >= seq_ident_cutoff]
+        ranked_pdbs_df_outfile = op.join(self.data, '{}-ranked_pdbs.csv'.format(date.short_date))
+        self.ranked_pdbs_df.to_csv(ranked_pdbs_df_outfile)
+
+        print('[INFO] Saved UniProt -> PDB mapping at {}'.format(ranked_pdbs_df_outfile))
+        return ranked_pdbs_df_outfile
+
+    def blast_seqs_to_pdb(self, seq_ident_cutoff=0.90, all_genes=False, force_rerun=False, evalue=0.001, display_link=False):
         """BLAST each gene sequence to the PDB. Results are saved as dataframes in the structure_files folder.
 
         Returns: Path to summary results dataframe which details best hit for each gene.
 
         """
+        # TODO: what if force_rerun=False but all_genes=True? and the last run was all_genes=False?
+        # answer -- use logging functions...
+        if not force_rerun:
+            # check for already saved mappings
+            # load the latest mapping if there are multiple
+            saved_dfs = utils.rank_dated_files('*-top_pdb_blast_df.csv', self.data)
 
+            if saved_dfs:
+                to_load_df = saved_dfs[0]
+                df_date = op.basename(to_load_df).split('-')[0]
+                self.top_blast_df = pd.read_csv(to_load_df, index_col=0)
+                print('[INFO] Loaded PDB BLAST top hits dated {}'.format(df_date))
+                return
+
+        # save the best blast hits per gene
         top_blast_pre_df = []
 
-        for i, r in tqdm(custom_df.iterrows()):
+        # if all_genes=False, BLAST only genes without a uniprot->pdb mapping
+        # requires ranked_pdbs_df to have been made
+        if hasattr(self, 'ranked_pdbs_df') and all_genes == False:
+            genes_with_pdbs = self.ranked_pdbs_df.m_gene.unique().tolist()
+            all_genes = self.mapping_df.m_gene.unique().tolist()
+            genes_without_pdbs = [x for x in all_genes if x not in genes_with_pdbs]
+            seqs_to_map = self.mapping_df[self.mapping_df.m_gene.isin(genes_without_pdbs)]
+        else:
+            # if all_genes=True, BLAST all sequences we have
+            seqs_to_map = self.mapping_df[pd.notnull(self.mapping_df.m_seq_file)]
+
+        for i, r in tqdm(seqs_to_map.iterrows()):
             g = r['m_gene']
-            seq = r['u_seq']
+            seq_file = r['m_seq_file']
+            seq_file_path = op.join(self.seq_files, g, seq_file)
 
             # make the gene specific folder under the structure_files directory
             gene_folder = op.join(self.struct_single_chain, str(g))
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            blast_df = ssbio.databases.pdb.blast_pdb(seq, evalue=evalue, link=link)
-            if blast_df.empty:
-                continue
+            # read the sequence
+            # TODO: replace with biopython sequence loading..
+            seq = ssbio.sequence.fasta.load_fasta_file(seq_file_path)
+            seq_str = str(seq[0].seq)
+
+            # BLAST the sequence to the PDB
+            # but do not run the request if the output file already exists and force_rerun is False
+            blast_outfile = op.join(gene_folder, str(g) + '_blast_df.csv')
+            if op.exists(blast_outfile) and force_rerun == False:
+                blast_df = pd.read_csv(blast_outfile, index_col=0)
             else:
-                # save the blast_df
-                blast_df.to_csv(op.join(gene_folder, str(g) + '_blast_df.csv'))
-                # save the top blast hit
-                top_hit = blast_df.loc[0].to_dict()
-                top_hit['m_gene'] = g
-                top_blast_pre_df.append(top_hit)
+                blast_df = ssbio.databases.pdb.blast_pdb(seq_str, evalue=evalue, link=display_link)
+
+                # if no blast results are returned, move on to the next sequence
+                if blast_df.empty:
+                    continue
+
+                # save the blast_df to the structure_files/by_gene folder
+                blast_df.to_csv(blast_outfile)
+
+            # retrieve the top hits
+            # if the top BLAST hit % sequence identity is less than the cutoff, do not save it as a top hit
+            top_hits_df = blast_df[blast_df.hit_percent_ident >= seq_ident_cutoff]
+
+            for i,r in top_hits_df.iterrows():
+                hit = r.to_dict()
+                hit['m_gene'] = g
+                hit['m_seq_file'] = seq_file
+                top_blast_pre_df.append(hit)
 
         top_blast_df = pd.DataFrame(top_blast_pre_df)
-        reorg = ['m_gene', 'hit_pdb', 'hit_pdb_chain', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident']
+        reorg = ['m_gene', 'm_seq_file', 'hit_pdb', 'hit_pdb_chain', 'hit_evalue', 'hit_score', 'hit_num_ident',
+                 'hit_percent_ident', 'hit_num_similar', 'hit_percent_similar', 'hit_num_gaps', 'hit_percent_gaps']
         self.top_blast_df = top_blast_df[reorg]
-        top_blast_df_outfile = op.join(self.data, '{}-pdb_blast_df.csv'.format(date.short_date))
+        top_blast_df_outfile = op.join(self.data, '{}-top_pdb_blast_df.csv'.format(date.short_date))
         self.top_blast_df.to_csv(top_blast_df_outfile)
 
+        print('[INFO] Saved PDB BLAST top hits at {}'.format(top_blast_df_outfile))
         return top_blast_df_outfile
 
-    def organize_itasser_models(self, raw_dir):
+    # def download_structures(self):
+    #     """Download all structures which have been mapped to our genes.
+    #
+    #     Returns:
+    #
+    #     """
+    #     genes_plus_structure_df = self.ranked_pdbs_df[['m_gene','pdb_id','pdb_chain_id']]
+    #     if hasattr(self, 'top_blast_df'):
+    #         blasted_genes = self.top_blast_df.m_gene.tolist()
+    #         genes_with_structure.extend(blasted_genes)
+    #
+    #     for g in self.genes:
+    #         if g in genes_with_structure:
+    #             pdbs_for_this_gene =
+
+
+    def organize_itasser_models(self, raw_dir, custom_name_mapping=None):
         """Reorganize the raw information from I-TASSER modeling.
 
         - Copies the model1.pdb file to the matching gene folder in structure_files/by_gene/
@@ -642,7 +772,7 @@ class GEMPRO():
         return op.join(self.data, '{}-homology_models_df.csv'.format(date.short_date))
 
     def run_pipeline(self):
-        """Run the entire GEM-PRO pipel ine.
+        """Run the entire GEM-PRO pipeline.
 
         Options include:
         ...
@@ -656,17 +786,17 @@ class GEMPRO():
         # check for missing maps, request manual mapping file?
         pass
 
-
-if __name__ == '__main__':
-    # run the GEM-PRO pipeline!
-
-    # parse arguments
-    p = argparse.ArgumentParser(description='Runs the GEM-PRO pipeline')
-    p.add_argument('gemfile', help='Path to the GEM file')
-    p.add_argument('gemname', help='Name you would like to use to refer to this GEM')
-    p.add_argument('rootdir', help='Directory where GEM-PRO files should be stored')
-
-    args = p.parse_args()
-
-    my_gem_pro = GEMPRO(args.gemfile, args.gemname, args.rootdir)
-    my_gem_pro.run_pipeline()
+#
+# if __name__ == '__main__':
+#     # run the GEM-PRO pipeline!
+#
+#     # parse arguments
+#     p = argparse.ArgumentParser(description='Runs the GEM-PRO pipeline')
+#     p.add_argument('gemfile', help='Path to the GEM file')
+#     p.add_argument('gemname', help='Name you would like to use to refer to this GEM')
+#     p.add_argument('rootdir', help='Directory where GEM-PRO files should be stored')
+#
+#     args = p.parse_args()
+#
+#     my_gem_pro = GEMPRO(args.gemfile, args.gemname, args.rootdir)
+#     my_gem_pro.run_pipeline()
