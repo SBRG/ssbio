@@ -53,7 +53,7 @@ def download_drugbank_db(username, password, outdir=None):
 
     # an HTML page is returned if there is an error getting the file
     if r.headers['Content-Type'] == 'text/html; charset=utf-8':
-        raise ConnectionError('DrugBank data could not be downloaded. Please check your username and password.')
+        raise ConnectionError('DrugBank data_dir could not be downloaded. Please check your username and password.')
 
     with open(outfile, "wb") as db:
         db.write(r.content)
@@ -132,8 +132,8 @@ def parse_drugbank_xml(db_xml_path, outdir=None):
         # SNP-FX contains literature-derived data on the therapeutic effects or therapeutic responses
         # for more than 60 drug-polymorphism combinations,
         # while SNP-ADR contains data on adverse reactions compiled from more than 50 drug-polymorphsim pairings.
-        # All of the data in these tables is hyperlinked to drug entries from DrugBank, protein data from UniProt,
-        # SNP data from dbSNP and bibliographic data from PubMed.
+        # All of the data_dir in these tables is hyperlinked to drug entries from DrugBank, protein data_dir from UniProt,
+        # SNP data_dir from dbSNP and bibliographic data_dir from PubMed.
         # NOTE: these dataframes are combined, with a db_snp_adr column indicating a known ADR
         if drug['snp-effects']:
             for snp_eff in utils.force_list(drug['snp-effects']['effect']):

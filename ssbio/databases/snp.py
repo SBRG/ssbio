@@ -50,7 +50,7 @@ def download_parse_uniprot_variation(wd):
     return outfile_pandas
 
 class SNP:
-    """Return SNP data for a provided gene ID.
+    """Return SNP data_dir for a provided gene ID.
     """
 
     def __init__(self, gene_id):

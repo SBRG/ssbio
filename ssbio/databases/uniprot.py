@@ -172,7 +172,7 @@ def uniprot_sites(uniprot_id):
     return gff_df
 
 
-def download_uniprot_file(uniprot_id, filetype, outdir=''):
+def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
     """Download any UniProt file for a UniProt ID/ACC
 
     Args:
@@ -188,7 +188,7 @@ def download_uniprot_file(uniprot_id, filetype, outdir=''):
     if outdir:
         outfile = op.join(outdir, outfile)
 
-    if not op.exists(outfile):
+    if not op.exists(outfile) and not force_rerun:
         urlrequest.urlretrieve(url, outfile)
 
     return outfile
@@ -329,33 +329,27 @@ def parse_uniprot_txt_file(infile):
     metadata_key = list(metadata.keys())[0]
 
     # uniprot_metadata_dict['u_seq'] = metadata[metadata_key]['sequence']
-    uniprot_metadata_dict['u_seq_len'] = len(
+    uniprot_metadata_dict['seq_len'] = len(
         str(metadata[metadata_key]['sequence']))
-    uniprot_metadata_dict['u_reviewed'] = metadata[
-        metadata_key]['is_reviewed']
-    uniprot_metadata_dict['u_seq_version'] = metadata[
-        metadata_key]['sequence_version']
-    uniprot_metadata_dict['u_entry_version'] = metadata[
-        metadata_key]['entry_version']
+    uniprot_metadata_dict['reviewed'] = metadata[metadata_key]['is_reviewed']
+    uniprot_metadata_dict['seq_version'] = metadata[metadata_key]['sequence_version']
+    uniprot_metadata_dict['entry_version'] = metadata[metadata_key]['entry_version']
     if 'gene' in metadata[metadata_key]:
-        uniprot_metadata_dict['u_gene_name'] = metadata[
-            metadata_key]['gene']
+        uniprot_metadata_dict['gene_name'] = metadata[metadata_key]['gene']
     if 'description' in metadata[metadata_key]:
-        uniprot_metadata_dict['u_description'] = metadata[
-            metadata_key]['description']
+        uniprot_metadata_dict['description'] = metadata[metadata_key]['description']
     if 'refseq' in metadata[metadata_key]:
-        uniprot_metadata_dict['u_refseq'] = metadata[
-            metadata_key]['refseq']
+        uniprot_metadata_dict['refseq'] = metadata[metadata_key]['refseq']
     if 'kegg' in metadata[metadata_key]:
-        uniprot_metadata_dict['u_kegg_id'] = metadata[
-            metadata_key]['kegg']
+        uniprot_metadata_dict['kegg_id'] = metadata[metadata_key]['kegg']
     if 'ec' in metadata[metadata_key]:
-        uniprot_metadata_dict['u_ec_number'] = metadata[
-            metadata_key]['ec']
+        uniprot_metadata_dict['ec_number'] = metadata[metadata_key]['ec']
     if 'pfam' in metadata[metadata_key]:
-        uniprot_metadata_dict['u_pfam'] = metadata[
-            metadata_key]['pfam']
-
+        uniprot_metadata_dict['pfam'] = metadata[metadata_key]['pfam']
+    if 'pdbs' in metadata[metadata_key]:
+        uniprot_metadata_dict['pdbs'] = list(set(metadata[metadata_key]['pdbs']))
+    else:
+        uniprot_metadata_dict['pdbs'] = []
     return uniprot_metadata_dict
 
 
