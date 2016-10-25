@@ -2,9 +2,8 @@ import unittest
 
 import ssbio.databases.uniprot
 
-
 class TestUniProt(unittest.TestCase):
-    """Unit tests for PDB
+    """Unit tests for UniProt
     """
 
     def test_uniprot_valid_id(self):
