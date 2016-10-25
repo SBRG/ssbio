@@ -31,6 +31,29 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+
+# def consolidate_pandas_dfs(*args):
+#
+#
+
+def split_folder_and_path(filepath):
+    """Split a file path into its folder, filename, and extension
+
+    Args:
+        path (str): path to a file
+
+    Returns:
+        Tuple of (folder, filename (without extension), extension)
+
+    """
+    dirname = op.dirname(filepath)
+    filename = op.basename(filepath)
+    splitext = op.splitext(filename)
+    filename_without_extension = splitext[0]
+    extension = splitext[1]
+
+    return(dirname, filename_without_extension, extension)
+
 def dict_head(d, disp=5):
     """Return the head of a dictionary.
 
@@ -79,9 +102,10 @@ def force_string(val=None):
     """Force a string representation of an object
 
     Args:
-        val: object to parse into a string
+        val (str): object to parse into a string
 
     Returns:
+        String
 
     """
     if val is None:
