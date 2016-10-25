@@ -1,15 +1,41 @@
 import re
+import os.path as op
+from cobra.io import load_matlab_model
+from cobra.io import read_sbml_model
+from cobra.io import load_json_model
 
+def model_loader(gem_file_path, gem_file_type):
+    """
+    Load the GEM using COBRApy. Accept SBML or MAT files as input.
 
+    Args:
+        gem_file_path (str): Path to model file
+        gem_file_type (str): if your model is in "sbml" (or "xml"), "mat", or 'json" format
+
+    Returns:
+        Model object.
+
+    """
+    extension = op.splitext(gem_file_path)[1]
+    if gem_file_type.replace('.', '').lower() == 'xml' or gem_file_type.replace('.', '').lower() == 'sbml':
+        model = read_sbml_model(gem_file_path)
+    elif extension.replace('.', '').lower() == 'mat':
+        model = load_matlab_model(gem_file_path)
+    elif extension.replace('.', '').lower() == 'json':
+        model = load_json_model(gem_file_path)
+    else:
+        raise ValueError('File type must be in SBML, MATLAB, or JSON formats.')
+
+    return model
 
 def is_spontaneous(gene):
-    """
+    """Input a COBRApy Gene object and check if the ID matches a spontaneous IDs.
 
     :param gene:
     :return:
     """
     spont = re.compile("[Ss](_|)0001")
-    if spont.match(gene):
+    if spont.match(gene.id):
         return True
     else:
         return False
@@ -22,7 +48,7 @@ def true_num_genes(model):
     '''
     true_num = 0
     for gene in model.genes:
-        if not is_spontaneous(gene.id):
+        if not is_spontaneous(gene):
             true_num += 1
     return true_num
 
@@ -30,10 +56,9 @@ def true_num_genes(model):
 def true_num_reactions(model):
     true_num = 0
     for rxn in model.reactions:
-        genes = [x.id for x in rxn.genes]
-        if len(genes) == 0:
+        if len(rxn.genes) == 0:
             continue
-        if len(genes) == 1 and is_spontaneous(genes[0]):
+        if len(rxn.genes) == 1 and is_spontaneous(list(rxn.genes)[0]):
             continue
         else:
             true_num += 1
@@ -42,10 +67,9 @@ def true_num_reactions(model):
 def adj_num_reactions(model, missing_genes):
     adj_num = 0
     for rxn in model.reactions:
-        genes = [x.id for x in rxn.genes]
-        if len(genes) == 0:
+        if len(rxn.genes) == 0:
             continue
-        if len(genes) == 1 and (is_spontaneous(genes[0]) or genes[0] in missing_genes):
+        if len(rxn.genes) == 1 and (is_spontaneous(list(rxn.genes)[0]) or list(rxn.genes)[0] in missing_genes):
             continue
         else:
             adj_num += 1
