@@ -268,7 +268,7 @@ def pdb_current_checker(pdb_ids):
     return pdb_status
 
 
-@cachetools.func.ttl_cache(maxsize=256)
+@cachetools.func.ttl_cache(maxsize=1024)
 def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
     """Utilize the PDBe REST API to return the rank-ordered list of PDB "best structures".
 
@@ -287,28 +287,31 @@ def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
     # Load the existing json file
     if outfile and op.exists(outfile) and not force_rerun:
         with open(outfile, 'r') as f:
-            data = json.load(f)
+            raw_data = json.load(f)
+        log.debug('{}: Loaded existing json file'.format(uniprot_id))
 
     # Otherwise run the web request
     else:
         response = requests.get('https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/{}'.format(uniprot_id),
                                 data={'key': 'value'})
-
         if response.status_code == 404:
-            log.error('404 returned for {}, probably no structures available.'.format(uniprot_id))
-            return []
-
-        data = dict(response.json())[uniprot_id]
+            log.warning('{}: 404 returned, probably no structures available.'.format(uniprot_id))
+            raw_data = {uniprot_id:{}}
+        else:
+            log.debug('{}: Obtained best structures'.format(uniprot_id))
+            raw_data = response.json()
 
         # Write the json file if specified
         if outfile:
             with open(outfile, 'w') as f:
-                json.dump(data, f)
+                json.dump(raw_data, f)
+            log.debug('{}: Saved json file of best structures'.format(uniprot_id))
 
+    data = dict(raw_data)[uniprot_id]
     return data
 
 
-@cachetools.func.ttl_cache(maxsize=256)
+@cachetools.func.ttl_cache(maxsize=1024)
 def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link=False):
     """Returns a list of BLAST hits of a sequence to available structures in the PDB.
 
@@ -337,6 +340,7 @@ def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link
     if outfile and op.exists(outfile) and not force_rerun:
         # Parse the existing XML file
         tree = etree.parse(outfile, parser)
+        log.debug('{}: Loaded existing BLAST XML results'.format(outfile))
     else:
         # Load the BLAST XML results if force_rerun=True
         page = 'http://www.rcsb.org/pdb/rest/getBlastPDB1?sequence={}&eCutOff={}&maskLowComplexity=yes&matrix=BLOSUM62&outputFormat=XML'.format(
@@ -352,7 +356,7 @@ def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link
 
             # Parse the XML string
             tree = etree.ElementTree(etree.fromstring(response, parser))
-
+            log.debug('Loaded BLAST results from REST server')
         else:
             log.error('BLAST request timed out')
             return []
@@ -405,7 +409,7 @@ def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link
 
         hit_list.append(info)
 
-    log.debug("Number of BLAST hits: {}".format(len(hit_list)))
+    log.debug("{}: Number of BLAST hits".format(len(hit_list)))
     return hit_list
 
 

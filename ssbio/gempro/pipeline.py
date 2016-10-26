@@ -66,29 +66,29 @@ class GEMPRO(object):
             genes:
         """
         self.root_dir = root_dir
-        self.model_dir = op.join(root_dir, gem_name)
+        self.base_dir = op.join(root_dir, gem_name)
 
         # model_files - directory where original gems and gem-related files are stored
-        self.model_files = op.join(self.model_dir, 'model_files')
+        self.model_files = op.join(self.base_dir, 'model_files')
 
         # data - directory where all data will be stored
-        self.data = op.join(self.model_dir, 'data')
+        self.data = op.join(self.base_dir, 'data')
 
         # notebooks_dir - directory where ipython notebooks_dir will be stored for manual analyses
-        self.notebooks_dir = op.join(self.model_dir, 'notebooks')
+        self.notebooks_dir = op.join(self.base_dir, 'notebooks')
 
         # # figures - directory where all figures will be stored
-        self.figures = op.join(self.model_dir, 'figures')
+        self.figures = op.join(self.base_dir, 'figures')
 
         # struct_files - directory where structure related files will be downloaded/are located
-        self.struct_files = op.join(self.model_dir, 'structure_files')
+        self.struct_files = op.join(self.base_dir, 'structure_files')
         self.struct_single_chain = op.join(self.struct_files, 'by_gene')
 
         # seq_files - sequence related files are stored here
-        self.seq_files = op.join(self.model_dir, 'sequence_files')
+        self.seq_files = op.join(self.base_dir, 'sequence_files')
 
         # Create directory tree
-        for directory in [self.model_dir, self.data, self.notebooks_dir, self.figures,
+        for directory in [self.base_dir, self.data, self.notebooks_dir, self.figures,
                           self.model_files, self.struct_files, self.struct_single_chain, self.seq_files]:
             if not op.exists(directory):
                 os.makedirs(directory)
@@ -153,6 +153,7 @@ class GEMPRO(object):
             for x in list(set(genes_list)):
                 new_gene = Gene(id=x)
 
+                # TODO: if loading a previously saved gempro json, this will reset all annotations! dont do that!
                 # TODO: clean up this dict
                 new_gene.annotation['sequence'] = {'kegg'          : {'uniprot_acc'  : None,
                                                                       'kegg_id'      : None,
@@ -174,22 +175,24 @@ class GEMPRO(object):
             self._genes = DictList(tmp_list)
         else:
             for x in genes_list:
-                x.annotation['sequence'] = {'kegg'          : {'uniprot_acc'  : None,
-                                                               'kegg_id'      : None,
-                                                               'seq_len'      : 0,
-                                                               'pdbs'         : [],
-                                                               'seq_file'     : None,
-                                                               'metadata_file': None},
-                                            'uniprot'       : {},
-                                            'representative': {'uniprot_acc'  : None,
-                                                               'kegg_id'      : None,
-                                                               'seq_len'      : 0,
-                                                               'pdbs'         : [],
-                                                               'seq_file'     : None,
-                                                               'metadata_file': None}}
-                x.annotation['structure'] = {'ranked_pdbs'   : [],
-                                             'blast_pdbs'    : [],
-                                             'representative': {}}
+                if 'sequence' not in x.annotation.keys():
+                    x.annotation['sequence'] = {'kegg'          : {'uniprot_acc'  : None,
+                                                                   'kegg_id'      : None,
+                                                                   'seq_len'      : 0,
+                                                                   'pdbs'         : [],
+                                                                   'seq_file'     : None,
+                                                                   'metadata_file': None},
+                                                'uniprot'       : {},
+                                                'representative': {'uniprot_acc'  : None,
+                                                                   'kegg_id'      : None,
+                                                                   'seq_len'      : 0,
+                                                                   'pdbs'         : [],
+                                                                   'seq_file'     : None,
+                                                                   'metadata_file': None}}
+                if 'structure' not in x.annotation.keys():
+                    x.annotation['structure'] = {'ranked_pdbs'   : [],
+                                                 'blast_pdbs'    : [],
+                                                 'representative': {}}
             self._genes = genes_list
 
     def add_genes_by_id(self, genes_list):

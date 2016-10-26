@@ -131,7 +131,7 @@ def get_folding_rate_for_gene(bnumber, temp, refT=37):
 
     """
 
-    slope = 22000  # not many data on this value, but it'kegg effect on growth rate very small
+    slope = 22000  # not many data_dir on this value, but it'kegg effect on growth rate very small
     id_and_seq = uniprot_info(bnumber)
 
     # TODO: get (pdb_file, dssp_file, chain_id) for bnumber

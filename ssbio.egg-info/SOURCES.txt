@@ -1,12 +1,13 @@
 setup.py
 ssbio/__init__.py
-ssbio/nbutils.py
 ssbio/utils.py
 ssbio.egg-info/PKG-INFO
 ssbio.egg-info/SOURCES.txt
 ssbio.egg-info/dependency_links.txt
 ssbio.egg-info/requires.txt
 ssbio.egg-info/top_level.txt
+ssbio/atlas/__init__.py
+ssbio/atlas/pipeline.py
 ssbio/cobra/__init__.py
 ssbio/cobra/geneinfo.py
 ssbio/cobra/utils.py
@@ -16,6 +17,7 @@ ssbio/databases/drugbank.py
 ssbio/databases/isoform.py
 ssbio/databases/kegg.py
 ssbio/databases/matador.py
+ssbio/databases/ncbi.py
 ssbio/databases/pdb.py
 ssbio/databases/snp.py
 ssbio/databases/uniprot.py
@@ -37,6 +39,7 @@ ssbio/scripts/cleanpdb
 ssbio/scripts/thermostability
 ssbio/sequence/__init__.py
 ssbio/sequence/alignment.py
+ssbio/sequence/blast.py
 ssbio/sequence/fasta.py
 ssbio/sequence/properties/__init__.py
 ssbio/sequence/properties/aggregation_propensity.py
@@ -60,6 +63,7 @@ ssbio/structure/properties/ssbond.py
 ssbio/test/__init__.py
 ssbio/test/test_cleanpdb.py
 ssbio/test/test_fasta.py
+ssbio/test/test_gempro_pipeline.py
 ssbio/test/test_identifiers.py
 ssbio/test/test_isoform.py
 ssbio/test/test_itasserparse.py
@@ -67,6 +71,7 @@ ssbio/test/test_mutatepdb.py
 ssbio/test/test_pdb.py
 ssbio/test/test_thermostability.py
 ssbio/test/test_uniprot.py
+ssbio/test/test_utils.py
 ssbio/tools/__init__.py
 ssbio/tools/output_checker2.py
 ssbio/tools/output_checker3.py

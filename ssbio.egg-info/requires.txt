@@ -6,3 +6,5 @@ requests
 cachetools
 bioservices
 prody
+xmltodict
+bidict

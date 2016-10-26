@@ -31,11 +31,6 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-
-# def consolidate_pandas_dfs(*args):
-#
-#
-
 def split_folder_and_path(filepath):
     """Split a file path into its folder, filename, and extension
 
@@ -52,7 +47,7 @@ def split_folder_and_path(filepath):
     filename_without_extension = splitext[0]
     extension = splitext[1]
 
-    return(dirname, filename_without_extension, extension)
+    return dirname, filename_without_extension, extension
 
 def dict_head(d, disp=5):
     """Return the head of a dictionary.

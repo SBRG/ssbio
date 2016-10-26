@@ -11,6 +11,8 @@ date = utils.Date()
 
 # TODO: what if i want to write one fasta file for multiple sequences?
 
+
+
 def write_fasta_file(seq_str, ident, description='',
                      extension='faa', outdir=None, overwrite=False, ignore_alphabet=False):
     '''
@@ -49,7 +51,7 @@ def load_seq_string(seq_string, ident, name='', desc='', ignore_alphabet=False):
     """Load an amino acid sequence string.
 
     Args:
-        seq_string (str): A protein'kegg amino acid sequence
+        seq_string (str): A protein amino acid sequence
         ident (str): Database identifier (ie. UniProt or PDB ID)
         name (str): OPTIONAL protein name (ie. gene name)
         desc (str): OPTIONAL description of this sequence (ie. catabolizes G6P)

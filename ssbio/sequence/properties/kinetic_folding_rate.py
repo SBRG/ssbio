@@ -35,7 +35,7 @@ def get_folding_rate_for_seq(seq, opn, temp, refT=37):
 
     """
 
-    slope = 22000  # not many data on this value, it'kegg effect on growth rate very small
+    slope = 22000  # not many data_dir on this value, it'kegg effect on growth rate very small
 
     # get folding rate for the reference temperature
     ref_rate = get_folding_rate_from_url(seq, opn)
