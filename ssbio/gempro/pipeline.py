@@ -308,14 +308,14 @@ class GEMPRO(object):
             kegg_dict['gene'] = gene_id
             kegg_pre_df.append(kegg_dict)
 
-            log.debug('Saved KEGG information for gene {}'.format(gene_id))
+            log.debug('{}: Loaded KEGG information for gene'.format(gene_id))
 
         # Save a dataframe of the file mapping info
         cols = ['gene', 'uniprot_acc', 'kegg_id', 'seq_len', 'pdbs', 'seq_file', 'metadata_file']
         self.df_kegg_mapping = pd.DataFrame.from_records(kegg_pre_df, columns=cols)
         self.df_kegg_mapping.to_csv(kegg_df_outfile)
 
-        log.info('Saved KEGG dataframe at {}'.format(kegg_df_outfile))
+        log.info('{}: Saved KEGG dataframe'.format(kegg_df_outfile))
 
         # Info on genes that could not be mapped
         self.missing_kegg_mapping = self.df_kegg_mapping[pd.isnull(self.df_kegg_mapping.kegg_id)].gene.unique().tolist()
@@ -370,6 +370,7 @@ class GEMPRO(object):
                 # Append empty information for a gene that cannot be mapped
                 uniprot_dict['gene'] = gene_id
                 uniprot_pre_df.append(uniprot_dict)
+                log.warning('{}: Unable to map to UniProt'.format(gene_id))
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
 
@@ -412,7 +413,7 @@ class GEMPRO(object):
 
         uniprot_df_outfile = op.join(self.data, 'df_uniprot_mapping.csv')
         self.df_uniprot_mapping.to_csv(uniprot_df_outfile)
-        log.info('Saved UniProt information at {}'.format(uniprot_df_outfile))
+        log.info('{}: Saved UniProt information'.format(uniprot_df_outfile))
 
         self.missing_uniprot_mapping = self.df_uniprot_mapping[pd.isnull(self.df_uniprot_mapping.kegg_id)].gene.unique().tolist()
         # Info on genes that could not be mapped
@@ -493,7 +494,7 @@ class GEMPRO(object):
 
         uniprot_df_outfile = op.join(self.data, 'df_uniprot_mapping.csv')
         self.df_uniprot_mapping.to_csv(uniprot_df_outfile)
-        log.info('Saved UniProt information at {}'.format(uniprot_df_outfile))
+        log.info('{}: Saved UniProt information'.format(uniprot_df_outfile))
 
         return uniprot_df_outfile
 
@@ -523,7 +524,7 @@ class GEMPRO(object):
             seq_file = ssbio.sequence.fasta.write_fasta_file(seq_str=s, ident=g, outdir=gene_folder)
             gene.annotation['sequence']['representative']['seq_file'] = op.basename(seq_file)
 
-            log.info('Loaded manually defined sequence information for {}.'.format(g))
+            log.info('{}: Loaded manually defined sequence information'.format(g))
 
     def set_representative_sequences(self):
         """Combine information from KEGG, UniProt, and manual mappings.
@@ -567,7 +568,7 @@ class GEMPRO(object):
                 kegg_prop = seq_prop['kegg']
                 seq_prop['representative'].update(kegg_prop)
                 genedict.update(kegg_prop)
-                log.debug('Representative sequence set from KEGG for {}'.format(g))
+                log.debug('{}: Representative sequence set from KEGG'.format(g))
 
             # If there are UniProt annotations and no KEGG annotations
             elif seq_prop['kegg']['seq_len'] == 0 and len(seq_prop['uniprot']) > 0:
@@ -586,7 +587,7 @@ class GEMPRO(object):
                 seq_prop['representative'].update(for_saving)
                 genedict.update(for_saving)
                 genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
-                log.debug('Representative sequence set from UniProt for {} using {}'.format(g, best_u))
+                log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
 
             # If there are both UniProt and KEGG annotations..
             elif seq_prop['kegg']['seq_len'] > 0 and len(seq_prop['uniprot']) > 0:
@@ -595,7 +596,7 @@ class GEMPRO(object):
                 if len(kegg_prop['pdbs']) > 0 and kegg_prop['uniprot_acc'] not in seq_prop['uniprot'].keys():
                     seq_prop['representative'].update(kegg_prop)
                     genedict.update(kegg_prop)
-                    log.debug('Representative sequence set from KEGG for {}'.format(g))
+                    log.debug('{}: Representative sequence set from KEGG'.format(g))
                 else:
                     # If there are multiple uniprots rank them by the sum of reviewed + num_pdbs
                     uniprots = seq_prop['uniprot'].keys()
@@ -611,7 +612,7 @@ class GEMPRO(object):
                     seq_prop['representative'].update(for_saving)
                     genedict.update(for_saving)
                     genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
-                    log.debug('Representative sequence set from UniProt for {} using {}'.format(g, best_u))
+                    log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
 
             if genedict['pdbs']:
                 genedict['pdbs'] = ';'.join(genedict['pdbs'])
@@ -631,7 +632,7 @@ class GEMPRO(object):
         self.df_sequence_mapping.fillna(value=np.nan, inplace=True)
         mapping_df_outfile = op.join(self.data, 'df_sequence_mapping.csv')
         self.df_sequence_mapping.to_csv(mapping_df_outfile)
-        log.info('Merged ID mapping information at {}'.format(mapping_df_outfile))
+        log.info('{}: Merged ID mapping information'.format(mapping_df_outfile))
 
         return mapping_df_outfile
 
@@ -685,7 +686,7 @@ class GEMPRO(object):
                         rank += 1
 
                     g.annotation['structure']['ranked_pdbs'] = ranked_pdbs
-                    log.debug('Saved PDB ranking for {}'.format(gene_id))
+                    log.debug('{}: Loaded PDB ranking'.format(gene_id))
 
         cols = ['gene', 'uniprot_acc', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'pdb_resolution',
                 'pdb_start', 'pdb_end', 'seq_coverage', 'unp_start', 'unp_end', 'tax_id', 'rank']
@@ -709,12 +710,13 @@ class GEMPRO(object):
         for g in tqdm(self.genes):
             gene_id = str(str(g.id))
             seq_file = g.annotation['sequence']['representative']['seq_file']
-            seq_dir, seq_name, seq_ext = utils.split_folder_and_path(seq_file)
 
             # Check if a representative sequence was set
             if not seq_file:
                 log.warning('No sequence set for {}'.format(gene_id))
                 continue
+
+            seq_dir, seq_name, seq_ext = utils.split_folder_and_path(seq_file)
 
             # If all_genes=False, BLAST only genes without a uniprot->pdb mapping
             already_ranked_pdbs = g.annotation['structure']['ranked_pdbs']
@@ -742,7 +744,7 @@ class GEMPRO(object):
 
             # If no blast results are returned, move on to the next sequence
             if not blast_results:
-                log.error('No BLAST results for {}'.format(gene_id))
+                log.warning('No BLAST results for {}'.format(gene_id))
                 continue
 
             # Save blast hits in gene annotation
