@@ -406,6 +406,9 @@ def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
     Returns:
         list: Rank-ordered list of dictionaries representing chain-specific PDB entries
 
+    TODO:
+        Python 2 returns unicode thingy
+
     """
     outfile = op.join(outdir, outfile)
 

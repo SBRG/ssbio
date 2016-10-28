@@ -1,7 +1,7 @@
 [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/nmih/ssbio)
 
 ## Install
-Clone this repository to any location and then install it!
+Clone this repository to any location and then install it.
 
 Cloning
 ```bash

@@ -9,7 +9,6 @@ ssbio.egg-info/top_level.txt
 ssbio/atlas/__init__.py
 ssbio/atlas/pipeline.py
 ssbio/cobra/__init__.py
-ssbio/cobra/geneinfo.py
 ssbio/cobra/utils.py
 ssbio/databases/__init__.py
 ssbio/databases/chembl.py
@@ -18,6 +17,7 @@ ssbio/databases/isoform.py
 ssbio/databases/kegg.py
 ssbio/databases/matador.py
 ssbio/databases/ncbi.py
+ssbio/databases/patric.py
 ssbio/databases/pdb.py
 ssbio/databases/snp.py
 ssbio/databases/uniprot.py
@@ -61,6 +61,7 @@ ssbio/structure/properties/resprops.py
 ssbio/structure/properties/sequence.py
 ssbio/structure/properties/ssbond.py
 ssbio/test/__init__.py
+ssbio/test/test_atlas_pipeline.py
 ssbio/test/test_cleanpdb.py
 ssbio/test/test_fasta.py
 ssbio/test/test_gempro_pipeline.py

@@ -843,6 +843,7 @@ class GEMPRO(object):
                     log.warning('{}: No structures available - no structures will be downloaded'.format(gene_id))
                     continue
 
+                # TODO: keep chain information?
                 # Get list of BLASTed PDBs
                 blasted_pdbs = [x['hit_pdb'].lower() for x in g.annotation['structure']['blast_pdbs']]
 

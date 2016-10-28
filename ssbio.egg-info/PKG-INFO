@@ -9,12 +9,22 @@ License: MIT
 Description: [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/nmih/ssbio)
         
         ## Install
-        Clone this repository (git clone https://github.com/nmih/ssbio.git) to any location and run:
+        Clone this repository to any location and then install it.
+        
+        Cloning
         ```bash
-        $ python setup.py install
+        $ git clone https://github.com/nmih/ssbio.git
         ```
-        or run in develop mode if you want to make changes to the code:
+        
+        Installation
         ```bash
+        $ cd ssbio
         $ python setup.py develop
+        ```
+        
+        Updating
+        ```bash
+        $ cd ssbio
+        $ git pull
         ```
 Platform: UNKNOWN
