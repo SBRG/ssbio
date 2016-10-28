@@ -100,8 +100,8 @@ def parse_mmcif_header(infile):
         chemicals_filtered = utils.filter_list_by_indices(mmdict['_chem_comp.id'],
                                                             utils.not_find(mmdict['_chem_comp.type'],
                                                                            chemical_types_exclude,
-                                                                           case_sensitive=False))
-        chemicals_fitered = utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=False)
+                                                                           case_sensitive=True))
+        chemicals_fitered = utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=True)
         newdict['chemicals'] = chemicals_fitered
     else:
         log.debug('{}: No chemical composition field'.format(infile))
