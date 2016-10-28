@@ -67,6 +67,20 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', force_rerun=Fal
 
     return outfile
 
+def parse_pdb_header(infile):
+    """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
+
+    If you want full access to the mmCIF file just use the MMCIF2Dict class in Biopython.
+
+    Args:
+        infile: Path to mmCIF file
+
+    Returns:
+        dict: Dictionary of parsed header
+
+    """
+    pass
+
 @cachetools.func.ttl_cache(maxsize=500, ttl=SEVEN_DAYS)
 def parse_mmcif_header(infile):
     """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
@@ -100,11 +114,16 @@ def parse_mmcif_header(infile):
         chemicals_filtered = utils.filter_list_by_indices(mmdict['_chem_comp.id'],
                                                             utils.not_find(mmdict['_chem_comp.type'],
                                                                            chemical_types_exclude,
-                                                                           case_sensitive=True))
+                                                                           case_sensitive=False))
         chemicals_fitered = utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=True)
         newdict['chemicals'] = chemicals_fitered
     else:
         log.debug('{}: No chemical composition field'.format(infile))
+
+    if '_entity_src_gen.pdbx_gene_src_scientific_name' in mmdict:
+        newdict['organism'] = mmdict['_entity_src_gen.pdbx_gene_src_scientific_name']
+    else:
+        log.debug('{}: No organism field'.format(infile))
 
     return newdict
 
