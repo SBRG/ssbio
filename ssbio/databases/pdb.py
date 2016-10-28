@@ -106,7 +106,7 @@ def parse_mmcif_header(infile):
         log.debug('{}: No experimental method field'.format(infile))
 
     if '_refine.ls_d_res_high' in mmdict:
-        newdict['resolution'] = mmdict['_refine.ls_d_res_high']
+        newdict['resolution'] = float(mmdict['_refine.ls_d_res_high'])
     else:
         log.debug('{}: No resolution field'.format(infile))
 
