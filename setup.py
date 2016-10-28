@@ -24,5 +24,5 @@ setup(
                       'bioservices',
                       'prody',
                       'xmltodict',
-                      'bidict']
+                      'more_itertools']
 )

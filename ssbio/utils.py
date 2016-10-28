@@ -83,6 +83,77 @@ def input_parser(args):
     """
     pass
 
+def find(lst, a, case_sensitive=True):
+    """Return indices of a list which have elements that match an object or list of objects
+
+    Args:
+        lst: list of values
+        a: object(s) to check equality
+
+    Returns:
+        list: list of indicies of lst which equal a
+
+    """
+    a = force_list(a)
+
+    if not case_sensitive:
+        lst = [x.lower() for x in lst]
+        a = [y.lower() for y in a]
+
+    return [i for i, x in enumerate(lst) if x in a]
+
+def not_find(lst, a, case_sensitive=True):
+    """Return indices of a list which have elements that DO NOT match an object or list of objects
+
+    Args:
+        lst: list of values
+        a: object(s) to check inequality
+
+    Returns:
+        list: list of indicies of lst which do not equal a
+
+    """
+    a = force_list(a)
+
+    if not case_sensitive:
+        lst = [x.lower() for x in lst]
+        a = [y.lower() for y in a]
+
+    return [i for i, x in enumerate(lst) if x not in a]
+
+def filter_list(lst, takeout, case_sensitive=True):
+    """Return a modified list removing items specified.
+
+    Args:
+        lst: Original list of values
+        takeout: Object or objects to remove from lst
+
+    Returns:
+        list: Filtered list of values
+
+    """
+    takeout = force_list(takeout)
+
+    if not case_sensitive:
+        lst = [x.lower() for x in lst]
+        takeout = [y.lower() for y in takeout]
+
+    return [x for x in lst if x not in takeout]
+
+def filter_list_by_indices(lst, indices):
+    """Return a modified list containing only the indices indicated.
+
+    Args:
+        lst: Original list of values
+        indices: List of indices to keep from the original list
+
+    Returns:
+        list: Filtered list of values
+
+    """
+    return [x for i, x in enumerate(lst) if i in indices]
+
+
 @contextmanager
 def suppress_stdout():
     with open(os.devnull, "w") as devnull:
@@ -121,6 +192,30 @@ def force_list(val=None):
     if isinstance(val, pd.Series):
         return val.tolist()
     return val if isinstance(val, list) else [val]
+
+def force_lower_list(val=None):
+    """Force a lowercase list representation of strings
+
+    Args:
+        val: string or strings to parse into a list
+
+    Returns:
+        list: with lowercase values
+
+    """
+    return [x.lower() for x in force_list(val)]
+
+def force_upper_list(val=None):
+    """Force a UPPERCASE list representation of strings
+
+    Args:
+        val: string or strings to parse into a list
+
+    Returns:
+        list: with UPPERCASE values
+
+    """
+    return [x.upper() for x in force_list(val)]
 
 def split_list(a_list):
     half = len(a_list)//2

@@ -5,22 +5,22 @@ import os.path as op
 import pandas as pd
 
 
-def msms_output(filename, outdir=None):
+def msms_output(pdb_file, outdir=None):
     """Run MSMS (through Biopython) on a PDB file.
 
     Saves the result dataframe
 
     Args:
-        filename:
+        pdb_file:
 
     Returns:
 
     """
-    basename = op.splitext(op.basename(filename))[0]
+    basename = op.splitext(op.basename(pdb_file))[0]
 
-    my_structure = PDBIOExt(filename)
+    my_structure = PDBIOExt(pdb_file)
     model = my_structure.first_model
-    rd = PDB.ResidueDepth(model, filename)
+    rd = PDB.ResidueDepth(model, pdb_file)
 
     akeys = list(rd)
     if len(akeys) == 0:

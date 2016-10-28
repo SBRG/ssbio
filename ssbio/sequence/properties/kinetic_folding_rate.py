@@ -35,7 +35,7 @@ def get_folding_rate_for_seq(seq, opn, temp, refT=37):
 
     """
 
-    slope = 22000  # not many data_dir on this value, it'kegg effect on growth rate very small
+    slope = 22000  # not many data_dir on this value, it's effect on growth rate very small
 
     # get folding rate for the reference temperature
     ref_rate = get_folding_rate_from_url(seq, opn)
@@ -52,7 +52,7 @@ def get_folding_rate_from_url(seq, opn):
     """Predict the kinetic folding rate of a protein
 
     for more information, see http://www.iitm.ac.in/bioinfo/fold-rate/
-    it might be better to get sequence directly from ME2.0 (i.e. whatever that'kegg being modeled)
+    it might be better to get sequence directly from ME2.0 (i.e. whatever that's being modeled)
     not from structure here (which may include some weird one letter codes, which need to be fixed)?
 
     Args:

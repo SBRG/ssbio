@@ -25,7 +25,7 @@ AAdict = {'CYS': 'polar',
           'SEC': 'polar'}
 
 
-def residue_props(filename):
+def residue_props(pdb_file):
     """
     Returns a dictionary of residue properties indicating the
     percentage of the respective property.
@@ -34,7 +34,7 @@ def residue_props(filename):
     Output: Dictonary of percentage (float) of properties
     """
 
-    my_structure = PDBIOExt(filename)
+    my_structure = PDBIOExt(pdb_file)
     model = my_structure.first_model
 
     props = {}

@@ -16,12 +16,12 @@ class TestATLAS(unittest.TestCase):
         # Prepare your ATLAS analysis
         self.atlas = ATLAS(base_strain_name='iJO1366', root_dir=self.ROOT_DIR,
                            seq_type='prot',
-                           base_gem_file_path=op.join(self.ROOT_DIR, 'iJO1366', 'atlas\\model_files\\iJO1366.xml'),
+                           base_gem_file_path=op.join(self.ROOT_DIR, 'iJO1366', 'atlas\\model_dir\\iJO1366.xml'),
                            base_gem_file_type='sbml',
                            reference_genome='U00096')
 
         # Input the list of strains you would like to compare
-        with open(op.join(self.ROOT_DIR, 'iJO1366\\atlas\\data\\161016-55strains.in')) as f:
+        with open(op.join(self.ROOT_DIR, 'iJO1366\\atlas\\data_dir\\161016-55strains.in')) as f:
             genomes = f.read().splitlines()
         self.atlas.download_genome_cds(genomes, email='nmih@ucsd.edu')
 

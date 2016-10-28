@@ -39,15 +39,16 @@ def calculate_res_distance(res_1, res_2, pdb_file):
                 res_chk_2 = j.id[1]
 
     paired = ssbio.utils.combinations(ires_list, 2)
-    # try:
-    for k in paired:
-        chainA = PDB.Selection.unfold_entities(k[0], 'C')[0]
-        chainB = PDB.Selection.unfold_entities(k[1], 'C')[0]
-        vec = list(
-            np.array([x.get_coord() for x in k[0]]).mean(axis=0) - np.array([x.get_coord() for x in k[1]]).mean(
-                axis=0))
-        distance = magni(vec[0], vec[1], vec[2])
+    try:
+        for k in paired:
+            chainA = PDB.Selection.unfold_entities(k[0], 'C')[0]
+            chainB = PDB.Selection.unfold_entities(k[1], 'C')[0]
+            vec = list(
+                np.array([x.get_coord() for x in k[0]]).mean(axis=0) - np.array([x.get_coord() for x in k[1]]).mean(
+                    axis=0))
+            distance = magni(vec[0], vec[1], vec[2])
 
-    return distance
-    # except UnboundLocalError:
-    #     return "Unknown interaction"
+        return distance
+    except UnboundLocalError:
+        log.error("Unknown interaction")
+        return None

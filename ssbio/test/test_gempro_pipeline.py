@@ -50,7 +50,7 @@ class TestGEMPRO(unittest.TestCase):
     def test_prep_folders(self):
         # Test if folders were made
         self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME)))
-        folders = ['data', 'notebooks', 'figures', 'structure_files', 'structure_files/by_gene', 'sequence_files']
+        folders = ['data', 'notebooks', 'figures', 'structures', 'structures/by_gene', 'sequences']
         for f in folders:
             self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME, f)))
 
@@ -72,7 +72,7 @@ class TestGEMPRO(unittest.TestCase):
 
     def test_kegg_mapping_and_metadata(self):
         """Test that KEGG mapping did these things:
-        1. Save the KEGG dataframe, create the df_kegg_mapping attribute
+        1. Create the df_kegg_metadata attribute
         2. Save individual sequence and metadata files per gene in the sequence_files folder
         3. Save KEGG related info into each GeneInfo object
         """
@@ -80,11 +80,9 @@ class TestGEMPRO(unittest.TestCase):
         outfile_df = self.my_gempro.kegg_mapping_and_metadata(kegg_organism_code=kegg_organism_code)
 
         # 1.
-        # Test if KEGG mapping dataframe was created
-        self.assertTrue(op.exists(op.join(self.my_gempro.data, outfile_df)))
         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
-        self.assertIsInstance(self.my_gempro.df_kegg_mapping, pd.DataFrame)
-        self.assertEqual(len(self.my_gempro.df_kegg_mapping.gene.unique()), len(self.my_gempro.genes))
+        self.assertIsInstance(self.my_gempro.df_kegg_metadata, pd.DataFrame)
+        self.assertEqual(len(self.my_gempro.df_kegg_metadata.gene.unique()), len(self.my_gempro.genes))
 
         ## Tests per gene
         for gene in self.my_gempro.genes:
@@ -95,9 +93,9 @@ class TestGEMPRO(unittest.TestCase):
             # If the gene did not map to a KEGG ID, a folder will still be made for it
             # It will still be in the KEGG DF, just with empty entries
             # It will not have anything downloaded for it
-            gene_structure_folder = op.join(self.my_gempro.seq_files, g)
+            gene_structure_folder = op.join(self.my_gempro.sequence_dir, g)
             self.assertTrue(op.exists(gene_structure_folder))
-            self.assertTrue(g in self.my_gempro.df_kegg_mapping.gene.tolist())
+            self.assertTrue(g in self.my_gempro.df_kegg_metadata.gene.tolist())
 
             if g in self.will_not_map:
                 self.assertTrue(g in self.my_gempro.missing_kegg_mapping)
@@ -112,18 +110,16 @@ class TestGEMPRO(unittest.TestCase):
 
     def test_uniprot_mapping_and_metadata(self):
         """Test that UniProt mapping did these things:
-        1. Save the UniProt dataframe, create the df_uniprot_mapping attribute
+        1. Create the df_uniprot_metadata attribute
         2. Save individual sequence and metadata files per gene in the sequence_files folder
         3. Save UniProt related info into each GeneInfo object
         """
         outfile_df = self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
 
         # 1.
-        # Test if mapping mapping dataframe was created
-        self.assertTrue(op.exists(op.join(self.my_gempro.data, outfile_df)))
         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
-        self.assertIsInstance(self.my_gempro.df_uniprot_mapping, pd.DataFrame)
-        self.assertEqual(len(self.my_gempro.df_uniprot_mapping.gene.unique()), len(self.my_gempro.genes))
+        self.assertIsInstance(self.my_gempro.df_uniprot_metadata, pd.DataFrame)
+        self.assertEqual(len(self.my_gempro.df_uniprot_metadata.gene.unique()), len(self.my_gempro.genes))
 
         ## Tests per gene
         for gene in self.my_gempro.genes:
@@ -134,16 +130,16 @@ class TestGEMPRO(unittest.TestCase):
             # If the gene did not map to a UniProt ID, a folder will still be made for it
             # It will still be in the UniProt DF, just with empty entries
             # It will not have anything downloaded for it
-            gene_structure_folder = op.join(self.my_gempro.seq_files, g)
+            gene_structure_folder = op.join(self.my_gempro.sequence_dir, g)
             self.assertTrue(op.exists(gene_structure_folder))
-            self.assertTrue(g in self.my_gempro.df_uniprot_mapping.gene.tolist())
+            self.assertTrue(g in self.my_gempro.df_uniprot_metadata.gene.tolist())
 
             if g in self.will_not_map:
                 self.assertTrue(g in self.my_gempro.missing_uniprot_mapping)
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))
             else:
-                uniprots = self.my_gempro.df_uniprot_mapping[self.my_gempro.df_uniprot_mapping.gene == g].uniprot_acc.unique().tolist()
+                uniprots = self.my_gempro.df_uniprot_metadata[self.my_gempro.df_uniprot_metadata.gene == g].uniprot_acc.unique().tolist()
                 for u in uniprots:
                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))

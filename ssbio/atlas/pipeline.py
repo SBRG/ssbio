@@ -68,27 +68,27 @@ class ATLAS():
         self.notebooks_dir = op.join(self.base_dir, 'notebooks')
         # atlas_dir - directory where all ATLAS analysis will be carried out
         self.atlas_dir = op.join(self.base_dir, 'atlas')
-        # model_files - directory where base strain GEM and new models will be stored
-        self.model_files = op.join(self.atlas_dir, 'model_files')
+        # model_dir - directory where base strain GEM and new models will be stored
+        self.model_files = op.join(self.atlas_dir, 'models')
         # data_dir - directory where all data_dir will be stored
         self.data_dir = op.join(self.atlas_dir, 'data')
-        # figures - directory where all figures will be stored
-        self.figures_dir = op.join(self.atlas_dir, 'figures')
-        # seq_dir - sequence related files are stored here
-        self.seq_dir = op.join(self.atlas_dir, 'sequence_files')
+        # figure_dir - directory where all figure_dir will be stored
+        self.figure_dir = op.join(self.atlas_dir, 'figures')
+        # sequence_dir - sequence related files are stored here
+        self.sequence_dir = op.join(self.atlas_dir, 'sequences')
 
         list_of_dirs.extend(
-                [self.base_dir, self.notebooks_dir, self.atlas_dir, self.data_dir, self.figures_dir, self.model_files,
-                 self.seq_dir])
+                [self.base_dir, self.notebooks_dir, self.atlas_dir, self.data_dir, self.figure_dir, self.model_files,
+                 self.sequence_dir])
 
         if seq_type == 'nucl':
-            self.seq_atlas_dir = op.join(self.seq_dir, 'dna')
+            self.seq_atlas_dir = op.join(self.sequence_dir, 'dna')
             self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
             self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
             self.fasta_extension = 'fna'
 
         if seq_type == 'prot':
-            self.seq_atlas_dir = op.join(self.seq_dir, 'protein')
+            self.seq_atlas_dir = op.join(self.sequence_dir, 'protein')
             self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
             self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
             self.fasta_extension = 'faa'
