@@ -348,8 +348,6 @@ def parse_uniprot_txt_file(infile):
         uniprot_metadata_dict['pfam'] = metadata[metadata_key]['pfam']
     if 'pdbs' in metadata[metadata_key]:
         uniprot_metadata_dict['pdbs'] = list(set(metadata[metadata_key]['pdbs']))
-    else:
-        uniprot_metadata_dict['pdbs'] = []
     return uniprot_metadata_dict
 
 

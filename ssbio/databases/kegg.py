@@ -57,7 +57,7 @@ def download_kegg_aa_seq(organism_code, gene_id, outdir='', force_rerun=False):
 
 @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def map_kegg_all_genes(organism_code, target_db):
-    """Map all of an organism'kegg gene IDs to the target database.
+    """Map all of an organism's gene IDs to the target database.
 
     This is faster than supplying a specific list of genes to map,
     plus there seems to be a limit on the number you can map with a manual REST query anyway.
