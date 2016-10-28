@@ -889,7 +889,7 @@ class GEMPRO(object):
             self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).reset_index(drop=True)
             log.info('Updated existing PDB dataframe.')
         else:
-            cols = ['gene', 'experiment','resolution','chemicals','pdb_file', 'mmcif_file']
+            cols = ['gene', 'organism', 'experiment', 'resolution', 'chemicals', 'pdb_file', 'mmcif_file']
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
             log.info('Created PDB metadata dataframe.')
 
