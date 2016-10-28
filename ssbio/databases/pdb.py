@@ -1,5 +1,3 @@
-# TODO: 160501 - copied from ssbio_new - please ORGANIZE!
-
 import json
 import io
 import requests
@@ -10,6 +8,7 @@ import cachetools
 import gzip
 
 from Bio.PDB import PDBList
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
 from ssbio import utils
 from ssbio.structure.cleanpdb import CleanPDB
@@ -28,6 +27,86 @@ except ImportError:
     from io import StringIO
 
 SEVEN_DAYS = 60 * 60 * 24 * 7
+
+def download_structure(pdb_id, file_type, outdir='', outfile='', force_rerun=False):
+    """Download a structure from the RCSB PDB by ID. Specify the file type desired.
+
+    Args:
+        pdb_id: PDB ID
+        file_type: pdb, pdb.gz, cif, cif.gz, xml.gz
+        outdir: optional output directory
+        outfile: optional output name
+
+    Returns:
+
+    """
+    pdb_id = pdb_id.lower()
+    file_type = file_type.lower()
+    file_types = ['pdb', 'pdb.gz', 'cif', 'cif.gz', 'xml.gz']
+    if file_type not in file_types:
+        raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz')
+
+    if outfile:
+        outfile = op.join(outdir, outfile)
+    else:
+        outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
+
+    if not op.exists(outfile) and not force_rerun:
+        download_link = 'https://files.rcsb.org/download/{}.{}'.format(pdb_id, file_type)
+        req = requests.get(download_link)
+
+        # Raise error if request fails
+        req.raise_for_status()
+
+        with open(outfile, 'w') as f:
+            f.write(req.text)
+
+        log.debug('{}: Saved structure file'.format(outfile))
+    else:
+        log.debug('{}: Structure file already saved'.format(outfile))
+
+    return outfile
+
+@cachetools.func.ttl_cache(maxsize=500, ttl=SEVEN_DAYS)
+def parse_mmcif_header(infile):
+    """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
+
+    If you want full access to the mmCIF file just use the MMCIF2Dict class in Biopython.
+
+    Args:
+        infile: Path to mmCIF file
+
+    Returns:
+        dict: Dictionary of parsed header
+
+    """
+    newdict = {}
+    mmdict = MMCIF2Dict(infile)
+
+    chemical_ids_exclude = ['HOH']
+    chemical_types_exclude = ['l-peptide linking','peptide linking']
+
+    if '_exptl.method' in mmdict:
+        newdict['experiment'] = mmdict['_exptl.method']
+    else:
+        log.debug('{}: No experimental method field'.format(infile))
+
+    if '_refine.ls_d_res_high' in mmdict:
+        newdict['resolution'] = mmdict['_refine.ls_d_res_high']
+    else:
+        log.debug('{}: No resolution field'.format(infile))
+
+    if '_chem_comp.id' in mmdict:
+        chemicals_filtered = utils.filter_list_by_indices(mmdict['_chem_comp.id'],
+                                                            utils.not_find(mmdict['_chem_comp.type'],
+                                                                           chemical_types_exclude,
+                                                                           case_sensitive=False))
+        chemicals_fitered = utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=False)
+        newdict['chemicals'] = chemicals_fitered
+    else:
+        log.debug('{}: No chemical composition field'.format(infile))
+
+    return newdict
 
 
 def download_and_load_pdb(pdb_id, output_dir, file_type='pdb'):
@@ -146,7 +225,7 @@ def _theoretical_pdbs():
     Returns: list of theoretical PDBs
 
     """
-    theoretical_pdbs_link = "ftp://ftp.wwpdb.org/pub/pdb/data_dir/structures/models/index/titles.idx"
+    theoretical_pdbs_link = "ftp://ftp.wwpdb.org/pub/pdb/data/structures/models/index/titles.idx"
     response = urllib2.urlopen(theoretical_pdbs_link)
     theoretical_pdbs_raw = BytesIO(response.read())
     theoretical_pdbs_df = pd.read_table(theoretical_pdbs_raw, sep='\t', header=None)
@@ -188,7 +267,7 @@ def _obsolete_pdb_mapping():
     """
     pdb_obsolete_mapping = {}
 
-    req = urllib2.Request('ftp://ftp.wwpdb.org/pub/pdb/data_dir/status/obsolete.dat')
+    req = urllib2.Request('ftp://ftp.wwpdb.org/pub/pdb/data/status/obsolete.dat')
     response = urllib2.urlopen(req)
     output = response.read().decode('utf-8').strip().split('\n')
     for line in output:
@@ -249,8 +328,9 @@ def pdb_current_checker(pdb_ids):
         dict: Dictionary of {pdb_id: <status>}, where status can be
             "theoretical", "current", or a list of PDB IDs giving the non-obsolete entry
     """
-    pdb_ids = utils.force_list(pdb_ids)
-    pdb_ids = [x.lower() for x in pdb_ids]
+    pdb_ids = utils.force_lower_list(pdb_ids)
+
+    log.debug('Checking list of PDBs: {}'.format(pdb_ids))
 
     pdb_status = {}
 
@@ -267,6 +347,32 @@ def pdb_current_checker(pdb_ids):
 
     return pdb_status
 
+
+def update_pdb_list(pdb_ids):
+    """Filter a list of PDBs to remove obsolete and theoretical IDs. Replace obsolete ones with the updated IDs
+
+    Args:
+        pdb_ids: List of PDB IDs
+
+    Returns:
+        Updated list of PDB IDs
+
+    """
+    pdb_ids = utils.force_lower_list(pdb_ids)
+    checked = pdb_current_checker(pdb_ids)
+
+    new_pdb_ids = []
+
+    for p in pdb_ids:
+        if not checked[p] == 'current':
+            if checked[p] == 'theoretical':
+                continue
+            elif checked[p]:
+                new_pdb_ids.extend(p)
+        else:
+            new_pdb_ids.append(p)
+
+    return list(set(new_pdb_ids))
 
 @cachetools.func.ttl_cache(maxsize=1024)
 def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
@@ -312,7 +418,7 @@ def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
 
 
 @cachetools.func.ttl_cache(maxsize=1024)
-def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link=False):
+def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, seq_ident_cutoff=0, link=False):
     """Returns a list of BLAST hits of a sequence to available structures in the PDB.
 
     Args:
@@ -385,6 +491,10 @@ def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link
             info['hit_num_ident'] = int(hspi.text)
             info['hit_percent_ident'] = int(hspi.text)/len_orig
 
+            if int(hspi.text)/len_orig < seq_ident_cutoff:
+                log.debug('{}: does not meet sequence identity cutoff'.format(hitdef.text.split('|')[0].split(':')[0]))
+                continue
+
         # Number of similar residues (positive hits)
         hspp = hsp.find('Hsp_positive')
         if hspp is not None:
@@ -413,7 +523,7 @@ def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, link
     return hit_list
 
 
-def blast_pdb_df(seq, xml_outfile, xml_outdir='', force_rerun=False, evalue=0.001, link=False):
+def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0.001, seq_ident_cutoff=0, link=False):
     """Make a dataframe of BLAST results
 
     Args: see blast_pdb
@@ -422,10 +532,16 @@ def blast_pdb_df(seq, xml_outfile, xml_outdir='', force_rerun=False, evalue=0.00
         Tuple of (original results, parsed results in Pandas DataFrame)
 
     """
-    blast_results = blast_pdb(seq=seq, outfile=xml_outfile, outdir=xml_outdir, force_rerun=force_rerun, evalue=evalue, link=link)
+    blast_results = blast_pdb(seq=seq,
+                              outfile=xml_outfile,
+                              outdir=xml_outdir,
+                              force_rerun=force_rerun,
+                              evalue=evalue,
+                              seq_ident_cutoff=seq_ident_cutoff,
+                              link=link)
     cols = ['hit_pdb', 'hit_pdb_chains', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident',
             'hit_num_similar', 'hit_percent_similar', 'hit_num_gaps', 'hit_percent_gaps']
-    return blast_results, pd.DataFrame.from_records(blast_results, columns=cols)
+    return pd.DataFrame.from_records(blast_results, columns=cols)
 
 
 @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
