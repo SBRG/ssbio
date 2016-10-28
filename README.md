@@ -16,5 +16,6 @@ $ python setup.py develop
 
 Updating
 ```bash
+$ cd ssbio
 $ git pull
 ```
