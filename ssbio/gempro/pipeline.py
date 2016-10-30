@@ -38,6 +38,7 @@ bs_kegg = KEGG()
 
 from cobra.core import DictList
 from more_itertools import unique_everseen
+# from dotmap import DotMap
 
 """
 notes
@@ -64,6 +65,50 @@ it should be left up to the user if they want to save that information
 only important dfs should be saved, like the gempro final
 everything else should be saved in gene annotations
 """
+
+
+# TODO using these classes in the annotation field will work
+class StructureProp(object):
+    def __init__(self, ranked_pdbs=None, blast_pdbs=None, pdb=None, representative=None):
+        if not ranked_pdbs:
+            ranked_pdbs = []
+        if not blast_pdbs:
+            blast_pdbs = []
+        if not pdb:
+            pdb = {}
+        if not representative:
+            representative = {'pdb_id'             : None,
+                              'resolution'         : float('inf'),
+                              'original_pdb_file'  : None,
+                              'original_mmcif_file': None,
+                              'clean_pdb_file'     : None}
+        self.ranked_pdbs = ranked_pdbs
+        self.blast_pdbs = blast_pdbs
+        self.pdb = pdb
+        self.representative = representative
+
+
+class SequenceProp(object):
+    def __init__(self, kegg=None, uniprot=None, representative=None):
+        if not kegg:
+            kegg = {'uniprot_acc'  : None,
+                    'kegg_id'      : None,
+                    'seq_len'      : 0,
+                    'pdbs'         : [],
+                    'seq_file'     : None,
+                    'metadata_file': None}
+        if not uniprot:
+            uniprot = {}
+        if not representative:
+            representative = {'uniprot_acc'  : None,
+                              'kegg_id'      : None,
+                              'seq_len'      : 0,
+                              'pdbs'         : [],
+                              'seq_file'     : None,
+                              'metadata_file': None}
+        self.kegg = kegg
+        self.uniprot = uniprot
+        self.representative = representative
 
 
 class GEMPRO(object):
@@ -423,7 +468,7 @@ class GEMPRO(object):
                 # Append empty information for a gene that cannot be mapped
                 uniprot_dict['gene'] = gene_id
                 uniprot_pre_df.append(uniprot_dict)
-                log.warning('{}: Unable to map to UniProt'.format(gene_id))
+                log.debug('{}: Unable to map to UniProt'.format(gene_id))
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
 
@@ -657,12 +702,13 @@ class GEMPRO(object):
 
                     uni_prop = seq_prop['uniprot'][best_u]
                     your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
-                    for_saving = {your_key: uni_prop[your_key] for your_key in your_keys}
+                    for_saving = {your_key: uni_prop[your_key] for your_key in your_keys if your_key in uni_prop}
                     seq_prop['representative'].update(for_saving)
                     genedict.update(for_saving)
 
                     # For saving in dataframe, save as string
-                    genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
+                    if 'kegg_id' in genedict:
+                        genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
 
                     log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
 
@@ -795,12 +841,10 @@ class GEMPRO(object):
                                                           seq_ident_cutoff=seq_ident_cutoff,
                                                           link=display_link)
 
-            # If no blast results are returned, move on to the next sequence
             if not blast_results:
-                log.warning('No BLAST results for {}'.format(gene_id))
-                continue
+                log.debug('No BLAST results for {}'.format(gene_id))
             else:
-                log.info('{}: {} PDBs BLASTed'.format(gene_id, len(blast_results)))
+                log.debug('{}: {} PDBs BLASTed'.format(gene_id, len(blast_results)))
 
             # Save blast hits in gene annotation
             g.annotation['structure']['blast_pdbs'] = blast_results
@@ -840,7 +884,7 @@ class GEMPRO(object):
             if all_pdbs:
                 # Check if we have any PDBs
                 if not g.annotation['structure']['blast_pdbs'] and not g.annotation['structure']['ranked_pdbs']:
-                    log.warning('{}: No structures available - no structures will be downloaded'.format(gene_id))
+                    log.debug('{}: No structures available - no structures will be downloaded'.format(gene_id))
                     continue
 
                 # TODO: keep chain information?
@@ -858,7 +902,7 @@ class GEMPRO(object):
             else:
                 # Check if we have a representative structure
                 if not g.annotation['structure']['representative']['pdb_id']:
-                    log.warning('{}: No representative structure available - no structure will be downloaded'.format(gene_id))
+                    log.debug('{}: No representative structure available - no structure will be downloaded'.format(gene_id))
                     continue
 
                 # Download representative structure only!
