@@ -28,7 +28,7 @@ except ImportError:
 
 SEVEN_DAYS = 60 * 60 * 24 * 7
 
-def download_structure(pdb_id, file_type, outdir='', outfile='', force_rerun=False):
+def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, force_rerun=False):
     """Download a structure from the RCSB PDB by ID. Specify the file type desired.
 
     Args:
@@ -51,8 +51,13 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', force_rerun=Fal
     else:
         outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
 
+    if header:
+        folder = 'header'
+    else:
+        folder = 'download'
+
     if not op.exists(outfile) and not force_rerun:
-        download_link = 'https://files.rcsb.org/download/{}.{}'.format(pdb_id, file_type)
+        download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
         req = requests.get(download_link)
 
         # Raise error if request fails
@@ -423,7 +428,7 @@ def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
         response = requests.get('https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/{}'.format(uniprot_id),
                                 data={'key': 'value'})
         if response.status_code == 404:
-            log.warning('{}: 404 returned, probably no structures available.'.format(uniprot_id))
+            log.debug('{}: 404 returned, probably no structures available.'.format(uniprot_id))
             raw_data = {uniprot_id:{}}
         else:
             log.debug('{}: Obtained best structures'.format(uniprot_id))
@@ -703,6 +708,8 @@ def sifts_pdb_chain_to_uniprot(pdb, chain):
 #
 #         return de_unicodeify(final_dict)
 #
-# if __name__ == '__main__':
-#     p = Structure()
-#     p.pdb_current_checker('2223')
+if __name__ == '__main__':
+    seq = 'VLSPADKTNVKAAWGVKALSPADKTNVKAALTAVAHVDDMPNAL'
+    print(blast_pdb(seq, evalue=1))
+    print(len(blast_pdb(seq, evalue=1)))
+    print(len(blast_pdb(seq, evalue=1, seq_ident_cutoff=.83)))
