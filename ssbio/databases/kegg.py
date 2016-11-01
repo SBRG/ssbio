@@ -76,6 +76,6 @@ def map_kegg_all_genes(organism_code, target_db):
     # strip the organism code from the keys and the identifier in the values
     new_mapping = {}
     for k,v in mapping.items():
-        new_mapping[k.replace(organism_code + ':', '')] = v.split(':')[1]
+        new_mapping[k.replace(organism_code + ':', '')] = str(v.split(':')[1])
 
     return new_mapping

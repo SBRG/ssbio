@@ -366,7 +366,7 @@ def parse_uniprot_txt_file(infile):
 #     #     single = False
 #     uniprot_ids = utils.force_list(uniprot_ids)
 #
-#     uniprot_metadata_raw = bsup.retrieve(uniprot_ids, frmt='txt')
+#     uniprot_metadata_raw = bs_unip.retrieve(uniprot_ids, frmt='txt')
 #     uniprot_metadata_final = {}
 #
 #     for uniprot_id in tqdm(uniprot_ids):

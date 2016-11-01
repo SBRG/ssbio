@@ -1,6 +1,7 @@
 import os.path as op
 import unittest
-from ssbio.atlas.pipeline import ATLAS
+
+from ssbio.pipeline.atlas import ATLAS
 
 
 class TestATLAS(unittest.TestCase):

@@ -46,15 +46,18 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
     if file_type not in file_types:
         raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz')
 
-    if outfile:
-        outfile = op.join(outdir, outfile)
-    else:
-        outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
-
     if header:
         folder = 'header'
+        if outfile:
+            outfile = op.join(outdir, outfile)
+        else:
+            outfile = op.join(outdir, '{}.header.{}'.format(pdb_id, file_type))
     else:
         folder = 'download'
+        if outfile:
+            outfile = op.join(outdir, outfile)
+        else:
+            outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
 
     if not op.exists(outfile) and not force_rerun:
         download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
@@ -106,7 +109,7 @@ def parse_mmcif_header(infile):
     chemical_types_exclude = ['l-peptide linking','peptide linking']
 
     if '_exptl.method' in mmdict:
-        newdict['experiment'] = mmdict['_exptl.method']
+        newdict['experimental_method'] = mmdict['_exptl.method']
     else:
         log.debug('{}: No experimental method field'.format(infile))
 
@@ -126,7 +129,7 @@ def parse_mmcif_header(infile):
         log.debug('{}: No chemical composition field'.format(infile))
 
     if '_entity_src_gen.pdbx_gene_src_scientific_name' in mmdict:
-        newdict['organism'] = mmdict['_entity_src_gen.pdbx_gene_src_scientific_name']
+        newdict['taxonomy_name'] = mmdict['_entity_src_gen.pdbx_gene_src_scientific_name']
     else:
         log.debug('{}: No organism field'.format(infile))
 
@@ -440,7 +443,7 @@ def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force
                                 data={'key': 'value'})
         if response.status_code == 404:
             log.debug('{}: 404 returned, probably no structures available.'.format(uniprot_id))
-            raw_data = {uniprot_id:{}}
+            raw_data = {uniprot_id: {}}
         else:
             log.debug('{}: Obtained best structures'.format(uniprot_id))
             raw_data = response.json()

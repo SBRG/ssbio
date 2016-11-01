@@ -22,16 +22,15 @@ import ssbio.itasser.itasserparse
 from cobra.core import Gene
 from cobra.core import DictList
 
-
 import sys
 import logging
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 
 date = utils.Date()
-bsup = UniProt()
+bs_unip = UniProt()
 bs_kegg = KEGG()
 
 
@@ -345,7 +344,7 @@ class GEMPRO(object):
                 with open(metadata_file) as mf:
                     kegg_parsed = bs_kegg.parse(mf.read())
                     if 'STRUCTURE' in kegg_parsed.keys():
-                        kegg_dict['pdbs'] = kegg_parsed['STRUCTURE']['PDB'].split(' ')
+                        kegg_dict['pdbs'] = str(kegg_parsed['STRUCTURE']['PDB']).split(' ')
                         # TODO: there is a lot more you can get from the KEGG metadata file, examples below
                         # (consider saving it in the DF and in gene)
                         # 'DBLINKS': {'NCBI-GeneID': '100763844', 'NCBI-ProteinID': 'XP_003514445'}
@@ -408,7 +407,7 @@ class GEMPRO(object):
             genes_to_map = [x.id for x in self.genes]
 
         # Map all IDs first to available UniProts
-        genes_to_uniprots = bsup.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
+        genes_to_uniprots = bs_unip.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
 
         uniprot_pre_df = []
         for g in tqdm(self.genes):
@@ -433,7 +432,7 @@ class GEMPRO(object):
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
 
-                    uniprot_dict['uniprot_acc'] = mapped_uniprot
+                    uniprot_dict['uniprot_acc'] = str(mapped_uniprot)
 
                     # Download uniprot metadata
                     metadata_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot,
@@ -457,7 +456,7 @@ class GEMPRO(object):
                     # Save in Gene
                     if 'pdbs' not in uniprot_dict:
                         uniprot_dict['pdbs'] = []
-                    g.annotation['sequence']['uniprot'][mapped_uniprot] = uniprot_dict
+                    g.annotation['sequence']['uniprot'][str(mapped_uniprot)] = uniprot_dict
 
                     # Add info to dataframe
                     # TODO: empty pdb lists should be NaN in the dataframe
@@ -731,8 +730,8 @@ class GEMPRO(object):
                     to_add_to_annotation = OrderedDict()
 
                     for best_structure in best_structures:
-                        currpdb = best_structure['pdb_id'].lower()
-                        currchain = best_structure['chain_id'].upper()
+                        currpdb = str(best_structure['pdb_id'].lower())
+                        currchain = str(best_structure['chain_id'].upper())
 
                         pdb_rel = ssbio.databases.pdb.get_release_date(currpdb)
 
@@ -752,7 +751,7 @@ class GEMPRO(object):
                         best_structure_dict['rank'] = rank
 
                         # For saving in the Gene annotation
-                        to_add_to_annotation[currpdb + '_' + currchain] = best_structure_dict.copy()
+                        to_add_to_annotation[str(currpdb + '_' + currchain)] = best_structure_dict.copy()
 
                         # For saving in the summary dataframe
                         best_structure_dict['gene'] = gene_id
@@ -869,7 +868,7 @@ class GEMPRO(object):
             else:
                 log.debug('No BLAST results for {}'.format(gene_id))
 
-        cols = ['gene', 'pdb_id', 'pdb_chain_id', 'resolution', 'release_date' 'blast_score', 'blast_evalue',
+        cols = ['gene', 'pdb_id', 'pdb_chain_id', 'resolution', 'release_date', 'blast_score', 'blast_evalue',
                 'seq_coverage', 'seq_similar', 'seq_num_coverage', 'seq_num_similar']
         self.df_pdb_blast = pd.DataFrame.from_records(blast_results_pre_df, columns=cols)
 
@@ -1071,19 +1070,24 @@ class GEMPRO(object):
 
                 # Save annotation info
                 cif_dict['pdb_file'] = op.basename(pdb_file)
-                cif_dict['mmcif_file'] = op.basename(cif_file)
-                g.annotation['structure']['pdb'][p].update(cif_dict.copy())
+                cif_dict['mmcif_header'] = op.basename(cif_file)
+                g.annotation['structure']['pdb'][k].update(cif_dict)
 
-                cif_dict['gene'] = gene_id
-                pdb_pre_df.append(cif_dict)
+                adder = g.annotation['structure']['pdb'][k].copy()
+                adder['chemicals'] = ';'.join(adder['chemicals'])
+                if isinstance(adder['taxonomy_name'], list):
+                    adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
+                adder['gene'] = gene_id
+                pdb_pre_df.append(adder)
 
         # Save a dataframe of the PDB metadata
         if hasattr(self, 'df_pdb_metadata'):
-            self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).reset_index(drop=True)
+            self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
             log.info('Updated existing PDB dataframe.')
         else:
-            cols = ['gene', 'organism', 'experiment', 'resolution', 'chemicals', 'pdb_file', 'mmcif_file']
-            self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
+            cols = ['gene', 'pdb_id', 'pdb_chain_id', 'taxonomy_name', 'experimental_method',
+                    'resolution', 'seq_coverage', 'chemicals', 'rank', 'release_date', 'pdb_file', 'mmcif_header']
+            self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
             log.info('Created PDB metadata dataframe.')
 
     def get_pdb_id_list(self, gene):

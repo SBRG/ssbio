@@ -1,10 +1,11 @@
-import unittest
-import tempfile
 import os.path as op
-from ssbio.gempro.pipeline import GEMPRO
+import unittest
+
 import cobra
 import pandas as pd
+from ssbio.pipeline.gempro import GEMPRO
 from ssbio.utils import Date
+
 date = Date()
 
 class TestGEMPRO(unittest.TestCase):
