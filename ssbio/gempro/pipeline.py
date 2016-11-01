@@ -1056,17 +1056,13 @@ class GEMPRO(object):
 
             if all_pdbs:
                 # Check if we have any PDBs
-                if not g.annotation['structure']['blast_pdbs'] and not g.annotation['structure']['ranked_pdbs']:
+                if len(g.annotation['structure']['pdb']) == 0:
                     log.debug('{}: No structures available - no structures will be downloaded'.format(gene_id))
                     continue
 
-                # TODO: keep chain information?
-                # Get list of BLASTed PDBs
-                blasted_pdbs = [x['hit_pdb'].lower() for x in g.annotation['structure']['blast_pdbs']]
-
-                # Get list of PDBs from best_structures
-                all_pdbs = [c['pdb_id'].lower() for c in g.annotation['structure']['ranked_pdbs']]
-                all_pdbs.extend(blasted_pdbs)
+                # Get list of PDBs
+                all_pdbs = list(g.annotation['structure']['pdb'].keys())
+                all_pdbs = [x[:4] for x in all_pdbs]
 
                 # Make sure theoretical or obsolete pdbs are filtered out (obsolete is replaced)
                 pdbs_to_download = ssbio.databases.pdb.update_pdb_list(all_pdbs)
@@ -1074,12 +1070,12 @@ class GEMPRO(object):
 
             else:
                 # Check if we have a representative structure
-                if not g.annotation['structure']['representative']['pdb_id']:
+                if not g.annotation['structure']['representative']['structure_id']:
                     log.debug('{}: No representative structure available - no structure will be downloaded'.format(gene_id))
                     continue
 
                 # Download representative structure only!
-                pdbs_to_download = [g.annotation['structure']['representative']['pdb_id'].lower()]
+                pdbs_to_download = [g.annotation['structure']['representative']['structure_id'].lower()]
 
             # Download the PDBs
             for p in pdbs_to_download:
@@ -1098,7 +1094,7 @@ class GEMPRO(object):
                 # TODO: also save coverage information for the gene/uniprot id
                 info_dict['pdb_file'] = op.basename(pdb_file)
                 info_dict['mmcif_file'] = op.basename(cif_file)
-                g.annotation['structure']['pdb'][p] = info_dict
+                g.annotation['structure']['pdb'][p].update(info_dict)
 
                 info_dict['gene'] = gene_id
                 pdb_pre_df.append(info_dict)
