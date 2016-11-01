@@ -22,7 +22,6 @@ setup(
                       'requests',
                       'cachetools',
                       'bioservices',
-                      'prody',
                       'xmltodict',
                       'more_itertools',
                       'dotmap']
