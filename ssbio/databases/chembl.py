@@ -1,11 +1,17 @@
-import pandas as pd
 import requests
-from bs4 import BeautifulSoup
-import numpy as np
 
-# this takes a uniprot id returns its chembl id
+
 def chembl_uniprot_to_chembl_id(uniprot_id):
-    r = requests.get('https://www.ebi.ac.uk/chemblws/targets/uniprot/%s.json' % uniprot_id)
+    """Map a UniProt ID to a ChEMBL ID.
+
+    Args:
+        uniprot_id (str): UniProt ID
+
+    Returns:
+        str: ChEMBL ID
+
+    """
+    r = requests.get('https://www.ebi.ac.uk/chemblws/targets/uniprot/{}.json'.format(uniprot_id))
     if r.status_code == 200:
         d = r.json()
         return str(d['target']['chemblId'])
@@ -13,9 +19,17 @@ def chembl_uniprot_to_chembl_id(uniprot_id):
         return None
 
 
-# this takes a chembl ID and returns drugs that target it
-def chembl_targets_to_drugs(chembl_id):
-    r = requests.get('https://www.ebi.ac.uk/chemblws/targets/%s/approvedDrug.json' % chembl_id)
+def chembl_targets_to_approved_drugs(chembl_id):
+    """Map a ChEMBL ID to the ChEMBL drugs that target it
+
+    Args:
+        chembl_id (str):
+
+    Returns:
+        ?
+
+    """
+    r = requests.get('https://www.ebi.ac.uk/chemblws/targets/{}/approvedDrug.json'.format(chembl_id))
     if r.status_code == 200:
         d = r.json()
         approved_drugs = d['approvedDrugs']
@@ -31,10 +45,18 @@ def chembl_targets_to_drugs(chembl_id):
             return None
 
 
-# wrapper function for the above 2
 def chembl_uniprot_to_drugs(uniprot_id):
+    """Map a UniProt ID to approved drugs that target it
+
+    Args:
+        uniprot_id (str): UniProt ID
+
+    Returns:
+        ?
+
+    """
     chembl_id = chembl_uniprot_to_chembl_id(uniprot_id)
     if chembl_id:
-        return chembl_targets_to_drugs(chembl_id)
+        return chembl_targets_to_approved_drugs(chembl_id)
     else:
         return None
