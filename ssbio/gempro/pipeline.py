@@ -1035,7 +1035,6 @@ class GEMPRO(object):
                 # If not, move on to the next potential PDB
 
 
-
     def pdb_downloader_and_metadata(self, all_pdbs=False, force_rerun=False):
         """Download structures which have been mapped to our genes. Gets PDB file and mmCIF header.
 
