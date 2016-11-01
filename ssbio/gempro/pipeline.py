@@ -702,7 +702,7 @@ class GEMPRO(object):
 
         "Finally, a single quality indicator is also calculated for each entry by taking the harmonic average
         of all the percentile scores representing model and model-data-fit quality measures and then subtracting
-        10 times the numerical value of the resolution (in Ångström) of the entry to ensure that resolution plays
+        10 times the numerical value of the resolution (in Angstrom) of the entry to ensure that resolution plays
         a role in characterising the quality of a structure. This single empirical 'quality measure' value is used
         by the PDBe query system to sort results and identify the 'best' structure in a given context. At present,
         entries determined by methods other than X-ray crystallography do not have similar data quality information
