@@ -11,7 +11,10 @@ setup(
     packages=find_packages(),
     package_dir={'ssbio': 'ssbio'},
     package_data={'ssbio': ['ssbio/etc/*']},
-    scripts = ['ssbio/scripts/cleanpdb', 'ssbio/scripts/aggprop', 'ssbio/scripts/thermostability', 'ssbio/structure/mutatepdb.py', 'ssbio/structure/tleap.py',
+    scripts = ['ssbio/structure/cleanpdb.py',
+               'ssbio/sequence/properties/aggregation_propensity.py',
+               'ssbio/sequence/properties/thermostability.py',
+               'ssbio/structure/mutatepdb.py', 'ssbio/structure/tleap.py',
                'ssbio/databases/drugbank.py', 'ssbio/structure/properties/msmsprops.py',
                'ssbio/dock/dock.py'],
     long_description=open('README.md').read(),
@@ -22,7 +25,5 @@ setup(
                       'requests',
                       'cachetools',
                       'bioservices',
-                      'xmltodict',
-                      'more_itertools',
-                      'dotmap']
+                      'xmltodict']
 )

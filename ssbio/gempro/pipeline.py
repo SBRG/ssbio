@@ -1,31 +1,28 @@
-import argparse
 import os
 import os.path as op
-import shutil
-import glob
 import numpy as np
+import shutil
+import pandas as pd
+from tqdm import tqdm
+from collections import OrderedDict
+
+from bioservices.uniprot import UniProt
+from bioservices import KEGG
 
 from Bio import SeqIO
 
-from bioservices.uniprot import UniProt
-
-bsup = UniProt()
-
-import ssbio.cobra.utils
 from ssbio import utils
-from collections import OrderedDict
-date = utils.Date()
-
+import ssbio.cobra.utils
 import ssbio.databases.kegg
 import ssbio.databases.uniprot
 import ssbio.databases.pdb
 import ssbio.sequence.fasta
-import pandas as pd
+import ssbio.itasser.itasserparse
 
-from tqdm import tqdm
-
-import ssbio.databases.pdb
 from cobra.core import Gene
+from cobra.core import DictList
+
+
 import sys
 import logging
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -33,39 +30,9 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 
-from bioservices import KEGG
+date = utils.Date()
+bsup = UniProt()
 bs_kegg = KEGG()
-
-from cobra.core import DictList
-from more_itertools import unique_everseen
-# from dotmap import DotMap
-import ssbio.itasser.itasserparse
-
-"""
-notes
-
-force_rerun
-if possible, files that require a web request should be downloaded and used as a cache
-- metadata files
-- sequence files
-- structure files (pdb, sifts)
-- blast to the pdb
-- best_structures api
-also, files that require runtime of a program
-- dssp
-- msms
-- cleaned pdbs
-- minimized pdbs
-- homology models
-
-each function should have a force_rerun flag to download the newest files
-also there should be a global setting?
-
-if dataframes are made, it should always return the actual dataframe
-it should be left up to the user if they want to save that information
-only important dfs should be saved, like the gempro final
-everything else should be saved in gene annotations
-"""
 
 
 # TODO using these classes in the annotation field will work
