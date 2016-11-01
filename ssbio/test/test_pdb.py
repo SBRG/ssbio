@@ -57,6 +57,9 @@ class TestPDB(unittest.TestCase):
     def test_blast_pdb(self):
         seq = 'VLSPADKTNVKAAWGVKALSPADKTNVKAALTAVAHVDDMPNAL'
 
+        # Test that sequence identity cutoff works
+        print(ssbio.databases.pdb.blast_pdb(seq))
+
 
     # # TODO: this result changes based on pdb database
     # def test_top_pdb_blast_hit(self):

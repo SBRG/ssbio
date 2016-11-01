@@ -306,7 +306,6 @@ def _obsolete_pdb_mapping():
 
     return pdb_obsolete_mapping
 
-
 def is_obsolete_pdb(pdb_id):
     """Check if a PDB ID is obsolete or not
 
@@ -398,8 +397,8 @@ def update_pdb_list(pdb_ids):
 
     return list(set(new_pdb_ids))
 
-@cachetools.func.ttl_cache(maxsize=1024)
-def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
+
+def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force_rerun=False):
     """Utilize the PDBe REST API to return the rank-ordered list of PDB "best structures".
 
     The URL to access the results is formatted like so:
@@ -412,7 +411,8 @@ def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
         list: Rank-ordered list of dictionaries representing chain-specific PDB entries
 
     TODO:
-        Python 2 returns unicode thingy
+        - Python 2 returns unicode thingy
+        - unit test
 
     """
     outfile = op.join(outdir, outfile)
@@ -441,11 +441,18 @@ def best_structures(uniprot_id, outfile='', outdir='', force_rerun=False):
             log.debug('{}: Saved json file of best structures'.format(uniprot_id))
 
     data = dict(raw_data)[uniprot_id]
+
+    # Filter for sequence identity percentage
+    if seq_ident_cutoff != 0:
+        for result in data:
+            if result['coverage'] < seq_ident_cutoff:
+                data.remove(result)
+
     return data
 
 
 @cachetools.func.ttl_cache(maxsize=1024)
-def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, seq_ident_cutoff=0, link=False):
+def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0, link=False, force_rerun=False):
     """Returns a list of BLAST hits of a sequence to available structures in the PDB.
 
     Args:
@@ -458,6 +465,9 @@ def blast_pdb(seq, outfile='', outdir='', force_rerun=False, evalue=0.0001, seq_
 
     Returns:
         list: Rank ordered list of BLAST hits in dictionaries.
+
+    TODO:
+        - Unit test
 
     """
 
@@ -569,6 +579,92 @@ def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0
     cols = ['hit_pdb', 'hit_pdb_chains', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident',
             'hit_num_similar', 'hit_percent_similar', 'hit_num_gaps', 'hit_percent_gaps']
     return pd.DataFrame.from_records(blast_results, columns=cols)
+
+
+@cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
+def _property_table():
+    """Download the PDB -> resolution table directly from the RCSB PDB REST service.
+
+    See the other fields that you can get here: http://www.rcsb.org/pdb/results/reportField.do
+
+    Returns:
+        Pandas DataFrame: table of structureId as the index, resolution and experimentalTechnique as the columns
+
+    """
+    url = 'http://www.rcsb.org/pdb/rest/customReport.csv?pdbids=*&customReportColumns=structureId,resolution,experimentalTechnique,releaseDate&service=wsfile&format=csv'
+    r = requests.get(url)
+    p = pd.read_csv(StringIO(r.text)).set_index('structureId')
+    return p
+
+
+def get_resolution(pdb_id):
+    """Quick way to get the resolution of a PDB ID using the table of results from the REST service
+
+    Returns infinity if the resolution is not available.
+
+    Returns:
+        float: resolution of a PDB ID in Angstroms
+
+    TODO:
+        - Unit test
+
+    """
+
+    pdb_id = pdb_id.upper()
+    if pdb_id not in _property_table().index:
+        raise ValueError('PDB ID not in property table')
+    else:
+        resolution = _property_table().ix[pdb_id, 'resolution']
+        if pd.isnull(resolution):
+            log.debug('{}: no resolution available, probably not an X-ray crystal structure')
+            resolution = float('inf')
+
+    return resolution
+
+# def get_taxonomy(pdb_id):
+#     """Quick way to get the taxonomy of a PDB ID using the table of results from the REST service
+#
+#     Returns None if the taxonomy is not available.
+# TODO: taxonomy add chain ID in the table
+#
+#     Returns:
+#         str: Organism of a PDB ID
+#
+#     """
+#
+#     pdb_id = pdb_id.upper()
+#     if pdb_id not in _property_table().index:
+#         raise ValueError('PDB ID not in property table')
+#     else:
+#         taxonomy = _property_table().ix[pdb_id, 'taxonomy']
+#         if pd.isnull(taxonomy):
+#             log.debug('{}: no taxonomy available')
+#             taxonomy = None
+#
+#     return taxonomy
+
+
+def get_release_date(pdb_id):
+    """Quick way to get the release date of a PDB ID using the table of results from the REST service
+
+    Returns None if the release date is not available.
+
+    Returns:
+        str: Organism of a PDB ID
+
+    """
+
+    pdb_id = pdb_id.upper()
+    if pdb_id not in _property_table().index:
+        raise ValueError('PDB ID not in property table')
+    else:
+        release_date = _property_table().ix[pdb_id, 'releaseDate']
+        if pd.isnull(release_date):
+            log.debug('{}: no taxonomy available')
+            release_date = None
+
+    return release_date
+
 
 
 @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)

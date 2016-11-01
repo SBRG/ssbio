@@ -24,5 +24,6 @@ setup(
                       'bioservices',
                       'prody',
                       'xmltodict',
-                      'more_itertools']
+                      'more_itertools',
+                      'dotmap']
 )
