@@ -15,7 +15,7 @@ setup(
                'ssbio/sequence/properties/aggregation_propensity.py',
                'ssbio/sequence/properties/thermostability.py',
                'ssbio/structure/mutatepdb.py', 'ssbio/structure/tleap.py',
-               'ssbio/databases/drugbank.py', 'ssbio/structure/properties/msmsprops.py',
+               'ssbio/databases/drugbank.py', 'ssbio/structure/properties/msms.py',
                'ssbio/dock/dock.py'],
     long_description=open('README.md').read(),
     install_requires=['biopython',
