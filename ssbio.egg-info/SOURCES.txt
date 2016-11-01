@@ -6,6 +6,14 @@ ssbio.egg-info/SOURCES.txt
 ssbio.egg-info/dependency_links.txt
 ssbio.egg-info/requires.txt
 ssbio.egg-info/top_level.txt
+ssbio/databases/drugbank.py
+ssbio/dock/dock.py
+ssbio/scripts/aggprop
+ssbio/scripts/cleanpdb
+ssbio/scripts/thermostability
+ssbio/structure/mutatepdb.py
+ssbio/structure/tleap.py
+ssbio/structure/properties/msmsprops.py
 ssbio/atlas/__init__.py
 ssbio/atlas/pipeline.py
 ssbio/cobra/__init__.py

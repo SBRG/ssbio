@@ -3,6 +3,7 @@ import os.path as op
 import logging
 log = logging.getLogger(__name__)
 
+
 def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_rerun=False):
     """Download the entire set of DNA or protein sequences from protein-encoding genes in a genome from NCBI.
 

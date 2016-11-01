@@ -399,18 +399,29 @@ def update_pdb_list(pdb_ids):
 
 
 def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force_rerun=False):
-    """Utilize the PDBe REST API to return the rank-ordered list of PDB "best structures".
+    """Use the PDBe REST service to query for the best PDB structures for a UniProt ID.
 
-    The URL to access the results is formatted like so:
-    https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession
+        More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
+        Link used to retrieve results: https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession
+        The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and, if the same, resolution.
 
-    Args:
-        uniprot_id (str): UniProt Accession ID
+        Args:
+            uniprot_id (str): UniProt Accession ID
 
-    Returns:
-        list: Rank-ordered list of dictionaries representing chain-specific PDB entries
+        Returns:
+            list: Rank-ordered list of dictionaries representing chain-specific PDB entries. Keys are:
+            pdb_id: the PDB ID which maps to the UniProt ID
+            chain_id: the specific chain of the PDB which maps to the UniProt ID
+            coverage: the percent coverage of the entire UniProt sequence
+            resolution: the resolution of the structure
+            start: the structure residue number which maps to the start of the mapped sequence
+            end: the structure residue number which maps to the end of the mapped sequence
+            unp_start: the sequence residue number which maps to the structure start
+            unp_end: the sequence residue number which maps to the structure end
+            experimental_method: type of experiment used to determine structure
+            tax_id: taxonomic ID of the protein's original organism
 
-    TODO:
+        TODO:
         - Python 2 returns unicode thingy
         - unit test
 
@@ -621,11 +632,12 @@ def get_resolution(pdb_id):
 
     return resolution
 
+
 # def get_taxonomy(pdb_id):
 #     """Quick way to get the taxonomy of a PDB ID using the table of results from the REST service
 #
 #     Returns None if the taxonomy is not available.
-# TODO: taxonomy add chain ID in the table
+# TODO: taxonomy adds chain ID in the table, need to deal with that
 #
 #     Returns:
 #         str: Organism of a PDB ID
@@ -666,7 +678,6 @@ def get_release_date(pdb_id):
     return release_date
 
 
-
 @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
 def _sifts_mapping():
     baseURL = "ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/"
@@ -693,8 +704,8 @@ def SIFTS():
 
 def sifts_pdb_chain_to_uniprot(pdb, chain):
     return _sifts_mapping().ix[(pdb.lower(), chain.upper())]['SP_PRIMARY'].unique().tolist()
-#
-#
+
+
 # class Structure():
 #     """
 #     Class for defining Structure within an SBML model.
@@ -723,87 +734,8 @@ def sifts_pdb_chain_to_uniprot(pdb, chain):
 #
 #         # dictionary of chain IDs and their sequences as strings
 #         self.sequences = seqs
-#
 
-#
-#
-#     def pdb_current_checker(self, pdb_ids):
-#         """
-#         # status can be "theoretical", "current", or a PDB ID giving the non-obsolete entry
-#         """
-#         if not pdb_ids:
-#             return None
-#         if isinstance(pdb_ids, str):
-#             pdb_ids = [pdb_ids]
-#
-#         pdb_status = {}
-#
-#         theoretical = list(set(PDB_THEORETICAL).intersection(pdb_ids))
-#         obsolete = list(set(PDB_OBSOLETE_MAPPING.keys()).intersection(pdb_ids))
-#         current = list(set(pdb_ids).difference(theoretical, obsolete))
-#
-#         for t in theoretical:
-#             pdb_status[t] = 'theoretical'
-#         for o in obsolete:
-#             pdb_status[o] = PDB_OBSOLETE_MAPPING[o]
-#         for c in current:
-#             pdb_status[c] = 'current'
-#
-#         return pdb_status
-#
-#     def pdb_metadata_and_download(pdbids):
-#         final_dict = {}
-#         counter = 1
-#
-#         if isinstance(pdbids, str):
-#             pdbids = [pdbids]
-#
-#         for pdbid in pdbids:
-#
-#             clear_output(wait=True)
-#             print('***PROGRESS: PARSED & DOWNLOADED %d/%d PDB IDS***\n' % (counter, len(pdbids)))
-#             counter += 1
-#             sys.stdout.flush()
-#
-#             try:
-#                 header = pr.parsePDBHeader(pdbid)
-#
-#             # if PDB isn't able to be downloaded
-#             except IOError:
-#                 try:
-#                     header = pr.parsePDBHeader(pr.fetchPDBviaFTP(pdbid,format='cif'))
-#                 except IOError:
-#                     continue
-#
-#             appender = defaultdict(list)
-#             for prop,val in header.iteritems():
-#                 if isinstance(val, pr.proteins.header.Chemical):
-#                     appender['p_chemicals'].append(val.resname)
-#                 elif isinstance(val, pr.proteins.header.Polymer):
-#                     appender['p_chains'].append(val.chid)
-#                     if val.ec:
-#                         appender['p_ec_numbers'].append((val.chid,val.ec))
-#                 elif prop == 'reference':
-#                     if 'doi' in val:
-#                         appender['p_doi'] = val['doi']
-#                     if 'pmid' in val:
-#                         appender['p_pmid'] = val['pmid']
-#                 elif prop in ['resolution','space_group','experiment','deposition_date']:
-#                     appender['p_' + prop] = val
-#
-#             tmp = {}
-#             for chain in appender['p_chains']:
-#                 try:
-#                     uniprot_mapping = sifts_pdb_chain_to_uniprot(pdbid, chain)
-#                 except KeyError:
-#                     uniprot_mapping = ['PDB-'+chain]
-#                 tmp[chain] = uniprot_mapping
-#             appender['p_chain_uniprot_map'] = tmp
-#
-#             final_dict[pdbid] = dict(appender)
-#
-#         return de_unicodeify(final_dict)
-#
+
 if __name__ == '__main__':
     seq = 'VLSPADKTNVKAAWGVKALSPADKTNVKAALTAVAHVDDMPNAL'
     print(blast_pdb(seq, evalue=1))

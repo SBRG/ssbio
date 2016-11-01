@@ -66,6 +66,7 @@ def download_drugbank_db(username, password, outdir=None):
 
     return rename_unzipped_file
 
+
 def parse_drugbank_xml(db_xml_path, outdir=None):
     """Parse the main DrugBank XML database
 
@@ -78,6 +79,9 @@ def parse_drugbank_xml(db_xml_path, outdir=None):
         db_main_path: Main DrugBank ID mapping
         db_bind_path: DrugBank binding partners
         db_snp_path: Pharmacogenomics information
+
+    TODO:
+        - Use ElementTree instead
 
     """
     if not outdir:

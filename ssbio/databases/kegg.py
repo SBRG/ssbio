@@ -55,6 +55,7 @@ def download_kegg_aa_seq(organism_code, gene_id, outdir='', force_rerun=False):
 
     return outfile
 
+
 @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def map_kegg_all_genes(organism_code, target_db):
     """Map all of an organism's gene IDs to the target database.

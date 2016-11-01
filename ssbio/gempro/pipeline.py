@@ -989,7 +989,7 @@ class GEMPRO(object):
 
         log.info('Completed copying of I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.')
 
-    def set_representative_structure(self, always_use_homology=True):
+    def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage'):
         """Set the representative structure for a gene.
 
         Each gene can have a combination of the following:
@@ -998,8 +998,10 @@ class GEMPRO(object):
         - BLASTed PDBs
 
         If the always_use_homology flag is true, homology models are always set as representative when they exist.
-            If there are multiple homology models, a ranking needs to be provided to select the top one.
-        If the always_use_homology flag is false
+            If there are multiple homology models, we rank by default by the seq_coverage key. Other parameters:
+            - c_score
+            - model_date
+            - tm_score
 
         """
 
@@ -1036,29 +1038,36 @@ class GEMPRO(object):
                 elif has_pdb and not has_homology:
                     use_pdb = True
 
+            # If we are to use homology, save its information in the representative structure field
             if use_homology:
-                original_pdb_file = g.annotation['structure']['homology']['model_file']
-                original_pdb_file = g.annotation['structure']['homology']['model_file']
+                hm = g.annotation['structure']['homology']
+                # Sort the available homology models by the specified field
+                sorted_homology_ids = sorted(hm, key=lambda x: hm[x][sort_homology_by], reverse=True)
 
-            #
-            # # First check if PDBs were also BLASTed
-            # blasted_pdbs = [x['hit_pdb'].lower() for x in g.annotation['structure']['blast_pdbs']]
-            #
-            # # Get list of PDBs from best_structures
-            # all_pdbs = [c['pdb_id'].lower() for c in g.annotation['structure']['ranked_pdbs']]
-            # all_pdbs.extend(blasted_pdbs)
-            #
-            # # Make sure theoretical or obsolete pdbs are filtered out (obsolete is replaced)
-            # all_pdbs = ssbio.databases.pdb.update_pdb_list(all_pdbs)
-            #
-            # # If no BLASTed PDBs, just set the first ranked structure as representative
-            # if not blasted_pdbs:
-            #
-            #
-            #
-            #
-            # # TODO: should also do QC/QA checks here, including (original checks):
-            # -
+                top_homology = sorted_homology_ids[0]
+                original_pdb_file = g.annotation['structure']['homology'][top_homology]['model_file']
+                seq_coverage = g.annotation['structure']['homology'][top_homology]['seq_coverage']
+
+                g.annotation['structure']['representative']['structure_id'] = top_homology
+                g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
+                g.annotation['structure']['representative']['original_pdb_file'] = original_pdb_file
+                # g.annotation['structure']['representative']['clean_pdb_file'] =
+
+            elif use_pdb:
+                # Put PDBs through QC/QA
+                all_pdbs_and_chains = list(g.annotation['structure']['pdb'].keys())
+
+                # Get first potential PDB
+                # Download the PDB
+                # Clean it, keeping only chain indicated
+                # Write sequence
+                # Compare representative sequence to structure sequence
+                # If ends are <10% length of original, keep = True, else keep = False
+                # If only point mutations or point deletions, keep = True, else keep = False
+                # if keep = True, set as representative
+                # If not, move on to the next potential PDB
+
+
 
     def pdb_downloader_and_metadata(self, all_pdbs=False, force_rerun=False):
         """Download structures which have been mapped to our genes. Gets PDB file and mmCIF header.

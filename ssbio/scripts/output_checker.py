@@ -1,14 +1,17 @@
-from __future__ import absolute_import
 import os
 import glob
 import argparse
 import re
 import subprocess
-import ast
-from io import open
+
+try:
+    input = raw_input
+except NameError:
+    pass
+
 
 class OutputChecker(object):
-    u"""
+    """
     Ever run a program or script that generates output files, and wonder if they
     completed successfully? output_checker.py will help you out by:
     1) Asking you what the extension of the input files are (ex: "*.in")
@@ -21,22 +24,22 @@ class OutputChecker(object):
 
     def __init__(self, working_dir=None, input_file_extension=None, output_file_extension=None, complete_phrase=None, display_files=None, fast=None):
         if not working_dir:
-            self.working_dir = raw_input(u"Working directory: ")
+            self.working_dir = input("Working directory: ")
         else:
             self.working_dir = working_dir
 
         if not input_file_extension:
-            self.input_file_extension = raw_input(u"Input files: ")
+            self.input_file_extension = input("Input files: ")
         else:
             self.input_file_extension = input_file_extension
 
         if not output_file_extension:
-            self.output_file_extension = raw_input(u"Output files: ")
+            self.output_file_extension = input("Output files: ")
         else:
             self.output_file_extension = output_file_extension
 
         if not complete_phrase:
-            self.complete_phrase = raw_input(u"Complete phrase: ")
+            self.complete_phrase = input("Complete phrase: ")
         else:
             self.complete_phrase = complete_phrase
 
@@ -44,7 +47,7 @@ class OutputChecker(object):
         self.fast = fast
 
     def file_searcher(self, ext):
-        u"""
+        """
         Returns a list of all files which have provided extension in the working directory
         Output:
         files - list of files
@@ -57,16 +60,16 @@ class OutputChecker(object):
         return files
 
     def grep_text(self, text, pattern):
-        u"""
+        """
         Simple code to grep for a pattern in text
         """
         grepper = re.compile(pattern)
-        if grepper.search(unicode(text)):
+        if grepper.search(str(text)):
             return True
         return False
 
     def grep_file(self, pattern, file_obj):
-        u"""
+        """
         From: http://code.activestate.com/recipes/577069-access-grep-from-python
         """
         for line_num, line in enumerate(file_obj):
@@ -76,12 +79,12 @@ class OutputChecker(object):
 
     def tail(self, f, n):
         process = subprocess.Popen(
-            [u'tail', u'-n {0}'.format(n), u'{0}'.format(f)], stdout=subprocess.PIPE)
+            ['tail', '-n {0}'.format(n), '{0}'.format(f)], stdout=subprocess.PIPE)
         stdout = process.communicate()[0]
         return stdout
 
     def outfiles_done(self):
-        u"""
+        """
         Returns the output files that have the complete phrase in them
         """
         complete = []
@@ -98,19 +101,19 @@ class OutputChecker(object):
                     complete.append(f)
 
         if self.display_files:
-            print complete
+            print(complete)
 
         return complete
 
 
-if __name__ == u'__main__':
-    p = argparse.ArgumentParser(description=u'Output Parser v0.1')
-    p.add_argument(u'--working_dir', u'-wd')
-    p.add_argument(u'--input', u'-i')
-    p.add_argument(u'--output', u'-o')
-    p.add_argument(u'--complete', u'-c')
-    p.add_argument(u'--display', u'-d', action=u'store_true', default=False)
-    p.add_argument(u'--fast', u'-f', action=u'store_true', default=False)
+if __name__ == '__main__':
+    p = argparse.ArgumentParser(description='Output Parser v0.1')
+    p.add_argument('--working_dir', '-wd')
+    p.add_argument('--input', '-i')
+    p.add_argument('--output', '-o')
+    p.add_argument('--complete', '-c')
+    p.add_argument('--display', '-d', action='store_true', default=False)
+    p.add_argument('--fast', '-f', action='store_true', default=False)
     args = p.parse_args()
 
     oc = OutputChecker(args.working_dir, args.input,
@@ -125,10 +128,10 @@ if __name__ == u'__main__':
     infiles = oc.file_searcher(oc.input_file_extension)
     outfiles = oc.file_searcher(oc.output_file_extension)
 
-    print u'Number of input files: {0}'.format(len(infiles))
-    print u'Number of output files: {0}'.format(len(outfiles))
+    print('Number of input files: {0}'.format(len(infiles)))
+    print('Number of output files: {0}'.format(len(outfiles)))
     completed_files = oc.outfiles_done()
-    print u'Number of completed output files: {0}'.format(len(completed_files))
+    print('Number of completed output files: {0}'.format(len(completed_files)))
 
     # print(outfiles)
     # print(completed_files)

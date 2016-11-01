@@ -1,6 +1,6 @@
 from Bio import PDB
 import pandas as pd
-import prody as pr
+# import prody as pr
 
 from Bio.PDB.DSSP import *
 from Bio.PDB.Polypeptide import aa1
@@ -249,33 +249,33 @@ if __name__ == '__main__':
 
 
 # TODO: convert these functions to use biopython?
-def get_dssp_ss_content_multiplechains(prody_ag, chain):
-    """Get secondary structure across chain
-
-    Args:
-        prody_ag: ProDy atomgroup object (parsed PDB file)
-        chain (str): chain ID
-
-    Returns:
-
-    """
-    a = prody_ag.getData('resnum')
-    b = prody_ag.getData('name')
-    c = prody_ag.getData('secondary')
-    d = prody_ag.getData('chain')
-    resid = []
-    SSstr = []
-    idx = [i for i, x in enumerate(d) if x == chain]
-    for i in idx:
-        if b[i] == 'CA':
-            resid.append(i)
-            SSstr.append(c[i])
-
-    N = float(len(SSstr))
-    helix_alpha = SSstr.count('H') / N
-    helix_3_10 = SSstr.count('G') / N
-    extended = SSstr.count('E') / N
-    return helix_alpha, helix_3_10, extended
+# def get_dssp_ss_content_multiplechains(prody_ag, chain):
+#     """Get secondary structure across chain
+#
+#     Args:
+#         prody_ag: ProDy atomgroup object (parsed PDB file)
+#         chain (str): chain ID
+#
+#     Returns:
+#
+#     """
+#     a = prody_ag.getData('resnum')
+#     b = prody_ag.getData('name')
+#     c = prody_ag.getData('secondary')
+#     d = prody_ag.getData('chain')
+#     resid = []
+#     SSstr = []
+#     idx = [i for i, x in enumerate(d) if x == chain]
+#     for i in idx:
+#         if b[i] == 'CA':
+#             resid.append(i)
+#             SSstr.append(c[i])
+#
+#     N = float(len(SSstr))
+#     helix_alpha = SSstr.count('H') / N
+#     helix_3_10 = SSstr.count('G') / N
+#     extended = SSstr.count('E') / N
+#     return helix_alpha, helix_3_10, extended
 
 
 def get_ss_class(pdb_file, dssp_file, chain):

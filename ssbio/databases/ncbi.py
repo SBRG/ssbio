@@ -1,12 +1,9 @@
-import os
+import logging
 import os.path as op
-
 from Bio import Entrez
 from ssbio import utils
 
 date = utils.Date()
-
-import logging
 log = logging.getLogger(__name__)
 
 
