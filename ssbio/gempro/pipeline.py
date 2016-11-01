@@ -1062,7 +1062,7 @@ class GEMPRO(object):
 
                 # Get list of PDBs
                 all_pdbs = list(g.annotation['structure']['pdb'].keys())
-                all_pdbs = [x[:4] for x in all_pdbs]
+                all_pdbs = {x[:4]:x for x in all_pdbs}
 
                 # Make sure theoretical or obsolete pdbs are filtered out (obsolete is replaced)
                 pdbs_to_download = ssbio.databases.pdb.update_pdb_list(all_pdbs)
@@ -1070,6 +1070,7 @@ class GEMPRO(object):
 
             else:
                 # Check if we have a representative structure
+                # TODO: incomplete
                 if not g.annotation['structure']['representative']['structure_id']:
                     log.debug('{}: No representative structure available - no structure will be downloaded'.format(gene_id))
                     continue
