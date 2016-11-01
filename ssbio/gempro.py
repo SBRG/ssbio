@@ -1035,12 +1035,12 @@ class GEMPRO(object):
                 # If not, move on to the next potential PDB
 
 
-    def pdb_downloader_and_metadata(self, all_pdbs=False, force_rerun=False):
-        """Download structures which have been mapped to our genes. Gets PDB file and mmCIF header.
+    def pdb_downloader_and_metadata(self, force_rerun=False):
+        """Download ALL structures which have been mapped to our genes. Gets PDB file and mmCIF header and
+            creates a metadata table.
 
         Args:
-            all_pdbs (bool): Default False, if True, all PDBs in the ranked and blasted pdb fields are downloaded.
-                If False, only the representative PDB is downloaded.
+            force_rerun (bool):
 
         """
         pdb_pre_df = []
@@ -1053,33 +1053,14 @@ class GEMPRO(object):
             if not op.exists(gene_struct_dir):
                 os.mkdir(gene_struct_dir)
 
-            if all_pdbs:
-                # Check if we have any PDBs
-                if len(g.annotation['structure']['pdb']) == 0:
-                    log.debug('{}: No structures available - no structures will be downloaded'.format(gene_id))
-                    continue
-
-                # Get list of PDBs
-                all_pdbs = list(g.annotation['structure']['pdb'].keys())
-                all_pdbs = {x[:4]:x for x in all_pdbs}
-
-                # Make sure theoretical or obsolete pdbs are filtered out (obsolete is replaced)
-                pdbs_to_download = ssbio.databases.pdb.update_pdb_list(all_pdbs)
-                log.debug('{}: Gene is mapped to these PDBs - {}'.format(gene_id, pdbs_to_download))
-
-            else:
-                # Check if we have a representative structure
-                # TODO: incomplete
-                if not g.annotation['structure']['representative']['structure_id']:
-                    log.debug('{}: No representative structure available - no structure will be downloaded'.format(gene_id))
-                    continue
-
-                # Download representative structure only!
-                pdbs_to_download = [g.annotation['structure']['representative']['structure_id'].lower()]
+            # Check if we have any PDBs
+            if len(g.annotation['structure']['pdb']) == 0:
+                log.debug('{}: No structures available - no structures will be downloaded'.format(gene_id))
+                continue
 
             # Download the PDBs
-            for p in pdbs_to_download:
-                info_dict = {}
+            for k, v in g.annotation['structure']['pdb'].items():
+                p = v['pdb_id']
 
                 log.debug('{}: Downloading PDB and mmCIF'.format(p))
                 pdb_file = ssbio.databases.pdb.download_structure(pdb_id=p, file_type='pdb', header=False, outdir=gene_struct_dir, force_rerun=force_rerun)
@@ -1088,18 +1069,15 @@ class GEMPRO(object):
                 # Parse the mmCIF header
                 cif_dict = ssbio.databases.pdb.parse_mmcif_header(cif_file)
 
-                info_dict.update(cif_dict)
-
                 # Save annotation info
-                # TODO: also save coverage information for the gene/uniprot id
-                info_dict['pdb_file'] = op.basename(pdb_file)
-                info_dict['mmcif_file'] = op.basename(cif_file)
-                g.annotation['structure']['pdb'][p].update(info_dict)
+                cif_dict['pdb_file'] = op.basename(pdb_file)
+                cif_dict['mmcif_file'] = op.basename(cif_file)
+                g.annotation['structure']['pdb'][p].update(cif_dict.copy())
 
-                info_dict['gene'] = gene_id
-                pdb_pre_df.append(info_dict)
+                cif_dict['gene'] = gene_id
+                pdb_pre_df.append(cif_dict)
 
-        # Save a dataframe of the UniProt metadata
+        # Save a dataframe of the PDB metadata
         if hasattr(self, 'df_pdb_metadata'):
             self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).reset_index(drop=True)
             log.info('Updated existing PDB dataframe.')
@@ -1108,6 +1086,19 @@ class GEMPRO(object):
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
             log.info('Created PDB metadata dataframe.')
 
+    def get_pdb_id_list(self, gene):
+        """Return the list of PDB IDs mapped to a gene.
+
+        Returns:
+            list: List of PDB IDs
+
+        """
+        pdbs = []
+        if len(gene.annotation['structure']['pdb']) > 0:
+            keys = list(gene.annotation['structure']['pdb'].keys())
+            pdbs = list(set([x[:4] for x in keys]))
+
+        return pdbs
 
     def run_pipeline(self):
         """Run the entire GEM-PRO pipeline.
