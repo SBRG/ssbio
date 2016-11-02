@@ -410,6 +410,17 @@ def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force
         Link used to retrieve results: https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession
         The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and, if the same, resolution.
 
+        Here is the ranking algorithm described by the PDB paper:
+        https://nar.oxfordjournals.org/content/44/D1/D385.full
+
+        "Finally, a single quality indicator is also calculated for each entry by taking the harmonic average
+        of all the percentile scores representing model and model-data-fit quality measures and then subtracting
+        10 times the numerical value of the resolution (in Angstrom) of the entry to ensure that resolution plays
+        a role in characterising the quality of a structure. This single empirical 'quality measure' value is used
+        by the PDBe query system to sort results and identify the 'best' structure in a given context. At present,
+        entries determined by methods other than X-ray crystallography do not have similar data quality information
+        available and are not considered as 'best structures'."
+
         Args:
             uniprot_id (str): UniProt Accession ID
 
@@ -425,10 +436,6 @@ def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force
             unp_end: the sequence residue number which maps to the structure end
             experimental_method: type of experiment used to determine structure
             tax_id: taxonomic ID of the protein's original organism
-
-        TODO:
-        - Python 2 returns unicode thingy
-        - unit test
 
     """
     outfile = op.join(outdir, outfile)
@@ -481,9 +488,6 @@ def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0, lin
 
     Returns:
         list: Rank ordered list of BLAST hits in dictionaries.
-
-    TODO:
-        - Unit test
 
     """
 
