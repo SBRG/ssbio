@@ -1002,6 +1002,72 @@ class GEMPRO(object):
                 elif has_pdb and not has_homology:
                     use_pdb = True
 
+            if use_pdb:
+                try:
+                    gene_seq_dir = op.join(self.sequence_dir, gene_id)
+                    gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
+
+                    # Get the representative sequence
+                    # TODO: should ID for rep seq be saved?
+                    ref_seq_id = g.annotation['sequence']['representative']['seq_file'].split('.')[0]
+                    seq_file = g.annotation['sequence']['representative']['seq_file']
+                    seq_file_path = op.join(gene_seq_dir, seq_file)
+                    seq_record = SeqIO.read(open(seq_file_path), "fasta")
+                    ref_seq = str(seq_record.seq)
+
+                    # Put PDBs through QC/QA
+                    all_pdbs_and_chains = list(g.annotation['structure']['pdb'].keys())
+                    convert_to_dict = utils.DefaultOrderedDict(list)
+                    for x in all_pdbs_and_chains:
+                        convert_to_dict[x[0]].append(x[1])
+
+                    for pdb, chains in convert_to_dict.items():
+                        # Download the PDB
+                        pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
+                                                                          outdir=gene_struct_dir, force_rerun=force_rerun)
+
+                        # Get the sequences of the chains
+                        chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file)
+
+                        for chain in chains:
+                            chain_seq = chain_to_seq[chain]
+
+                            # Compare representative sequence to structure sequence
+                            found_good_pdb = ssbio.structure.properties.quality.sequence_checker(reference_id=ref_seq_id,
+                                                                                                 reference_sequence=ref_seq,
+                                                                                                 structure_id=pdb+'_'+chain,
+                                                                                                 structure_sequence=chain_seq,
+                                                                                                 allow_missing_on_termini=allow_missing_on_termini,
+                                                                                                 allow_mutants=allow_mutants,
+                                                                                                 allow_deletions=allow_deletions,
+                                                                                                 allow_insertions=allow_insertions,
+                                                                                                 allow_unresolved=allow_unresolved,
+                                                                                                 write_output=True,
+                                                                                                 outdir=gene_struct_dir,
+                                                                                                 force_rerun=force_rerun)
+
+                            # If found_good_pdb = True, set as representative
+                            # If not, move on to the next potential PDB
+                            if found_good_pdb:
+                                orig_pdb_data = g.annotation['structure']['pdb'][(pdb, chain)]
+                                g.annotation['structure']['representative']['structure_id'] = (pdb, chain)
+                                g.annotation['structure']['representative']['seq_coverage'] = orig_pdb_data['seq_coverage']
+                                g.annotation['structure']['representative']['original_pdb_file'] = op.basename(pdb_file)
+
+                                # Clean it
+                                custom_clean = CleanPDB(keep_chains=chain)
+                                my_pdb = PDBIOExt(pdb_file)
+                                default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix='clean',
+                                                                       out_dir=gene_struct_dir)
+                                default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
+
+                                g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
+                                raise StopIteration
+                except StopIteration:
+                    log.debug('{}: Found representative PDB'.format(gene_id))
+                else:
+                    use_homology = True
+
             # If we are to use homology, save its information in the representative structure field
             if use_homology:
                 hm = g.annotation['structure']['homology']
@@ -1016,68 +1082,6 @@ class GEMPRO(object):
                 g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
                 g.annotation['structure']['representative']['original_pdb_file'] = original_pdb_file
                 # g.annotation['structure']['representative']['clean_pdb_file'] =
-
-            elif use_pdb:
-                gene_seq_dir = op.join(self.sequence_dir, gene_id)
-                gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
-
-                # Get the representative sequence
-                # TODO: should ID for rep seq be saved?
-                ref_seq_id = g.annotation['sequence']['representative']['seq_file'].split('.')[0]
-                seq_file = g.annotation['sequence']['representative']['seq_file']
-                seq_file_path = op.join(gene_seq_dir, seq_file)
-                seq_record = SeqIO.read(open(seq_file_path), "fasta")
-                ref_seq = str(seq_record.seq)
-
-                # Put PDBs through QC/QA
-                all_pdbs_and_chains = list(g.annotation['structure']['pdb'].keys())
-                convert_to_dict = utils.DefaultOrderedDict(list)
-                for x in all_pdbs_and_chains:
-                    convert_to_dict[x[0]].append(x[1])
-
-                found_good_pdb = False
-                for pdb, chains in convert_to_dict.items():
-                    # Download the PDB
-                    pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
-                                                                      outdir=gene_struct_dir, force_rerun=force_rerun)
-
-                    # Get the sequences of the chains
-                    chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file)
-
-                    for chain in chains:
-                        chain_seq = chain_to_seq[chain]
-
-                        # Compare representative sequence to structure sequence
-                        found_good_pdb = ssbio.structure.properties.quality.sequence_checker(reference_id=ref_seq_id,
-                                                                                             reference_sequence=ref_seq,
-                                                                                             structure_id=pdb+'_'+chain,
-                                                                                             structure_sequence=chain_seq,
-                                                                                             allow_missing_on_termini=allow_missing_on_termini,
-                                                                                             allow_mutants=allow_mutants,
-                                                                                             allow_deletions=allow_deletions,
-                                                                                             allow_insertions=allow_insertions,
-                                                                                             allow_unresolved=allow_unresolved,
-                                                                                             write_output=True,
-                                                                                             outdir=gene_struct_dir,
-                                                                                             force_rerun=force_rerun)
-
-                        # if found_good_pdb = True, set as representative
-                        # If not, move on to the next potential PDB
-                        if found_good_pdb:
-                            orig_pdb_data = g.annotation['structure']['pdb'][(pdb, chain)]
-                            g.annotation['structure']['representative']['structure_id'] = (pdb, chain)
-                            g.annotation['structure']['representative']['seq_coverage'] = orig_pdb_data['seq_coverage']
-                            g.annotation['structure']['representative']['original_pdb_file'] = pdb_file
-
-                            # Clean it
-                            custom_clean = CleanPDB(keep_chains=chain)
-                            my_pdb = PDBIOExt(pdb_file)
-                            default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix='clean',
-                                                                   out_dir=gene_struct_dir)
-                            default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
-
-                            g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
-                            break
 
     def pdb_downloader_and_metadata(self, force_rerun=False):
         """Download ALL structures which have been mapped to our genes. Gets PDB file and mmCIF header and
