@@ -1,82 +1,92 @@
-from Bio.Emboss.Applications import NeedleCommandline
-from Bio import AlignIO
-import os
+import os.path as op
 import pandas as pd
 import numpy as np
 from collections import defaultdict
+from Bio import AlignIO
+from Bio.Emboss.Applications import NeedleCommandline
 
-def run_alignment(id_a, faa_a, id_b, faa_b):
-    '''
-    Runs the needle alignment program for two fasta files
-    and writes the result to a file. Returns the filename.
 
-    Input:  id_a - first id
-            faa_a - first fasta file name
-            id_b - second id
-            faa_b - second fasta file name
-    Output: alignment_file - file name of alignment
-    '''
+def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapextend=0.5, outdir='', outfile=''):
+    """Run the needle alignment program for two fasta files and writes the result to a file. Returns the filename.
 
-    alignment_file = "%s_%s_align.txt" % (id_a, id_b)
+    Args:
+        id_a: first id
+        faa_a: first FASTA file path
+        id_b: second id
+        faa_b: second FASTA file path
 
-    if os.path.isfile(alignment_file):
-        return alignment_file
+    Returns:
+        str: alignment_file - file path to alignment
 
+    """
+
+    if not outfile:
+        outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
     else:
-        needle_cline = NeedleCommandline(
-            asequence=faa_a, bsequence=faa_b, gapopen=10, gapextend=0.5, outfile=alignment_file)
-        stdout, stderr = needle_cline()
-        return alignment_file
+        outfile = op.join(outdir, outfile)
 
-# SEE: https://www.biostars.org/p/91124/
+    if op.exists(outfile):
+        return outfile
 
-def run_alignment2(a_id, a_seq, b_id, b_seq):
+    needle_cline = NeedleCommandline(asequence=faa_a, bsequence=faa_b,
+                                     gapopen=gapopen, gapextend=gapextend,
+                                     outfile=outfile)
+    stdout, stderr = needle_cline()
+    return outfile
+
+
+def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=0.5, outdir='', outfile=''):
+    """Run the needle alignment program and writes the result to a file. Returns the filename.
+
+    SEE: https://www.biostars.org/p/91124/
+
+    Args:
+        id_a (str): sequence ID #1
+        seq_a (str): sequence #1
+        id_b (str): sequence ID #2
+        seq_b (str): sequence #2
+
+    Returns:
+        alignment_file - file name of alignment
+
     """
-    Runs the needle alignment program and returns a raw text dump of the alignment
 
-    Input:  a_id - sequence ID #1 (string)
-            a_seq - sequence #1 (string)
-            b_id - sequence ID #2 (string)
-            b_seq - sequence #2 (string)
-    Output: alignment_file - file name of alignment
+    if not outfile:
+        outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+    else:
+        outfile = op.join(outdir, outfile)
 
-    DEPENDENCIES:
-    get_alignment_allpos_df
-    """
+    if op.exists(outfile):
+        return outfile
 
-    from Bio.Emboss.Applications import NeedleCommandline
-
-    alignment_file = "/tmp/%s_%s_align.txt" % (a_id, b_id)
-
-    needle_cline = NeedleCommandline(asequence="asis::"+a_seq, bsequence="asis::"+b_seq, gapopen=10, gapextend=0.5, outfile=alignment_file)
+    needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
+                                     gapopen=gapopen, gapextend=gapextend,
+                                     outfile=outfile)
     stdout, stderr = needle_cline()
 
-    return get_alignment_allpos_df(alignment_file, a_id, b_id)
+    return outfile
 
 
-def get_alignment_df(alignment_file):
-    '''
-    Creates an alignment dataframe indicating where matches, mutations, insertions, and deletions are.
-    Takes in a needle alignment file and returns a Pandas DataFrame.
-    Input: alignment_file - needle alignment file between two amino acid sequences
-    Output: alignment_df - Pandas DataFrame of the alignment.
-    '''
+def get_alignment_summary_df(alignment_file):
+    """Create an alignment dataframe indicating where matches, mutations, insertions, and deletions are.
+        Takes in a needle alignment file and returns a Pandas DataFrame.
+
+    Args:
+        alignment_file - needle alignment file between two amino acid sequences
+
+    Retunrs:
+        alignment_df - Pandas DataFrame of the alignment.
+
+    """
 
     alignments = list(AlignIO.parse(alignment_file, "emboss"))
-    alignment_df = pd.DataFrame(columns=[
-                                'id_a', 'id_b', 'type', 'id_a_start', 'id_a_stop', 'count', 'id_a_aa', 'id_b_aa'])
+    alignment_df = pd.DataFrame(columns=['id_a', 'id_b', 'type', 'id_a_start', 'id_a_stop', 'count', 'id_a_aa', 'id_b_aa'])
 
     for alignment in alignments:
-        #         if not switch:
         a_seq_id = list(alignment)[0].id
         a_seq = str(list(alignment)[0].seq)
         b_seq_id = list(alignment)[1].id
         b_seq = str(list(alignment)[1].seq)
-    #         else:
-    #             a_seq_id = list(alignment)[1].id
-    #             a_seq = str(list(alignment)[1].seq)
-    #             b_seq_id = list(alignment)[0].id
-    #             b_seq = str(list(alignment)[0].seq)
 
         idx_start = 1
 
@@ -115,10 +125,7 @@ def get_alignment_df(alignment_file):
                     appender['id_a_start'] = idx_start
                     appender['id_a_stop'] = idx_end
                     appender['count'] = idx_end - idx_start + 1
-# print '%s from %d to %d with %d members' % (appender['type'],
-# appender['start'], appender['stop'], appender['count'])
-                    alignment_df = alignment_df.append(
-                        appender, ignore_index=True)
+                    alignment_df = alignment_df.append(appender, ignore_index=True)
 
                 if aa_flag_tracker == 'insertion':
                     appender = {}
@@ -128,9 +135,7 @@ def get_alignment_df(alignment_file):
                     appender['id_a_start'] = new_i
                     appender['id_a_stop'] = new_i
                     appender['count'] = insertion_counter
-# print '%s of length %d' % (aa_flag_tracker, insertion_counter)
-                    alignment_df = alignment_df.append(
-                        appender, ignore_index=True)
+                    alignment_df = alignment_df.append(appender, ignore_index=True)
                     insertion_counter = 0
                 idx_start = new_i + 1
 
@@ -145,7 +150,6 @@ def get_alignment_df(alignment_file):
                 appender['count'] = 1
                 appender['id_a_aa'] = a
                 appender['id_b_aa'] = b
-#                     print '%s at %d' % (aa_flag, new_i + 1)
                 alignment_df = alignment_df.append(appender, ignore_index=True)
                 idx_start = new_i + 1
 
@@ -159,10 +163,7 @@ def get_alignment_df(alignment_file):
                     appender['id_a_start'] = idx_start
                     appender['id_a_stop'] = idx_end
                     appender['count'] = idx_end - idx_start + 1
-# print '%s from %d to %d with %d members' % (appender['type'],
-# appender['start'], appender['stop'], appender['count'])
-                    alignment_df = alignment_df.append(
-                        appender, ignore_index=True)
+                    alignment_df = alignment_df.append(appender, ignore_index=True)
 
             elif (i + 1) == len(a_seq) and aa_flag_tracker != aa_flag:
                 idx_end = new_i + 1
@@ -175,24 +176,30 @@ def get_alignment_df(alignment_file):
                     appender['id_a_start'] = idx_start
                     appender['id_a_stop'] = idx_end
                     appender['count'] = idx_end - idx_start + 1
-# print '%s from %d to %d with %d members' % (appender['type'],
-# appender['start'], appender['stop'], appender['count'])
-                    alignment_df = alignment_df.append(
-                        appender, ignore_index=True)
-# print new_i + 1, ':', a, b, 'last=%kegg, now=%kegg' %
-# (aa_flag_tracker,aa_flag)
+                    alignment_df = alignment_df.append(appender, ignore_index=True)
 
             aa_flag_tracker = aa_flag
 
     return alignment_df
 
-def get_alignment_allpos_df(alignment_file, a_seq_id=None, b_seq_id=None):
+
+def get_alignment_df(alignment_file, a_seq_id=None, b_seq_id=None):
+    """Get a Pandas DataFrame of the Needle alignment results. Contains all positions of the sequences.
+
+    Args:
+        alignment_file:
+        a_seq_id: Optional specification of the ID of the reference sequence
+        b_seq_id: Optional specification of the ID of the aligned sequence
+
+    Returns:
+        Pandas DataFrame: all positions in the alignment
+
+    """
     alignments = list(AlignIO.parse(alignment_file, "emboss"))
 
     appender = defaultdict(dict)
     idx = 0
     for alignment in alignments:
-    #         if not switch:
         if not a_seq_id:
             a_seq_id = list(alignment)[0].id
         a_seq = str(list(alignment)[0].seq)
@@ -244,41 +251,18 @@ def get_alignment_allpos_df(alignment_file, a_seq_id=None, b_seq_id=None):
     alignment_df = pd.DataFrame.from_dict(appender, orient='index')
     alignment_df = alignment_df[['id_a', 'id_b', 'type', 'id_a_aa', 'id_a_pos', 'id_b_aa', 'id_b_pos']].fillna(value=np.nan)
 
-#     alignment_df = alignment_df.join(alignment_df['id_a'].apply(lambda x: pd.Series(x.split('.')[1])))
-#     alignment_df = alignment_df.rename(columns={0:'id_a_chain'})
-
-#     alignment_df = alignment_df.join(alignment_df['id_b'].apply(lambda x: pd.Series(x.split('.')[1])))
-#     alignment_df = alignment_df.rename(columns={0:'id_b_chain'})
-
     return alignment_df
 
-# TODO: needleall has a bug
-# def run_alignment_needleall(a_id, a_faa, b_id, b_faa):
-#
-#     from Bio.Emboss.Applications import NeedleallCommandline
-#     import os.path
-#
-#     alignment_file = "%s-%s_align.txt" % (a_id, b_id)
-#
-#     if os.path.isfile(alignment_file):
-#         # print 'Alignment %s file already exists' % alignment_file
-#         return alignment_file
-#
-#     else:
-#         print '**RUNNING ALIGNMENT FOR %kegg AND %kegg**' % (a_id, b_id)
-#         needle_cline = NeedleallCommandline(asequence=a_faa, bsequence=b_faa, gapopen=10, gapextend=0.5, outfile=alignment_file)
-#         stdout, stderr = needle_cline()
-#         return alignment_file
 
-
-def needle_reader(infile):
-    """
-    Reads in a needle alignment file and spits out statistics of the alignment.
+def needle_statistics(infile):
+    """Reads in a needle alignment file and spits out statistics of the alignment.
 
     Args:
         infile (str): Alignment file name
+
     Returns:
         dict: alignment_properties - a dictionary telling you the number of gaps, identity, etc.
+
     """
 
     alignments = list(AlignIO.parse(infile, "emboss"))
@@ -326,3 +310,22 @@ def needle_reader(infile):
             line = f.readline()
 
     return alignment_properties
+
+
+# TODO: needleall has a bug
+# def run_alignment_needleall(a_id, a_faa, b_id, b_faa):
+#
+#     from Bio.Emboss.Applications import NeedleallCommandline
+#     import os.path
+#
+#     alignment_file = "%s-%s_align.txt" % (a_id, b_id)
+#
+#     if os.path.isfile(alignment_file):
+#         # print 'Alignment %s file already exists' % alignment_file
+#         return alignment_file
+#
+#     else:
+#         print '**RUNNING ALIGNMENT FOR %kegg AND %kegg**' % (a_id, b_id)
+#         needle_cline = NeedleallCommandline(asequence=a_faa, bsequence=b_faa, gapopen=10, gapextend=0.5, outfile=alignment_file)
+#         stdout, stderr = needle_cline()
+#         return alignment_file
