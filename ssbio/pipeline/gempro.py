@@ -1002,6 +1002,8 @@ class GEMPRO(object):
                 elif has_pdb and not has_homology:
                     use_pdb = True
 
+            structure_set = False
+
             if use_pdb:
                 try:
                     gene_seq_dir = op.join(self.sequence_dir, gene_id)
@@ -1062,9 +1064,11 @@ class GEMPRO(object):
                                 default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
                                 g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
+                                structure_set = True
                                 raise StopIteration
                 except StopIteration:
                     log.debug('{}: Found representative PDB'.format(gene_id))
+                    continue
                 else:
                     if has_homology:
                         use_homology = True
@@ -1072,7 +1076,7 @@ class GEMPRO(object):
                         log.debug('{}: No representative PDB'.format(gene_id))
 
             # If we are to use homology, save its information in the representative structure field
-            if use_homology:
+            if use_homology and not structure_set:
                 hm = g.annotation['structure']['homology']
                 # Sort the available homology models by the specified field
                 sorted_homology_ids = sorted(hm, key=lambda x: hm[x][sort_homology_by], reverse=True)
@@ -1085,6 +1089,7 @@ class GEMPRO(object):
                 g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
                 g.annotation['structure']['representative']['original_pdb_file'] = original_pdb_file
                 # g.annotation['structure']['representative']['clean_pdb_file'] =
+                structure_set = True
             else:
                 log.debug('{}: No representative PDB'.format(gene_id))
 
