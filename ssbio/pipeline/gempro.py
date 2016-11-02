@@ -1066,7 +1066,10 @@ class GEMPRO(object):
                 except StopIteration:
                     log.debug('{}: Found representative PDB'.format(gene_id))
                 else:
-                    use_homology = True
+                    if has_homology:
+                        use_homology = True
+                    else:
+                        log.debug('{}: No representative PDB'.format(gene_id))
 
             # If we are to use homology, save its information in the representative structure field
             if use_homology:
@@ -1082,6 +1085,8 @@ class GEMPRO(object):
                 g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
                 g.annotation['structure']['representative']['original_pdb_file'] = original_pdb_file
                 # g.annotation['structure']['representative']['clean_pdb_file'] =
+            else:
+                log.debug('{}: No representative PDB'.format(gene_id))
 
     def pdb_downloader_and_metadata(self, force_rerun=False):
         """Download ALL structures which have been mapped to our genes. Gets PDB file and mmCIF header and
