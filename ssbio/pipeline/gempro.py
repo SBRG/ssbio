@@ -5,7 +5,6 @@ import shutil
 import pandas as pd
 from tqdm import tqdm
 from collections import OrderedDict
-from collections import defaultdict
 
 from bioservices.uniprot import UniProt
 from bioservices import KEGG
@@ -20,6 +19,9 @@ import ssbio.databases.pdb
 import ssbio.sequence.fasta
 import ssbio.itasser.itasserparse
 import ssbio.structure.properties.residues
+import ssbio.structure.properties.quality
+from ssbio.structure.cleanpdb import CleanPDB
+from ssbio.structure.pdbioext import PDBIOExt
 
 from cobra.core import Gene
 from cobra.core import DictList
@@ -698,17 +700,6 @@ class GEMPRO(object):
 
         Creates a summary dataframe accessible by the attribute "df_pdb_ranking".
 
-        Here is the ranking algorithm described by the PDB paper:
-        https://nar.oxfordjournals.org/content/44/D1/D385.full
-
-        "Finally, a single quality indicator is also calculated for each entry by taking the harmonic average
-        of all the percentile scores representing model and model-data-fit quality measures and then subtracting
-        10 times the numerical value of the resolution (in Angstrom) of the entry to ensure that resolution plays
-        a role in characterising the quality of a structure. This single empirical 'quality measure' value is used
-        by the PDBe query system to sort results and identify the 'best' structure in a given context. At present,
-        entries determined by methods other than X-ray crystallography do not have similar data quality information
-        available and are not considered as 'best structures'."
-
         """
         best_structures_pre_df = []
 
@@ -780,6 +771,8 @@ class GEMPRO(object):
         cols = ['gene', 'uniprot_acc', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'seq_coverage',
                 'release_date', 'taxonomy_id', 'pdb_start', 'pdb_end', 'unp_start', 'unp_end', 'rank']
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
+
+        # TODO: also report genes with no PDB?
 
         log.info('Completed UniProt -> best PDB mapping. See the "df_pdb_ranking" attribute.')
 
@@ -958,7 +951,9 @@ class GEMPRO(object):
 
         log.info('Completed copying of I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.')
 
-    def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage', force_rerun=False):
+    def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage',
+                                     allow_missing_on_termini=0.1, allow_mutants=True, allow_deletions=False,
+                                     allow_insertions=False, allow_unresolved=True, force_rerun=False):
         """Set the representative structure for a gene.
 
         Each gene can have a combination of the following:
@@ -1027,6 +1022,8 @@ class GEMPRO(object):
                 gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
 
                 # Get the representative sequence
+                # TODO: should ID for rep seq be saved?
+                ref_seq_id = g.annotation['sequence']['representative']['seq_file'].split('.')[0]
                 seq_file = g.annotation['sequence']['representative']['seq_file']
                 seq_file_path = op.join(gene_seq_dir, seq_file)
                 seq_record = SeqIO.read(open(seq_file_path), "fasta")
@@ -1051,13 +1048,35 @@ class GEMPRO(object):
                         chain_seq = chain_to_seq[chain]
 
                         # Compare representative sequence to structure sequence
-                        # ssbio.structure.properties.quality.sequence_checker(chain_seq, ref_seq)
+                        found_good_pdb = ssbio.structure.properties.quality.sequence_checker(reference_id=ref_seq_id,
+                                                                                             reference_sequence=ref_seq,
+                                                                                             structure_id=pdb+'_'+chain,
+                                                                                             structure_sequence=chain_seq,
+                                                                                             allow_missing_on_termini=allow_missing_on_termini,
+                                                                                             allow_mutants=allow_mutants,
+                                                                                             allow_deletions=allow_deletions,
+                                                                                             allow_insertions=allow_insertions,
+                                                                                             allow_unresolved=allow_unresolved,
+                                                                                             write_output=True,
+                                                                                             outdir=gene_struct_dir,
+                                                                                             force_rerun=force_rerun)
 
-                        # If ends are <10% length of original, keep = True, else keep = False
-                        # If only point mutations or point deletions, keep = True, else keep = False
-                        # if keep = True, set as representative
+                        # if found_good_pdb = True, set as representative
                         # If not, move on to the next potential PDB
                         if found_good_pdb:
+                            orig_pdb_data = g.annotation['structure']['pdb'][(pdb, chain)]
+                            g.annotation['structure']['representative']['structure_id'] = (pdb, chain)
+                            g.annotation['structure']['representative']['seq_coverage'] = orig_pdb_data['seq_coverage']
+                            g.annotation['structure']['representative']['original_pdb_file'] = pdb_file
+
+                            # Clean it
+                            custom_clean = CleanPDB(keep_chains=chain)
+                            my_pdb = PDBIOExt(pdb_file)
+                            default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix='clean',
+                                                                   out_dir=gene_struct_dir)
+                            default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
+
+                            g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
                             break
 
     def pdb_downloader_and_metadata(self, force_rerun=False):
