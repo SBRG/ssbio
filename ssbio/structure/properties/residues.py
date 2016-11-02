@@ -7,9 +7,8 @@ import cachetools
 
 from Bio.PDB import Polypeptide
 from ssbio.structure.pdbioext import PDBIOExt
-from ssbio.structure.pdbioext import PDBIOExt
 from Bio import PDB
-from Bio import Struct
+# from Bio import Struct
 
 AAdict = {'CYS': 'polar',
           'ILE': 'nonpolar',
@@ -95,20 +94,6 @@ def get_pdb_seqs(pdb_file):
     return structure_seqs
 
 
-def count_ss_bond(filename, threshold_new=5):
-    """
-    Counts the number of sulfide bridges (S-S bonds formed by
-    cysteines in close proximity)
-    Input: PDB or mmCIF file (will be parsed into a Struct object)
-    Output: Int of number of SS bonds
-    """
-    s = Struct.read(filename)
-    my_structure = s.as_protein()
-    ss = my_structure.search_ss_bonds(threshold=threshold_new)
-
-    return len(list(ss))
-
-
 def residue_props(pdb_file):
     """Return a dictionary of residue properties indicating the percentage of the respective property for a PDB file.
 
@@ -152,58 +137,6 @@ def residue_props(pdb_file):
     return props
 
 
-def magni(a, b, c):
-    """Calculate the magnitude of distance vector
-    """
-    return pow((pow(a, 2) + pow(b, 2) + pow(c, 2)), 1.0 / 2.0)
-
-
-@cachetools.func.ttl_cache(maxsize=256)
-def calculate_res_distance(res_1, res_2, pdb_file):
-    """Calculate distance of one residue number to another in a PDB file
-
-    Args:
-        res_1: Residue number 1
-        res_2: Residue number 2
-        pdb_file: Path to PDB file
-
-    Returns:
-
-    """
-
-    my_structure = PDBIOExt(pdb_file)
-    model = my_structure.first_model
-
-    res_list = PDB.Selection.unfold_entities(model, 'R')
-
-    ires_list = []
-    res_chk_1 = ''
-    res_chk_2 = ''
-    for j in res_list:
-        if j.id[1] in [res_1, res_2] and j.resname != 'HOH':
-            ires_list.append(j)
-            if res_chk_1 == '' and res_chk_2 == '':
-                res_chk_1 = j.id[1]
-            else:
-                res_chk_2 = j.id[1]
-
-    paired = ssbio.utils.combinations(ires_list, 2)
-    try:
-        for k in paired:
-            chainA = PDB.Selection.unfold_entities(k[0], 'C')[0]
-            chainB = PDB.Selection.unfold_entities(k[1], 'C')[0]
-            vec = list(
-                np.array([x.get_coord() for x in k[0]]).mean(axis=0) - np.array([x.get_coord() for x in k[1]]).mean(
-                    axis=0))
-            distance = magni(vec[0], vec[1], vec[2])
-
-        return distance
-    except UnboundLocalError:
-        log.error("Unknown interaction")
-        return None
-
-
-
 @cachetools.func.ttl_cache(maxsize=1000)
 def get_pdb_res_starts(pdb_file):
     """Return a dictionary of the first residue number in each chain of a PDB file
@@ -225,4 +158,66 @@ def get_pdb_res_starts(pdb_file):
 
     return start_residues
 
+#
+# def magni(a, b, c):
+#     """Calculate the magnitude of distance vector
+#     """
+#     return pow((pow(a, 2) + pow(b, 2) + pow(c, 2)), 1.0 / 2.0)
 
+
+# @cachetools.func.ttl_cache(maxsize=256)
+# def calculate_res_distance(res_1, res_2, pdb_file):
+#     """Calculate distance of one residue number to another in a PDB file
+#
+#     Args:
+#         res_1: Residue number 1
+#         res_2: Residue number 2
+#         pdb_file: Path to PDB file
+#
+#     Returns:
+#
+#     """
+#
+#     my_structure = PDBIOExt(pdb_file)
+#     model = my_structure.first_model
+#
+#     res_list = PDB.Selection.unfold_entities(model, 'R')
+#
+#     ires_list = []
+#     res_chk_1 = ''
+#     res_chk_2 = ''
+#     for j in res_list:
+#         if j.id[1] in [res_1, res_2] and j.resname != 'HOH':
+#             ires_list.append(j)
+#             if res_chk_1 == '' and res_chk_2 == '':
+#                 res_chk_1 = j.id[1]
+#             else:
+#                 res_chk_2 = j.id[1]
+#
+#     paired = ssbio.utils.combinations(ires_list, 2)
+#     try:
+#         for k in paired:
+#             chainA = PDB.Selection.unfold_entities(k[0], 'C')[0]
+#             chainB = PDB.Selection.unfold_entities(k[1], 'C')[0]
+#             vec = list(
+#                 np.array([x.get_coord() for x in k[0]]).mean(axis=0) - np.array([x.get_coord() for x in k[1]]).mean(
+#                     axis=0))
+#             distance = magni(vec[0], vec[1], vec[2])
+#
+#         return distance
+#     except UnboundLocalError:
+#         log.error("Unknown interaction")
+#         return None
+
+# def count_ss_bond(filename, threshold_new=5):
+#     """
+#     Counts the number of sulfide bridges (S-S bonds formed by
+#     cysteines in close proximity)
+#     Input: PDB or mmCIF file (will be parsed into a Struct object)
+#     Output: Int of number of SS bonds
+#     """
+#     s = Struct.read(filename)
+#     my_structure = s.as_protein()
+#     ss = my_structure.search_ss_bonds(threshold=threshold_new)
+#
+#     return len(list(ss))
