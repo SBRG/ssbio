@@ -28,6 +28,7 @@ except ImportError:
 
 SEVEN_DAYS = 60 * 60 * 24 * 7
 
+
 def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, force_rerun=False):
     """Download a structure from the RCSB PDB by ID. Specify the file type desired.
 
@@ -74,6 +75,7 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
         log.debug('{}: Structure file already saved'.format(outfile))
 
     return outfile
+
 
 def parse_pdb_header(infile):
     """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.

@@ -5,6 +5,7 @@ import shutil
 import pandas as pd
 from tqdm import tqdm
 from collections import OrderedDict
+from collections import defaultdict
 
 from bioservices.uniprot import UniProt
 from bioservices import KEGG
@@ -18,6 +19,7 @@ import ssbio.databases.uniprot
 import ssbio.databases.pdb
 import ssbio.sequence.fasta
 import ssbio.itasser.itasserparse
+import ssbio.structure.properties.residues
 
 from cobra.core import Gene
 from cobra.core import DictList
@@ -689,7 +691,7 @@ class GEMPRO(object):
         self.df_sequence_mapping.fillna(value=np.nan, inplace=True)
         # mapping_df_outfile = op.join(self.data_dir, 'df_sequence_mapping.csv')
         # self.df_sequence_mapping.to_csv(mapping_df_outfile)
-        log.info('Created sequence mapping dataframe. Inspect the "df_sequence_mapping" attribute for more info.')
+        log.info('Created sequence mapping dataframe. See the "df_sequence_mapping" attribute.')
 
     def map_uniprot_to_pdb(self, seq_ident_cutoff=0, force_rerun=False):
         """Map UniProt IDs to a ranked list of PDB structures available.
@@ -751,7 +753,7 @@ class GEMPRO(object):
                         best_structure_dict['rank'] = rank
 
                         # For saving in the Gene annotation
-                        to_add_to_annotation[str(currpdb + '_' + currchain)] = best_structure_dict.copy()
+                        to_add_to_annotation[(currpdb, currchain)] = best_structure_dict.copy()
 
                         # For saving in the summary dataframe
                         best_structure_dict['gene'] = gene_id
@@ -829,13 +831,14 @@ class GEMPRO(object):
                 to_add_to_annotation = OrderedDict()
 
                 for blast_result in blast_results:
-                    pdb = blast_result['hit_pdb'].lower()
+                    pdb = str(blast_result['hit_pdb'].lower())
                     chains = blast_result['hit_pdb_chains']
 
                     pdb_rez = ssbio.databases.pdb.get_resolution(pdb)
                     pdb_rel = ssbio.databases.pdb.get_release_date(pdb)
 
                     for chain in chains:
+                        chain = str(chain.upper())
                         blast_dict = {}
                         blast_dict['pdb_id'] = pdb
                         blast_dict['pdb_chain_id'] = chain
@@ -849,7 +852,7 @@ class GEMPRO(object):
                         blast_dict['seq_num_similar'] = blast_result['hit_num_similar']
 
                         # For saving in Gene annotation
-                        to_add_to_annotation[pdb + '_' + chain] = blast_dict.copy()
+                        to_add_to_annotation[(pdb, chain)] = blast_dict.copy()
 
                         # For saving in summary dataframe
                         blast_dict['gene'] = gene_id
@@ -955,7 +958,7 @@ class GEMPRO(object):
 
         log.info('Completed copying of I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.')
 
-    def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage'):
+    def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage', force_rerun=False):
         """Set the representative structure for a gene.
 
         Each gene can have a combination of the following:
@@ -1020,19 +1023,42 @@ class GEMPRO(object):
                 # g.annotation['structure']['representative']['clean_pdb_file'] =
 
             elif use_pdb:
+                gene_seq_dir = op.join(self.sequence_dir, gene_id)
+                gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
+
+                # Get the representative sequence
+                seq_file = g.annotation['sequence']['representative']['seq_file']
+                seq_file_path = op.join(gene_seq_dir, seq_file)
+                seq_record = SeqIO.read(open(seq_file_path), "fasta")
+                ref_seq = str(seq_record.seq)
+
                 # Put PDBs through QC/QA
                 all_pdbs_and_chains = list(g.annotation['structure']['pdb'].keys())
+                convert_to_dict = utils.DefaultOrderedDict(list)
+                for x in all_pdbs_and_chains:
+                    convert_to_dict[x[0]].append(x[1])
 
-                # Get first potential PDB
-                # Download the PDB
-                # Clean it, keeping only chain indicated
-                # Write sequence
-                # Compare representative sequence to structure sequence
-                # If ends are <10% length of original, keep = True, else keep = False
-                # If only point mutations or point deletions, keep = True, else keep = False
-                # if keep = True, set as representative
-                # If not, move on to the next potential PDB
+                found_good_pdb = False
+                for pdb, chains in convert_to_dict.items():
+                    # Download the PDB
+                    pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
+                                                                      outdir=gene_struct_dir, force_rerun=force_rerun)
 
+                    # Get the sequences of the chains
+                    chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file)
+
+                    for chain in chains:
+                        chain_seq = chain_to_seq[chain]
+
+                        # Compare representative sequence to structure sequence
+                        # ssbio.structure.properties.quality.sequence_checker(chain_seq, ref_seq)
+
+                        # If ends are <10% length of original, keep = True, else keep = False
+                        # If only point mutations or point deletions, keep = True, else keep = False
+                        # if keep = True, set as representative
+                        # If not, move on to the next potential PDB
+                        if found_good_pdb:
+                            break
 
     def pdb_downloader_and_metadata(self, force_rerun=False):
         """Download ALL structures which have been mapped to our genes. Gets PDB file and mmCIF header and
@@ -1090,13 +1116,16 @@ class GEMPRO(object):
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
             log.info('Created PDB metadata dataframe.')
 
-    def get_pdb_id_list(self, gene):
+    def get_pdbs_for_gene(self, gene):
         """Return the list of PDB IDs mapped to a gene.
 
         Returns:
             list: List of PDB IDs
 
         """
+        if isinstance(gene, str):
+            gene = self.genes.get_by_id(gene)
+
         pdbs = []
         if len(gene.annotation['structure']['pdb']) > 0:
             keys = list(gene.annotation['structure']['pdb'].keys())

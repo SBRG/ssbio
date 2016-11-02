@@ -3,8 +3,14 @@ import glob
 import pandas as pd
 import numpy as np
 
+
+def sequence_checker(structure_sequence, reference_sequence):
+
+
+
 def p2f(x):
     return float(x.strip('%'))/100
+
 
 def parse_procheck(quality_directory):
     '''

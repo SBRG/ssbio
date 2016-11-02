@@ -31,7 +31,7 @@ def run_alignment(id_a, faa_a, id_b, faa_b):
 # SEE: https://www.biostars.org/p/91124/
 
 def run_alignment2(a_id, a_seq, b_id, b_seq):
-    '''
+    """
     Runs the needle alignment program and returns a raw text dump of the alignment
 
     Input:  a_id - sequence ID #1 (string)
@@ -42,7 +42,7 @@ def run_alignment2(a_id, a_seq, b_id, b_seq):
 
     DEPENDENCIES:
     get_alignment_allpos_df
-    '''
+    """
 
     from Bio.Emboss.Applications import NeedleCommandline
 
@@ -252,7 +252,7 @@ def get_alignment_allpos_df(alignment_file, a_seq_id=None, b_seq_id=None):
 
     return alignment_df
 
-
+# TODO: needleall has a bug
 # def run_alignment_needleall(a_id, a_faa, b_id, b_faa):
 #
 #     from Bio.Emboss.Applications import NeedleallCommandline
@@ -271,31 +271,31 @@ def get_alignment_allpos_df(alignment_file, a_seq_id=None, b_seq_id=None):
 #         return alignment_file
 
 
-def needle_reader(fl):
-    '''
+def needle_reader(infile):
+    """
     Reads in a needle alignment file and spits out statistics of the alignment.
 
-    Input: fl - alignment file name
-    Output: alignment_properties - a dictionary telling you the number of gaps, identity, etc.
-    '''
+    Args:
+        infile (str): Alignment file name
+    Returns:
+        dict: alignment_properties - a dictionary telling you the number of gaps, identity, etc.
+    """
 
-    alignments = list(AlignIO.parse(fl, "emboss"))
+    alignments = list(AlignIO.parse(infile, "emboss"))
 
-    f=open(fl)
+    f = open(infile)
     alignment_properties = defaultdict(dict)
     line = f.readline()
 
     for i in range(len(alignments)):
-        #print alignments[i]
         while line.rstrip() != "#=======================================":
             line = f.readline()
             if not line:
                 raise StopIteration
 
         while line[0] == "#":
-            #Read in the rest of this alignment header,
-            #try and discover the number of records expected
-            #and their length
+            # Read in the rest of this alignment header,
+            # try and discover the number of records expected and their length
             parts = line[1:].split(":", 1)
             key = parts[0].lower().strip()
             if key == '2':
@@ -322,7 +322,7 @@ def needle_reader(fl):
                 score = float(parts[1].strip())
                 alignment_properties[pdb_id]['score'] = score
 
-            #And read in another line...
+            # And read in another line...
             line = f.readline()
 
     return alignment_properties

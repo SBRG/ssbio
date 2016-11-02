@@ -80,54 +80,82 @@ class CleanPDB(PDB.Select):
                 atom.set_altloc(' ')
             return True
 
-# TODO: integrate add_ter_to_pdb
-def add_ter_to_pdb(infile, outfile_name=None):
-    '''
-    Adds 'TER' cards to a PDB file when encountering:
-    - a OXT atom - indicating the end of an amino acid chain
-    - a ATOM to HETATM change - indicating a cofactor or ligand
-    - a HETATM change to a new residue - indicating a new cofactor or ligand
-    Input: any PDB file
-    Output: the path to the fixed pdb file
-    '''
-    with open(infile,'r') as pdb_file:
-        lines = pdb_file.readlines()
 
-    # open new file to write to
-    if not outfile_name:
-        outfile = os.path.splitext(os.path.basename(infile))[0] + '_fix.pdb'
-    else:
-        outfile = outfile_name
+# def clean_pdb(infile, chain_id, outdir, outfile=''):
+#     """Clean a PDB file and keep only the chain of interest.
+#
+#     Args:
+#         infile: Path to PDB file
+#         chain_id: Chain to keep
+#         outdir: Directory to output the clean PDB file
+#
+#     Returns:
+#
+#     """
+#     my_pdb = PDBIOExt(infile)
+#     my_model = my_pdb.first_model
+#
+#     # clean pdb and save a file with only these chains of interest
+#     # suffix appended with chains (1fat_A_B_cleaned.pdb)
+#     log.debug('Cleaning PDB file {} and keeping chain {}...'.format(infile, chain_id))
+#     my_cleaner = CleanPDB(keep_chains=[chain_id])
+#
+#     if output_name:
+#         my_new_pdb_id = output_name
+#     else:
+#         my_new_pdb_id = '{}_{}_cleaned'.format(pdb_id, chain_id)
+#
+#     my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, custom_ext='.pdb', out_suffix='',
+#                                     out_dir=output_dir, custom_selection=my_cleaner)
+#
+#     return my_clean_pdb
 
-    with open(outfile,'w') as new_pdb_file:
 
-        for line in lines:
-            # grab residue name to compare with previous residue name
-            resname = line[17:20]
-            # if AMBER added an OXT, that is usually the end of the protein chain
-            if 'OXT' in line:
-#                 print '***END OF PROTEIN CHAIN***'
-                new_pdb_file.write(line)
-                new_pdb_file.write('TER\n')
-
-            # TODO: this should be manual input
-            elif 'MG' in line:
-#                 print '***MG ION***'
-                new_pdb_file.write(line)
-                new_pdb_file.write('TER\n')
-
-            # if there is a change from ATOM to HETATM, that usually indicates the presence of a cofactor/ligand
-            # also check if the previous resname was different - could be a start of a new cofactor/ligand
-            elif 'HETATM' in line and ('ATOM' in lines[lines.index(line)-1] or resname != prev_resname):
-#                 print '***LIGAND OR COFACTOR NEXT***'
-                resname = line[17:20]
-                new_pdb_file.write('TER\n')
-                new_pdb_file.write(line)
-            else:
-                new_pdb_file.write(line)
-            prev_resname = resname
-
-    return outfile
+# # TODO: does CleanPDB add the TERs?
+# def add_ter_to_pdb(infile, outfile_name=None):
+#     '''
+#     Adds 'TER' cards to a PDB file when encountering:
+#     - a OXT atom - indicating the end of an amino acid chain
+#     - a ATOM to HETATM change - indicating a cofactor or ligand
+#     - a HETATM change to a new residue - indicating a new cofactor or ligand
+#     Input: any PDB file
+#     Output: the path to the fixed pdb file
+#     '''
+#     with open(infile,'r') as pdb_file:
+#         lines = pdb_file.readlines()
+#
+#     # open new file to write to
+#     if not outfile_name:
+#         outfile = os.path.splitext(os.path.basename(infile))[0] + '_fix.pdb'
+#     else:
+#         outfile = outfile_name
+#
+#     with open(outfile,'w') as new_pdb_file:
+#
+#         for line in lines:
+#             # grab residue name to compare with previous residue name
+#             resname = line[17:20]
+#             # if AMBER added an OXT, that is usually the end of the protein chain
+#             if 'OXT' in line:
+#                 new_pdb_file.write(line)
+#                 new_pdb_file.write('TER\n')
+#
+#             # TODO: this should be manual input
+#             elif 'MG' in line:
+#                 new_pdb_file.write(line)
+#                 new_pdb_file.write('TER\n')
+#
+#             # if there is a change from ATOM to HETATM, that usually indicates the presence of a cofactor/ligand
+#             # also check if the previous resname was different - could be a start of a new cofactor/ligand
+#             elif 'HETATM' in line and ('ATOM' in lines[lines.index(line)-1] or resname != prev_resname):
+#                 resname = line[17:20]
+#                 new_pdb_file.write('TER\n')
+#                 new_pdb_file.write(line)
+#             else:
+#                 new_pdb_file.write(line)
+#             prev_resname = resname
+#
+#     return outfile
 
 
 if __name__ == '__main__':
