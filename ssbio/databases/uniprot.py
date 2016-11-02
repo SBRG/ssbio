@@ -11,18 +11,15 @@ except ImportError:
     import urllib as urlrequest
 
 import bioservices
-
 bsup = bioservices.uniprot.UniProt()
 
 from dateutil.parser import parse as dateparse
-from tqdm import tqdm
 import warnings
 import re
 import cachetools
 from ssbio import utils
 import requests
 import os.path as op
-import os
 
 SEVEN_DAYS = 60 * 60 * 24 * 7
 
