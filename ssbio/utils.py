@@ -13,11 +13,14 @@ import collections
 from collections import defaultdict
 from contextlib import contextmanager
 from collections import OrderedDict, Callable
+
 try:
     from IPython.display import clear_output
+
     have_ipython = True
 except ImportError:
     have_ipython = False
+
 
 @contextmanager
 def suppress_stdout():
@@ -30,6 +33,7 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
 
 def split_folder_and_path(filepath):
     """Split a file path into its folder, filename, and extension
@@ -49,6 +53,7 @@ def split_folder_and_path(filepath):
 
     return dirname, filename_without_extension, extension
 
+
 def dict_head(d, disp=5):
     """Return the head of a dictionary.
 
@@ -64,6 +69,7 @@ def dict_head(d, disp=5):
     """
     return {k: d[k] for k in list(d.keys())[:disp]}
 
+
 def rank_dated_files(pattern, dir):
     """Search a directory for files that match a pattern. Return an ordered list of these files.
 
@@ -78,10 +84,12 @@ def rank_dated_files(pattern, dir):
     files = glob.glob(op.join(dir, pattern))
     return sorted(files, reverse=True)
 
+
 def input_parser(args):
     """Parse command line inputs
     """
     pass
+
 
 def find(lst, a, case_sensitive=True):
     """Return indices of a list which have elements that match an object or list of objects
@@ -102,6 +110,7 @@ def find(lst, a, case_sensitive=True):
 
     return [i for i, x in enumerate(lst) if x in a]
 
+
 def not_find(lst, a, case_sensitive=True):
     """Return indices of a list which have elements that DO NOT match an object or list of objects
 
@@ -121,6 +130,7 @@ def not_find(lst, a, case_sensitive=True):
 
     return [i for i, x in enumerate(lst) if x not in a]
 
+
 def filter_list(lst, takeout, case_sensitive=True):
     """Return a modified list removing items specified.
 
@@ -139,6 +149,7 @@ def filter_list(lst, takeout, case_sensitive=True):
         takeout = [y.lower() for y in takeout]
 
     return [x for x in lst if x not in takeout]
+
 
 def filter_list_by_indices(lst, indices):
     """Return a modified list containing only the indices indicated.
@@ -164,6 +175,7 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+
 def force_string(val=None):
     """Force a string representation of an object
 
@@ -177,6 +189,7 @@ def force_string(val=None):
     if val is None:
         return ''
     return val if isinstance(val, str) else ';'.join(val)
+
 
 def force_list(val=None):
     """Force a list representation of an object
@@ -193,6 +206,7 @@ def force_list(val=None):
         return val.tolist()
     return val if isinstance(val, list) else [val]
 
+
 def force_lower_list(val=None):
     """Force a lowercase list representation of strings
 
@@ -204,6 +218,7 @@ def force_lower_list(val=None):
 
     """
     return [x.lower() for x in force_list(val)]
+
 
 def force_upper_list(val=None):
     """Force a UPPERCASE list representation of strings
@@ -217,9 +232,11 @@ def force_upper_list(val=None):
     """
     return [x.upper() for x in force_list(val)]
 
+
 def split_list(a_list):
-    half = len(a_list)//2
+    half = len(a_list) // 2
     return a_list[:half], a_list[half:]
+
 
 def input_list_parser(instring, filetype=''):
     """Always return a list of files with varying input
@@ -251,6 +268,7 @@ def input_list_parser(instring, filetype=''):
     else:
         return instring.split(',')
 
+
 def flatlist_dropdup(list_of_lists):
     return list(set([str(item) for sublist in list_of_lists for item in sublist]))
 
@@ -259,7 +277,8 @@ def chunks(l, n):
     """ Yield successive n-sized chunks from l.
     """
     for i in range(0, len(l), n):
-        yield l[i:i+n]
+        yield l[i:i + n]
+
 
 def combinations(iterable, r):
     """Calculate combinations
@@ -291,6 +310,7 @@ def combinations(iterable, r):
             indices[j] = indices[j - 1] + 1
         yield list(pool[i] for i in indices)
 
+
 class Date():
     def __init__(self):
         self.short_date = self.date_prefix()
@@ -304,7 +324,7 @@ class DefaultOrderedDict(OrderedDict):
     # Source: http://stackoverflow.com/a/6190500/562769
     def __init__(self, default_factory=None, *a, **kw):
         if (default_factory is not None and
-           not isinstance(default_factory, Callable)):
+                not isinstance(default_factory, Callable)):
             raise TypeError('first argument must be callable')
         OrderedDict.__init__(self, *a, **kw)
         self.default_factory = default_factory
@@ -342,7 +362,7 @@ class DefaultOrderedDict(OrderedDict):
     def __repr__(self):
         return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
                                                OrderedDict.__repr__(self))
+    
 
-if __name__ == '__main__':
-    d = Date()
-    print(d.short_date)
+def percentage_to_float(x):
+    return float(x.strip('%')) / 100
