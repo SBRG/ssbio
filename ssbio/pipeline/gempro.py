@@ -1003,14 +1003,13 @@ class GEMPRO(object):
                     use_pdb = True
 
             structure_set = False
+            gene_seq_dir = op.join(self.sequence_dir, gene_id)
+            gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
 
             if use_pdb:
                 try:
-                    gene_seq_dir = op.join(self.sequence_dir, gene_id)
-                    gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
-
                     # Get the representative sequence
-                    # TODO: should ID for rep seq be saved?
+                    # TODO: should ID for ref seq be saved?
                     ref_seq_id = g.annotation['sequence']['representative']['seq_file'].split('.')[0]
                     seq_file = g.annotation['sequence']['representative']['seq_file']
                     seq_file_path = op.join(gene_seq_dir, seq_file)
@@ -1059,21 +1058,21 @@ class GEMPRO(object):
                                 # Clean it
                                 custom_clean = CleanPDB(keep_chains=chain)
                                 my_pdb = PDBIOExt(pdb_file)
-                                default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix='clean',
+                                default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
+                                                                       out_suffix='{}_clean'.format(chain),
                                                                        out_dir=gene_struct_dir)
                                 default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
                                 g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
+
                                 structure_set = True
                                 raise StopIteration
                 except StopIteration:
-                    log.debug('{}: Found representative PDB'.format(gene_id))
+                    log.debug('{}: Found representative PDB ({}, {})'.format(gene_id, pdb, chain))
                     continue
                 else:
                     if has_homology:
                         use_homology = True
-                    else:
-                        log.debug('{}: No representative PDB'.format(gene_id))
 
             # If we are to use homology, save its information in the representative structure field
             if use_homology and not structure_set:
@@ -1088,7 +1087,17 @@ class GEMPRO(object):
                 g.annotation['structure']['representative']['structure_id'] = top_homology
                 g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
                 g.annotation['structure']['representative']['original_pdb_file'] = original_pdb_file
-                # g.annotation['structure']['representative']['clean_pdb_file'] =
+
+                # Clean it
+                custom_clean = CleanPDB()
+                my_pdb = PDBIOExt(original_pdb_file)
+                default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
+                                                       out_suffix='clean'.format(chain),
+                                                       out_dir=gene_struct_dir)
+                default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
+
+                g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
+
                 structure_set = True
             else:
                 log.debug('{}: No representative PDB'.format(gene_id))

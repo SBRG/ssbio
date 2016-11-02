@@ -6,7 +6,7 @@ Scripts are contained in this folder which can be executed from your shell.
 This script will automatically:
 
 * Add missing chains to a PDB file
-* Select a single chain if noted
+* Select a single chain or chains if noted
 * Remove alternate atom locations
 * Add atom occupancies
 * Add B (temperature) factors (default Biopython behavior)
@@ -19,6 +19,10 @@ $ cleanpdb --help
 #### Example: clean one PDB file
 ```bash
 $ cleanpdb 1kf6.pdb
+```
+####Example: clean one PDB file and keep only chains A and B
+```bash
+$ cleanpdb 1kf6.pdb --chain A,B
 ```
 #### Example: clean multiple PDB files
 ```bash

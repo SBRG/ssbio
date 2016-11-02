@@ -1,11 +1,15 @@
 from Bio import PDB
 import argparse
+import textwrap
 import glob
 import os
 import os.path as op
 
 from ssbio.structure.pdbioext import PDBIOExt
 from tqdm import tqdm
+
+import logging
+log = logging.getLogger(__name__)
 
 
 class CleanPDB(PDB.Select):
@@ -20,7 +24,7 @@ class CleanPDB(PDB.Select):
     """
 
     def __init__(self, remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
-                 remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=[]):
+                 remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
         """Initialize the parameters which indicate what cleaning will occur
 
         Args:
@@ -38,7 +42,10 @@ class CleanPDB(PDB.Select):
         self.add_atom_occ = add_atom_occ
         self.remove_res_hetero = remove_res_hetero
         self.add_chain_id_if_empty = add_chain_id_if_empty
-        self.keep_chains = keep_chains
+        if not keep_chains:
+            self.keep_chains = []
+        else:
+            self.keep_chains = keep_chains
 
     def accept_chain(self, chain):
         # If the chain does not have an ID, add one to it and keep it
@@ -79,36 +86,6 @@ class CleanPDB(PDB.Select):
             if self.remove_atom_alt:
                 atom.set_altloc(' ')
             return True
-
-
-# def clean_pdb(infile, chain_id, outdir, outfile=''):
-#     """Clean a PDB file and keep only the chain of interest.
-#
-#     Args:
-#         infile: Path to PDB file
-#         chain_id: Chain to keep
-#         outdir: Directory to output the clean PDB file
-#
-#     Returns:
-#
-#     """
-#     my_pdb = PDBIOExt(infile)
-#     my_model = my_pdb.first_model
-#
-#     # clean pdb and save a file with only these chains of interest
-#     # suffix appended with chains (1fat_A_B_cleaned.pdb)
-#     log.debug('Cleaning PDB file {} and keeping chain {}...'.format(infile, chain_id))
-#     my_cleaner = CleanPDB(keep_chains=[chain_id])
-#
-#     if output_name:
-#         my_new_pdb_id = output_name
-#     else:
-#         my_new_pdb_id = '{}_{}_cleaned'.format(pdb_id, chain_id)
-#
-#     my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, custom_ext='.pdb', out_suffix='',
-#                                     out_dir=output_dir, custom_selection=my_cleaner)
-#
-#     return my_clean_pdb
 
 
 # # TODO: does CleanPDB add the TERs?
@@ -161,7 +138,34 @@ class CleanPDB(PDB.Select):
 if __name__ == '__main__':
     # load inputs from command line
 
-    p = argparse.ArgumentParser(description='Cleans a PDB file')
+    p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                description=textwrap.dedent('''\
+                                Clean PDB files - cleanpdb.py
+                                -----------------------------
+                                This script will automatically:
+
+                                * Add missing chains to a PDB file
+                                * Select a single chain or chains if noted
+                                * Remove alternate atom locations
+                                * Add atom occupancies
+                                * Add B (temperature) factors (default Biopython behavior)
+
+                                Cleaned PDBs will be in a clean_pdbs folder where the script is executed.
+                                Example: script help
+                                $ cleanpdb --help
+
+                                Example: clean one PDB file
+                                $ cleanpdb 1kf6.pdb
+
+                                Example: clean one PDB file and keep only chains A and B
+                                $ cleanpdb 1kf6.pdb --chain A,B
+
+                                Example: clean multiple PDB files
+                                $ cleanpdb *.pdb
+
+                                Example: clean a whole directory of PDB
+                                $ cleanpdb /path/to/pdb/files
+                                '''))
     p.add_argument('infile', help='PDB file or folder you want to clean', nargs='+', type=str)
     p.add_argument('--outsuffix', '-o', default='clean', help='Suffix appended to PDB file')
     p.add_argument('--chain', '-c', help='Keep only specified chains')
@@ -187,7 +191,6 @@ if __name__ == '__main__':
     for pdb in tqdm(pdbs):
         if op.isdir(pdb):
             continue
-        # print('Cleaning PDB: {}'.format(pdb))
         my_pdb = PDBIOExt(pdb)
         my_cleaner = CleanPDB(remove_atom_alt=args.keepalt, remove_atom_hydrogen=args.keephydro, keep_atom_alt_id='A', add_atom_occ=True,
                               remove_res_hetero=args.keephetero, add_chain_id_if_empty='X', keep_chains=chains)
