@@ -89,12 +89,15 @@ class ATLAS():
             self.fasta_extension = 'fna'
             self.blast_seq_type = 'nucl'
 
-        if seq_type == 'protein':
+        elif seq_type == 'protein':
             self.seq_atlas_dir = op.join(self.sequence_dir, 'protein')
             self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
             self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
             self.fasta_extension = 'faa'
             self.blast_seq_type = 'prot'
+
+        else:
+            raise ValueError('seqtype must be "dna" or "protein"')
 
         list_of_dirs.extend([self.seq_atlas_dir, self.seq_atlas_org_dir, self.seq_atlas_gene_dir])
 

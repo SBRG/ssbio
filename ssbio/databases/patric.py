@@ -40,11 +40,14 @@ def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_re
             log.debug('FASTA file already exists at {}'.format(outfile))
             return outfile
 
-    ftp = ftplib.FTP('ftp.patricbrc.org')
-    ftp.login()
-    ftp.cwd("/patric2/patric3/genomes/{0}/".format(patric_id))
-    with open(outfile, "wb") as gFile:
-        ftp.retrbinary('RETR {0}.PATRIC.{1}'.format(patric_id, extension), gFile.write)
-    ftp.quit()
+    try:
+        ftp = ftplib.FTP('ftp.patricbrc.org')
+        ftp.login()
+        ftp.cwd("/patric2/patric3/genomes/{0}/".format(patric_id))
+        with open(outfile, "wb") as gFile:
+            ftp.retrbinary('RETR {0}.PATRIC.{1}'.format(patric_id, extension), gFile.write)
+        ftp.quit()
+    except:
+        return
 
     return outfile
