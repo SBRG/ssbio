@@ -1065,6 +1065,10 @@ class GEMPRO(object):
 
                                 g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
 
+                                # TODO: download SIFTS file
+                                # TODO: mutate it based on the alignment
+                                # TODO: run xleap commands too?
+
                                 structure_set = True
                                 raise StopIteration
                 except StopIteration:
@@ -1101,6 +1105,8 @@ class GEMPRO(object):
                 structure_set = True
             else:
                 log.debug('{}: No representative PDB'.format(gene_id))
+
+        # TODO: summary of results
 
     def pdb_downloader_and_metadata(self, force_rerun=False):
         """Download ALL structures which have been mapped to our genes. Gets PDB file and mmCIF header and
@@ -1158,6 +1164,10 @@ class GEMPRO(object):
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
             log.info('Created PDB metadata dataframe.')
 
+    # TODO: prepare genes for homology modeling
+    def homology_modeling_prep(self):
+        pass
+
     def get_pdbs_for_gene(self, gene):
         """Return the list of PDB IDs mapped to a gene.
 
@@ -1175,6 +1185,7 @@ class GEMPRO(object):
 
         return pdbs
 
+    # TODO: get this done
     def run_pipeline(self):
         """Run the entire GEM-PRO pipeline.
 

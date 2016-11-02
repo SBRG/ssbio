@@ -32,6 +32,7 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=''):
         hom_dict['model_date'] = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
     else:
         log.debug('{}: No homology model exists'.format(raw_dir))
+        return hom_dict
 
     ### Other modeling results
     dest_itasser_dir = op.join(copy_to_dir, 'itasser')
