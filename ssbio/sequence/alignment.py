@@ -6,65 +6,118 @@ from Bio import AlignIO
 from Bio.Emboss.Applications import NeedleCommandline
 
 
-def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapextend=0.5, outdir='', outfile=''):
-    """Run the needle alignment program for two fasta files and writes the result to a file. Returns the filename.
+def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapextend=0.5,
+                                  write_output=False, outdir='', outfile='', force_rerun=False):
+    """Run the needle alignment program for two fasta files and return the raw alignment result.
+
+    More info:
+    EMBOSS needle: http://www.bioinformatics.nl/cgi-bin/emboss/help/needle
+    Biopython wrapper: http://biopython.org/DIST/docs/tutorial/Tutorial.html#htoc84
 
     Args:
-        id_a: first id
-        faa_a: first FASTA file path
-        id_b: second id
-        faa_b: second FASTA file path
+        id_a: ID of reference sequence
+        faa_a: File path to reference sequence
+        id_b: ID of sequence to be aligned
+        faa_b: File path to sequence to be aligned
+        gapopen: Gap open penalty is the score taken away when a gap is created
+        gapextend: Gap extension penalty is added to the standard gap penalty for each base or residue in the gap
+        write_output (bool): Default False, set to True if you want the alignment file saved
+        outdir (str, optional): Path to output directory. Default is the current directory.
+        outfile (str, optional): Name of output file. If not set, is {id_a}_{id_b}_align.txt
+        force_rerun (bool): Default False, set to True if you want to rerun the alignment if outfile exists.
 
     Returns:
-        str: alignment_file - file path to alignment
+        str: Raw alignment result of the needle alignment in srspair format.
 
     """
 
-    if not outfile:
-        outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+    # If you don't want to save the output file, just run the alignment and return the raw results
+    if not write_output:
+        needle_cline = NeedleCommandline(asequence=faa_a, bsequence=faa_b,
+                                         gapopen=gapopen, gapextend=gapextend,
+                                         stdout=True, auto=True)
+        raw_alignment_text, stderr = needle_cline()
+
+    # If you do want to save an output file...
     else:
-        outfile = op.join(outdir, outfile)
+        # Make a default name if no outfile is set
+        if not outfile:
+            outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+        else:
+            outfile = op.join(outdir, outfile)
 
-    if op.exists(outfile):
-        return outfile
+        # Check if the outfile already exists, and read it and return those results
+        if op.exists(outfile) and not force_rerun:
+            with open(outfile) as f:
+                raw_alignment_text = f.read()
 
-    needle_cline = NeedleCommandline(asequence=faa_a, bsequence=faa_b,
-                                     gapopen=gapopen, gapextend=gapextend,
-                                     outfile=outfile)
-    stdout, stderr = needle_cline()
-    return outfile
+        # If it doesn't exist, or force_rerun=True, run the alignment
+        else:
+            needle_cline = NeedleCommandline(asequence=faa_a, bsequence=faa_b,
+                                             gapopen=gapopen, gapextend=gapextend,
+                                             outfile=outfile)
+            stdout, stderr = needle_cline()
+            with open(outfile) as f:
+                raw_alignment_text = f.read()
+
+    return raw_alignment_text
 
 
-def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=0.5, outdir='', outfile=''):
-    """Run the needle alignment program and writes the result to a file. Returns the filename.
+def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=0.5,
+                                write_output=False, outdir='', outfile='', force_rerun=False):
+    """Run the needle alignment program for two strings and return the raw alignment result.
 
-    SEE: https://www.biostars.org/p/91124/
+    More info:
+    EMBOSS needle: http://www.bioinformatics.nl/cgi-bin/emboss/help/needle
+    Biopython wrapper: http://biopython.org/DIST/docs/tutorial/Tutorial.html#htoc84
+    Using strings as input: https://www.biostars.org/p/91124/
 
     Args:
-        id_a (str): sequence ID #1
-        seq_a (str): sequence #1
-        id_b (str): sequence ID #2
-        seq_b (str): sequence #2
+        id_a: ID of reference sequence
+        seq_a: String representation of reference sequence
+        id_b: ID of sequence to be aligned
+        seq_b: String representation of sequence to be aligned
+        gapopen: Gap open penalty is the score taken away when a gap is created
+        gapextend: Gap extension penalty is added to the standard gap penalty for each base or residue in the gap
+        write_output (bool): Default False, set to True if you want the alignment file saved
+        outdir (str, optional): Path to output directory. Default is the current directory.
+        outfile (str, optional): Name of output file. If not set, is {id_a}_{id_b}_align.txt
+        force_rerun (bool): Default False, set to True if you want to rerun the alignment if outfile exists.
 
     Returns:
-        alignment_file - file name of alignment
+        str: Raw alignment result of the needle alignment in srspair format.
 
     """
+    # If you don't want to save the output file, just run the alignment and return the raw results
+    if not write_output:
+        needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
+                                         gapopen=gapopen, gapextend=gapextend,
+                                         stdout=True, auto=True)
+        raw_alignment_text, stderr = needle_cline()
 
-    if not outfile:
-        outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+    # If you do want to save an output file...
     else:
-        outfile = op.join(outdir, outfile)
+        # Make a default name if no outfile is set
+        if not outfile:
+            outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+        else:
+            outfile = op.join(outdir, outfile)
 
-    if op.exists(outfile):
-        return outfile
+        # Check if the outfile already exists, and read it and return those results
+        if op.exists(outfile) and not force_rerun:
+            with open(outfile) as f:
+                raw_alignment_text = f.read()
 
-    needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
-                                     gapopen=gapopen, gapextend=gapextend,
-                                     outfile=outfile)
-    stdout, stderr = needle_cline()
+        # If it doesn't exist, or force_rerun=True, run the alignment
+        else:
+            needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
+                                             gapopen=gapopen, gapextend=gapextend,
+                                             outfile=outfile)
+            stdout, stderr = needle_cline()
+            with open(outfile) as f:
+                raw_alignment_text = f.read()
 
-    return outfile
+    return raw_alignment_text
 
 
 def get_alignment_summary_df(alignment_file):
