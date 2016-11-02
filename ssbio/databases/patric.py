@@ -1,6 +1,7 @@
 import ftplib
 import os.path as op
 import logging
+import os
 log = logging.getLogger(__name__)
 
 
@@ -36,7 +37,7 @@ def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_re
 
     if not force_rerun:
         # return the path to the file if it was already downloaded
-        if op.exists(outfile):
+        if op.exists(outfile) and os.stat(outfile).st_size != 0:
             log.debug('FASTA file already exists at {}'.format(outfile))
             return outfile
 
