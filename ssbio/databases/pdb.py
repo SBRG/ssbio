@@ -26,6 +26,9 @@ try:
 except ImportError:
     from io import StringIO
 
+import gzip
+
+
 SEVEN_DAYS = 60 * 60 * 24 * 7
 
 
@@ -90,6 +93,7 @@ def parse_pdb_header(infile):
 
     """
     pass
+
 
 @cachetools.func.ttl_cache(maxsize=500, ttl=SEVEN_DAYS)
 def parse_mmcif_header(infile):
@@ -185,6 +189,34 @@ def download_and_clean_pdb(pdb_id, chain_id, output_dir, file_type='pdb', output
                                     out_dir=output_dir, custom_selection=my_cleaner)
 
     return my_clean_pdb
+
+
+# TODO: check this for python 2
+def download_sifts_xml(pdb_id, outdir='', outfile=''):
+    """Download the SIFTS file for a PDB ID.
+
+    Args:
+        pdb_id:
+        outdir:
+        outfile:
+
+    Returns:
+
+    """
+    baseURL = 'ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/xml/'
+    filename = '{}.xml.gz'.format(pdb_id)
+
+    if outfile:
+        outfile = op.join(outdir, outfile)
+    else:
+        outfile = op.join(outdir, filename.split('.')[0] + '.sifts.xml')
+
+    if not op.exists(outfile):
+        response = urllib2.urlopen(baseURL + filename)
+        with open(outfile, 'wb') as outfile:
+            outfile.write(gzip.decompress(response.read()))
+
+    return outfile
 
 
 def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):

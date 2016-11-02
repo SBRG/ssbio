@@ -14,7 +14,7 @@ def download_genome_sequence(genome_accession_or_id, seqtype, email, outdir='', 
 
     Args:
         genome_accession_or_id (str): RefSeq complete genome ID (e.g. "NC_000913") or GenBank ID (e.g. "U00096.3")
-        seqtype (str): "nucl" or "prot" - if you want the coding sequences in amino acid or DNA format.
+        seqtype (str): "dna" or "protein" - if you want the coding sequences in amino acid or DNA format.
         email (str): mandatory email so NCBI knows who is accessing the data_dir
         outdir (str): optional output directory (default is the current directory)
 
@@ -22,14 +22,14 @@ def download_genome_sequence(genome_accession_or_id, seqtype, email, outdir='', 
         Path to downloaded FASTA file.
 
     """
-    if seqtype == 'nucl':
+    if seqtype == 'dna':
         extension = 'fna'
         rettype = "fasta_cds_na"
-    elif seqtype == 'prot':
+    elif seqtype == 'protein':
         extension = 'faa'
         rettype = "fasta_cds_aa"
     else:
-        raise ValueError('seqtype must be "nucl" or "prot"')
+        raise ValueError('seqtype must be "dna" or "protein"')
 
     # path and filename parsing
     if outfile:

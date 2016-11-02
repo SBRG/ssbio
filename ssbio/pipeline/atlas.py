@@ -5,6 +5,7 @@ import ssbio.cobra.utils
 import ssbio.sequence.blast
 import ssbio.sequence.fasta
 import ssbio.databases.ncbi
+import ssbio.databases.patric
 
 import cobra.manipulation
 import cobra.flux_analysis
@@ -36,14 +37,14 @@ class ATLAS():
     Each step may generate a report and also request additional files if something is missing
     """
 
-    def __init__(self, base_strain_name, root_dir, seq_type='prot', base_gem_file_path=None, base_gem_file_type=None,
+    def __init__(self, base_strain_name, root_dir, seq_type='protein', base_gem_file_path=None, base_gem_file_type=None,
                  reference_genome=None):
         """Prepare for ATLAS analysis.
 
         Args:
             base_strain_name (str): Name of your base strain, and folder which will be created
             root_dir (str): Path to folder in which base_strain_name folder will be created
-            seq_type (str): Whether to run analysis on "nucl" (DNA) or "prot" (amino acid) sequences
+            seq_type (str): Whether to run analysis on "dna" (DNA) or "protein" (amino acid) sequences
         """
 
         self._reference_genome = reference_genome
@@ -81,17 +82,19 @@ class ATLAS():
                 [self.base_dir, self.notebooks_dir, self.atlas_dir, self.data_dir, self.figure_dir, self.model_files,
                  self.sequence_dir])
 
-        if seq_type == 'nucl':
+        if seq_type == 'dna':
             self.seq_atlas_dir = op.join(self.sequence_dir, 'dna')
             self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
             self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
             self.fasta_extension = 'fna'
+            self.blast_seq_type = 'nucl'
 
-        if seq_type == 'prot':
+        if seq_type == 'protein':
             self.seq_atlas_dir = op.join(self.sequence_dir, 'protein')
             self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
             self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
             self.fasta_extension = 'faa'
+            self.blast_seq_type = 'prot'
 
         list_of_dirs.extend([self.seq_atlas_dir, self.seq_atlas_org_dir, self.seq_atlas_gene_dir])
 
@@ -106,7 +109,27 @@ class ATLAS():
         self.genome_id_to_fasta_file = {}
         self.genome_id_to_strain_model = {}
 
-    def download_genome_cds(self, ids, email, force_rerun=False):
+    def download_genome_cds_patric(self, ids, force_rerun=False):
+        """
+
+        Args:
+            ids:
+            force_rerun:
+
+        Returns:
+
+        """
+        for x in tqdm(ids):
+            f = ssbio.databases.patric.download_genome_sequence(patric_id=x, seqtype=self.seq_type,
+                                                                outdir=self.seq_atlas_org_dir,
+                                                                force_rerun=force_rerun)
+            self.genome_id_to_fasta_file[x] = f
+            log.debug('Downloaded sequence for {}'.format(x))
+
+        if len(self.genome_id_to_fasta_file) > 0:
+            log.info('Downloaded sequences of coding genes.')
+
+    def download_genome_cds_ncbi(self, ids, email, force_rerun=False):
         """Loads a list of NCBI GIs or RefSeq complete genome IDs and downloads the CDS FASTA files
 
         Args:
@@ -151,7 +174,7 @@ class ATLAS():
 
             # Run bidirectional BLAST
             b1, b2 = ssbio.sequence.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
-                                                                  dbtype=self.seq_type, outdir=self.seq_atlas_org_dir)
+                                                                  dbtype=self.blast_seq_type, outdir=self.seq_atlas_org_dir)
 
             # Using the BLAST files, find the BBH
             bbh = ssbio.sequence.blast.calculate_bbh(blast_results_1=b1, blast_results_2=b2,
@@ -163,7 +186,7 @@ class ATLAS():
         ortho_matrix = ssbio.sequence.blast.create_orthology_matrix(r_name=self.reference_genome,
                                                                     genome_to_bbh_files=bbh_files,
                                                                     outname='{}_{}_orthology.csv'.format(
-                                                                        self.reference_genome, self.seq_type),
+                                                                        self.reference_genome, self.blast_seq_type),
                                                                     outdir=self.data_dir)
 
         log.info('Saved orthology matrix at {}'.format(ortho_matrix))
