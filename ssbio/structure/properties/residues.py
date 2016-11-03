@@ -137,7 +137,7 @@ def residue_props(pdb_file):
     return props
 
 
-@cachetools.func.ttl_cache(maxsize=1000)
+# @cachetools.func.ttl_cache(maxsize=1000)
 def get_pdb_res_starts(pdb_file):
     """Return a dictionary of the first residue number in each chain of a PDB file
 

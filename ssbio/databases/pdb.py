@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 import os.path as op
 from io import BytesIO
-import cachetools
+# import cachetools
 import gzip
 
 from Bio.PDB import PDBList

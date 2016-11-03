@@ -31,7 +31,7 @@ AAdict = {'CYS': 'polar',
           'MSE': 'polar',
           'SEC': 'polar'}
 
-@cachetools.func.ttl_cache(maxsize=300)
+# @cachetools.func.ttl_cache(maxsize=300)
 def dssp_dataframe(filename):
     """
     Calculation of various properties utilizing the DSSP program.
