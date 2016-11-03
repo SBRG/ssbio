@@ -584,7 +584,9 @@ class GEMPRO(object):
             seq_file = ssbio.sequence.fasta.write_fasta_file(seq_str=s, ident=g, outdir=gene_folder)
             gene.annotation['sequence']['representative']['seq_file'] = op.basename(seq_file)
 
-            log.info('{}: Loaded manually defined sequence information'.format(g))
+            log.debug('{}: Loaded manually defined sequence information'.format(g))
+
+        log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
 
     def set_representative_sequence(self):
         """Combine information from KEGG, UniProt, and manual mappings. Saves a DataFrame of results.
