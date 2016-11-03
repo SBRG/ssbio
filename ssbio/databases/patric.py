@@ -48,6 +48,7 @@ def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_re
         with open(outfile, "wb") as gFile:
             ftp.retrbinary('RETR {0}.PATRIC.{1}'.format(patric_id, extension), gFile.write)
         ftp.quit()
+    # TODO: check exceptions
     except:
         return
 

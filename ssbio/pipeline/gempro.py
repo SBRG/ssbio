@@ -909,6 +909,37 @@ class GEMPRO(object):
 
         log.info('Updated homology model information for {} genes.'.format(counter))
 
+    # TODO: code to prep homology modeling
+    def prep_itasser_models(self, outdir, itasser_installation, itlib_location, runtype, print_exec=False, **kwargs):
+        pass
+        # import ssbio.itasser.itasserprep as ip
+        # # if running on ssb1-3
+        # runtype = 'torque'
+        # itasser_loc = '~/software/I-TASSER4.4'
+        # itlib_loc = '~/software/ITLIB'
+        # local_dir = '/home/nathan/projects_unsynced/thermatoga_me/structure_files/homology_models'
+        # run_from_dir = '~/projects/thermatoga_me/structure_files/homology_models'
+        #
+        # for ident, seq in genes_and_sequences:
+        #     ip.ITASSERPrep(ident, seq, local_dir,
+        #                    itasser_loc=itasser_loc, itlib_loc=itlib_loc,
+        #                    runtype=runtype, print_exec=True, data_dir=run_from_dir)
+
+        # # if running on NERSC
+        # runtype = 'slurm'
+        # itasser_loc = '~/projects/software/I-TASSER4.4'
+        # itlib_loc = '~/projects/software/ITLIB'
+        # email = 'nmih@ucsd.edu'
+        # username = 'nmih'
+        # project = 'm1244'
+        # data_dir = '~/projects/thermatoga_me/structure_files/homology_models'
+        #
+        # for ident, seq in genes_and_sequences:
+        #     ip.ITASSERPrep(ident, seq, '/home/nathan/projects_unsynced/thermatoga_me/structure_files/homology_models',
+        #                    itasser_loc=itasser_loc, itlib_loc=itlib_loc,
+        #                    runtype=runtype, print_exec=True, data_dir=data_dir, project_id=project,
+        #                    slurm_email=email, slurm_username=username)
+
     def get_itasser_models(self, homology_raw_dir, custom_itasser_name_mapping=None):
         """Copy generated homology models from a directory to the GEM-PRO directory.
 
