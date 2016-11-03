@@ -639,7 +639,7 @@ def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0
 
 
 # @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=10)
 def _property_table():
     """Download the PDB -> resolution table directly from the RCSB PDB REST service.
 
@@ -655,6 +655,7 @@ def _property_table():
     return p
 
 
+@lru_cache(maxsize=500)
 def get_resolution(pdb_id):
     """Quick way to get the resolution of a PDB ID using the table of results from the REST service
 
@@ -703,6 +704,7 @@ def get_resolution(pdb_id):
 #     return taxonomy
 
 
+@lru_cache(maxsize=500)
 def get_release_date(pdb_id):
     """Quick way to get the release date of a PDB ID using the table of results from the REST service
 
