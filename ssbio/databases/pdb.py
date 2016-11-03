@@ -95,7 +95,7 @@ def parse_pdb_header(infile):
     pass
 
 
-@cachetools.func.ttl_cache(maxsize=500, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=500, ttl=SEVEN_DAYS)
 def parse_mmcif_header(infile):
     """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
 
@@ -277,7 +277,7 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
     return my_pdb_resnum, my_pdb_annotation
 
 
-@cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
 def _theoretical_pdbs():
     """Get the list of theoretical PDBs directly from the wwPDB.
 
@@ -310,7 +310,7 @@ def is_theoretical_pdb(pdb_id):
     return pdb_id in _theoretical_pdbs()
 
 
-@cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
 def _obsolete_pdb_mapping():
     """Get the mapping of obsolete PDBs directly from the wwPDB.
 
@@ -506,7 +506,7 @@ def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force
     return data
 
 
-@cachetools.func.ttl_cache(maxsize=1024)
+# @cachetools.func.ttl_cache(maxsize=1024)
 def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0, link=False, force_rerun=False):
     """Returns a list of BLAST hits of a sequence to available structures in the PDB.
 
@@ -633,7 +633,7 @@ def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0
     return pd.DataFrame.from_records(blast_results, columns=cols)
 
 
-@cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
 def _property_table():
     """Download the PDB -> resolution table directly from the RCSB PDB REST service.
 
@@ -719,7 +719,7 @@ def get_release_date(pdb_id):
     return release_date
 
 
-@cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
 def _sifts_mapping():
     baseURL = "ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/"
     filename = "pdb_chain_uniprot.csv.gz"

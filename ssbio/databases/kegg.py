@@ -1,6 +1,6 @@
 import os.path as op
 SEVEN_DAYS = 60 * 60 * 24 * 7
-import cachetools
+# import cachetools
 from bioservices import KEGG
 kegg = KEGG()
 import io
@@ -56,7 +56,7 @@ def download_kegg_aa_seq(organism_code, gene_id, outdir='', force_rerun=False):
     return outfile
 
 
-@cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def map_kegg_all_genes(organism_code, target_db):
     """Map all of an organism's gene IDs to the target database.
 

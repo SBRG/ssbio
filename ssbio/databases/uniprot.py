@@ -42,7 +42,7 @@ def is_valid_uniprot_id(instring):
         return False
 
 
-@cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def get_fasta(uniprot_id):
     """Get the protein sequence for a UniProt ID as a string.
 
@@ -60,7 +60,7 @@ def get_fasta(uniprot_id):
         return bsup.get_fasta_sequence(uniprot_id)
 
 
-@cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
+# @cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
 def uniprot_reviewed_checker(uniprot_id):
     """Check if a single UniProt ID is reviewed or not.
 
