@@ -31,6 +31,8 @@ def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapexten
 
     """
 
+    # TODO: add check for needle installation
+
     # If you don't want to save the output file, just run the alignment and return the raw results
     if not write_output:
         needle_cline = NeedleCommandline(asequence=faa_a, bsequence=faa_b,
@@ -88,6 +90,10 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
         str: Raw alignment result of the needle alignment in srspair format.
 
     """
+
+    # TODO: add check for needle installation
+
+
     # If you don't want to save the output file, just run the alignment and return the raw results
     if not write_output:
         needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
