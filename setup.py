@@ -26,5 +26,6 @@ setup(
                           'pandas',
                           'requests',
                           'bioservices',
-                          'xmltodict']
+                          'xmltodict',
+                          'repoze.lru']
 )
