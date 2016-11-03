@@ -4,6 +4,9 @@ import numpy as np
 from collections import defaultdict
 from Bio import AlignIO
 from Bio.Emboss.Applications import NeedleCommandline
+import subprocess
+import logging
+log = logging.getLogger(__name__)
 
 
 def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapextend=0.5,
@@ -96,10 +99,16 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
 
     # If you don't want to save the output file, just run the alignment and return the raw results
     if not write_output:
-        needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
-                                         gapopen=gapopen, gapextend=gapextend,
-                                         stdout=True, auto=True)
-        raw_alignment_text, stderr = needle_cline()
+        retval = subprocess.call('needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile, seq_a, seq_b, gapopen, gapextend),
+                                 shell=True)
+        if retval == 0:
+            log.debug('Ran needle')
+        else:
+            log.error('Error running needle!')
+        # needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
+        #                                  gapopen=gapopen, gapextend=gapextend,
+        #                                  stdout=True, auto=True)
+        # raw_alignment_text, stderr = needle_cline()
 
     # If you do want to save an output file...
     else:
@@ -116,10 +125,21 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
 
         # If it doesn't exist, or force_rerun=True, run the alignment
         else:
-            needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
-                                             gapopen=gapopen, gapextend=gapextend,
-                                             outfile=outfile)
-            stdout, stderr = needle_cline()
+            retval = subprocess.call(
+                'needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile,
+                                                                                                                seq_a,
+                                                                                                                seq_b,
+                                                                                                                gapopen,
+                                                                                                                gapextend),
+                shell=True)
+            if retval == 0:
+                log.debug('Ran needle')
+            else:
+                log.error('Error running needle!')
+            # needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
+            #                                  gapopen=gapopen, gapextend=gapextend,
+            #                                  outfile=outfile)
+            # stdout, stderr = needle_cline()
             with open(outfile) as f:
                 raw_alignment_text = f.read()
 
