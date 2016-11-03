@@ -25,7 +25,6 @@ setup(
                           'tqdm',
                           'pandas',
                           'requests',
-                          'cachetools',
                           'bioservices',
                           'xmltodict']
 )

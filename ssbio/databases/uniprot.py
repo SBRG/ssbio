@@ -16,7 +16,7 @@ bsup = bioservices.uniprot.UniProt()
 from dateutil.parser import parse as dateparse
 import warnings
 import re
-import cachetools
+# import cachetools
 from ssbio import utils
 import requests
 import os.path as op

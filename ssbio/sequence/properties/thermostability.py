@@ -9,7 +9,7 @@ from ssbio import utils
 date = utils.Date()
 
 import math
-import cachetools
+# import cachetools
 import scipy.constants
 
 # author: Ke Chen
@@ -94,7 +94,7 @@ def calculate_oobatake_dS(seq, temp):
     return dS + dCp_sum * math.log(temp / T0)
 
 
-@cachetools.func.ttl_cache(maxsize=256)
+# @cachetools.func.ttl_cache(maxsize=256)
 def calculate_oobatake_dG(seq, temp):
     """Get dG in units cal/mol
 
@@ -115,7 +115,7 @@ def calculate_oobatake_dG(seq, temp):
     return dG - 563.552
 
 
-@cachetools.func.ttl_cache(maxsize=128)
+# @cachetools.func.ttl_cache(maxsize=128)
 def calculate_dill_dG(seq_len, temp):
     """Get dG using Dill method in units J/mol
 
@@ -135,7 +135,7 @@ def calculate_dill_dG(seq_len, temp):
     dG = dH + dCp * (temp - Th) - temp * dS - temp * dCp * math.log(float(temp) / Ts)
     return dG
 
-@cachetools.func.ttl_cache(maxsize=500)
+# @cachetools.func.ttl_cache(maxsize=500)
 def get_dG_at_T(seq, temp):
     """Predict dG at temperature T
 

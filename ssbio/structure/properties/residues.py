@@ -3,7 +3,7 @@ from Bio import PDB
 from Bio.PDB import Polypeptide
 import ssbio.utils
 import numpy as np
-import cachetools
+# import cachetools
 
 from Bio.PDB import Polypeptide
 from ssbio.structure.pdbioext import PDBIOExt

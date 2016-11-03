@@ -28,7 +28,7 @@ except ImportError:
 
 import glob
 import time
-import cachetools
+# import cachetools
 import requests
 
 
@@ -59,7 +59,7 @@ class AMYLPRED():
 
         return agg_index
 
-    @cachetools.func.ttl_cache(maxsize=128)
+    # @cachetools.func.ttl_cache(maxsize=128)
     def consensus_aggregation(self, seq):
         url = "http://aias.biol.uoa.gr/AMYLPRED2/login.php"
         cj = CookieJar()

@@ -6,7 +6,7 @@ from Bio.PDB.DSSP import *
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
 from ssbio.structure.pdbioext import PDBIOExt
-import cachetools
+# import cachetools
 
 AAdict = {'CYS': 'polar',
           'ILE': 'nonpolar',

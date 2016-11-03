@@ -13,7 +13,7 @@ except ImportError:
 
 import scipy.constants
 import math
-import cachetools
+# import cachetools
 
 # author: Ke Chen
 
@@ -47,7 +47,7 @@ def get_folding_rate_for_seq(seq, opn, temp, refT=37):
     return rate
 
 
-@cachetools.func.ttl_cache(maxsize=500)
+# @cachetools.func.ttl_cache(maxsize=500)
 def get_folding_rate_from_url(seq, opn):
     """Predict the kinetic folding rate of a protein
 
