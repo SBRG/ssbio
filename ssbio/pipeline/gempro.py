@@ -1042,8 +1042,6 @@ class GEMPRO(object):
             if use_pdb:
                 try:
                     # Get the representative sequence
-                    # TODO: should ID for ref seq be saved?
-                    ref_seq_id = g.annotation['sequence']['representative']['seq_file'].split('.')[0]
                     seq_file = g.annotation['sequence']['representative']['seq_file']
                     seq_file_path = op.join(gene_seq_dir, seq_file)
                     seq_record = SeqIO.read(open(seq_file_path), "fasta")
@@ -1067,7 +1065,7 @@ class GEMPRO(object):
                             chain_seq = chain_to_seq[chain]
 
                             # Compare representative sequence to structure sequence
-                            found_good_pdb = ssbio.structure.properties.quality.sequence_checker(reference_id=ref_seq_id,
+                            found_good_pdb = ssbio.structure.properties.quality.sequence_checker(reference_id=gene_id,
                                                                                                  reference_sequence=ref_seq,
                                                                                                  structure_id=pdb+'_'+chain,
                                                                                                  structure_sequence=chain_seq,
