@@ -829,16 +829,16 @@ class GEMPRO(object):
                     pdb = str(blast_result['hit_pdb'].lower())
                     chains = blast_result['hit_pdb_chains']
 
-                    pdb_rez = ssbio.databases.pdb.get_resolution(pdb)
-                    pdb_rel = ssbio.databases.pdb.get_release_date(pdb)
+                    # pdb_rez = ssbio.databases.pdb.get_resolution(pdb)
+                    # pdb_rel = ssbio.databases.pdb.get_release_date(pdb)
 
                     for chain in chains:
                         chain = str(chain.upper())
                         blast_dict = {}
                         blast_dict['pdb_id'] = pdb
                         blast_dict['pdb_chain_id'] = chain
-                        blast_dict['resolution'] = pdb_rez
-                        blast_dict['release_date'] = pdb_rel
+                        # blast_dict['resolution'] = pdb_rez
+                        # blast_dict['release_date'] = pdb_rel
                         blast_dict['blast_score'] = blast_result['hit_score']
                         blast_dict['blast_evalue'] = blast_result['hit_evalue']
                         blast_dict['seq_coverage'] = blast_result['hit_percent_ident']
@@ -866,7 +866,7 @@ class GEMPRO(object):
             else:
                 log.debug('No BLAST results for {}'.format(gene_id))
 
-        cols = ['gene', 'pdb_id', 'pdb_chain_id', 'resolution', 'release_date', 'blast_score', 'blast_evalue',
+        cols = ['gene', 'pdb_id', 'pdb_chain_id', 'blast_score', 'blast_evalue', # 'resolution', 'release_date',
                 'seq_coverage', 'seq_similar', 'seq_num_coverage', 'seq_num_similar']
         self.df_pdb_blast = pd.DataFrame.from_records(blast_results_pre_df, columns=cols)
 
