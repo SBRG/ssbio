@@ -42,13 +42,14 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=''):
         os.mkdir(dest_itasser_dir)
 
     # init.dat
+    # File size is usually pretty big, don't copy for now, just parse
     init_dat = 'init.dat'
     old_init_dat = op.join(raw_dir, init_dat)
     new_init_dat = op.join(dest_itasser_dir, init_dat)
     if op.exists(old_init_dat):
         hom_dict.update(parse_init_dat(old_init_dat))
-        if not op.exists(new_init_dat):
-            shutil.copy2(old_init_dat, new_init_dat)
+        # if not op.exists(new_init_dat):
+        #     shutil.copy2(old_init_dat, new_init_dat)
 
     # seq.dat
     seq_dat = 'seq.dat'
