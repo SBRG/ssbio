@@ -1,6 +1,6 @@
 import os.path as op
 import unittest
-
+import tempfile
 import cobra
 import pandas as pd
 from ssbio.pipeline.gempro import GEMPRO
@@ -15,9 +15,9 @@ class TestGEMPRO(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.GEM_NAME = 'ecoli_test'
-        # self.tempdir = tempfile.TemporaryDirectory()
-        # self.ROOT_DIR = self.tempdir.name
-        self.ROOT_DIR = 'C:\\Users\\nathan\\Dropbox (UCSD SBRG)\\Desktop\\'
+        self.tempdir = tempfile.TemporaryDirectory()
+        self.ROOT_DIR = self.tempdir.name
+        # self.ROOT_DIR = 'C:\\Users\\nathan\\Dropbox (UCSD SBRG)\\Desktop\\'
         gem_file = 'test_files/Ec_core_flux1.xml'
 
         self.my_gempro = GEMPRO(self.GEM_NAME, self.ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
