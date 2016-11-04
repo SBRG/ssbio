@@ -1,0 +1,79 @@
+ENTRY       b0431             CDS       T00007
+NAME        cyoB
+DEFINITION  (RefSeq) cytochrome o ubiquinol oxidase subunit I (EC:1.10.3.-)
+ORTHOLOGY   K02298  cytochrome o ubiquinol oxidase subunit I [EC:1.10.3.10]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00190  Oxidative phosphorylation
+            eco01100  Metabolic pathways
+MODULE      eco_M00417  Cytochrome o ubiquinol oxidase
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Energy metabolism
+               00190 Oxidative phosphorylation
+                b0431 (cyoB)
+            Enzymes [BR:eco01000]
+             1. Oxidoreductases
+              1.10  Acting on diphenols and related substances as donors
+               1.10.3  With oxygen as acceptor
+                1.10.3.10  ubiquinol oxidase (H+-transporting)
+                 b0431 (cyoB)
+POSITION    complement(448650..450641)
+MOTIF       Pfam: COX1
+DBLINKS     NCBI-ProteinID: NP_414965
+            NCBI-GeneID: 945615
+            Pasteur: cyoB
+            RegulonDB: ECK120000174
+            EcoGene: EG10179
+            ECOCYC: EG10179
+            ASAP: ABE-0001493
+            UniProt: P0ABI8
+STRUCTURE   PDB: 1FFT
+AASEQ       663
+            MFGKLSLDAVPFHEPIVMVTIAGIILGGLALVGLITYFGKWTYLWKEWLTSVDHKRLGIM
+            YIIVAIVMLLRGFADAIMMRSQQALASAGEAGFLPPHHYDQIFTAHGVIMIFFVAMPFVI
+            GLMNLVVPLQIGARDVAFPFLNNLSFWFTVVGVILVNVSLGVGEFAQTGWLAYPPLSGIE
+            YSPGVGVDYWIWSLQLSGIGTTLTGINFFVTILKMRAPGMTMFKMPVFTWASLCANVLII
+            ASFPILTVTVALLTLDRYLGTHFFTNDMGGNMMMYINLIWAWGHPEVYILILPVFGVFSE
+            IAATFSRKRLFGYTSLVWATVCITVLSFIVWLHHFFTMGAGANVNAFFGITTMIIAIPTG
+            VKIFNWLFTMYQGRIVFHSAMLWTIGFIVTFSVGGMTGVLLAVPGADFVLHNSLFLIAHF
+            HNVIIGGVVFGCFAGMTYWWPKAFGFKLNETWGKRAFWFWIIGFFVAFMPLYALGFMGMT
+            RRLSQQIDPQFHTMLMIAASGAVLIALGILCLVIQMYVSIRDRDQNRDLTGDPWGGRTLE
+            WATSSPPPFYNFAVVPHVHERDAFWEMKEKGEAYKKPDHYEEIHMPKNSGAGIVIAAFST
+            IFGFAMIWHIWWLAIVGFAGMIITWIVKSFDEDVDYYVPVAEIEKLENQHFDEITKAGLK
+            NGN
+NTSEQ       1992
+            atgttcggaaaattatcacttgatgcagtcccgttccatgaacctatcgtcatggttacg
+            atcgctggcattattttgggaggtctggcgctcgttggcctgatcacttacttcggtaag
+            tggacctacctgtggaaagagtggctgacctccgtcgaccataaacgcctcggtatcatg
+            tatatcatcgtggcgattgtgatgttgctgcgtggttttgctgacgccattatgatgcgt
+            agccagcaggctcttgcctcggcgggcgaagcgggcttcctgccacctcaccactacgat
+            cagatctttaccgcgcacggcgtgattatgatcttcttcgtggcgatgcctttcgttatc
+            ggtctgatgaacctggtggttccgctgcagatcggcgcgcgtgacgttgcgttcccgttc
+            ctcaacaacttaagcttctggtttaccgttgttggtgtgattctggttaacgtttctctc
+            ggcgtgggcgaatttgcgcagaccggctggctggcctatccaccgctatcgggaatagag
+            tacagtccgggagtcggtgtcgattactggatatggagtctccagctatccggtataggt
+            acgacgcttaccggtatcaacttcttcgttaccattctgaagatgcgcgcaccgggcatg
+            accatgttcaagatgccagtatttacctgggcatcactgtgcgcgaacgtactgattatt
+            gcttccttcccaattctgacggttaccgtcgcgttgttgaccctggatcgctatctgggc
+            acccatttctttaccaacgatatgggtggcaacatgatgatgtacatcaacctgatttgg
+            gcctggggccacccggaagtttacatcctgatcctgcctgttttcggtgtgttctccgaa
+            attgcggcaaccttctcgcgtaaacgtctgtttggttatacctcgctggtatgggcaacc
+            gtctgtatcaccgtgctgtcgttcatcgtttggctgcaccacttctttacgatgggtgcg
+            ggcgcgaacgtaaacgccttctttggtatcaccacaatgattatcgccatcccgaccggg
+            gtgaagatcttcaactggctgttcaccatgtatcagggccgcatcgtgttccattctgcg
+            atgctgtggaccatcggttttatcgtcaccttctcggtgggcgggatgactggcgtgctg
+            ctggccgtaccgggcgcggacttcgttctgcataacagcctgttcctgattgcgcacttc
+            cataacgtgatcatcggcggcgtggtcttcggctgcttcgcagggatgacctactggtgg
+            cctaaagcgttcggtttcaaactgaacgaaacctggggtaaacgcgcgttctggttctgg
+            atcatcggcttcttcgttgcctttatgccactgtatgcgctgggcttcatgggcatgacc
+            cgtcgtttgagccagcagattgacccgcagttccacaccatgctgatgattgcagccagc
+            ggtgcagtactgattgcgctgggtattctctgcctcgttattcagatgtacgtttctatt
+            cgcgaccgcgaccagaaccgtgacctgactggcgacccgtggggtggccgtacgctggag
+            tgggcaacctcttccccgcctccgttctataactttgccgtagtgccgcacgttcacgaa
+            cgtgatgcattctgggaaatgaaagagaaaggcgaagcgtataaaaagcctgaccactat
+            gaagaaattcatatgccgaaaaacagcggtgcaggtatcgtcattgcagctttctccacc
+            atcttcggtttcgccatgatctggcatatctggtggctggcgattgttggcttcgcaggc
+            atgatcatcacctggatcgtgaaaagcttcgacgaggacgtggattactacgtgccggtg
+            gcagaaatcgaaaaactggaaaaccagcatttcgatgagattactaaggcagggctgaaa
+            aatggcaactga
+///

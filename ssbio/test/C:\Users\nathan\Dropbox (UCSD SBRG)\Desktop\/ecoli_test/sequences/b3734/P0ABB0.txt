@@ -1,0 +1,311 @@
+ID   ATPA_ECOLI              Reviewed;         513 AA.
+AC   P0ABB0; P00822; Q2M852; Q47249;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   08-NOV-2005, sequence version 1.
+DT   05-OCT-2016, entry version 105.
+DE   RecName: Full=ATP synthase subunit alpha {ECO:0000255|HAMAP-Rule:MF_01346};
+DE            EC=3.6.3.14 {ECO:0000255|HAMAP-Rule:MF_01346};
+DE   AltName: Full=ATP synthase F1 sector subunit alpha {ECO:0000255|HAMAP-Rule:MF_01346};
+DE   AltName: Full=F-ATPase subunit alpha {ECO:0000255|HAMAP-Rule:MF_01346};
+GN   Name=atpA {ECO:0000255|HAMAP-Rule:MF_01346}; Synonyms=papA, uncA;
+GN   OrderedLocusNames=b3734, JW3712;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6395859; DOI=10.1042/bj2240799;
+RA   Walker J.E., Gay N.J., Saraste M., Eberle A.N.;
+RT   "DNA sequence around the Escherichia coli unc operon. Completion of
+RT   the sequence of a 17 kilobase segment containing asnA, oriC, unc, glmS
+RT   and phoS.";
+RL   Biochem. J. 224:799-815(1984).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6272228; DOI=10.1093/nar/9.9.2187;
+RA   Gay N.J., Walker J.E.;
+RT   "The atp operon: nucleotide sequence of the region encoding the alpha-
+RT   subunit of Escherichia coli ATP-synthase.";
+RL   Nucleic Acids Res. 9:2187-2194(1981).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6277310; DOI=10.1016/0006-291X(81)90494-0;
+RA   Kanazawa H., Kayano T., Mabuchi K., Futai M.;
+RT   "Nucleotide sequence of the genes coding for alpha, beta and gamma
+RT   subunits of the proton-translocating ATPase of Escherichia coli.";
+RL   Biochem. Biophys. Res. Commun. 103:604-612(1981).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6301339; DOI=10.1111/j.1749-6632.1982.tb25731.x;
+RA   Kanazawa H., Futai M.;
+RT   "Structure and function of H+-ATPase: what we have learned from
+RT   Escherichia coli H+-ATPase.";
+RL   Ann. N. Y. Acad. Sci. 402:45-64(1982).
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7686882; DOI=10.1006/geno.1993.1230;
+RA   Burland V.D., Plunkett G. III, Daniels D.L., Blattner F.R.;
+RT   "DNA sequence and analysis of 136 kilobases of the Escherichia coli
+RT   genome: organizational symmetry around the origin of replication.";
+RL   Genomics 16:551-561(1993).
+RN   [6]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [7]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [8]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-50.
+RX   PubMed=6278247; DOI=10.1007/BF00271191;
+RA   Nielsen J., Hansen F.G., Hoppe J., Friedl P., von Meyenburg K.;
+RT   "The nucleotide sequence of the atp genes coding for the F0 subunits
+RT   a, b, c and the F1 subunit delta of the membrane bound ATP synthase of
+RT   Escherichia coli.";
+RL   Mol. Gen. Genet. 184:33-39(1981).
+RN   [9]
+RP   SEQUENCE REVISION TO 239-244.
+RX   PubMed=2868922; DOI=10.1016/0014-5793(86)80310-6;
+RA   Slan-Lotter H., Clarke D.M., Bragg P.D.;
+RT   "Isolation of a fourth cysteinyl-containing peptide of the alpha-
+RT   subunit of the F1 ATPase from Escherichia coli necessitates revision
+RT   of the DNA sequence.";
+RL   FEBS Lett. 197:121-124(1986).
+RN   [10]
+RP   PROTEIN SEQUENCE OF 1-8.
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RA   Pasquali C., Sanchez J.-C., Ravier F., Golaz O., Hughes G.J.,
+RA   Frutiger S., Paquet N., Wilkins M., Appel R.D., Bairoch A.,
+RA   Hochstrasser D.F.;
+RL   Submitted (SEP-1994) to UniProtKB.
+RN   [11]
+RP   PROTEIN SEQUENCE OF 1-12.
+RC   STRAIN=K12 / EMG2;
+RX   PubMed=9298646; DOI=10.1002/elps.1150180807;
+RA   Link A.J., Robison K., Church G.M.;
+RT   "Comparing the predicted and observed properties of proteins encoded
+RT   in the genome of Escherichia coli K-12.";
+RL   Electrophoresis 18:1259-1313(1997).
+RN   [12]
+RP   MUTAGENESIS OF LYS-175.
+RX   PubMed=2903146;
+RA   Rao R., Pagan J., Senior A.E.;
+RT   "Directed mutagenesis of the strongly conserved lysine 175 in the
+RT   proposed nucleotide-binding domain of alpha-subunit from Escherichia
+RT   coli F1-ATPase.";
+RL   J. Biol. Chem. 263:15957-15963(1988).
+RN   [13]
+RP   IDENTIFICATION BY 2D-GEL.
+RX   PubMed=9298644; DOI=10.1002/elps.1150180805;
+RA   VanBogelen R.A., Abshire K.Z., Moldover B., Olson E.R.,
+RA   Neidhardt F.C.;
+RT   "Escherichia coli proteome analysis using the gene-protein database.";
+RL   Electrophoresis 18:1243-1251(1997).
+RN   [14]
+RP   SUBUNIT, AND SUBCELLULAR LOCATION.
+RC   STRAIN=BL21-DE3;
+RX   PubMed=16079137; DOI=10.1074/jbc.M506479200;
+RA   Stenberg F., Chovanec P., Maslen S.L., Robinson C.V., Ilag L.,
+RA   von Heijne G., Daley D.O.;
+RT   "Protein complexes of the Escherichia coli cell envelope.";
+RL   J. Biol. Chem. 280:34409-34419(2005).
+RN   [15]
+RP   X-RAY CRYSTALLOGRAPHY (4.4 ANGSTROMS) OF AN ALPHA(3)/BETA
+RP   (3)/GAMMA/EPSILON COMPLEX.
+RX   PubMed=10570135; DOI=10.1073/pnas.96.24.13697;
+RA   Hausrath A.C., Grueber G., Matthews B.W., Capaldi R.A.;
+RT   "Structural features of the gamma subunit of the Escherichia coli F(1)
+RT   ATPase revealed by a 4.4-A resolution map obtained by X-ray
+RT   crystallography.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 96:13697-13702(1999).
+CC   -!- FUNCTION: Produces ATP from ADP in the presence of a proton
+CC       gradient across the membrane. The alpha chain is a regulatory
+CC       subunit.
+CC   -!- CATALYTIC ACTIVITY: ATP + H(2)O + H(+)(In) = ADP + phosphate +
+CC       H(+)(Out). {ECO:0000255|HAMAP-Rule:MF_01346}.
+CC   -!- SUBUNIT: F-type ATPases have 2 components, CF(1) - the catalytic
+CC       core - and CF(0) - the membrane proton channel. CF(1) has five
+CC       subunits: alpha(3), beta(3), gamma(1), delta(1), epsilon(1). CF(0)
+CC       has three main subunits: a(1), b(2) and c(9-12). The alpha and
+CC       beta chains form an alternating ring which encloses part of the
+CC       gamma chain. CF(1) is attached to CF(0) by a central stalk formed
+CC       by the gamma and epsilon chains, while a peripheral stalk is
+CC       formed by the delta and b chains. {ECO:0000255|HAMAP-
+CC       Rule:MF_01346}.
+CC   -!- INTERACTION:
+CC       P0ABB4:atpD; NbExp=10; IntAct=EBI-368707, EBI-368783;
+CC   -!- SUBCELLULAR LOCATION: Cell inner membrane {ECO:0000255|HAMAP-
+CC       Rule:MF_01346, ECO:0000269|PubMed:16079137}; Peripheral membrane
+CC       protein {ECO:0000255|HAMAP-Rule:MF_01346,
+CC       ECO:0000269|PubMed:16079137}.
+CC   -!- SIMILARITY: Belongs to the ATPase alpha/beta chains family.
+CC       {ECO:0000255|HAMAP-Rule:MF_01346}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; X01631; CAA25780.1; ALT_SEQ; Genomic_DNA.
+DR   EMBL; J01594; AAA24735.1; ALT_SEQ; Genomic_DNA.
+DR   EMBL; V00265; CAA23519.1; ALT_SEQ; Genomic_DNA.
+DR   EMBL; V00312; CAA23596.1; ALT_SEQ; Genomic_DNA.
+DR   EMBL; M12212; AAA20045.1; -; Unassigned_DNA.
+DR   EMBL; M25464; AAA83873.1; -; Genomic_DNA.
+DR   EMBL; L10328; AAA62086.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC76757.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAE77554.1; -; Genomic_DNA.
+DR   EMBL; V00266; CAA23525.1; -; Genomic_DNA.
+DR   PIR; G65176; PWECA.
+DR   RefSeq; NP_418190.1; NC_000913.3.
+DR   RefSeq; WP_001176745.1; NZ_LN832404.1.
+DR   PDB; 1D8S; X-ray; 4.40 A; A/B/C=1-513.
+DR   PDB; 3OAA; X-ray; 3.26 A; A/B/C/I/J/K/Q/R/S/Y/Z/a=1-513.
+DR   PDBsum; 1D8S; -.
+DR   PDBsum; 3OAA; -.
+DR   ProteinModelPortal; P0ABB0; -.
+DR   SMR; P0ABB0; 24-511.
+DR   DIP; DIP-31845N; -.
+DR   IntAct; P0ABB0; 28.
+DR   MINT; MINT-1251537; -.
+DR   STRING; 511145.b3734; -.
+DR   TCDB; 3.A.2.1.1; the h(+)- or na(+)-translocating f-type, v-type and a-type atpase (f-atpase) superfamily.
+DR   SWISS-2DPAGE; P0ABB0; -.
+DR   EPD; P0ABB0; -.
+DR   PaxDb; P0ABB0; -.
+DR   PRIDE; P0ABB0; -.
+DR   EnsemblBacteria; AAC76757; AAC76757; b3734.
+DR   EnsemblBacteria; BAE77554; BAE77554; BAE77554.
+DR   GeneID; 948242; -.
+DR   KEGG; ecj:JW3712; -.
+DR   KEGG; eco:b3734; -.
+DR   PATRIC; 32122965; VBIEscCol129921_3858.
+DR   EchoBASE; EB0096; -.
+DR   EcoGene; EG10098; atpA.
+DR   eggNOG; ENOG4105CDG; Bacteria.
+DR   eggNOG; COG0056; LUCA.
+DR   HOGENOM; HOG000130111; -.
+DR   InParanoid; P0ABB0; -.
+DR   KO; K02111; -.
+DR   OMA; PVFCIYV; -.
+DR   PhylomeDB; P0ABB0; -.
+DR   BioCyc; EcoCyc:ATPA-MONOMER; -.
+DR   BioCyc; ECOL316407:JW3712-MONOMER; -.
+DR   BioCyc; MetaCyc:ATPA-MONOMER; -.
+DR   EvolutionaryTrace; P0ABB0; -.
+DR   PRO; PR:P0ABB0; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0016020; C:membrane; IDA:UniProtKB.
+DR   GO; GO:0005886; C:plasma membrane; IEA:UniProtKB-SubCell.
+DR   GO; GO:0045261; C:proton-transporting ATP synthase complex, catalytic core F(1); IMP:EcoliWiki.
+DR   GO; GO:0005524; F:ATP binding; IEA:UniProtKB-HAMAP.
+DR   GO; GO:0046933; F:proton-transporting ATP synthase activity, rotational mechanism; IEA:UniProtKB-HAMAP.
+DR   GO; GO:0046961; F:proton-transporting ATPase activity, rotational mechanism; IEA:InterPro.
+DR   GO; GO:0015991; P:ATP hydrolysis coupled proton transport; IEA:InterPro.
+DR   GO; GO:0015986; P:ATP synthesis coupled proton transport; IMP:EcoliWiki.
+DR   CDD; cd01132; F1_ATPase_alpha; 1.
+DR   Gene3D; 2.40.30.20; -; 1.
+DR   Gene3D; 3.40.50.300; -; 1.
+DR   HAMAP; MF_01346; ATP_synth_alpha_bact; 1.
+DR   InterPro; IPR020003; ATPase_a/bsu_AS.
+DR   InterPro; IPR023366; ATPase_asu-like.
+DR   InterPro; IPR005294; ATPase_F1-cplx_asu.
+DR   InterPro; IPR000793; ATPase_F1/V1/A1-cplx_a/bsu_C.
+DR   InterPro; IPR000194; ATPase_F1/V1/A1_a/bsu_nucl-bd.
+DR   InterPro; IPR004100; ATPase_F1_a/bsu_N.
+DR   InterPro; IPR033732; F1_ATPase_alpha.
+DR   InterPro; IPR027417; P-loop_NTPase.
+DR   PANTHER; PTHR15184:SF3; PTHR15184:SF3; 1.
+DR   Pfam; PF00006; ATP-synt_ab; 1.
+DR   Pfam; PF00306; ATP-synt_ab_C; 1.
+DR   Pfam; PF02874; ATP-synt_ab_N; 1.
+DR   SUPFAM; SSF47917; SSF47917; 1.
+DR   SUPFAM; SSF50615; SSF50615; 1.
+DR   SUPFAM; SSF52540; SSF52540; 1.
+DR   TIGRFAMs; TIGR00962; atpA; 1.
+DR   PROSITE; PS00152; ATPASE_ALPHA_BETA; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; ATP synthesis; ATP-binding; Cell inner membrane;
+KW   Cell membrane; CF(1); Complete proteome; Direct protein sequencing;
+KW   Hydrogen ion transport; Hydrolase; Ion transport; Membrane;
+KW   Nucleotide-binding; Reference proteome; Transport.
+FT   CHAIN         1    513       ATP synthase subunit alpha.
+FT                                /FTId=PRO_0000144325.
+FT   NP_BIND     169    176       ATP. {ECO:0000305}.
+FT   SITE        373    373       Required for activity.
+FT   MUTAGEN     175    175       K->E: Reduced activity and reduced ATP-
+FT                                binding. {ECO:0000269|PubMed:2903146}.
+FT   MUTAGEN     175    175       K->I: Reduced activity and loss of ATP-
+FT                                binding. {ECO:0000269|PubMed:2903146}.
+FT   CONFLICT     91     91       T -> I (in Ref. 4; AAA83873).
+FT                                {ECO:0000305}.
+FT   CONFLICT    239    244       PYAGCA -> RMPVAL (in Ref. 4; CAA25780/
+FT                                AAA24735). {ECO:0000305}.
+FT   CONFLICT    300    302       RAA -> MLQ (in Ref. 2; CAA23519).
+FT                                {ECO:0000305}.
+FT   STRAND       28     35       {ECO:0000244|PDB:3OAA}.
+FT   STRAND       38     43       {ECO:0000244|PDB:3OAA}.
+FT   STRAND       52     55       {ECO:0000244|PDB:3OAA}.
+FT   TURN         56     58       {ECO:0000244|PDB:3OAA}.
+FT   STRAND       59     66       {ECO:0000244|PDB:3OAA}.
+FT   STRAND       71     77       {ECO:0000244|PDB:3OAA}.
+FT   STRAND       87     89       {ECO:0000244|PDB:3OAA}.
+FT   STRAND       94     98       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       101    103       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      107    109       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      126    130       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      136    138       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       151    156       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      166    174       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       175    184       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      187    190       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      192    199       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       202    215       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      221    226       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       232    251       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      255    261       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       263    276       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       290    298       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      302    304       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       306    313       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      322    326       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      329    331       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       333    335       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       340    348       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      349    355       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       357    360       {ECO:0000244|PDB:3OAA}.
+FT   TURN        370    372       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      374    377       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       378    381       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       384    407       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       415    430       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       443    452       {ECO:0000244|PDB:3OAA}.
+FT   TURN        455    459       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       462    475       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       477    479       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       481    489       {ECO:0000244|PDB:3OAA}.
+FT   HELIX       494    507       {ECO:0000244|PDB:3OAA}.
+SQ   SEQUENCE   513 AA;  55222 MW;  DD1F3859375E9103 CRC64;
+     MQLNSTEISE LIKQRIAQFN VVSEAHNEGT IVSVSDGVIR IHGLADCMQG EMISLPGNRY
+     AIALNLERDS VGAVVMGPYA DLAEGMKVKC TGRILEVPVG RGLLGRVVNT LGAPIDGKGP
+     LDHDGFSAVE AIAPGVIERQ SVDQPVQTGY KAVDSMIPIG RGQRELIIGD RQTGKTALAI
+     DAIINQRDSG IKCIYVAIGQ KASTISNVVR KLEEHGALAN TIVVVATASE SAALQYLAPY
+     AGCAMGEYFR DRGEDALIIY DDLSKQAVAY RQISLLLRRP PGREAFPGDV FYLHSRLLER
+     AARVNAEYVE AFTKGEVKGK TGSLTALPII ETQAGDVSAF VPTNVISITD GQIFLETNLF
+     NAGIRPAVNP GISVSRVGGA AQTKIMKKLS GGIRTALAQY RELAAFSQFA SDLDDATRKQ
+     LDHGQKVTEL LKQKQYAPMS VAQQSLVLFA AERGYLADVE LSKIGSFEAA LLAYVDRDHA
+     PLMQEINQTG GYNDEIEGKL KGILDSFKAT QSW
+//

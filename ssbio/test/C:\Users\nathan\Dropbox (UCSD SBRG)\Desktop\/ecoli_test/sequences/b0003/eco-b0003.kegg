@@ -1,0 +1,59 @@
+ENTRY       b0003             CDS       T00007
+NAME        thrB
+DEFINITION  (RefSeq) homoserine kinase (EC:2.7.1.39)
+ORTHOLOGY   K00872  homoserine kinase [EC:2.7.1.39]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00260  Glycine, serine and threonine metabolism
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+            eco01120  Microbial metabolism in diverse environments
+            eco01230  Biosynthesis of amino acids
+MODULE      eco_M00018  Threonine biosynthesis, aspartate => homoserine => threonine
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Overview
+               01230 Biosynthesis of amino acids
+                b0003 (thrB)
+              Amino acid metabolism
+               00260 Glycine, serine and threonine metabolism
+                b0003 (thrB)
+            Enzymes [BR:eco01000]
+             2. Transferases
+              2.7  Transferring phosphorus-containing groups
+               2.7.1  Phosphotransferases with an alcohol group as acceptor
+                2.7.1.39  homoserine kinase
+                 b0003 (thrB)
+POSITION    2801..3733
+MOTIF       Pfam: GHMP_kinases_N GHMP_kinases_C
+DBLINKS     NCBI-ProteinID: NP_414544
+            NCBI-GeneID: 947498
+            Pasteur: thrB
+            EcoGene: EG10999
+            ECOCYC: EG10999
+            ASAP: ABE-0000010
+            UniProt: P00547
+AASEQ       310
+            MVKVYAPASSANMSVGFDVLGAAVTPVDGALLGDVVTVEAAETFSLNNLGRFADKLPSEP
+            RENIVYQCWERFCQELGKQIPVAMTLEKNMPIGSGLGSSACSVVAALMAMNEHCGKPLND
+            TRLLALMGELEGRISGSIHYDNVAPCFLGGMQLMIEENDIISQQVPGFDEWLWVLAYPGI
+            KVSTAEARAILPAQYRRQDCIAHGRHLAGFIHACYSRQPELAAKLMKDVIAEPYRERLLP
+            GFRQARQAVAEIGAVASGISGSGPTLFALCDKPETAQRVADWLGKNYLQNQEGFVHICRL
+            DTAGARVLEN
+NTSEQ       933
+            atggttaaagtttatgccccggcttccagtgccaatatgagcgtcgggtttgatgtgctc
+            ggggcggcggtgacacctgttgatggtgcattgctcggagatgtagtcacggttgaggcg
+            gcagagacattcagtctcaacaacctcggacgctttgccgataagctgccgtcagaacca
+            cgggaaaatatcgtttatcagtgctgggagcgtttttgccaggaactgggtaagcaaatt
+            ccagtggcgatgaccctggaaaagaatatgccgatcggttcgggcttaggctccagtgcc
+            tgttcggtggtcgcggcgctgatggcgatgaatgaacactgcggcaagccgcttaatgac
+            actcgtttgctggctttgatgggcgagctggaaggccgtatctccggcagcattcattac
+            gacaacgtggcaccgtgttttctcggtggtatgcagttgatgatcgaagaaaacgacatc
+            atcagccagcaagtgccagggtttgatgagtggctgtgggtgctggcgtatccggggatt
+            aaagtctcgacggcagaagccagggctattttaccggcgcagtatcgccgccaggattgc
+            attgcgcacgggcgacatctggcaggcttcattcacgcctgctattcccgtcagcctgag
+            cttgccgcgaagctgatgaaagatgttatcgctgaaccctaccgtgaacggttactgcca
+            ggcttccggcaggcgcggcaggcggtcgcggaaatcggcgcggtagcgagcggtatctcc
+            ggctccggcccgaccttgttcgctctgtgtgacaagccggaaaccgcccagcgcgttgcc
+            gactggttgggtaagaactacctgcaaaatcaggaaggttttgttcatatttgccggctg
+            gatacggcgggcgcacgagtactggaaaactaa
+///

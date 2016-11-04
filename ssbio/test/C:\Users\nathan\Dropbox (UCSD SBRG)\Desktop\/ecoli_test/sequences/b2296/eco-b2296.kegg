@@ -1,0 +1,76 @@
+ENTRY       b2296             CDS       T00007
+NAME        ackA
+DEFINITION  (RefSeq) acetate kinase A and propionate kinase 2 (EC:2.7.2.- 2.7.2.1)
+ORTHOLOGY   K00925  acetate kinase [EC:2.7.2.1]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00430  Taurine and hypotaurine metabolism
+            eco00620  Pyruvate metabolism
+            eco00640  Propanoate metabolism
+            eco00680  Methane metabolism
+            eco01100  Metabolic pathways
+            eco01120  Microbial metabolism in diverse environments
+            eco01200  Carbon metabolism
+MODULE      eco_M00579  Phosphate acetyltransferase-acetate kinase pathway, acetyl-CoA => acetate
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Overview
+               01200 Carbon metabolism
+                b2296 (ackA)
+              Carbohydrate metabolism
+               00620 Pyruvate metabolism
+                b2296 (ackA)
+               00640 Propanoate metabolism
+                b2296 (ackA)
+              Energy metabolism
+               00680 Methane metabolism
+                b2296 (ackA)
+              Metabolism of other amino acids
+               00430 Taurine and hypotaurine metabolism
+                b2296 (ackA)
+            Enzymes [BR:eco01000]
+             2. Transferases
+              2.7  Transferring phosphorus-containing groups
+               2.7.2  Phosphotransferases with a carboxy group as acceptor
+                2.7.2.1  acetate kinase
+                 b2296 (ackA)
+POSITION    2413470..2414672
+MOTIF       Pfam: Acetate_kinase BcrAD_BadFG
+DBLINKS     NCBI-ProteinID: NP_416799
+            NCBI-GeneID: 946775
+            Pasteur: ackA
+            RegulonDB: ECK120000024
+            EcoGene: EG10027
+            ECOCYC: EG10027
+            ASAP: ABE-0007579
+            UniProt: P0A6A3
+AASEQ       400
+            MSSKLVLVLNCGSSSLKFAIIDAVNGEEYLSGLAECFHLPEARIKWKMDGNKQEAALGAG
+            AAHSEALNFIVNTILAQKPELSAQLTAIGHRIVHGGEKYTSSVVIDESVIQGIKDAASFA
+            PLHNPAHLIGIEEALKSFPQLKDKNVAVFDTAFHQTMPEESYLYALPYNLYKEHGIRRYG
+            AHGTSHFYVTQEAAKMLNKPVEELNIITCHLGNGGSVSAIRNGKCVDTSMGLTPLEGLVM
+            GTRSGDIDPAIIFHLHDTLGMSVDAINKLLTKESGLLGLTEVTSDCRYVEDNYATKEDAK
+            RAMDVYCHRLAKYIGAYTALMDGRLDAVVFTGGIGENAAMVRELSLGKLGVLGFEVDHER
+            NLAARFGKSGFINKEGTRPAVVIPTNEELVIAQDASRLTA
+NTSEQ       1203
+            atgtcgagtaagttagtactggttctgaactgcggtagttcttcactgaaatttgccatc
+            atcgatgcagtaaatggtgaagagtacctttctggtttagccgaatgtttccacctgccc
+            gaagcacgtatcaaatggaaaatggacggcaataaacaggaagcggctttaggtgcaggc
+            gccgctcacagcgaagcgctcaactttatcgttaatactattctggcacaaaaaccagaa
+            ctgtctgcgcagctgactgctatcggtcaccgtatcgtacacggcggcgaaaagtatacc
+            agctccgtagtgatcgatgagtctgttattcagggtatcaaagatgcagcttcttttgca
+            ccgctgcacaacccggctcacctgatcggtatcgaagaagctctgaaatctttcccacag
+            ctgaaagacaaaaacgttgctgtatttgacaccgcgttccaccagactatgccggaagag
+            tcttacctctacgccctgccttacaacctgtacaaagagcacggcatccgtcgttacggc
+            gcgcacggcaccagccacttctatgtaacccaggaagcggcaaaaatgctgaacaaaccg
+            gtagaagaactgaacatcatcacctgccacctgggcaacggtggttccgtttctgctatc
+            cgcaacggtaaatgcgttgacacctctatgggcctgaccccgctggaaggtctggtcatg
+            ggtacccgttctggtgatatcgatccggcgatcatcttccacctgcacgacaccctgggc
+            atgagcgttgacgcaatcaacaaactgctgaccaaagagtctggcctgctgggtctgacc
+            gaagtgaccagcgactgccgctatgttgaagacaactacgcgacgaaagaagacgcgaag
+            cgcgcaatggacgtttactgccaccgcctggcgaaatacatcggtgcctacactgcgctg
+            atggatggtcgtctggacgctgttgtattcactggtggtatcggtgaaaatgccgcaatg
+            gttcgtgaactgtctctgggcaaactgggcgtgctgggctttgaagttgatcatgaacgc
+            aacctggctgcacgtttcggcaaatctggtttcatcaacaaagaaggtacccgtcctgcg
+            gtggttatcccaaccaacgaagaactggttatcgcgcaagacgcgagccgcctgactgcc
+            tga
+///

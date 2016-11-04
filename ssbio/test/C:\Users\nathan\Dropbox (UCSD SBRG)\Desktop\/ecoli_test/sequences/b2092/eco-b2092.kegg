@@ -1,0 +1,34 @@
+ENTRY       b2092             gene      T00007
+NAME        gatC
+DEFINITION  (RefSeq) pseudogene
+ORGANISM    eco  Escherichia coli K-12 MG1655
+POSITION    complement(join(2172921..2173362,2173365..2174278))
+DBLINKS     NCBI-GeneID: 946603
+            EcoGene: EG12416
+            ECOCYC: EG12416
+            ASAP: ABE-0006928
+NTSEQ       1356
+            atgttttcagaagtcatgcgttatattctcgacctcggccctacggtgatgctgccgatt
+            gtcatcattattttttctaaaatattaggcatgaaggcaggcgattgctttaaagcgggt
+            ctgcatatcgggattggctttgttggcattggccttgtgattggcttaatgctggattcc
+            attggcccggcggcgaaagcgatggcggaaaatttcgacctgaatctgcatgtggtcgat
+            gttggctggccgggctcttcaccaatgacctgggcgtcgcaaattgcgctggtggcgatt
+            ccgattgcgattctggttaacgtggcgatgttactgacccgtatgacgcgggtggtaaat
+            gttgatatctggaatatctggcatatgaccttcaccggcgcgttgctgcatctggcaacc
+            ggttcatggatgatagggatggcaggtgtggtaattcacgcggcgtttgtttataagctc
+            ggcgactggtttgcccgcgatacccgaaatttctttgagctggaaggtattgctattccg
+            cacggtacgtcggcgtatatggggccgattgcggtgctggtcgatgctatcatcgagaaa
+            atcccaggcgttaaccgaattaaatttagcgccgacgatattcagcgcaaatttggtcca
+            tttggcgagcctgtcaccgtgggttttgtgatggggctgattatcggcatcctcgcgggt
+            tacgatgtcaaaggtgtattgcagctggcggtaaaaacggcggcagtgatgctgctaatg
+            ccacgggtgattaaacccatcatggatggtttaacgcccatcgctaagcaggctcgtagt
+            cgtttacaggcgaagttcggcggtcaggagttcctgattggccttgatccggcgttgctg
+            ctgggacatacggcggtggtatcggcaagcctgatttttatcccactcaccattttaatt
+            gctgtttgtgtgccgggtaatcaggtgctgccgtttggcgatcttgccaccatcggcttc
+            ttcgtggcgatggcggtcgccgtgcatcgtggaaatctgttccgcaccttaatctcgggt
+            gtcatcattatgagcatcaccctgtggatcgcgacgcaaactattggtttgcacacccaa
+            ctggcggctaatgctggggcgttaaaagccgggggtatggtggcttcaatggatcagggc
+            ggttctcccattacctggttactgattcaggttttctccccgcaaaatattcccggtttc
+            attattatcggtgcaatttatctgaccggtattttcatgacctggcgtagagcgcgtggc
+            tttattaaacaagagaaagtcgttctcgcagaataa
+///

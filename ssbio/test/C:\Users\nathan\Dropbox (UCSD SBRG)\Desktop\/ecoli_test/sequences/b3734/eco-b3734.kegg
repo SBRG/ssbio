@@ -1,0 +1,72 @@
+ENTRY       b3734             CDS       T00007
+NAME        atpA
+DEFINITION  (RefSeq) F1 sector of membrane-bound ATP synthase, alpha subunit (EC:3.6.3.14)
+ORTHOLOGY   K02111  F-type H+-transporting ATPase subunit alpha [EC:3.6.3.14]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00190  Oxidative phosphorylation
+            eco01100  Metabolic pathways
+MODULE      eco_M00157  F-type ATPase, prokaryotes and chloroplasts
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Energy metabolism
+               00190 Oxidative phosphorylation
+                b3734 (atpA)
+            Enzymes [BR:eco01000]
+             3. Hydrolases
+              3.6  Acting on acid anhydrides
+               3.6.3  Acting on acid anhydrides to catalyse transmembrane movement of substances
+                3.6.3.14  H+-transporting two-sector ATPase
+                 b3734 (atpA)
+            Photosynthesis proteins [BR:eco00194]
+             Photosystem and electron transport system
+              F-type ATPase [OT]
+               b3734 (atpA)
+POSITION    complement(3918316..3919857)
+MOTIF       Pfam: ATP-synt_ab ATP-synt_ab_C ATP-synt_ab_N ATPase ATPase_2 HAS-barrel
+DBLINKS     NCBI-ProteinID: NP_418190
+            NCBI-GeneID: 948242
+            Pasteur: atpA
+            RegulonDB: ECK120000094
+            EcoGene: EG10098
+            ECOCYC: EG10098
+            ASAP: ABE-0012213
+            UniProt: P0ABB0
+STRUCTURE   PDB: 3OAA
+AASEQ       513
+            MQLNSTEISELIKQRIAQFNVVSEAHNEGTIVSVSDGVIRIHGLADCMQGEMISLPGNRY
+            AIALNLERDSVGAVVMGPYADLAEGMKVKCTGRILEVPVGRGLLGRVVNTLGAPIDGKGP
+            LDHDGFSAVEAIAPGVIERQSVDQPVQTGYKAVDSMIPIGRGQRELIIGDRQTGKTALAI
+            DAIINQRDSGIKCIYVAIGQKASTISNVVRKLEEHGALANTIVVVATASESAALQYLAPY
+            AGCAMGEYFRDRGEDALIIYDDLSKQAVAYRQISLLLRRPPGREAFPGDVFYLHSRLLER
+            AARVNAEYVEAFTKGEVKGKTGSLTALPIIETQAGDVSAFVPTNVISITDGQIFLETNLF
+            NAGIRPAVNPGISVSRVGGAAQTKIMKKLSGGIRTALAQYRELAAFSQFASDLDDATRKQ
+            LDHGQKVTELLKQKQYAPMSVAQQSLVLFAAERGYLADVELSKIGSFEAALLAYVDRDHA
+            PLMQEINQTGGYNDEIEGKLKGILDSFKATQSW
+NTSEQ       1542
+            atgcaactgaattccaccgaaatcagcgaactgatcaagcagcgcattgctcagttcaat
+            gttgtgagtgaagctcacaacgaaggtactattgtttctgtaagtgacggtgttatccgc
+            attcacggcctggccgattgtatgcagggtgaaatgatctccctgccgggtaaccgttac
+            gctatcgcactgaacctcgagcgcgactctgtaggtgcggttgttatgggtccgtacgct
+            gaccttgccgaaggcatgaaagttaagtgtactggccgtatcctggaagttccggttggc
+            cgtggcctgctgggccgtgtggttaacactctgggtgcaccaatcgacggtaaaggtccg
+            ctggatcacgacggcttctctgctgtagaagcaatcgctccgggcgttatcgaacgtcag
+            tccgtagatcagccggtacagaccggttataaagccgttgactccatgatcccaatcggt
+            cgtggtcagcgtgaattgatcatcggtgaccgtcagacaggtaaaaccgcactggctatc
+            gatgccatcatcaaccagcgcgattccggtatcaaatgtatctatgtcgctatcggccag
+            aaagcgtccaccatttctaacgtggtacgtaaactggaagagcacggcgcactggctaac
+            accatcgttgtggtagcaaccgcgtctgaatccgctgcactgcaatacctggcaccgtat
+            gccggttgcgcaatgggcgaatacttccgtgaccgcggtgaagatgcgctgatcatttac
+            gatgacctgtctaaacaggctgttgcttaccgtcagatctccctgctgctccgtcgtccg
+            ccaggacgtgaagcattcccgggcgacgttttctacctccactctcgtctgctggagcgt
+            gctgcacgtgttaacgccgaatacgttgaagccttcaccaaaggtgaagtgaaagggaaa
+            accggttctctgaccgcactgccgattatcgaaactcaggcgggtgacgtttctgcgttc
+            gttccgaccaacgtaatctccattaccgatggtcagatcttcctggaaaccaacctgttc
+            aacgccggtattcgtcctgcggttaacccgggtatttccgtatcccgtgttggtggtgca
+            gcacagaccaagatcatgaaaaaactgtccggtggtatccgtaccgctctggcacagtat
+            cgtgaactggcagcgttctctcagtttgcatccgaccttgacgatgcaacacgtaagcag
+            cttgaccacggtcagaaagtgaccgaactgctgaaacagaaacagtatgcgccgatgtcc
+            gttgcgcagcagtctctggttctgttcgcagcagaacgtggttacctggcggatgttgaa
+            ctgtcgaaaattggcagcttcgaagccgctctgctggcttacgtcgaccgtgatcacgct
+            ccgttgatgcaagagatcaaccagaccggtggctacaacgacgaaatcgaaggcaagctg
+            aaaggcatcctcgattccttcaaagcaacccaatcctggtaa
+///

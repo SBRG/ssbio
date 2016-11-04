@@ -1,0 +1,266 @@
+ID   AK1H_ECOLI              Reviewed;         820 AA.
+AC   P00561; Q47659; Q6LEL0;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   29-AUG-2003, sequence version 2.
+DT   05-OCT-2016, entry version 168.
+DE   RecName: Full=Bifunctional aspartokinase/homoserine dehydrogenase 1;
+DE   AltName: Full=Aspartokinase I/homoserine dehydrogenase I;
+DE            Short=AKI-HDI;
+DE   Includes:
+DE     RecName: Full=Aspartokinase;
+DE              EC=2.7.2.4;
+DE   Includes:
+DE     RecName: Full=Homoserine dehydrogenase;
+DE              EC=1.1.1.3;
+GN   Name=thrA; Synonyms=thrA1, thrA2; OrderedLocusNames=b0002, JW0001;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=7003595; DOI=10.1073/pnas.77.10.5730;
+RA   Katinka M., Cossart P., Sibilli L., Saint-Girons I., Chalvignac M.A.,
+RA   le Bras G., Cohen G.N., Yaniv M.;
+RT   "Nucleotide sequence of the thrA gene of Escherichia coli.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 77:5730-5733(1980).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12;
+RX   PubMed=1630901; DOI=10.1093/nar/20.13.3305;
+RA   Yura T., Mori H., Nagai H., Nagata T., Ishihama A., Fujita N.,
+RA   Isono K., Mizobuchi K., Nakata A.;
+RT   "Systematic sequencing of the Escherichia coli genome: analysis of the
+RT   0-2.4 min region.";
+RL   Nucleic Acids Res. 20:3305-3308(1992).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7610040; DOI=10.1093/nar/23.12.2105;
+RA   Burland V.D., Plunkett G. III, Sofia H.J., Daniels D.L.,
+RA   Blattner F.R.;
+RT   "Analysis of the Escherichia coli genome VI: DNA sequence of the
+RT   region from 92.8 through 100 minutes.";
+RL   Nucleic Acids Res. 23:2105-2119(1995).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA], AND SEQUENCE REVISION.
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [6]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-10.
+RX   PubMed=6277952;
+RA   Gardner J.F.;
+RT   "Initiation, pausing, and termination of transcription in the
+RT   threonine operon regulatory region of Escherichia coli.";
+RL   J. Biol. Chem. 257:3896-3904(1982).
+RN   [7]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-10.
+RX   PubMed=2410621; DOI=10.1016/0022-2836(85)90169-X;
+RA   Lynn S.P., Bauer C.E., Chapman K.A., Gardner J.F.;
+RT   "Identification and characterization of mutants affecting
+RT   transcription termination at the threonine operon attenuator.";
+RL   J. Mol. Biol. 183:529-541(1985).
+RN   [8]
+RP   PROTEIN SEQUENCE OF 51-129.
+RX   PubMed=387092; DOI=10.1016/S0300-9084(79)80174-1;
+RA   Sibilli L., le Bras G., Cossart P., Chalvignac M.A., le Bras G.,
+RA   Briley P.A., Cohen G.N.;
+RT   "The primary structure of Escherichia coli K 12 aspartokinase I-
+RT   homoserine dehydrogenase I: sequence of cyanogen bromide peptide CB
+RT   3.";
+RL   Biochimie 61:733-739(1979).
+RN   [9]
+RP   SEQUENCE REVISION TO 11.
+RX   PubMed=6298218;
+RA   Zakin M.M., Duchange N., Ferrara P., Cohen G.N.;
+RT   "Nucleotide sequence of the metL gene of Escherichia coli. Its
+RT   product, the bifunctional aspartokinase II-homoserine dehydrogenase
+RT   II, and the bifunctional product of the thrA gene, aspartokinase I-
+RT   homoserine dehydrogenase I, derive from a common ancestor.";
+RL   J. Biol. Chem. 258:3028-3031(1983).
+RN   [10]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 553-588.
+RX   PubMed=390305; DOI=10.1007/BF00267853;
+RA   Cossart P., Katinka M., Yaniv M.;
+RT   "Construction and expression of a hybrid plasmid containing the
+RT   Escherichia coli thrA and thrB genes.";
+RL   Mol. Gen. Genet. 175:39-44(1979).
+CC   -!- CATALYTIC ACTIVITY: L-homoserine + NAD(P)(+) = L-aspartate 4-
+CC       semialdehyde + NAD(P)H.
+CC   -!- CATALYTIC ACTIVITY: ATP + L-aspartate = ADP + 4-phospho-L-
+CC       aspartate.
+CC   -!- ENZYME REGULATION: The enzyme activities are regulated
+CC       allosterically by L-threonine.
+CC   -!- PATHWAY: Amino-acid biosynthesis; L-lysine biosynthesis via DAP
+CC       pathway; (S)-tetrahydrodipicolinate from L-aspartate: step 1/4.
+CC   -!- PATHWAY: Amino-acid biosynthesis; L-methionine biosynthesis via de
+CC       novo pathway; L-homoserine from L-aspartate: step 1/3.
+CC   -!- PATHWAY: Amino-acid biosynthesis; L-methionine biosynthesis via de
+CC       novo pathway; L-homoserine from L-aspartate: step 3/3.
+CC   -!- PATHWAY: Amino-acid biosynthesis; L-threonine biosynthesis; L-
+CC       threonine from L-aspartate: step 1/5.
+CC   -!- PATHWAY: Amino-acid biosynthesis; L-threonine biosynthesis; L-
+CC       threonine from L-aspartate: step 3/5.
+CC   -!- SUBUNIT: Homotetramer.
+CC   -!- MISCELLANEOUS: Aspartokinase II-homoserine dehydrogenase II and
+CC       aspartokinase III also catalyze the same reaction(s).
+CC   -!- SIMILARITY: In the N-terminal section; belongs to the
+CC       aspartokinase family. {ECO:0000305}.
+CC   -!- SIMILARITY: In the C-terminal section; belongs to the homoserine
+CC       dehydrogenase family. {ECO:0000305}.
+CC   -!- SIMILARITY: Contains 2 ACT domains. {ECO:0000255|PROSITE-
+CC       ProRule:PRU01007}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; V00361; CAA23660.1; -; Genomic_DNA.
+DR   EMBL; J01706; AAA83914.1; -; Genomic_DNA.
+DR   EMBL; U14003; AAA97301.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC73113.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAB96579.2; -; Genomic_DNA.
+DR   EMBL; V00360; CAA23659.1; -; Genomic_DNA.
+DR   EMBL; X68872; CAA48734.1; -; Genomic_DNA.
+DR   EMBL; M28570; AAA24673.1; -; Genomic_DNA.
+DR   EMBL; M10644; AAA24671.1; -; Genomic_DNA.
+DR   PIR; B64720; DEECK.
+DR   RefSeq; NP_414543.1; NC_000913.3.
+DR   RefSeq; WP_001264707.1; NZ_LN832404.1.
+DR   ProteinModelPortal; P00561; -.
+DR   SMR; P00561; 1-462, 1-462.
+DR   BioGrid; 4261933; 229.
+DR   DIP; DIP-2907N; -.
+DR   IntAct; P00561; 7.
+DR   MINT; MINT-1288804; -.
+DR   STRING; 511145.b0002; -.
+DR   BindingDB; P00561; -.
+DR   EPD; P00561; -.
+DR   PaxDb; P00561; -.
+DR   PRIDE; P00561; -.
+DR   EnsemblBacteria; AAC73113; AAC73113; b0002.
+DR   EnsemblBacteria; BAB96579; BAB96579; BAB96579.
+DR   GeneID; 945803; -.
+DR   KEGG; ecj:JW0001; -.
+DR   KEGG; eco:b0002; -.
+DR   PATRIC; 32115099; VBIEscCol129921_0001.
+DR   EchoBASE; EB0991; -.
+DR   EcoGene; EG10998; thrA.
+DR   eggNOG; ENOG4105CFH; Bacteria.
+DR   eggNOG; COG0460; LUCA.
+DR   eggNOG; COG0527; LUCA.
+DR   HOGENOM; HOG000271593; -.
+DR   InParanoid; P00561; -.
+DR   KO; K12524; -.
+DR   OMA; QAYDESS; -.
+DR   PhylomeDB; P00561; -.
+DR   BioCyc; EcoCyc:ASPKINIHOMOSERDEHYDROGI-MONOMER; -.
+DR   BioCyc; ECOL316407:JW0001-MONOMER; -.
+DR   BioCyc; MetaCyc:ASPKINIHOMOSERDEHYDROGI-MONOMER; -.
+DR   SABIO-RK; P00561; -.
+DR   UniPathway; UPA00034; UER00015.
+DR   UniPathway; UPA00050; UER00063.
+DR   UniPathway; UPA00050; UER00461.
+DR   UniPathway; UPA00051; UER00462.
+DR   UniPathway; UPA00051; UER00465.
+DR   PRO; PR:P00561; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0016597; F:amino acid binding; IEA:InterPro.
+DR   GO; GO:0004072; F:aspartate kinase activity; IDA:EcoCyc.
+DR   GO; GO:0005524; F:ATP binding; IEA:UniProtKB-KW.
+DR   GO; GO:0004412; F:homoserine dehydrogenase activity; IDA:EcoCyc.
+DR   GO; GO:0050661; F:NADP binding; IEA:InterPro.
+DR   GO; GO:0009090; P:homoserine biosynthetic process; IDA:EcoCyc.
+DR   GO; GO:0009089; P:lysine biosynthetic process via diaminopimelate; IDA:EcoCyc.
+DR   GO; GO:0009088; P:threonine biosynthetic process; IEA:UniProtKB-UniPathway.
+DR   Gene3D; 3.40.1160.10; -; 2.
+DR   Gene3D; 3.40.50.720; -; 1.
+DR   InterPro; IPR002912; ACT_dom.
+DR   InterPro; IPR001048; Asp/Glu/Uridylate_kinase.
+DR   InterPro; IPR005106; Asp/hSer_DH_NAD-bd.
+DR   InterPro; IPR001341; Asp_kinase_dom.
+DR   InterPro; IPR018042; Aspartate_kinase_CS.
+DR   InterPro; IPR011147; Bifunc_aspartokin/hSer_DH.
+DR   InterPro; IPR027795; GATS-like_ACT_dom.
+DR   InterPro; IPR001342; HDH_cat.
+DR   InterPro; IPR019811; HDH_CS.
+DR   InterPro; IPR016040; NAD(P)-bd_dom.
+DR   Pfam; PF00696; AA_kinase; 1.
+DR   Pfam; PF01842; ACT; 1.
+DR   Pfam; PF13840; ACT_7; 1.
+DR   Pfam; PF00742; Homoserine_dh; 1.
+DR   Pfam; PF03447; NAD_binding_3; 1.
+DR   PIRSF; PIRSF000727; ThrA; 1.
+DR   SUPFAM; SSF51735; SSF51735; 1.
+DR   SUPFAM; SSF53633; SSF53633; 1.
+DR   TIGRFAMs; TIGR00657; asp_kinases; 1.
+DR   PROSITE; PS51671; ACT; 2.
+DR   PROSITE; PS00324; ASPARTOKINASE; 1.
+DR   PROSITE; PS01042; HOMOSER_DHGENASE; 1.
+PE   1: Evidence at protein level;
+KW   Allosteric enzyme; Amino-acid biosynthesis; ATP-binding;
+KW   Complete proteome; Direct protein sequencing; Kinase;
+KW   Multifunctional enzyme; NADP; Nucleotide-binding; Oxidoreductase;
+KW   Reference proteome; Repeat; Threonine biosynthesis; Transferase.
+FT   CHAIN         1    820       Bifunctional aspartokinase/homoserine
+FT                                dehydrogenase 1.
+FT                                /FTId=PRO_0000066681.
+FT   DOMAIN      320    394       ACT 1. {ECO:0000255|PROSITE-
+FT                                ProRule:PRU01007}.
+FT   DOMAIN      401    478       ACT 2. {ECO:0000255|PROSITE-
+FT                                ProRule:PRU01007}.
+FT   NP_BIND     471    478       NADP. {ECO:0000255}.
+FT   REGION        1    249       Aspartokinase.
+FT   REGION      250    470       Interface.
+FT   REGION      471    820       Homoserine dehydrogenase.
+FT   CONFLICT     11     11       V -> L (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    113    113       Q -> E (in Ref. 8; AA sequence).
+FT                                {ECO:0000305}.
+FT   CONFLICT    230    230       D -> N (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    375    375       Q -> L (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    393    393       T -> A (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    406    406       M -> L (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    553    553       D -> N (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    587    588       DY -> IT (in Ref. 10; AAA24671).
+FT                                {ECO:0000305}.
+FT   CONFLICT    607    607       T -> I (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+FT   CONFLICT    658    658       T -> R (in Ref. 1; CAA23660/AAA83914).
+FT                                {ECO:0000305}.
+SQ   SEQUENCE   820 AA;  89120 MW;  0BF28E9EECAB10ED CRC64;
+     MRVLKFGGTS VANAERFLRV ADILESNARQ GQVATVLSAP AKITNHLVAM IEKTISGQDA
+     LPNISDAERI FAELLTGLAA AQPGFPLAQL KTFVDQEFAQ IKHVLHGISL LGQCPDSINA
+     ALICRGEKMS IAIMAGVLEA RGHNVTVIDP VEKLLAVGHY LESTVDIAES TRRIAASRIP
+     ADHMVLMAGF TAGNEKGELV VLGRNGSDYS AAVLAACLRA DCCEIWTDVD GVYTCDPRQV
+     PDARLLKSMS YQEAMELSYF GAKVLHPRTI TPIAQFQIPC LIKNTGNPQA PGTLIGASRD
+     EDELPVKGIS NLNNMAMFSV SGPGMKGMVG MAARVFAAMS RARISVVLIT QSSSEYSISF
+     CVPQSDCVRA ERAMQEEFYL ELKEGLLEPL AVTERLAIIS VVGDGMRTLR GISAKFFAAL
+     ARANINIVAI AQGSSERSIS VVVNNDDATT GVRVTHQMLF NTDQVIEVFV IGVGGVGGAL
+     LEQLKRQQSW LKNKHIDLRV CGVANSKALL TNVHGLNLEN WQEELAQAKE PFNLGRLIRL
+     VKEYHLLNPV IVDCTSSQAV ADQYADFLRE GFHVVTPNKK ANTSSMDYYH QLRYAAEKSR
+     RKFLYDTNVG AGLPVIENLQ NLLNAGDELM KFSGILSGSL SYIFGKLDEG MSFSEATTLA
+     REMGYTEPDP RDDLSGMDVA RKLLILARET GRELELADIE IEPVLPAEFN AEGDVAAFMA
+     NLSQLDDLFA ARVAKARDEG KVLRYVGNID EDGVCRVKIA EVDGNDPLFK VKNGENALAF
+     YSHYYQPLPL VLRGYGAGND VTAAGVFADL LRTLSWKLGV
+//

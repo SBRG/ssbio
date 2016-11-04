@@ -1,0 +1,217 @@
+ID   ATPG_ECOLI              Reviewed;         287 AA.
+AC   P0ABA6; P00837; P00838; Q2M851;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   21-JUL-1986, sequence version 1.
+DT   05-OCT-2016, entry version 97.
+DE   RecName: Full=ATP synthase gamma chain;
+DE   AltName: Full=ATP synthase F1 sector gamma subunit;
+DE   AltName: Full=F-ATPase gamma subunit;
+GN   Name=atpG; Synonyms=papC, uncG; OrderedLocusNames=b3733, JW3711;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6395859; DOI=10.1042/bj2240799;
+RA   Walker J.E., Gay N.J., Saraste M., Eberle A.N.;
+RT   "DNA sequence around the Escherichia coli unc operon. Completion of
+RT   the sequence of a 17 kilobase segment containing asnA, oriC, unc, glmS
+RT   and phoS.";
+RL   Biochem. J. 224:799-815(1984).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6272217; DOI=10.1093/nar/9.20.5287;
+RA   Saraste M., Gay N.J., Eberle A., Runswick M.J., Walker J.E.;
+RT   "The atp operon: nucleotide sequence of the genes for the gamma, beta,
+RT   and epsilon subunits of Escherichia coli ATP synthase.";
+RL   Nucleic Acids Res. 9:5287-5296(1981).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6277310; DOI=10.1016/0006-291X(81)90494-0;
+RA   Kanazawa H., Kayano T., Mabuchi K., Futai M.;
+RT   "Nucleotide sequence of the genes coding for alpha, beta and gamma
+RT   subunits of the proton-translocating ATPase of Escherichia coli.";
+RL   Biochem. Biophys. Res. Commun. 103:604-612(1981).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6301339; DOI=10.1111/j.1749-6632.1982.tb25731.x;
+RA   Kanazawa H., Futai M.;
+RT   "Structure and function of H+-ATPase: what we have learned from
+RT   Escherichia coli H+-ATPase.";
+RL   Ann. N. Y. Acad. Sci. 402:45-64(1982).
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7686882; DOI=10.1006/geno.1993.1230;
+RA   Burland V.D., Plunkett G. III, Daniels D.L., Blattner F.R.;
+RT   "DNA sequence and analysis of 136 kilobases of the Escherichia coli
+RT   genome: organizational symmetry around the origin of replication.";
+RL   Genomics 16:551-561(1993).
+RN   [6]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [7]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [8]
+RP   PROTEIN SEQUENCE OF 2-9; 72-81; 203-208 AND 214-220.
+RX   PubMed=7508444;
+RA   Tang C., Wilkens S., Capaldi R.A.;
+RT   "Structure of the gamma subunit of Escherichia coli F1 ATPase probed
+RT   in trypsin digestion and biotin-avidin binding studies.";
+RL   J. Biol. Chem. 269:4467-4472(1994).
+RN   [9]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 261-287.
+RX   PubMed=2138624;
+RA   Iwamoto A., Miki J., Maeda M., Futai M.;
+RT   "H(+)-ATPase gamma subunit of Escherichia coli. Role of the conserved
+RT   carboxyl-terminal region.";
+RL   J. Biol. Chem. 265:5043-5048(1990).
+RN   [10]
+RP   SUBUNIT, AND SUBCELLULAR LOCATION.
+RC   STRAIN=BL21-DE3;
+RX   PubMed=16079137; DOI=10.1074/jbc.M506479200;
+RA   Stenberg F., Chovanec P., Maslen S.L., Robinson C.V., Ilag L.,
+RA   von Heijne G., Daley D.O.;
+RT   "Protein complexes of the Escherichia coli cell envelope.";
+RL   J. Biol. Chem. 280:34409-34419(2005).
+RN   [11]
+RP   X-RAY CRYSTALLOGRAPHY (4.4 ANGSTROMS).
+RX   PubMed=10570135; DOI=10.1073/pnas.96.24.13697;
+RA   Hausrath A.C., Grueber G., Matthews B.W., Capaldi R.A.;
+RT   "Structural features of the gamma subunit of the Escherichia coli F(1)
+RT   ATPase revealed by a 4.4-A resolution map obtained by X-ray
+RT   crystallography.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 96:13697-13702(1999).
+CC   -!- FUNCTION: Produces ATP from ADP in the presence of a proton
+CC       gradient across the membrane. The gamma chain is believed to be
+CC       important in regulating ATPase activity and the flow of protons
+CC       through the CF(0) complex.
+CC   -!- SUBUNIT: F-type ATPases have 2 components, CF(1) - the catalytic
+CC       core - and CF(0) - the membrane proton channel. CF(1) has five
+CC       subunits: alpha(3), beta(3), gamma(1), delta(1), epsilon(1). CF(0)
+CC       has three main subunits: a, b and c.
+CC       {ECO:0000269|PubMed:16079137}.
+CC   -!- INTERACTION:
+CC       P0A6E6:atpC; NbExp=4; IntAct=EBI-544306, EBI-544362;
+CC   -!- SUBCELLULAR LOCATION: Cell inner membrane
+CC       {ECO:0000269|PubMed:16079137}; Peripheral membrane protein
+CC       {ECO:0000269|PubMed:16079137}.
+CC   -!- SIMILARITY: Belongs to the ATPase gamma chain family.
+CC       {ECO:0000305}.
+CC   -!- SEQUENCE CAUTION:
+CC       Sequence=CAA23597.1; Type=Frameshift; Positions=Several; Evidence={ECO:0000305};
+CC       Sequence=CAA23597.1; Type=Miscellaneous discrepancy; Note=Sequencing errors.; Evidence={ECO:0000305};
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; X01631; CAA25781.1; -; Genomic_DNA.
+DR   EMBL; V00267; CAA23526.1; -; Genomic_DNA.
+DR   EMBL; J01594; AAA24736.1; ALT_FRAME; Genomic_DNA.
+DR   EMBL; V00312; CAA23597.1; ALT_SEQ; Genomic_DNA.
+DR   EMBL; M25464; AAA83874.1; -; Genomic_DNA.
+DR   EMBL; L10328; AAA62085.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC76756.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAE77555.1; -; Genomic_DNA.
+DR   EMBL; M34095; AAA24742.1; -; Genomic_DNA.
+DR   PIR; A01038; PWECG.
+DR   RefSeq; NP_418189.1; NC_000913.3.
+DR   RefSeq; WP_000896498.1; NZ_LN832404.1.
+DR   PDB; 1D8S; X-ray; 4.40 A; G=1-287.
+DR   PDB; 1FS0; X-ray; 2.10 A; G=19-248.
+DR   PDB; 3OAA; X-ray; 3.26 A; G/O/W/e=2-287.
+DR   PDBsum; 1D8S; -.
+DR   PDBsum; 1FS0; -.
+DR   PDBsum; 3OAA; -.
+DR   ProteinModelPortal; P0ABA6; -.
+DR   SMR; P0ABA6; 2-285, 79-140.
+DR   DIP; DIP-35938N; -.
+DR   IntAct; P0ABA6; 15.
+DR   STRING; 511145.b3733; -.
+DR   TCDB; 3.A.2.1.1; the h(+)- or na(+)-translocating f-type, v-type and a-type atpase (f-atpase) superfamily.
+DR   EPD; P0ABA6; -.
+DR   PaxDb; P0ABA6; -.
+DR   PRIDE; P0ABA6; -.
+DR   EnsemblBacteria; AAC76756; AAC76756; b3733.
+DR   EnsemblBacteria; BAE77555; BAE77555; BAE77555.
+DR   GeneID; 948243; -.
+DR   KEGG; ecj:JW3711; -.
+DR   KEGG; eco:b3733; -.
+DR   PATRIC; 32122963; VBIEscCol129921_3857.
+DR   EchoBASE; EB0102; -.
+DR   EcoGene; EG10104; atpG.
+DR   eggNOG; ENOG4105J80; Bacteria.
+DR   eggNOG; COG0224; LUCA.
+DR   HOGENOM; HOG000215912; -.
+DR   InParanoid; P0ABA6; -.
+DR   KO; K02115; -.
+DR   OMA; DRGMCGG; -.
+DR   PhylomeDB; P0ABA6; -.
+DR   BioCyc; EcoCyc:ATPG-MONOMER; -.
+DR   BioCyc; ECOL316407:JW3711-MONOMER; -.
+DR   BioCyc; MetaCyc:ATPG-MONOMER; -.
+DR   EvolutionaryTrace; P0ABA6; -.
+DR   PRO; PR:P0ABA6; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0016020; C:membrane; IDA:UniProtKB.
+DR   GO; GO:0005886; C:plasma membrane; IEA:UniProtKB-SubCell.
+DR   GO; GO:0045261; C:proton-transporting ATP synthase complex, catalytic core F(1); IMP:EcoliWiki.
+DR   GO; GO:0005524; F:ATP binding; IEA:UniProtKB-HAMAP.
+DR   GO; GO:0046933; F:proton-transporting ATP synthase activity, rotational mechanism; IDA:EcoCyc.
+DR   GO; GO:0046961; F:proton-transporting ATPase activity, rotational mechanism; IDA:EcoCyc.
+DR   GO; GO:0042777; P:plasma membrane ATP synthesis coupled proton transport; IEA:UniProtKB-HAMAP.
+DR   CDD; cd12151; F1-ATPase_gamma; 1.
+DR   HAMAP; MF_00815; ATP_synth_gamma_bact; 1.
+DR   InterPro; IPR000131; ATPase_F1-cplx_gsu.
+DR   InterPro; IPR023632; ATPase_F1_gsu_CS.
+DR   PANTHER; PTHR11693; PTHR11693; 1.
+DR   Pfam; PF00231; ATP-synt; 1.
+DR   PRINTS; PR00126; ATPASEGAMMA.
+DR   SUPFAM; SSF52943; SSF52943; 1.
+DR   TIGRFAMs; TIGR01146; ATPsyn_F1gamma; 1.
+DR   PROSITE; PS00153; ATPASE_GAMMA; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; ATP synthesis; Cell inner membrane; Cell membrane;
+KW   CF(1); Complete proteome; Direct protein sequencing;
+KW   Hydrogen ion transport; Ion transport; Membrane; Reference proteome;
+KW   Transport.
+FT   CHAIN         1    287       ATP synthase gamma chain.
+FT                                /FTId=PRO_0000073282.
+FT   HELIX        20     57       {ECO:0000244|PDB:1FS0}.
+FT   TURN         61     63       {ECO:0000244|PDB:3OAA}.
+FT   HELIX        66     68       {ECO:0000244|PDB:1FS0}.
+FT   STRAND       74     81       {ECO:0000244|PDB:1FS0}.
+FT   STRAND       84     86       {ECO:0000244|PDB:1FS0}.
+FT   HELIX        91    108       {ECO:0000244|PDB:1FS0}.
+FT   STRAND      112    119       {ECO:0000244|PDB:1FS0}.
+FT   HELIX       120    129       {ECO:0000244|PDB:1FS0}.
+FT   STRAND      133    137       {ECO:0000244|PDB:1FS0}.
+FT   HELIX       147    161       {ECO:0000244|PDB:1FS0}.
+FT   STRAND      168    177       {ECO:0000244|PDB:1FS0}.
+FT   STRAND      180    190       {ECO:0000244|PDB:1FS0}.
+FT   TURN        196    198       {ECO:0000244|PDB:3OAA}.
+FT   STRAND      207    210       {ECO:0000244|PDB:1FS0}.
+FT   HELIX       212    247       {ECO:0000244|PDB:1FS0}.
+SQ   SEQUENCE   287 AA;  31577 MW;  2417A4B8FBDB8EF8 CRC64;
+     MAGAKEIRSK IASVQNTQKI TKAMEMVAAS KMRKSQDRMA ASRPYAETMR KVIGHLAHGN
+     LEYKHPYLED RDVKRVGYLV VSTDRGLCGG LNINLFKKLL AEMKTWTDKG VQCDLAMIGS
+     KGVSFFNSVG GNVVAQVTGM GDNPSLSELI GPVKVMLQAY DEGRLDKLYI VSNKFINTMS
+     QVPTISQLLP LPASDDDDLK HKSWDYLYEP DPKALLDTLL RRYVESQVYQ GVVENLASEQ
+     AARMVAMKAA TDNGGSLIKE LQLVYNKARQ ASITQELTEI VSGAAAV
+//

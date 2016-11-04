@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python API &#8212; ssbio 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="ssbio 0.1 documentation" href="index.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="test.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-ssbio.gempro.pipeline">
+<span id="python-api"></span><h1>Python API<a class="headerlink" href="#module-ssbio.gempro.pipeline" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ssbio.gempro.pipeline.GEMPRO">
+<em class="property">class </em><code class="descclassname">ssbio.gempro.pipeline.</code><code class="descname">GEMPRO</code><span class="sig-paren">(</span><em>gem_name</em>, <em>root_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic class to represent all information of a GEM-PRO for a GEM</p>
+<p>Main steps are:
+1. Preparation of folders
+2. Automatic ID mapping
+3. QC/QA
+4. Homology modeling
+5. Representative structures</p>
+<p>Each step may generate a report and also request additional files if mappings are incomplete</p>
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.blast_seqs_to_pdb">
+<code class="descname">blast_seqs_to_pdb</code><span class="sig-paren">(</span><em>custom_df</em>, <em>evalue=0.001</em>, <em>link=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.blast_seqs_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.blast_seqs_to_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>BLAST each gene sequence to the PDB. Results are saved as dataframes in the structure_files folder.</p>
+<p>Returns: Path to summary results dataframe which details best hit for each gene.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.cosonlidate_mappings">
+<code class="descname">cosonlidate_mappings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.cosonlidate_mappings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.cosonlidate_mappings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine information from KEGG, UniProt, and manual mappings.</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.kegg_mapping_and_metadata">
+<code class="descname">kegg_mapping_and_metadata</code><span class="sig-paren">(</span><em>kegg_organism_code</em>, <em>custom_gene_mapping=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.kegg_mapping_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.kegg_mapping_and_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all genes in the model to UniProt IDs using the KEGG service. Also download all metadata and sequences</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">kegg_organism_code (str): The three letter KEGG code of your organism
+custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,</p>
+<blockquote>
+<div>custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
+Dictionary keys must match model genes.</div></blockquote>
+<dl class="last docutils">
+<dt>force_rerun (bool): Flag to indicate if function should be rerun (True) or if</dt>
+<dd>cached files that match the format <a href="#id1"><span class="problematic" id="id2">*</span></a>_kegg_df.csv should be used instead (default, False).</dd>
+</dl>
+</dd>
+</dl>
+<p>Returns: path to metadata/mapping dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.load_model">
+<code class="descname">load_model</code><span class="sig-paren">(</span><em>gem_file</em>, <em>file_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the GEM using COBRApy. Accept SBML or MAT files as input</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>file_type: if your model is in &#8220;SBML&#8221; (or &#8220;XML&#8221;), or &#8220;Matlab&#8221; formats</dd>
+</dl>
+<p>Returns: None - loads the model in the GEMPRO object instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.manual_id_mapping">
+<code class="descname">manual_id_mapping</code><span class="sig-paren">(</span><em>mapping_infile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.manual_id_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.manual_id_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a manual input file of model gene IDs &#8211;&gt; KEGG or UniProt IDs.</p>
+<p>This allows for mapping of the missing genes, or overriding of automatic mappings.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>mapping_infile: Path to .csv file with the headers:</dt>
+<dd>m_gene - model gene ID</dd>
+</dl>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.organize_itasser_models">
+<code class="descname">organize_itasser_models</code><span class="sig-paren">(</span><em>raw_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.organize_itasser_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.organize_itasser_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reorganize the raw information from I-TASSER modeling.</p>
+<ul class="simple">
+<li>Copies the model1.pdb file to the matching gene folder in structure_files/by_gene/</li>
+<li>Parses modeling information such as C-scores, template, etc</li>
+<li>Also will parse binding site (COACH) information if it exists</li>
+</ul>
+<p>TODO: what else to parse?
+TODO: finish summary df stuff</p>
+<p>Returns: path to summary results dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.prep_folders">
+<code class="descname">prep_folders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.prep_folders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.prep_folders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare all folders for a GEM-PRO project</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.run_pipeline">
+<code class="descname">run_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.run_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.run_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the entire GEM-PRO pipel ine.</p>
+<p>Options include:
+...</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.gempro.pipeline.GEMPRO.uniprot_mapping_and_metadata">
+<code class="descname">uniprot_mapping_and_metadata</code><span class="sig-paren">(</span><em>model_gene_source</em>, <em>custom_gene_mapping=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.uniprot_mapping_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.uniprot_mapping_and_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>model_gene_source (str): the database source of your model gene IDs, see <a class="reference external" href="http://www.uniprot.org/help/programmatic_access">http://www.uniprot.org/help/programmatic_access</a></dt>
+<dd>Common model gene sources are:
+Ensembl Genomes - ENSEMBLGENOME_ID
+Entrez Gene (GeneID) - P_ENTREZGENEID
+RefSeq Protein - P_REFSEQ_AC</dd>
+<dt>custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,</dt>
+<dd>custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
+Dictionary keys must match model genes.</dd>
+<dt>force_rerun (bool): Flag to indicate if function should be rerun (True) or if</dt>
+<dd>cached files that match the format <a href="#id3"><span class="problematic" id="id4">*</span></a>_uniprot_df.csv should be used instead (default, False).</dd>
+</dl>
+</dd>
+</dl>
+<p>Returns: path to metadata/mapping dataframe</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="test.html" title="previous chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/python_api.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Nathan Mih.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/python_api.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

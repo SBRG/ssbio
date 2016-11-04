@@ -1,0 +1,241 @@
+ID   ATPF_ECOLI              Reviewed;         156 AA.
+AC   P0ABA0; P00859; Q2M854;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   21-JUL-1986, sequence version 1.
+DT   05-OCT-2016, entry version 95.
+DE   RecName: Full=ATP synthase subunit b {ECO:0000255|HAMAP-Rule:MF_01398};
+DE   AltName: Full=ATP synthase F(0) sector subunit b {ECO:0000255|HAMAP-Rule:MF_01398};
+DE   AltName: Full=ATPase subunit I {ECO:0000255|HAMAP-Rule:MF_01398};
+DE   AltName: Full=F-type ATPase subunit b {ECO:0000255|HAMAP-Rule:MF_01398};
+DE            Short=F-ATPase subunit b {ECO:0000255|HAMAP-Rule:MF_01398};
+GN   Name=atpF {ECO:0000255|HAMAP-Rule:MF_01398}; Synonyms=papF, uncF;
+GN   OrderedLocusNames=b3736, JW3714;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6395859; DOI=10.1042/bj2240799;
+RA   Walker J.E., Gay N.J., Saraste M., Eberle A.N.;
+RT   "DNA sequence around the Escherichia coli unc operon. Completion of
+RT   the sequence of a 17 kilobase segment containing asnA, oriC, unc, glmS
+RT   and phoS.";
+RL   Biochem. J. 224:799-815(1984).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6272190; DOI=10.1093/nar/9.16.3919;
+RA   Gay N.J., Walker J.E.;
+RT   "The atp operon: nucleotide sequence of the promoter and the genes for
+RT   the membrane proteins, and the delta subunit of Escherichia coli ATP-
+RT   synthase.";
+RL   Nucleic Acids Res. 9:3919-3926(1981).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6277311; DOI=10.1016/0006-291X(81)90495-2;
+RA   Kanazawa H., Mabuchi K., Kayano T., Noumi T., Sekiya T., Futai M.;
+RT   "Nucleotide sequence of the genes for F0 components of the proton-
+RT   translocating ATPase from Escherichia coli: prediction of the primary
+RT   structure of F0 subunits.";
+RL   Biochem. Biophys. Res. Commun. 103:613-620(1981).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6278247; DOI=10.1007/BF00271191;
+RA   Nielsen J., Hansen F.G., Hoppe J., Friedl P., von Meyenburg K.;
+RT   "The nucleotide sequence of the atp genes coding for the F0 subunits
+RT   a, b, c and the F1 subunit delta of the membrane bound ATP synthase of
+RT   Escherichia coli.";
+RL   Mol. Gen. Genet. 184:33-39(1981).
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6301339; DOI=10.1111/j.1749-6632.1982.tb25731.x;
+RA   Kanazawa H., Futai M.;
+RT   "Structure and function of H+-ATPase: what we have learned from
+RT   Escherichia coli H+-ATPase.";
+RL   Ann. N. Y. Acad. Sci. 402:45-64(1982).
+RN   [6]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=2861200;
+RA   Porter A.C.G., Kumamoto C., Aldape K., Simoni R.D.;
+RT   "Role of the b subunit of the Escherichia coli proton-translocating
+RT   ATPase. A mutagenic analysis.";
+RL   J. Biol. Chem. 260:8182-8187(1985).
+RN   [7]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7686882; DOI=10.1006/geno.1993.1230;
+RA   Burland V.D., Plunkett G. III, Daniels D.L., Blattner F.R.;
+RT   "DNA sequence and analysis of 136 kilobases of the Escherichia coli
+RT   genome: organizational symmetry around the origin of replication.";
+RL   Genomics 16:551-561(1993).
+RN   [8]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [9]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [10]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 132-156.
+RX   PubMed=6458296; DOI=10.1016/0006-291X(81)91504-7;
+RA   Mabuchi K., Kanazawa H., Kayano T., Futai M.;
+RT   "Nucleotide sequence of the gene coding for the delta subunit of
+RT   proton translocating ATPase of Escherichia coli.";
+RL   Biochem. Biophys. Res. Commun. 102:172-179(1981).
+RN   [11]
+RP   FUNCTION.
+RX   PubMed=1682301;
+RA   McCormick K.A., Cain B.D.;
+RT   "Targeted mutagenesis of the b subunit of F1F0 ATP synthase in
+RT   Escherichia coli: Glu-77 through Gln-85.";
+RL   J. Bacteriol. 173:7240-7248(1991).
+RN   [12]
+RP   SUBUNIT, AND SUBCELLULAR LOCATION.
+RC   STRAIN=BL21-DE3;
+RX   PubMed=16079137; DOI=10.1074/jbc.M506479200;
+RA   Stenberg F., Chovanec P., Maslen S.L., Robinson C.V., Ilag L.,
+RA   von Heijne G., Daley D.O.;
+RT   "Protein complexes of the Escherichia coli cell envelope.";
+RL   J. Biol. Chem. 280:34409-34419(2005).
+RN   [13]
+RP   STRUCTURE BY NMR OF 1-34.
+RX   PubMed=10336456; DOI=10.1074/jbc.274.22.15598;
+RA   Dmitriev O., Jones P.C., Jiang W., Fillingame R.H.;
+RT   "Structure of the membrane domain of subunit b of the Escherichia coli
+RT   F0F1 ATP synthase.";
+RL   J. Biol. Chem. 274:15598-15604(1999).
+CC   -!- FUNCTION: F(1)F(0) ATP synthase produces ATP from ADP in the
+CC       presence of a proton or sodium gradient. F-type ATPases consist of
+CC       two structural domains, F(1) containing the extramembraneous
+CC       catalytic core and F(0) containing the membrane proton channel,
+CC       linked together by a central stalk and a peripheral stalk. During
+CC       catalysis, ATP synthesis in the catalytic domain of F(1) is
+CC       coupled via a rotary mechanism of the central stalk subunits to
+CC       proton translocation. {ECO:0000255|HAMAP-Rule:MF_01398}.
+CC   -!- FUNCTION: Component of the F(0) channel, it forms part of the
+CC       peripheral stalk, linking F(1) to F(0). {ECO:0000255|HAMAP-
+CC       Rule:MF_01398}.
+CC   -!- SUBUNIT: F-type ATPases have 2 components, F(1) - the catalytic
+CC       core - and F(0) - the membrane proton channel. F(1) has five
+CC       subunits: alpha(3), beta(3), gamma(1), delta(1), epsilon(1). F(0)
+CC       has three main subunits: a(1), b(2) and c(10-14). The alpha and
+CC       beta chains form an alternating ring which encloses part of the
+CC       gamma chain. F(1) is attached to F(0) by a central stalk formed by
+CC       the gamma and epsilon chains, while a peripheral stalk is formed
+CC       by the delta and b chains. {ECO:0000255|HAMAP-Rule:MF_01398}.
+CC   -!- SUBCELLULAR LOCATION: Cell inner membrane {ECO:0000255|HAMAP-
+CC       Rule:MF_01398}; Single-pass membrane protein {ECO:0000255|HAMAP-
+CC       Rule:MF_01398}.
+CC   -!- SIMILARITY: Belongs to the ATPase B chain family.
+CC       {ECO:0000255|HAMAP-Rule:MF_01398}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; J01594; AAA24733.1; -; Genomic_DNA.
+DR   EMBL; X01631; CAA25778.1; -; Genomic_DNA.
+DR   EMBL; V00264; CAA23516.1; -; Genomic_DNA.
+DR   EMBL; V00310; CAA23592.1; -; Genomic_DNA.
+DR   EMBL; V00266; CAA23523.1; -; Genomic_DNA.
+DR   EMBL; M25464; AAA83871.1; -; Genomic_DNA.
+DR   EMBL; M10422; AAA24741.1; -; Genomic_DNA.
+DR   EMBL; L10328; AAA62088.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC76759.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAE77552.1; -; Genomic_DNA.
+DR   EMBL; M12212; AAA20043.1; -; Unassigned_DNA.
+DR   PIR; D93732; LWECB.
+DR   RefSeq; NP_418192.1; NC_000913.3.
+DR   RefSeq; WP_001052219.1; NZ_LN832404.1.
+DR   PDB; 1B9U; NMR; -; A=1-34.
+DR   PDB; 1L2P; X-ray; 1.55 A; A=62-122.
+DR   PDB; 2KHK; NMR; -; A=30-82.
+DR   PDBsum; 1B9U; -.
+DR   PDBsum; 1L2P; -.
+DR   PDBsum; 2KHK; -.
+DR   ProteinModelPortal; P0ABA0; -.
+DR   SMR; P0ABA0; 1-34, 10-156, 29-114, 34-109, 102-155.
+DR   DIP; DIP-35994N; -.
+DR   IntAct; P0ABA0; 2.
+DR   STRING; 511145.b3736; -.
+DR   TCDB; 3.A.2.1.1; the h(+)- or na(+)-translocating f-type, v-type and a-type atpase (f-atpase) superfamily.
+DR   SWISS-2DPAGE; P0ABA0; -.
+DR   EPD; P0ABA0; -.
+DR   PaxDb; P0ABA0; -.
+DR   PRIDE; P0ABA0; -.
+DR   EnsemblBacteria; AAC76759; AAC76759; b3736.
+DR   EnsemblBacteria; BAE77552; BAE77552; BAE77552.
+DR   GeneID; 948247; -.
+DR   KEGG; ecj:JW3714; -.
+DR   KEGG; eco:b3736; -.
+DR   PATRIC; 32122969; VBIEscCol129921_3860.
+DR   EchoBASE; EB0101; -.
+DR   EcoGene; EG10103; atpF.
+DR   eggNOG; ENOG4107Z6K; Bacteria.
+DR   eggNOG; COG0711; LUCA.
+DR   HOGENOM; HOG000015378; -.
+DR   InParanoid; P0ABA0; -.
+DR   KO; K02109; -.
+DR   OMA; SMIQDLS; -.
+DR   PhylomeDB; P0ABA0; -.
+DR   BioCyc; EcoCyc:ATPF-MONOMER; -.
+DR   BioCyc; ECOL316407:JW3714-MONOMER; -.
+DR   BioCyc; MetaCyc:ATPF-MONOMER; -.
+DR   EvolutionaryTrace; P0ABA0; -.
+DR   PRO; PR:P0ABA0; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0031225; C:anchored component of membrane; IDA:EcoliWiki.
+DR   GO; GO:0016021; C:integral component of membrane; IEA:UniProtKB-KW.
+DR   GO; GO:0005886; C:plasma membrane; IEA:UniProtKB-SubCell.
+DR   GO; GO:0045263; C:proton-transporting ATP synthase complex, coupling factor F(o); IMP:EcoliWiki.
+DR   GO; GO:0046933; F:proton-transporting ATP synthase activity, rotational mechanism; IMP:EcoCyc.
+DR   GO; GO:0046961; F:proton-transporting ATPase activity, rotational mechanism; IMP:EcoCyc.
+DR   GO; GO:0015986; P:ATP synthesis coupled proton transport; IEA:UniProtKB-HAMAP.
+DR   Gene3D; 1.20.5.620; -; 1.
+DR   HAMAP; MF_01398; ATP_synth_b_bact; 1.
+DR   InterPro; IPR028987; ATPase_B-like_membr.
+DR   InterPro; IPR002146; ATPase_F0-cplx_b/b'su_bac.
+DR   InterPro; IPR005864; ATPase_F0-cplx_bsu_bac.
+DR   Pfam; PF00430; ATP-synt_B; 1.
+DR   SUPFAM; SSF81573; SSF81573; 1.
+DR   TIGRFAMs; TIGR01144; ATP_synt_b; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; ATP synthesis; Cell inner membrane; Cell membrane;
+KW   CF(0); Complete proteome; Hydrogen ion transport; Ion transport;
+KW   Membrane; Reference proteome; Transmembrane; Transmembrane helix;
+KW   Transport.
+FT   CHAIN         1    156       ATP synthase subunit b.
+FT                                /FTId=PRO_0000082371.
+FT   TRANSMEM     11     31       Helical. {ECO:0000255|HAMAP-
+FT                                Rule:MF_01398}.
+FT   SITE          9      9       Mutation prevents the formation of a
+FT                                functional proton pore, but has a small
+FT                                effect on the binding of F(1) to F(0).
+FT   SITE        131    131       Required for proton pore formation, as
+FT                                well as F(1) to F(0) binding.
+FT   CONFLICT     33     33       I -> F (in Ref. 3; CAA23592).
+FT                                {ECO:0000305}.
+FT   CONFLICT     62     62       T -> N (in Ref. 7; AAA24741).
+FT                                {ECO:0000305}.
+FT   CONFLICT     72     72       A -> D (in Ref. 3; CAA23592).
+FT                                {ECO:0000305}.
+FT   HELIX         4     24       {ECO:0000244|PDB:1B9U}.
+FT   HELIX        26     33       {ECO:0000244|PDB:1B9U}.
+FT   HELIX        63    120       {ECO:0000244|PDB:1L2P}.
+SQ   SEQUENCE   156 AA;  17264 MW;  51A93C8BEE9AD9DF CRC64;
+     MNLNATILGQ AIAFVLFVLF CMKYVWPPLM AAIEKRQKEI ADGLASAERA HKDLDLAKAS
+     ATDQLKKAKA EAQVIIEQAN KRRSQILDEA KAEAEQERTK IVAQAQAEIE AERKRAREEL
+     RKQVAILAVA GAEKIIERSV DEAANSDIVD KLVAEL
+//

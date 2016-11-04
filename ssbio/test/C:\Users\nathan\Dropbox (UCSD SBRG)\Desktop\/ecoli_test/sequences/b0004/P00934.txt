@@ -1,0 +1,234 @@
+ID   THRC_ECOLI              Reviewed;         428 AA.
+AC   P00934; Q6LEK8;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   21-JUL-1986, sequence version 1.
+DT   07-SEP-2016, entry version 150.
+DE   RecName: Full=Threonine synthase;
+DE            Short=TS;
+DE            EC=4.2.3.1;
+GN   Name=thrC; OrderedLocusNames=b0004, JW0003;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RX   PubMed=6316258; DOI=10.1093/nar/11.21.7331;
+RA   Parsot C., Cossart P., Saint-Girons I., Cohen G.N.;
+RT   "Nucleotide sequence of thrC and of the transcription termination
+RT   region of the threonine operon in Escherichia coli K12.";
+RL   Nucleic Acids Res. 11:7331-7345(1983).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12;
+RX   PubMed=1630901; DOI=10.1093/nar/20.13.3305;
+RA   Yura T., Mori H., Nagai H., Nagata T., Ishihama A., Fujita N.,
+RA   Isono K., Mizobuchi K., Nakata A.;
+RT   "Systematic sequencing of the Escherichia coli genome: analysis of the
+RT   0-2.4 min region.";
+RL   Nucleic Acids Res. 20:3305-3308(1992).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7610040; DOI=10.1093/nar/23.12.2105;
+RA   Burland V.D., Plunkett G. III, Sofia H.J., Daniels D.L.,
+RA   Blattner F.R.;
+RT   "Analysis of the Escherichia coli genome VI: DNA sequence of the
+RT   region from 92.8 through 100 minutes.";
+RL   Nucleic Acids Res. 23:2105-2119(1995).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [6]
+RP   PROTEIN SEQUENCE OF 1-12.
+RC   STRAIN=K12 / EMG2;
+RX   PubMed=9298646; DOI=10.1002/elps.1150180807;
+RA   Link A.J., Robison K., Church G.M.;
+RT   "Comparing the predicted and observed properties of proteins encoded
+RT   in the genome of Escherichia coli K-12.";
+RL   Electrophoresis 18:1259-1313(1997).
+RN   [7]
+RP   PROTEIN SEQUENCE OF 1-4.
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=9600841; DOI=10.1006/jmbi.1998.1726;
+RA   Wilkins M.R., Gasteiger E., Tonella L., Ou K., Tyler M.,
+RA   Sanchez J.-C., Gooley A.A., Walsh B.J., Bairoch A., Appel R.D.,
+RA   Williams K.L., Hochstrasser D.F.;
+RT   "Protein identification with N and C-terminal sequence tags in
+RT   proteome projects.";
+RL   J. Mol. Biol. 278:599-608(1998).
+RN   [8]
+RP   FUNCTION, CATALYTIC ACTIVITY, COFACTOR, SUBSTRATE SPECIFICITY, ENZYME
+RP   REGULATION, AND KINETIC PARAMETERS.
+RX   PubMed=7907888; DOI=10.1021/bi00177a035;
+RA   Laber B., Gerbling K.P., Harde C., Neff K.H., Nordhoff E.,
+RA   Pohlenz H.D.;
+RT   "Mechanisms of interaction of Escherichia coli threonine synthase with
+RT   substrates and inhibitors.";
+RL   Biochemistry 33:3413-3423(1994).
+RN   [9]
+RP   X-RAY CRYSTALLOGRAPHY (2.2 ANGSTROMS).
+RA   Omi R., Goto M., Miyahara I., Mizuguchi H., Hayashi H., Kagamiyama H.,
+RA   Hirotsu K.;
+RT   "Crystal structure of threonine synthase from Escherichia coli.";
+RL   Submitted (FEB-2009) to the PDB data bank.
+CC   -!- FUNCTION: Catalyzes the gamma-elimination of phosphate from L-
+CC       phosphohomoserine and the beta-addition of water to produce L-
+CC       threonine. To a lesser extent, is able to slowly catalyze the
+CC       deamination of L-threonine into alpha-ketobutyrate and that of L-
+CC       serine and 3-chloroalanine into pyruvate. Is also able to rapidly
+CC       convert vinylglycine to threonine, which proves that the pyridoxal
+CC       p-quinonoid of vinylglycine is an intermediate in the TS reaction.
+CC       {ECO:0000269|PubMed:7907888}.
+CC   -!- CATALYTIC ACTIVITY: O-phospho-L-homoserine + H(2)O = L-threonine +
+CC       phosphate. {ECO:0000269|PubMed:7907888}.
+CC   -!- COFACTOR:
+CC       Name=pyridoxal 5'-phosphate; Xref=ChEBI:CHEBI:597326;
+CC         Evidence={ECO:0000269|PubMed:7907888};
+CC   -!- ENZYME REGULATION: Is competitively inhibited by L-threo-3-
+CC       hydroxyhomoserine phosphate. {ECO:0000269|PubMed:7907888}.
+CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
+CC       Kinetic parameters:
+CC         KM=0.5 mM for O-phospho-L-homoserine
+CC         {ECO:0000269|PubMed:7907888};
+CC         Vmax=9.3 umol/min/mg enzyme {ECO:0000269|PubMed:7907888};
+CC   -!- PATHWAY: Amino-acid biosynthesis; L-threonine biosynthesis; L-
+CC       threonine from L-aspartate: step 5/5.
+CC   -!- SIMILARITY: Belongs to the threonine synthase family.
+CC       {ECO:0000305}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; U14003; AAA97303.1; -; Genomic_DNA.
+DR   EMBL; J01706; AAA83916.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC73115.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAB96581.1; -; Genomic_DNA.
+DR   PIR; A01157; SYECR.
+DR   RefSeq; NP_414545.1; NC_000913.3.
+DR   RefSeq; WP_000781074.1; NZ_LN832404.1.
+DR   PDB; 1VB3; X-ray; 2.20 A; A=1-428.
+DR   PDBsum; 1VB3; -.
+DR   ProteinModelPortal; P00934; -.
+DR   SMR; P00934; 1-428.
+DR   BioGrid; 4261935; 235.
+DR   DIP; DIP-10993N; -.
+DR   IntAct; P00934; 2.
+DR   STRING; 511145.b0004; -.
+DR   SWISS-2DPAGE; P00934; -.
+DR   EPD; P00934; -.
+DR   PaxDb; P00934; -.
+DR   PRIDE; P00934; -.
+DR   EnsemblBacteria; AAC73115; AAC73115; b0004.
+DR   EnsemblBacteria; BAB96581; BAB96581; BAB96581.
+DR   GeneID; 945198; -.
+DR   KEGG; ecj:JW0003; -.
+DR   KEGG; eco:b0004; -.
+DR   PATRIC; 32115103; VBIEscCol129921_0003.
+DR   EchoBASE; EB0993; -.
+DR   EcoGene; EG11000; thrC.
+DR   eggNOG; ENOG4105D98; Bacteria.
+DR   eggNOG; COG0498; LUCA.
+DR   HOGENOM; HOG000230743; -.
+DR   InParanoid; P00934; -.
+DR   KO; K01733; -.
+DR   OMA; LAFKDYG; -.
+DR   PhylomeDB; P00934; -.
+DR   BioCyc; EcoCyc:THRESYN-MONOMER; -.
+DR   BioCyc; ECOL316407:JW0003-MONOMER; -.
+DR   BioCyc; MetaCyc:THRESYN-MONOMER; -.
+DR   UniPathway; UPA00050; UER00065.
+DR   EvolutionaryTrace; P00934; -.
+DR   PRO; PR:P00934; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0005829; C:cytosol; IDA:EcoCyc.
+DR   GO; GO:0030170; F:pyridoxal phosphate binding; IBA:GO_Central.
+DR   GO; GO:0004795; F:threonine synthase activity; IDA:EcoCyc.
+DR   GO; GO:0009088; P:threonine biosynthetic process; IMP:EcoCyc.
+DR   Gene3D; 3.90.1380.10; -; 1.
+DR   InterPro; IPR000634; Ser/Thr_deHydtase_PyrdxlP-BS.
+DR   InterPro; IPR029144; Thr_synth_N.
+DR   InterPro; IPR004450; Thr_synthase-like.
+DR   InterPro; IPR001926; TrpB-like_PLP-dep.
+DR   Pfam; PF00291; PALP; 1.
+DR   Pfam; PF14821; Thr_synth_N; 1.
+DR   SUPFAM; SSF53686; SSF53686; 1.
+DR   TIGRFAMs; TIGR00260; thrC; 1.
+DR   PROSITE; PS00165; DEHYDRATASE_SER_THR; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; Amino-acid biosynthesis; Complete proteome;
+KW   Direct protein sequencing; Lyase; Pyridoxal phosphate;
+KW   Reference proteome; Threonine biosynthesis.
+FT   CHAIN         1    428       Threonine synthase.
+FT                                /FTId=PRO_0000185631.
+FT   MOD_RES     107    107       N6-(pyridoxal phosphate)lysine.
+FT                                {ECO:0000250}.
+FT   STRAND        3      5       {ECO:0000244|PDB:1VB3}.
+FT   STRAND        8     13       {ECO:0000244|PDB:1VB3}.
+FT   HELIX        15     21       {ECO:0000244|PDB:1VB3}.
+FT   HELIX        25     27       {ECO:0000244|PDB:1VB3}.
+FT   STRAND       30     34       {ECO:0000244|PDB:1VB3}.
+FT   HELIX        40     46       {ECO:0000244|PDB:1VB3}.
+FT   HELIX        51     63       {ECO:0000244|PDB:1VB3}.
+FT   HELIX        64     66       {ECO:0000244|PDB:1VB3}.
+FT   HELIX        69     79       {ECO:0000244|PDB:1VB3}.
+FT   STRAND       86     90       {ECO:0000244|PDB:1VB3}.
+FT   STRAND       93     97       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       107    121       {ECO:0000244|PDB:1VB3}.
+FT   TURN        122    124       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      127    132       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      134    136       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       137    144       {ECO:0000244|PDB:1VB3}.
+FT   TURN        145    147       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      151    158       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       164    171       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      177    184       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       186    195       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       196    198       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       200    206       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       216    221       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       224    230       {ECO:0000244|PDB:1VB3}.
+FT   TURN        235    239       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      240    246       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       251    261       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      267    273       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       278    285       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       299    301       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       309    318       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       323    325       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      326    330       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       333    345       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       352    362       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      370    375       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       379    382       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       383    390       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       398    404       {ECO:0000244|PDB:1VB3}.
+FT   STRAND      411    415       {ECO:0000244|PDB:1VB3}.
+FT   HELIX       417    424       {ECO:0000244|PDB:1VB3}.
+SQ   SEQUENCE   428 AA;  47114 MW;  5F7C20BE00B437E2 CRC64;
+     MKLYNLKDHN EQVSFAQAVT QGLGKNQGLF FPHDLPEFSL TEIDEMLKLD FVTRSAKILS
+     AFIGDEIPQE ILEERVRAAF AFPAPVANVE SDVGCLELFH GPTLAFKDFG GRFMAQMLTH
+     IAGDKPVTIL TATSGDTGAA VAHAFYGLPN VKVVILYPRG KISPLQEKLF CTLGGNIETV
+     AIDGDFDACQ ALVKQAFDDE ELKVALGLNS ANSINISRLL AQICYYFEAV AQLPQETRNQ
+     LVVSVPSGNF GDLTAGLLAK SLGLPVKRFI AATNVNDTVP RFLHDGQWSP KATQATLSNA
+     MDVSQPNNWP RVEELFRRKI WQLKELGYAA VDDETTQQTM RELKELGYTS EPHAAVAYRA
+     LRDQLNPGEY GLFLGTAHPA KFKESVEAIL GETLDLPKEL AERADLPLLS HNLPADFAAL
+     RKLMMNHQ
+//

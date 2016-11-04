@@ -1,0 +1,417 @@
+ID   ENO_ECOLI               Reviewed;         432 AA.
+AC   P0A6P9; P08324; Q2MA53;
+DT   01-AUG-1988, integrated into UniProtKB/Swiss-Prot.
+DT   23-JAN-2007, sequence version 2.
+DT   05-OCT-2016, entry version 111.
+DE   RecName: Full=Enolase {ECO:0000255|HAMAP-Rule:MF_00318};
+DE            EC=4.2.1.11 {ECO:0000255|HAMAP-Rule:MF_00318};
+DE   AltName: Full=2-phospho-D-glycerate hydro-lyase {ECO:0000255|HAMAP-Rule:MF_00318};
+DE   AltName: Full=2-phosphoglycerate dehydratase {ECO:0000255|HAMAP-Rule:MF_00318};
+GN   Name=eno {ECO:0000255|HAMAP-Rule:MF_00318};
+GN   OrderedLocusNames=b2779, JW2750;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RC   STRAIN=K12 / JM109 / ATCC 53323;
+RA   Klein M., Freudl R.;
+RL   Submitted (OCT-1994) to the EMBL/GenBank/DDBJ databases.
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-123.
+RX   PubMed=3514618;
+RA   Weng M., Makaroff C.A., Zalkin H.;
+RT   "Nucleotide sequence of Escherichia coli pyrG encoding CTP
+RT   synthetase.";
+RL   J. Biol. Chem. 261:5568-5574(1986).
+RN   [5]
+RP   PROTEIN SEQUENCE OF 2-16, AND SUBUNIT.
+RX   PubMed=8610017; DOI=10.1038/381169a0;
+RA   Py B., Higgins C.F., Krisch H.M., Carpousis A.J.;
+RT   "A DEAD-box RNA helicase in the Escherichia coli RNA degradosome.";
+RL   Nature 381:169-172(1996).
+RN   [6]
+RP   PROTEIN SEQUENCE OF 2-13.
+RC   STRAIN=K12 / EMG2;
+RX   PubMed=9298646; DOI=10.1002/elps.1150180807;
+RA   Link A.J., Robison K., Church G.M.;
+RT   "Comparing the predicted and observed properties of proteins encoded
+RT   in the genome of Escherichia coli K-12.";
+RL   Electrophoresis 18:1259-1313(1997).
+RN   [7]
+RP   PROTEIN SEQUENCE OF 2-5.
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=9600841; DOI=10.1006/jmbi.1998.1726;
+RA   Wilkins M.R., Gasteiger E., Tonella L., Ou K., Tyler M.,
+RA   Sanchez J.-C., Gooley A.A., Walsh B.J., Bairoch A., Appel R.D.,
+RA   Williams K.L., Hochstrasser D.F.;
+RT   "Protein identification with N and C-terminal sequence tags in
+RT   proteome projects.";
+RL   J. Mol. Biol. 278:599-608(1998).
+RN   [8]
+RP   FUNCTION, CATALYTIC ACTIVITY, COFACTOR, ENZYME REGULATION,
+RP   BIOPHYSICOCHEMICAL PROPERTIES, AND SUBUNIT.
+RC   STRAIN=B;
+RX   PubMed=4942326;
+RA   Spring T.G., Wold F.;
+RT   "The purification and characterization of Escherichia coli enolase.";
+RL   J. Biol. Chem. 246:6797-6802(1971).
+RN   [9]
+RP   PRELIMINARY CHARACTERIZATION, AND PHOSPHORYLATION.
+RC   STRAIN=K12 / JA200;
+RX   PubMed=2513001; DOI=10.1016/0300-9084(89)90116-8;
+RA   Dannelly H.K., Duclos B., Cozzone A.J., Reeves H.C.;
+RT   "Phosphorylation of Escherichia coli enolase.";
+RL   Biochimie 71:1095-1100(1989).
+RN   [10]
+RP   IDENTIFICATION BY 2D-GEL.
+RX   PubMed=9298644; DOI=10.1002/elps.1150180805;
+RA   VanBogelen R.A., Abshire K.Z., Moldover B., Olson E.R.,
+RA   Neidhardt F.C.;
+RT   "Escherichia coli proteome analysis using the gene-protein database.";
+RL   Electrophoresis 18:1243-1251(1997).
+RN   [11]
+RP   INTERACTION WITH RNASE E.
+RX   PubMed=9732274; DOI=10.1101/gad.12.17.2770;
+RA   Vanzo N.F., Li Y.S., Py B., Blum E., Higgins C.F., Raynal L.C.,
+RA   Krisch H.M., Carpousis A.J.;
+RT   "Ribonuclease E organizes the protein interactions in the Escherichia
+RT   coli RNA degradosome.";
+RL   Genes Dev. 12:2770-2781(1998).
+RN   [12]
+RP   SUBSTRATE BINDING AT LYS-342, ENZYME REGULATION, SECRETION OF
+RP   SUBSTRATE-BOUND ENOLASE, SUBCELLULAR LOCATION, AND MUTAGENESIS OF
+RP   GLU-168; GLU-209 AND LYS-342.
+RX   PubMed=15003462; DOI=10.1016/j.jmb.2003.12.082;
+RA   Boeel G., Pichereau V., Mijakovic I., Maze A., Poncet S., Gillet S.,
+RA   Giard J.-C., Hartke A., Auffray Y., Deutscher J.;
+RT   "Is 2-phosphoglycerate-dependent automodification of bacterial
+RT   enolases implicated in their export?";
+RL   J. Mol. Biol. 337:485-496(2004).
+RN   [13]
+RP   FUNCTION IN MRNA TURNOVER.
+RX   PubMed=14981237; DOI=10.1073/pnas.0308747101;
+RA   Bernstein J.A., Lin P.-H., Cohen S.N., Lin-Chao S.;
+RT   "Global analysis of Escherichia coli RNA degradosome function using
+RT   DNA microarrays.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 101:2758-2763(2004).
+RN   [14]
+RP   FUNCTION IN THE DECAY OF GLUCOSE TRANSPORTER MRNA.
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=15522087; DOI=10.1111/j.1365-2958.2004.04329.x;
+RA   Morita T., Kawamoto H., Mizota T., Inada T., Aiba H.;
+RT   "Enolase in the RNA degradosome plays a crucial role in the rapid
+RT   decay of glucose transporter mRNA in the response to phosphosugar
+RT   stress in Escherichia coli.";
+RL   Mol. Microbiol. 54:1063-1075(2004).
+RN   [15]
+RP   SUBCELLULAR LOCATION.
+RC   STRAIN=PB103;
+RX   PubMed=17242352; DOI=10.1073/pnas.0610491104;
+RA   Taghbalout A., Rothfield L.;
+RT   "RNaseE and the other constituents of the RNA degradosome are
+RT   components of the bacterial cytoskeleton.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 104:1667-1672(2007).
+RN   [16]
+RP   INTERACTION WITH RNASE E, AND SUBCELLULAR LOCATION.
+RX   PubMed=18337249; DOI=10.1074/jbc.M709118200;
+RA   Taghbalout A., Rothfield L.;
+RT   "RNaseE and RNA helicase B play central roles in the cytoskeletal
+RT   organization of the RNA degradosome.";
+RL   J. Biol. Chem. 283:13850-13855(2008).
+RN   [17]
+RP   ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-257, AND IDENTIFICATION BY
+RP   MASS SPECTROMETRY.
+RC   STRAIN=K12 / JW1106, and K12 / MG1655 / ATCC 47076;
+RX   PubMed=18723842; DOI=10.1074/mcp.M800187-MCP200;
+RA   Zhang J., Sprung R., Pei J., Tan X., Kim S., Zhu H., Liu C.F.,
+RA   Grishin N.V., Zhao Y.;
+RT   "Lysine acetylation is a highly abundant and evolutionarily conserved
+RT   modification in Escherichia coli.";
+RL   Mol. Cell. Proteomics 8:215-225(2009).
+RN   [18]
+RP   X-RAY CRYSTALLOGRAPHY (2.48 ANGSTROMS) IN COMPLEX WITH MAGNESIUM IONS,
+RP   COFACTOR, AND SUBUNIT.
+RX   PubMed=11676541; DOI=10.1006/jmbi.2001.5065;
+RA   Kuhnel K., Luisi B.F.;
+RT   "Crystal structure of the Escherichia coli RNA degradosome component
+RT   enolase.";
+RL   J. Mol. Biol. 313:583-592(2001).
+RN   [19]
+RP   X-RAY CRYSTALLOGRAPHY (1.6 ANGSTROMS) IN COMPLEX WITH THE MINIMAL
+RP   BINDING SEGMENT OF RNASE E AND MAGNESIUM IONS, AND SUBUNIT.
+RX   PubMed=16516921; DOI=10.1016/j.jmb.2006.02.012;
+RA   Chandran V., Luisi B.F.;
+RT   "Recognition of enolase in the Escherichia coli RNA degradosome.";
+RL   J. Mol. Biol. 358:8-15(2006).
+RN   [20]
+RP   X-RAY CRYSTALLOGRAPHY (1.9 ANGSTROMS) IN COMPLEX WITH THE MINIMAL
+RP   BINDING SEGMENT OF RNASE E, SUBUNIT, AND IDENTIFICATION BY MASS
+RP   SPECTROMETRY.
+RX   PubMed=20823555; DOI=10.1107/S0907444910030015;
+RA   Nurmohamed S., McKay A.R., Robinson C.V., Luisi B.F.;
+RT   "Molecular recognition between Escherichia coli enolase and
+RT   ribonuclease E.";
+RL   Acta Crystallogr. D 66:1036-1040(2010).
+CC   -!- FUNCTION: Catalyzes the reversible conversion of 2-
+CC       phosphoglycerate into phosphoenolpyruvate. It is essential for the
+CC       degradation of carbohydrates via glycolysis. It is also a
+CC       component of the RNA degradosome, a multi-enzyme complex involved
+CC       in RNA processing and messenger RNA degradation. Its interaction
+CC       with RNase E is important for the turnover of mRNA, in particular
+CC       on transcripts encoding enzymes of energy-generating metabolic
+CC       routes. Its presence in the degradosome is required for the
+CC       response to excess phosphosugar. May play a regulatory role in the
+CC       degradation of specific RNAs, such as ptsG mRNA, therefore linking
+CC       cellular metabolic status with post-translational gene regulation.
+CC       {ECO:0000255|HAMAP-Rule:MF_00318, ECO:0000269|PubMed:14981237,
+CC       ECO:0000269|PubMed:15522087, ECO:0000269|PubMed:4942326}.
+CC   -!- CATALYTIC ACTIVITY: 2-phospho-D-glycerate = phosphoenolpyruvate +
+CC       H(2)O. {ECO:0000255|HAMAP-Rule:MF_00318,
+CC       ECO:0000269|PubMed:4942326}.
+CC   -!- COFACTOR:
+CC       Name=Mg(2+); Xref=ChEBI:CHEBI:18420;
+CC         Evidence={ECO:0000255|HAMAP-Rule:MF_00318,
+CC         ECO:0000269|PubMed:11676541, ECO:0000269|PubMed:4942326};
+CC       Note=Mg(2+) is required for catalysis and for stabilizing the
+CC       dimer. {ECO:0000255|HAMAP-Rule:MF_00318,
+CC       ECO:0000269|PubMed:11676541, ECO:0000269|PubMed:4942326};
+CC   -!- ENZYME REGULATION: The covalent binding to the substrate at Lys-
+CC       342 causes inactivation of the enzyme, and possibly serves as a
+CC       signal for the export of the protein. Inhibited by fluoride ion.
+CC       {ECO:0000269|PubMed:15003462, ECO:0000269|PubMed:4942326}.
+CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
+CC       pH dependence:
+CC         Optimum pH is 8.1. {ECO:0000269|PubMed:4942326};
+CC   -!- PATHWAY: Carbohydrate degradation; glycolysis; pyruvate from D-
+CC       glyceraldehyde 3-phosphate: step 4/5. {ECO:0000255|HAMAP-
+CC       Rule:MF_00318}.
+CC   -!- SUBUNIT: Component of the RNA degradosome, which is a multiprotein
+CC       complex involved in RNA processing and mRNA degradation. Interacts
+CC       with the C-terminal region of the endoribonuclease RNase E.
+CC       Homodimer. {ECO:0000255|HAMAP-Rule:MF_00318,
+CC       ECO:0000269|PubMed:11676541, ECO:0000269|PubMed:16516921,
+CC       ECO:0000269|PubMed:18337249, ECO:0000269|PubMed:20823555,
+CC       ECO:0000269|PubMed:4942326, ECO:0000269|PubMed:8610017,
+CC       ECO:0000269|PubMed:9732274}.
+CC   -!- INTERACTION:
+CC       Self; NbExp=2; IntAct=EBI-368855, EBI-368855;
+CC       P21513:rne; NbExp=15; IntAct=EBI-368855, EBI-549958;
+CC   -!- SUBCELLULAR LOCATION: Cytoplasm, cytoskeleton. Secreted. Cell
+CC       surface. Note=Fractions of enolase are present in both the
+CC       cytoplasm and on the cell surface. As part of the bacterial
+CC       cytoskeleton in the cytoplasm, is organized as extended coiled
+CC       structures that wind around the cell, from one cell pole to the
+CC       other. When covalently bound to the substrate at Lys-342, the
+CC       inactive enolase is secreted, and remains attached to the cell
+CC       surface.
+CC   -!- PTM: Phosphorylated on serine residue(s).
+CC       {ECO:0000269|PubMed:2513001}.
+CC   -!- SIMILARITY: Belongs to the enolase family. {ECO:0000255|HAMAP-
+CC       Rule:MF_00318}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; X82400; CAA57795.1; -; Genomic_DNA.
+DR   EMBL; U29580; AAA69289.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC75821.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAE76853.1; -; Genomic_DNA.
+DR   EMBL; M12843; AAA24486.1; -; mRNA.
+DR   PIR; G65059; NOEC.
+DR   RefSeq; NP_417259.1; NC_000913.3.
+DR   RefSeq; WP_000036723.1; NZ_LN832404.1.
+DR   PDB; 1E9I; X-ray; 2.48 A; A/B/C/D=2-432.
+DR   PDB; 2FYM; X-ray; 1.60 A; A/C/D/F=2-432.
+DR   PDB; 3H8A; X-ray; 1.90 A; A/B/C/D=1-432.
+DR   PDBsum; 1E9I; -.
+DR   PDBsum; 2FYM; -.
+DR   PDBsum; 3H8A; -.
+DR   ProteinModelPortal; P0A6P9; -.
+DR   SMR; P0A6P9; 2-432.
+DR   BioGrid; 4262297; 313.
+DR   DIP; DIP-31847N; -.
+DR   IntAct; P0A6P9; 31.
+DR   MINT; MINT-1230935; -.
+DR   STRING; 511145.b2779; -.
+DR   SWISS-2DPAGE; P0A6P9; -.
+DR   EPD; P0A6P9; -.
+DR   PaxDb; P0A6P9; -.
+DR   PRIDE; P0A6P9; -.
+DR   EnsemblBacteria; AAC75821; AAC75821; b2779.
+DR   EnsemblBacteria; BAE76853; BAE76853; BAE76853.
+DR   GeneID; 945032; -.
+DR   KEGG; ecj:JW2750; -.
+DR   KEGG; eco:b2779; -.
+DR   PATRIC; 32120974; VBIEscCol129921_2879.
+DR   EchoBASE; EB0254; -.
+DR   EcoGene; EG10258; eno.
+DR   eggNOG; ENOG4105C70; Bacteria.
+DR   eggNOG; COG0148; LUCA.
+DR   HOGENOM; HOG000072173; -.
+DR   InParanoid; P0A6P9; -.
+DR   KO; K01689; -.
+DR   OMA; EFMIIPV; -.
+DR   PhylomeDB; P0A6P9; -.
+DR   BioCyc; EcoCyc:ENOLASE-MONOMER; -.
+DR   BioCyc; ECOL316407:JW2750-MONOMER; -.
+DR   BioCyc; MetaCyc:ENOLASE-MONOMER; -.
+DR   BRENDA; 4.2.1.11; 2026.
+DR   SABIO-RK; P0A6P9; -.
+DR   UniPathway; UPA00109; UER00187.
+DR   EvolutionaryTrace; P0A6P9; -.
+DR   PRO; PR:P0A6P9; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0009986; C:cell surface; IEA:UniProtKB-SubCell.
+DR   GO; GO:0005856; C:cytoskeleton; IPI:EcoCyc.
+DR   GO; GO:0005829; C:cytosol; IDA:UniProtKB.
+DR   GO; GO:0005576; C:extracellular region; IEA:UniProtKB-SubCell.
+DR   GO; GO:0016020; C:membrane; IDA:UniProtKB.
+DR   GO; GO:0000015; C:phosphopyruvate hydratase complex; IEA:InterPro.
+DR   GO; GO:0042802; F:identical protein binding; IPI:IntAct.
+DR   GO; GO:0000287; F:magnesium ion binding; IDA:EcoliWiki.
+DR   GO; GO:0004634; F:phosphopyruvate hydratase activity; IDA:EcoCyc.
+DR   GO; GO:0006096; P:glycolytic process; IMP:EcoliWiki.
+DR   CDD; cd03313; enolase; 1.
+DR   Gene3D; 3.20.20.120; -; 1.
+DR   Gene3D; 3.30.390.10; -; 1.
+DR   HAMAP; MF_00318; Enolase; 1.
+DR   InterPro; IPR000941; Enolase.
+DR   InterPro; IPR020810; Enolase_C.
+DR   InterPro; IPR029065; Enolase_C-like.
+DR   InterPro; IPR020809; Enolase_CS.
+DR   InterPro; IPR020811; Enolase_N.
+DR   InterPro; IPR029017; Enolase_N-like.
+DR   PANTHER; PTHR11902; PTHR11902; 1.
+DR   Pfam; PF00113; Enolase_C; 1.
+DR   Pfam; PF03952; Enolase_N; 1.
+DR   PIRSF; PIRSF001400; Enolase; 1.
+DR   PRINTS; PR00148; ENOLASE.
+DR   SMART; SM01192; Enolase_C; 1.
+DR   SMART; SM01193; Enolase_N; 1.
+DR   SUPFAM; SSF51604; SSF51604; 1.
+DR   SUPFAM; SSF54826; SSF54826; 1.
+DR   TIGRFAMs; TIGR01060; eno; 1.
+DR   PROSITE; PS00164; ENOLASE; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; Acetylation; Complete proteome; Cytoplasm; Cytoskeleton;
+KW   Direct protein sequencing; Glycolysis; Lyase; Magnesium;
+KW   Metal-binding; Reference proteome; Secreted.
+FT   INIT_MET      1      1       Removed. {ECO:0000269|PubMed:8610017,
+FT                                ECO:0000269|PubMed:9298646,
+FT                                ECO:0000269|PubMed:9600841}.
+FT   CHAIN         2    432       Enolase.
+FT                                /FTId=PRO_0000133882.
+FT   REGION        5     34       Interaction with RNase E.
+FT   REGION      369    372       Substrate binding. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   ACT_SITE    209    209       Proton donor. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   ACT_SITE    342    342       Proton acceptor. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   METAL       246    246       Magnesium.
+FT   METAL       290    290       Magnesium.
+FT   METAL       317    317       Magnesium.
+FT   BINDING     159    159       Substrate. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   BINDING     168    168       Substrate. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   BINDING     290    290       Substrate. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   BINDING     317    317       Substrate. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   BINDING     342    342       Substrate (covalent); in inhibited form.
+FT   BINDING     393    393       Substrate. {ECO:0000255|HAMAP-
+FT                                Rule:MF_00318}.
+FT   SITE        120    120       Interaction with RNase E.
+FT   SITE        376    376       Interaction with RNase E.
+FT   SITE        408    408       Interaction with RNase E.
+FT   MOD_RES     257    257       N6-acetyllysine.
+FT                                {ECO:0000269|PubMed:18723842}.
+FT   MUTAGEN     168    168       E->Q: 5% activity; not secreted.
+FT                                {ECO:0000269|PubMed:15003462}.
+FT   MUTAGEN     209    209       E->Q: 1% activity; not secreted.
+FT                                {ECO:0000269|PubMed:15003462}.
+FT   MUTAGEN     342    342       K->A,Q,R: 1% activity; not secreted.
+FT                                {ECO:0000269|PubMed:15003462}.
+FT   MUTAGEN     342    342       K->E: 94% activity; not secreted.
+FT                                {ECO:0000269|PubMed:15003462}.
+FT   CONFLICT    102    102       N -> K (in Ref. 1; CAA57795/AAA24486).
+FT                                {ECO:0000305}.
+FT   CONFLICT    220    220       A -> D (in Ref. 1; CAA57795).
+FT                                {ECO:0000305}.
+FT   CONFLICT    339    339       I -> Y (in Ref. 1; CAA57795).
+FT                                {ECO:0000305}.
+FT   CONFLICT    421    432       PYNGRKEIKGQA -> RTTVVKRSKARHKTDFI (in
+FT                                Ref. 1; CAA57795). {ECO:0000305}.
+FT   STRAND        3     13       {ECO:0000244|PDB:2FYM}.
+FT   STRAND       19     27       {ECO:0000244|PDB:2FYM}.
+FT   STRAND       32     36       {ECO:0000244|PDB:2FYM}.
+FT   STRAND       45     47       {ECO:0000244|PDB:2FYM}.
+FT   HELIX        59     61       {ECO:0000244|PDB:2FYM}.
+FT   HELIX        65     72       {ECO:0000244|PDB:2FYM}.
+FT   HELIX        74     79       {ECO:0000244|PDB:2FYM}.
+FT   HELIX        87     98       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      100    103       {ECO:0000244|PDB:3H8A}.
+FT   TURN        104    106       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       108    125       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       130    137       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      151    155       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       157    159       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      160    163       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      166    172       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       179    199       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       219    232       {ECO:0000244|PDB:2FYM}.
+FT   TURN        238    240       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      241    246       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       249    252       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      257    259       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       261    263       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      264    268       {ECO:0000244|PDB:1E9I}.
+FT   HELIX       270    283       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      286    291       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       298    308       {ECO:0000244|PDB:2FYM}.
+FT   TURN        309    311       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      312    317       {ECO:0000244|PDB:2FYM}.
+FT   TURN        318    322       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       324    332       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      337    341       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       343    345       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       349    361       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      365    369       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       379    386       {ECO:0000244|PDB:2FYM}.
+FT   STRAND      390    393       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       400    416       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       417    419       {ECO:0000244|PDB:2FYM}.
+FT   HELIX       424    427       {ECO:0000244|PDB:2FYM}.
+SQ   SEQUENCE   432 AA;  45655 MW;  0569036E87471B91 CRC64;
+     MSKIVKIIGR EIIDSRGNPT VEAEVHLEGG FVGMAAAPSG ASTGSREALE LRDGDKSRFL
+     GKGVTKAVAA VNGPIAQALI GKDAKDQAGI DKIMIDLDGT ENKSKFGANA ILAVSLANAK
+     AAAAAKGMPL YEHIAELNGT PGKYSMPVPM MNIINGGEHA DNNVDIQEFM IQPVGAKTVK
+     EAIRMGSEVF HHLAKVLKAK GMNTAVGDEG GYAPNLGSNA EALAVIAEAV KAAGYELGKD
+     ITLAMDCAAS EFYKDGKYVL AGEGNKAFTS EEFTHFLEEL TKQYPIVSIE DGLDESDWDG
+     FAYQTKVLGD KIQLVGDDLF VTNTKILKEG IEKGIANSIL IKFNQIGSLT ETLAAIKMAK
+     DAGYTAVISH RSGETEDATI ADLAVGTAAG QIKTGSMSRS DRVAKYNQLI RIEEALGEKA
+     PYNGRKEIKG QA
+//

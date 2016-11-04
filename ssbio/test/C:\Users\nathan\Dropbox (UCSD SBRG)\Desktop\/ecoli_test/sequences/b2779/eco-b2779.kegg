@@ -1,0 +1,95 @@
+ENTRY       b2779             CDS       T00007
+NAME        eno
+DEFINITION  (RefSeq) enolase (EC:4.2.1.11)
+ORTHOLOGY   K01689  enolase [EC:4.2.1.11]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00010  Glycolysis / Gluconeogenesis
+            eco00680  Methane metabolism
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+            eco01120  Microbial metabolism in diverse environments
+            eco01130  Biosynthesis of antibiotics
+            eco01200  Carbon metabolism
+            eco01230  Biosynthesis of amino acids
+            eco03018  RNA degradation
+MODULE      eco_M00001  Glycolysis (Embden-Meyerhof pathway), glucose => pyruvate
+            eco_M00002  Glycolysis, core module involving three-carbon compounds
+            eco_M00003  Gluconeogenesis, oxaloacetate => fructose-6P
+            eco_M00394  RNA degradosome
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Overview
+               01200 Carbon metabolism
+                b2779 (eno)
+               01230 Biosynthesis of amino acids
+                b2779 (eno)
+              Carbohydrate metabolism
+               00010 Glycolysis / Gluconeogenesis
+                b2779 (eno)
+              Energy metabolism
+               00680 Methane metabolism
+                b2779 (eno)
+             Genetic Information Processing
+              Folding, sorting and degradation
+               03018 RNA degradation
+                b2779 (eno)
+            Enzymes [BR:eco01000]
+             4. Lyases
+              4.2  Carbon-oxygen lyases
+               4.2.1  Hydro-lyases
+                4.2.1.11  phosphopyruvate hydratase
+                 b2779 (eno)
+            Messenger RNA biogenesis [BR:eco03019]
+             Prokaryotic Type
+              Bacterial mRNA degradation factors
+               RNA degradosome components
+                Other RNA degradosome components
+                 b2779 (eno)
+            Exosome [BR:eco04147]
+             Exosomal proteins
+              Proteins found in most exosomes
+               b2779 (eno)
+POSITION    complement(2906643..2907941)
+MOTIF       Pfam: Enolase_C Enolase_N MR_MLE_C MAAL_C
+DBLINKS     NCBI-ProteinID: NP_417259
+            NCBI-GeneID: 945032
+            Pasteur: eno
+            RegulonDB: ECK120000252
+            EcoGene: EG10258
+            ECOCYC: EG10258
+            ASAP: ABE-0009110
+            UniProt: P0A6P9
+STRUCTURE   PDB: 2FYM 3H8A 1E9I
+AASEQ       432
+            MSKIVKIIGREIIDSRGNPTVEAEVHLEGGFVGMAAAPSGASTGSREALELRDGDKSRFL
+            GKGVTKAVAAVNGPIAQALIGKDAKDQAGIDKIMIDLDGTENKSKFGANAILAVSLANAK
+            AAAAAKGMPLYEHIAELNGTPGKYSMPVPMMNIINGGEHADNNVDIQEFMIQPVGAKTVK
+            EAIRMGSEVFHHLAKVLKAKGMNTAVGDEGGYAPNLGSNAEALAVIAEAVKAAGYELGKD
+            ITLAMDCAASEFYKDGKYVLAGEGNKAFTSEEFTHFLEELTKQYPIVSIEDGLDESDWDG
+            FAYQTKVLGDKIQLVGDDLFVTNTKILKEGIEKGIANSILIKFNQIGSLTETLAAIKMAK
+            DAGYTAVISHRSGETEDATIADLAVGTAAGQIKTGSMSRSDRVAKYNQLIRIEEALGEKA
+            PYNGRKEIKGQA
+NTSEQ       1299
+            atgtccaaaatcgtaaaaatcatcggtcgtgaaatcatcgactcccgtggtaacccgact
+            gttgaagccgaagtacatctggagggtggtttcgtcggtatggcagctgctccgtcaggt
+            gcttctactggttcccgtgaagctctggaactgcgcgatggcgacaaatcccgtttcctg
+            ggtaaaggcgtaaccaaagctgttgctgcggtaaacggcccgatcgctcaggcgctgatt
+            ggcaaagatgctaaagatcaggctggcattgacaagatcatgatcgacctggacggcacc
+            gaaaacaaatccaaattcggcgcgaacgcaatcctggctgtatctctggctaacgccaaa
+            gctgctgcagctgctaaaggtatgccgctgtacgagcacatcgctgaactgaacggtact
+            ccgggcaaatactctatgccggttccgatgatgaacatcatcaacggtggtgagcacgct
+            gacaacaacgttgatatccaggaattcatgattcagccggttggcgcgaaaactgtgaaa
+            gaagccatccgcatgggttctgaagttttccatcacctggcaaaagttctgaaagcgaaa
+            ggcatgaacactgctgttggtgacgaaggtggctatgcgccgaacctgggttccaacgct
+            gaagctctggctgttatcgctgaagctgttaaagctgctggttatgaactgggcaaagac
+            atcactttggcgatggactgcgcagcttctgaattctacaaagatggtaaatacgttctg
+            gctggcgaaggcaacaaagcgttcacctctgaagaattcactcacttcctggaagaactg
+            accaaacagtacccgatcgtttctatcgaagacggtctggacgaatctgactgggacggt
+            ttcgcataccagaccaaagttctgggcgacaaaatccagctggttggtgacgacctgttc
+            gtaaccaacaccaagatcctgaaagaaggtatcgaaaaaggtatcgctaactccatcctg
+            atcaaattcaaccagatcggttctctgaccgaaactctggctgcaatcaagatggcgaaa
+            gatgctggctacactgcagttatctctcaccgttctggcgaaactgaagacgctaccatc
+            gctgacctggctgttggtactgctgcaggccagatcaaaactggttctatgagccgttct
+            gaccgtgttgctaaatacaaccagctgattcgtatcgaagaagctctgggcgaaaaagca
+            ccgtacaacggtcgtaaagagatcaaaggccaggcataa
+///

@@ -1,0 +1,296 @@
+ID   FRDA_ECOLI              Reviewed;         602 AA.
+AC   P00363; Q2M6E8;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   23-JAN-2007, sequence version 3.
+DT   07-SEP-2016, entry version 172.
+DE   RecName: Full=Fumarate reductase flavoprotein subunit;
+DE            EC=1.3.5.4;
+GN   Name=frdA; OrderedLocusNames=b4154, JW4115;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RC   STRAIN=K12;
+RX   PubMed=7037404;
+RA   Cole S.T.;
+RT   "Nucleotide sequence coding for the flavoprotein subunit of the
+RT   fumarate reductase of Escherichia coli.";
+RL   Eur. J. Biochem. 122:479-484(1982).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7610040; DOI=10.1093/nar/23.12.2105;
+RA   Burland V.D., Plunkett G. III, Sofia H.J., Daniels D.L.,
+RA   Blattner F.R.;
+RT   "Analysis of the Escherichia coli genome VI: DNA sequence of the
+RT   region from 92.8 through 100 minutes.";
+RL   Nucleic Acids Res. 23:2105-2119(1995).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [5]
+RP   MUTAGENESIS OF HIS-45.
+RX   PubMed=2668268;
+RA   Blaut M., Whittaker K., Valdovinos A., Ackrell B.A., Gunsalus R.P.,
+RA   Cecchini G.;
+RT   "Fumarate reductase mutants of Escherichia coli that lack covalently
+RT   bound flavin.";
+RL   J. Biol. Chem. 264:13599-13604(1989).
+RN   [6]
+RP   MUTAGENESIS OF HIS-233; CYS-248 AND ARG-249.
+RX   PubMed=1856194;
+RA   Schroeder I., Gunsalus R.P., Ackrell B.A.C., Cochran B., Cecchini G.;
+RT   "Identification of active site residues of Escherichia coli fumarate
+RT   reductase by site-directed mutagenesis.";
+RL   J. Biol. Chem. 266:13572-13579(1991).
+RN   [7]
+RP   IDENTIFICATION BY 2D-GEL.
+RX   PubMed=9298644; DOI=10.1002/elps.1150180805;
+RA   VanBogelen R.A., Abshire K.Z., Moldover B., Olson E.R.,
+RA   Neidhardt F.C.;
+RT   "Escherichia coli proteome analysis using the gene-protein database.";
+RL   Electrophoresis 18:1243-1251(1997).
+RN   [8]
+RP   MUTAGENESIS OF CYS-51.
+RX   PubMed=10535936; DOI=10.1073/pnas.96.22.12412;
+RA   Yi X., Mroczko M., Manoj K.M., Wang X., Hager L.P.;
+RT   "Replacement of the proximal heme thiolate ligand in chloroperoxidase
+RT   with a histidine residue.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 96:12412-12417(1999).
+RN   [9]
+RP   X-RAY CRYSTALLOGRAPHY (3.3 ANGSTROMS).
+RX   PubMed=10373108; DOI=10.1126/science.284.5422.1961;
+RA   Iverson T.M., Luna-Chavez C., Cecchini G., Rees D.C.;
+RT   "Structure of the Escherichia coli fumarate reductase respiratory
+RT   complex.";
+RL   Science 284:1961-1966(1999).
+RN   [10]
+RP   X-RAY CRYSTALLOGRAPHY (2.7 ANGSTROMS), AND CATALYTIC ACTIVITY.
+RX   PubMed=11850430; DOI=10.1074/jbc.M200815200;
+RA   Iverson T.M., Luna-Chavez C., Croal L.R., Cecchini G., Rees D.C.;
+RT   "Crystallographic studies of the Escherichia coli quinol-fumarate
+RT   reductase with inhibitors bound to the quinol-binding site.";
+RL   J. Biol. Chem. 277:16124-16130(2002).
+CC   -!- FUNCTION: Two distinct, membrane-bound, FAD-containing enzymes are
+CC       responsible for the catalysis of fumarate and succinate
+CC       interconversion; the fumarate reductase is used in anaerobic
+CC       growth, and the succinate dehydrogenase is used in aerobic growth.
+CC   -!- CATALYTIC ACTIVITY: Succinate + a quinone = fumarate + a quinol.
+CC       {ECO:0000269|PubMed:11850430}.
+CC   -!- COFACTOR:
+CC       Name=FAD; Xref=ChEBI:CHEBI:57692;
+CC       Note=Binds 1 FAD covalently per subunit.;
+CC   -!- SUBUNIT: Fumarate dehydrogenase forms part of an enzyme complex
+CC       containing four subunits: a flavoprotein, an iron-sulfur, and two
+CC       hydrophobic anchor proteins.
+CC   -!- INTERACTION:
+CC       P0AC47:frdB; NbExp=4; IntAct=EBI-550480, EBI-906724;
+CC   -!- SIMILARITY: Belongs to the FAD-dependent oxidoreductase 2 family.
+CC       FRD/SDH subfamily. {ECO:0000305}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; J01611; AAA23437.1; -; Genomic_DNA.
+DR   EMBL; U14003; AAA97053.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC77114.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAE78158.1; -; Genomic_DNA.
+DR   PIR; A00376; RDECFF.
+DR   RefSeq; NP_418578.1; NC_000913.3.
+DR   RefSeq; WP_001192973.1; NZ_LN832404.1.
+DR   PDB; 1KF6; X-ray; 2.70 A; A/M=1-602.
+DR   PDB; 1KFY; X-ray; 3.60 A; A/M=1-602.
+DR   PDB; 1L0V; X-ray; 3.30 A; A/M=1-602.
+DR   PDB; 2B76; X-ray; 3.30 A; A/M=1-602.
+DR   PDB; 3CIR; X-ray; 3.65 A; A/M=1-602.
+DR   PDB; 3P4P; X-ray; 2.80 A; A/M=1-577.
+DR   PDB; 3P4Q; X-ray; 3.35 A; A/M=1-577.
+DR   PDB; 3P4R; X-ray; 3.05 A; A/M=1-577.
+DR   PDB; 3P4S; X-ray; 3.10 A; A/M=1-577.
+DR   PDB; 4KX6; X-ray; 2.95 A; A/M=1-577.
+DR   PDBsum; 1KF6; -.
+DR   PDBsum; 1KFY; -.
+DR   PDBsum; 1L0V; -.
+DR   PDBsum; 2B76; -.
+DR   PDBsum; 3CIR; -.
+DR   PDBsum; 3P4P; -.
+DR   PDBsum; 3P4Q; -.
+DR   PDBsum; 3P4R; -.
+DR   PDBsum; 3P4S; -.
+DR   PDBsum; 4KX6; -.
+DR   ProteinModelPortal; P00363; -.
+DR   SMR; P00363; 1-577.
+DR   BioGrid; 4260883; 163.
+DR   DIP; DIP-9681N; -.
+DR   IntAct; P00363; 14.
+DR   MINT; MINT-1310079; -.
+DR   STRING; 511145.b4154; -.
+DR   DrugBank; DB00730; Thiabendazole.
+DR   PaxDb; P00363; -.
+DR   PRIDE; P00363; -.
+DR   EnsemblBacteria; AAC77114; AAC77114; b4154.
+DR   EnsemblBacteria; BAE78158; BAE78158; BAE78158.
+DR   GeneID; 948667; -.
+DR   KEGG; ecj:JW4115; -.
+DR   KEGG; eco:b4154; -.
+DR   PATRIC; 32123881; VBIEscCol129921_4288.
+DR   EchoBASE; EB0326; -.
+DR   EcoGene; EG10330; frdA.
+DR   eggNOG; ENOG4105C00; Bacteria.
+DR   eggNOG; COG1053; LUCA.
+DR   HOGENOM; HOG000160475; -.
+DR   InParanoid; P00363; -.
+DR   KO; K00244; -.
+DR   OMA; AAPSIIH; -.
+DR   PhylomeDB; P00363; -.
+DR   BioCyc; EcoCyc:FUM-FLAVO; -.
+DR   BioCyc; ECOL316407:JW4115-MONOMER; -.
+DR   BioCyc; MetaCyc:FUM-FLAVO; -.
+DR   BRENDA; 1.3.5.4; 2026.
+DR   SABIO-RK; P00363; -.
+DR   EvolutionaryTrace; P00363; -.
+DR   PRO; PR:P00363; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0005829; C:cytosol; IDA:EcoCyc.
+DR   GO; GO:0016020; C:membrane; IDA:UniProtKB.
+DR   GO; GO:0045284; C:plasma membrane fumarate reductase complex; IDA:EcoCyc.
+DR   GO; GO:0009055; F:electron carrier activity; IDA:EcoCyc.
+DR   GO; GO:0071949; F:FAD binding; IDA:EcoCyc.
+DR   GO; GO:0000104; F:succinate dehydrogenase activity; IDA:EcoCyc.
+DR   GO; GO:0009061; P:anaerobic respiration; IMP:EcoCyc.
+DR   GO; GO:0044780; P:bacterial-type flagellum assembly; IMP:EcoCyc.
+DR   GO; GO:0071973; P:bacterial-type flagellum-dependent cell motility; IMP:EcoCyc.
+DR   GO; GO:0006974; P:cellular response to DNA damage stimulus; IEP:EcoliWiki.
+DR   GO; GO:0022900; P:electron transport chain; IEA:InterPro.
+DR   GO; GO:0006113; P:fermentation; IMP:EcoCyc.
+DR   Gene3D; 1.20.58.100; -; 1.
+DR   Gene3D; 3.50.50.60; -; 2.
+DR   Gene3D; 3.90.700.10; -; 1.
+DR   InterPro; IPR003953; FAD-binding_2.
+DR   InterPro; IPR023753; FAD/NAD-binding_dom.
+DR   InterPro; IPR003952; FRD_SDH_FAD_BS.
+DR   InterPro; IPR015939; Fum_Rdtase/Succ_DH_flav-like_C.
+DR   InterPro; IPR005884; Fum_red_fp.
+DR   InterPro; IPR030664; SdhA/FrdA/AprA.
+DR   InterPro; IPR027477; Succ_DH/fumarate_Rdtase_cat.
+DR   InterPro; IPR014006; Succ_Dhase_FrdA_Gneg.
+DR   Pfam; PF00890; FAD_binding_2; 1.
+DR   Pfam; PF02910; Succ_DH_flav_C; 1.
+DR   PIRSF; PIRSF000171; SDHA_APRA_LASPO; 1.
+DR   SUPFAM; SSF46977; SSF46977; 1.
+DR   SUPFAM; SSF51905; SSF51905; 2.
+DR   SUPFAM; SSF56425; SSF56425; 1.
+DR   TIGRFAMs; TIGR01176; fum_red_Fp; 1.
+DR   TIGRFAMs; TIGR01812; sdhA_frdA_Gneg; 1.
+DR   PROSITE; PS00504; FRD_SDH_FAD_BINDING; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; Complete proteome; Electron transport; FAD;
+KW   Flavoprotein; Oxidoreductase; Reference proteome; Transport.
+FT   INIT_MET      1      1       Removed.
+FT   CHAIN         2    602       Fumarate reductase flavoprotein subunit.
+FT                                /FTId=PRO_0000158660.
+FT   NP_BIND       9     23       FAD. {ECO:0000255}.
+FT   ACT_SITE    233    233
+FT   ACT_SITE    249    249
+FT   MOD_RES      45     45       Tele-8alpha-FAD histidine.
+FT   MUTAGEN      45     45       H->R: Inactivates enzyme.
+FT                                {ECO:0000269|PubMed:2668268}.
+FT   MUTAGEN      45     45       H->S,C,Y: Decreased ability (greater than
+FT                                70%) to reduce fumarate.
+FT                                {ECO:0000269|PubMed:2668268}.
+FT   MUTAGEN     233    233       H->S: Severely affect succinate oxidation
+FT                                and decrease fumarate oxidation by 75%.
+FT                                {ECO:0000269|PubMed:1856194}.
+FT   MUTAGEN     248    248       C->S,A: Does not inactivate enzyme.
+FT                                {ECO:0000269|PubMed:1856194}.
+FT   MUTAGEN     249    249       R->H,L: Inactivates enzyme.
+FT                                {ECO:0000269|PubMed:1856194}.
+FT   CONFLICT    386    386       L -> P (in Ref. 1; AAA23437).
+FT                                {ECO:0000305}.
+FT   STRAND        2      5       {ECO:0000244|PDB:1KF6}.
+FT   STRAND        7     11       {ECO:0000244|PDB:1KF6}.
+FT   HELIX        15     27       {ECO:0000244|PDB:1KF6}.
+FT   STRAND       33     39       {ECO:0000244|PDB:1KF6}.
+FT   HELIX        41     43       {ECO:0000244|PDB:1KF6}.
+FT   HELIX        45     48       {ECO:0000244|PDB:1KF6}.
+FT   STRAND       58     60       {ECO:0000244|PDB:3P4P}.
+FT   HELIX        63     73       {ECO:0000244|PDB:1KF6}.
+FT   TURN         74     76       {ECO:0000244|PDB:1KF6}.
+FT   HELIX        80     99       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      110    112       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      128    130       {ECO:0000244|PDB:1L0V}.
+FT   HELIX       132    144       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      150    154       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      156    164       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      167    175       {ECO:0000244|PDB:1KF6}.
+FT   TURN        176    179       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      180    185       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      189    191       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       197    199       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      200    205       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       212    218       {ECO:0000244|PDB:1KF6}.
+FT   TURN        219    221       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      224    226       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      230    236       {ECO:0000244|PDB:1KF6}.
+FT   TURN        238    240       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       247    250       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      254    256       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       263    266       {ECO:0000244|PDB:1KF6}.
+FT   TURN        267    269       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       283    285       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       288    301       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      304    306       {ECO:0000244|PDB:3P4P}.
+FT   STRAND      312    316       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       318    320       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       322    328       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       330    340       {ECO:0000244|PDB:1KF6}.
+FT   TURN        344    346       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      349    358       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      361    363       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      371    373       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      375    377       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       379    381       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      385    387       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       395    416       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       423    442       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       449    463       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      464    468       {ECO:0000244|PDB:1KF6}.
+FT   HELIX       470    487       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      497    499       {ECO:0000244|PDB:3P4P}.
+FT   HELIX       501    525       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      533    535       {ECO:0000244|PDB:3P4P}.
+FT   TURN        545    547       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      550    556       {ECO:0000244|PDB:1KF6}.
+FT   STRAND      562    568       {ECO:0000244|PDB:1KF6}.
+SQ   SEQUENCE   602 AA;  65972 MW;  3306D7FF6E198AE9 CRC64;
+     MQTFQADLAI VGAGGAGLRA AIAAAQANPN AKIALISKVY PMRSHTVAAE GGSAAVAQDH
+     DSFEYHFHDT VAGGDWLCEQ DVVDYFVHHC PTEMTQLELW GCPWSRRPDG SVNVRRFGGM
+     KIERTWFAAD KTGFHMLHTL FQTSLQFPQI QRFDEHFVLD ILVDDGHVRG LVAMNMMEGT
+     LVQIRANAVV MATGGAGRVY RYNTNGGIVT GDGMGMALSH GVPLRDMEFV QYHPTGLPGS
+     GILMTEGCRG EGGILVNKNG YRYLQDYGMG PETPLGEPKN KYMELGPRDK VSQAFWHEWR
+     KGNTISTPRG DVVYLDLRHL GEKKLHERLP FICELAKAYV GVDPVKEPIP VRPTAHYTMG
+     GIETDQNCET RIKGLFAVGE CSSVGLHGAN RLGSNSLAEL VVFGRLAGEQ ATERAATAGN
+     GNEAAIEAQA AGVEQRLKDL VNQDGGENWA KIRDEMGLAM EEGCGIYRTP ELMQKTIDKL
+     AELQERFKRV RITDTSSVFN TDLLYTIELG HGLNVAECMA HSAMARKESR GAHQRLDEGC
+     TERDDVNFLK HTLAFRDADG TTRLEYSDVK ITTLPPAKRV YGGEADAADK AEAANKKEKA
+     NG
+//
