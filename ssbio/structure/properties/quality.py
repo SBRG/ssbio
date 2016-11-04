@@ -14,10 +14,11 @@ try:
 except ImportError:
     from io import StringIO
 
+
 def sequence_checker(reference_id, reference_sequence, structure_id, structure_sequence, gapopen=10, gapextend=0.5,
                      allow_missing_on_termini=0, allow_mutants=False, allow_deletions=False,
                      allow_insertions=False, allow_unresolved=False,
-                     write_output=False, outdir='', outfile='', force_rerun=False):
+                     outdir='', outfile='', force_rerun=False):
     """Report if a structure's sequence meets coverage checks to a reference sequence.
 
     First aligns a sequence from a chain of a PDB structure to "reference" sequence.
@@ -37,7 +38,6 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
         allow_deletions (bool): If deletions should be allowed or checked for
         allow_insertions (bool): If insertions should be allowed or checked for
         allow_unresolved (bool): If unresolved residues should be allowed or checked for
-        write_output (bool): Default False, set to True if you want the alignment file saved
         outdir (str, optional): Path to output directory. Default is the current directory.
         outfile (str, optional): Name of output file. If not set, is {id_a}_{id_b}_align.txt
         force_rerun (bool): Default False, set to True if you want to rerun the alignment if outfile exists.
@@ -54,7 +54,6 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
                                                                                  seq_b=structure_sequence,
                                                                                  gapopen=gapopen,
                                                                                  gapextend=gapextend,
-                                                                                 write_output=write_output,
                                                                                  outdir=outdir,
                                                                                  outfile=outfile,
                                                                                  force_rerun=force_rerun)

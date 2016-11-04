@@ -1,0 +1,54 @@
+########################################
+# Program: needle
+# Rundate: Thu  3 Nov 2016 18:21:35
+# Commandline: needle
+#    -outfile /tmp/test_alignment.txt
+#    -asequence test_sequences/P9WGE7.fasta
+#    -bsequence test_sequences/1gn3_A.faa
+#    -gapopen 10
+#    -gapextend 0.5
+# Align_format: srspair
+# Report_file: /tmp/test_alignment.txt
+########################################
+
+#=======================================
+#
+# Aligned_sequences: 2
+# 1: SODF_MYCTU
+# 2: 1gn3_A
+# Matrix: EBLOSUM62
+# Gap_penalty: 10.0
+# Extend_penalty: 0.5
+#
+# Length: 207
+# Identity:     197/207 (95.2%)
+# Similarity:   197/207 (95.2%)
+# Gaps:           8/207 ( 3.9%)
+# Score: 1061.0
+# 
+#
+#=======================================
+
+SODF_MYCTU         1 MAEYTLPDLDWDYGALEPHISGQINELHHSKHHATYVKGANDAVAKLEEA     50
+                     .|||||||||||||||||||||||||||||||||||||||||||||||||
+1gn3_A             1 XAEYTLPDLDWDYGALEPHISGQINELHHSKHHATYVKGANDAVAKLEEA     50
+
+SODF_MYCTU        51 RAKEDHSAILLNEKNLAFNLAGHVNHTIWWKNLSPNGGDKPTGELAAAIA    100
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+1gn3_A            51 RAKEDHSAILLNEKNLAFNLAGHVNHTIWWKNLSPNGGDKPTGELAAAIA    100
+
+SODF_MYCTU       101 DAFGSFDKFRAQFHAAATTVQGSGWAALGWDTLGNKLLIFQVYDHQTNFP    150
+                     ||||||||||||||||||||||||||||||||||||||||||||.|||||
+1gn3_A           101 DAFGSFDKFRAQFHAAATTVQGSGWAALGWDTLGNKLLIFQVYDQQTNFP    150
+
+SODF_MYCTU       151 LGIVPLLLLDMWEHAFYLQYKNVKVDFAKAFWNVVNWADVQSRYAAATSQ    200
+                     ||||||||||||||||||||||||||||||||||||||||||||||||| 
+1gn3_A           151 LGIVPLLLLDMWEHAFYLQYKNVKVDFAKAFWNVVNWADVQSRYAAATS-    199
+
+SODF_MYCTU       201 TKGLIFG    207
+                            
+1gn3_A           199 -------    199
+
+
+#---------------------------------------
+#---------------------------------------

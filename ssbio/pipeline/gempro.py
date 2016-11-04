@@ -728,7 +728,8 @@ class GEMPRO(object):
                         currpdb = str(best_structure['pdb_id'].lower())
                         currchain = str(best_structure['chain_id'].upper())
 
-                        pdb_rel = ssbio.databases.pdb.get_release_date(currpdb)
+                        # TODO: fix caching
+                        # pdb_rel = ssbio.databases.pdb.get_release_date(currpdb)
 
                         best_structure_dict = {}
                         best_structure_dict['pdb_id'] = currpdb
@@ -737,7 +738,7 @@ class GEMPRO(object):
                         best_structure_dict['experimental_method'] = best_structure['experimental_method']
                         best_structure_dict['resolution'] = best_structure['resolution']
                         best_structure_dict['seq_coverage'] = best_structure['coverage']
-                        best_structure_dict['release_date'] = pdb_rel
+                        # best_structure_dict['release_date'] = pdb_rel
                         best_structure_dict['taxonomy_id'] = best_structure['tax_id']
                         best_structure_dict['pdb_start'] = best_structure['start']
                         best_structure_dict['pdb_end'] = best_structure['end']
@@ -771,7 +772,7 @@ class GEMPRO(object):
                     log.debug('{}: No PDB/chain pairs mapped'.format(gene_id))
 
         cols = ['gene', 'uniprot_acc', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'seq_coverage',
-                'release_date', 'taxonomy_id', 'pdb_start', 'pdb_end', 'unp_start', 'unp_end', 'rank']
+                'taxonomy_id', 'pdb_start', 'pdb_end', 'unp_start', 'unp_end', 'rank'] #'release_date',
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
 
         # TODO: also report genes with no PDB?
@@ -1074,7 +1075,7 @@ class GEMPRO(object):
                                                                                                  allow_deletions=allow_deletions,
                                                                                                  allow_insertions=allow_insertions,
                                                                                                  allow_unresolved=allow_unresolved,
-                                                                                                 write_output=True,
+                                                                                                 outfile='{}_{}_align.txt'.format(gene_id, pdb+'_'+chain),
                                                                                                  outdir=gene_struct_dir,
                                                                                                  force_rerun=force_rerun)
 

@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapextend=0.5,
-                                  write_output=False, outdir='', outfile='', force_rerun=False):
+                                  outdir='', outfile='', force_rerun=False):
     """Run the needle alignment program for two fasta files and return the raw alignment result.
 
     More info:
@@ -24,7 +24,6 @@ def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapexten
         faa_b: File path to sequence to be aligned
         gapopen: Gap open penalty is the score taken away when a gap is created
         gapextend: Gap extension penalty is added to the standard gap penalty for each base or residue in the gap
-        write_output (bool): Default False, set to True if you want the alignment file saved
         outdir (str, optional): Path to output directory. Default is the current directory.
         outfile (str, optional): Name of output file. If not set, is {id_a}_{id_b}_align.txt
         force_rerun (bool): Default False, set to True if you want to rerun the alignment if outfile exists.
@@ -35,13 +34,14 @@ def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapexten
     """
 
     # TODO: add check for needle installation
-
+    # TODO: use below code for running on str instead of biopython
     # If you don't want to save the output file, just run the alignment and return the raw results
-    if not write_output:
+    if not outfile and not outdir:
         needle_cline = NeedleCommandline(asequence=faa_a, bsequence=faa_b,
                                          gapopen=gapopen, gapextend=gapextend,
                                          stdout=True, auto=True)
-        raw_alignment_text, stderr = needle_cline()
+        stdout, stderr = needle_cline()
+        raw_alignment_text = stdout.decode('utf-8')
 
     # If you do want to save an output file...
     else:
@@ -69,7 +69,7 @@ def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapexten
 
 
 def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=0.5,
-                                write_output=False, outdir='', outfile='', force_rerun=False):
+                                outdir='', outfile='', force_rerun=False):
     """Run the needle alignment program for two strings and return the raw alignment result.
 
     More info:
@@ -84,7 +84,6 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
         seq_b: String representation of sequence to be aligned
         gapopen: Gap open penalty is the score taken away when a gap is created
         gapextend: Gap extension penalty is added to the standard gap penalty for each base or residue in the gap
-        write_output (bool): Default False, set to True if you want the alignment file saved
         outdir (str, optional): Path to output directory. Default is the current directory.
         outfile (str, optional): Name of output file. If not set, is {id_a}_{id_b}_align.txt
         force_rerun (bool): Default False, set to True if you want to rerun the alignment if outfile exists.
@@ -95,16 +94,20 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
     """
 
     # TODO: add check for needle installation
-
-
     # If you don't want to save the output file, just run the alignment and return the raw results
-    if not write_output:
-        retval = subprocess.call('needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile, seq_a, seq_b, gapopen, gapextend),
-                                 shell=True)
-        if retval == 0:
-            log.debug('Ran needle')
-        else:
-            log.error('Error running needle!')
+    # TODO: are IDs needed?
+    if not outfile and not outdir:
+        command = subprocess.Popen(['needle',
+                                    '-asequence=asis::{}'.format(seq_a),
+                                    '-bsequence=asis::{}'.format(seq_b),
+                                    '-gapopen={}'.format(gapopen),
+                                    '-gapextend={}'.format(gapextend),
+                                    '-auto=True',
+                                    '-stdout=True'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, err = command.communicate()
+        raw_alignment_text = stdout.decode('utf-8')
         # needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
         #                                  gapopen=gapopen, gapextend=gapextend,
         #                                  stdout=True, auto=True)
@@ -125,21 +128,18 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
 
         # If it doesn't exist, or force_rerun=True, run the alignment
         else:
-            retval = subprocess.call(
-                'needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile,
-                                                                                                                seq_a,
-                                                                                                                seq_b,
-                                                                                                                gapopen,
-                                                                                                                gapextend),
-                shell=True)
-            if retval == 0:
-                log.debug('Ran needle')
-            else:
-                log.error('Error running needle!')
+            # TODO: Biopython wrapper does not put quotations on the outfile, just writing own command for now
+            cmd = 'needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile, seq_a, seq_b, gapopen, gapextend)
+            command = subprocess.Popen(cmd,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE,
+                                       shell=True)
+            out, err = command.communicate()
             # needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
             #                                  gapopen=gapopen, gapextend=gapextend,
             #                                  outfile=outfile)
             # stdout, stderr = needle_cline()
+
             with open(outfile) as f:
                 raw_alignment_text = f.read()
 
