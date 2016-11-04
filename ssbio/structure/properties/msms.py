@@ -5,7 +5,7 @@ import os.path as op
 import pandas as pd
 
 
-def msms_output(pdb_file, outdir=None):
+def msms_output(pdb_file, outdir=None, force_rerun=False):
     """Run MSMS (through Biopython) on a PDB file.
 
     Saves the result dataframe
@@ -17,6 +17,14 @@ def msms_output(pdb_file, outdir=None):
 
     """
     basename = op.splitext(op.basename(pdb_file))[0]
+
+    if outdir:
+        outfile = op.join(outdir, basename + '_msms.df')
+    else:
+        outfile = basename + '_msms.df'
+
+    if op.exists(outfile) and force_rerun==False:
+        return outfile
 
     my_structure = PDBIOExt(pdb_file)
     model = my_structure.first_model
@@ -43,10 +51,6 @@ def msms_output(pdb_file, outdir=None):
 
     msms_df = pd.DataFrame(anslist)
     msms_df = msms_df.rename(columns={0:'chain',1:'resnum',2:'res_depth',3:'ca_depth'})
-    if outdir:
-        outfile = op.join(outdir, basename + '_msms.df')
-    else:
-        outfile = basename + '_msms.df'
 
     msms_df.to_csv(outfile)
 
