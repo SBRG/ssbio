@@ -1192,7 +1192,9 @@ class GEMPRO(object):
             log.info('Updated existing PDB dataframe.')
         else:
             cols = ['gene', 'pdb_id', 'pdb_chain_id', 'taxonomy_name', 'experimental_method',
-                    'resolution', 'seq_coverage', 'chemicals', 'rank', 'release_date', 'pdb_file', 'mmcif_header']
+                    'resolution', 'seq_coverage', 'chemicals', 'rank', 'release_date', 'blast_evalue', 'blast_score',
+                    'seq_similar', 'seq_num_coverage', 'seq_num_similar',
+                    'pdb_file', 'mmcif_header']
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
             log.info('Created PDB metadata dataframe.')
 
