@@ -1,6 +1,9 @@
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 import ssbio.utils
 import subprocess
+import logging
+log = logging.getLogger(__name__)
+
 
 def sequence_properties(seq_str):
     """Utiize Biopython's ProteinAnalysis module to return general sequence properties of an amino acid string.
@@ -35,17 +38,22 @@ def sequence_properties(seq_str):
     return info_dict
 
 
-def emboss_pepstats(infile, outfile='', outdir='', force_rerun=False):
+def emboss_pepstats_on_file(infile, outfile='', outdir='', outext='.pepstats', force_rerun=False):
     # Check if pepstats is installed
     if not ssbio.utils.program_exists('pepstats'):
         raise OSError('EMBOSS package not installed.')
 
-    outfile = ssbio.utils.outfile_name_maker(infile=infile, outfile=outfile, outdir=outdir)
+    # Create the output file name
+    outfile = ssbio.utils.outfile_name_maker(infile=infile, outfile=outfile, outdir=outdir, outext=outext)
+
+    # Check for force rerunning
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         cmd = 'pepstats -sequence="{}" -outfile="{}"'.format(infile, outfile)
         command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = command.communicate()
-        print(out, err)
+        log.debug('{}: Ran EMBOSS pepstats'.format(infile))
+    else:
+        log.debug('{}: pepstats already exists')
 
     return outfile
 

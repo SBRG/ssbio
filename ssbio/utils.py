@@ -55,7 +55,7 @@ def split_folder_and_path(filepath):
     return dirname, filename_without_extension, extension
 
 
-def outfile_name_maker(infile, outfile='', outdir=''):
+def outfile_name_maker(infile, outext='', outfile='', outdir=''):
     """Create a default name for an output file based on the infile name, unless a output name is specified.
 
     Args:
@@ -71,17 +71,30 @@ def outfile_name_maker(infile, outfile='', outdir=''):
         >>> outfile_name_maker(infile='P00001.fasta')
         'P00001.out'
 
-        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.aln')
+        >>> outfile_name_maker(infile='P00001.fasta', outext='.mao')
+        'P00001.mao'
+
+        >>> outfile_name_maker(infile='P00001.fasta', outext='.new', outfile='P00001_aligned')
+        'P00001_aligned.new'
+
+        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned')
         'P00001_aligned.out'
 
-        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.aln', outdir='/my/dir/')
-        '/my/dir/P00001_aligned.aln'
+        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/')
+        '/my/dir/P00001_aligned'
 
     """
-    if not outfile:
-        orig_dir, orig_file_noext, orig_ext = split_folder_and_path(infile)
-        outfile = '{}.out'.format(orig_file_noext)
+    # If extension not provided, default is "out"
+    if not outext:
+        outext = '.out'
 
+    # If output filename not provided, default is to take name of infile
+    if not outfile:
+        orig_dir, outfile, orig_ext = split_folder_and_path(infile)
+
+    # Join the output filename and output extension
+    outfile = '{}{}'.format(outfile, outext)
+    # Join the output directory and output filename
     outfile = op.join(outdir, outfile)
 
     return outfile

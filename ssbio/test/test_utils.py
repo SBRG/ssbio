@@ -17,14 +17,22 @@ class TestUtils(unittest.TestCase):
         correct_out = 'P00001.out'
         self.assertEqual(test_out, correct_out)
 
-        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.out')
+        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outext='.mao')
+        correct_out = 'P00001.mao'
+        self.assertEqual(test_out, correct_out)
+
+        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outext='.new', outfile='P00001_aligned')
+        correct_out = 'P00001_aligned.new'
+        self.assertEqual(test_out, correct_out)
+
+        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned')
         correct_out = 'P00001_aligned.out'
         self.assertEqual(test_out, correct_out)
 
-        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.aln')
-        correct_out = 'P00001_aligned.aln'
+        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/')
+        correct_out = '/my/dir/P00001_aligned.out'
         self.assertEqual(test_out, correct_out)
 
-        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.aln', outdir='/my/dir/')
-        correct_out = '/my/dir/P00001_aligned.aln'
+        test_out = ssbio.utils.outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/', outext='.test')
+        correct_out = '/my/dir/P00001_aligned.test'
         self.assertEqual(test_out, correct_out)
