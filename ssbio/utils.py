@@ -55,11 +55,11 @@ def split_folder_and_path(filepath):
     return dirname, filename_without_extension, extension
 
 
-def outfile_name_maker(infile, outext='', outfile='', outdir=''):
-    """Create a default name for an output file based on the infile name, unless a output name is specified.
+def outfile_name_maker(inname, outext='', outfile='', outdir=''):
+    """Create a default name for an output file based on the inname name, unless a output name is specified.
 
     Args:
-        infile: Path to input file.
+        inname: Path to input file.
         outfile: Optional specified name of output file.
         outdir: Optional path to output directory
 
@@ -68,19 +68,19 @@ def outfile_name_maker(infile, outext='', outfile='', outdir=''):
 
     Examples:
 
-        >>> outfile_name_maker(infile='P00001.fasta')
+        >>> outfile_name_maker(inname='P00001.fasta')
         'P00001.out'
 
-        >>> outfile_name_maker(infile='P00001.fasta', outext='.mao')
+        >>> outfile_name_maker(inname='P00001.fasta', outext='.mao')
         'P00001.mao'
 
-        >>> outfile_name_maker(infile='P00001.fasta', outext='.new', outfile='P00001_aligned')
+        >>> outfile_name_maker(inname='P00001.fasta', outext='.new', outfile='P00001_aligned')
         'P00001_aligned.new'
 
-        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned')
+        >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned')
         'P00001_aligned.out'
 
-        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/')
+        >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/')
         '/my/dir/P00001_aligned'
 
     """
@@ -88,9 +88,9 @@ def outfile_name_maker(infile, outext='', outfile='', outdir=''):
     if not outext:
         outext = '.out'
 
-    # If output filename not provided, default is to take name of infile
+    # If output filename not provided, default is to take name of inname
     if not outfile:
-        orig_dir, outfile, orig_ext = split_folder_and_path(infile)
+        orig_dir, outfile, orig_ext = split_folder_and_path(inname)
 
     # Join the output filename and output extension
     outfile = '{}{}'.format(outfile, outext)

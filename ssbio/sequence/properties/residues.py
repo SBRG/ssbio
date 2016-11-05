@@ -38,25 +38,68 @@ def sequence_properties(seq_str):
     return info_dict
 
 
-def emboss_pepstats_on_file(infile, outfile='', outdir='', outext='.pepstats', force_rerun=False):
+def _emboss_pepstats_runner(pepstats_args, force_rerun, outfile):
     # Check if pepstats is installed
     if not ssbio.utils.program_exists('pepstats'):
         raise OSError('EMBOSS package not installed.')
 
-    # Create the output file name
-    outfile = ssbio.utils.outfile_name_maker(infile=infile, outfile=outfile, outdir=outdir, outext=outext)
-
     # Check for force rerunning
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        cmd = 'pepstats -sequence="{}" -outfile="{}"'.format(infile, outfile)
+        cmd = 'pepstats {}'.format(pepstats_args)
         command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = command.communicate()
-        log.debug('{}: Ran EMBOSS pepstats'.format(infile))
+        log.debug('Ran pepstats')
     else:
-        log.debug('{}: pepstats already exists')
+        log.debug('Pepstats output already exists')
+
+
+def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', force_rerun=False):
+    """Run EMBOSS pepstats on a sequence string, or FASTA file.
+
+    Args:
+        infile: Path to FASTA file
+        outfile: Name of output file without extension
+        outdir: Path to output directory
+        outext: Extension of results file, default is ".pepstats"
+        force_rerun: Flag to rerun pepstats
+
+    Returns:
+        str: Path to output file.
+
+    """
+
+    # Create the output file name
+    outfile = ssbio.utils.outfile_name_maker(inname=infile, outfile=outfile, outdir=outdir, outext=outext)
+
+    # Run pepstats
+    args = '-sequence="{}" -outfile="{}"'.format(infile, outfile)
+    _emboss_pepstats_runner(pepstats_args=args, force_rerun=force_rerun, outfile=outfile)
 
     return outfile
 
+
+def emboss_pepstats_on_str(instring, outfile, outdir='', outext='.pepstats', force_rerun=False):
+    """Run EMBOSS pepstats on a sequence string, or FASTA file.
+
+    Args:
+        instring: Sequence string
+        outfile: Name of output file without extension
+        outdir: Path to output directory
+        outext: Extension of results file, default is ".pepstats"
+        force_rerun: Flag to rerun pepstats
+
+    Returns:
+        str: Path to output file.
+
+    """
+    # Create the output file name
+    outfile = ssbio.utils.outfile_name_maker(inname='seq_str', outfile=outfile, outdir=outdir, outext=outext)
+
+    # Run pepstats
+    args = '-sequence=asis::{} -outfile="{}"'.format(instring, outfile)
+    _emboss_pepstats_runner(pepstats_args=args, force_rerun=force_rerun, outfile=outfile)
+
+    return outfile
 
 
 #
