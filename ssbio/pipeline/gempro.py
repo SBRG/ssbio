@@ -1231,6 +1231,14 @@ class GEMPRO(object):
         """
         pass
 
+    # def property_calculationexample:
+        # for all genes
+            # run the property calculation which will:
+            # save the information as a dict
+            # optionally save the raw output file
+            # update the gene annotation - represenative structure will have new keys
+
+
 #
 # if __name__ == '__main__':
 #     # run the GEM-PRO pipeline!
