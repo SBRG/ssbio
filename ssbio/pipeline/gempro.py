@@ -1210,6 +1210,7 @@ class GEMPRO(object):
         """Run EMBOSS pepstats on all representative sequences
 
         """
+        seq_prop_pre_df = []
         for g in tqdm(self.genes):
             gene_id = str(g.id)
             gene_folder = op.join(self.sequence_dir, gene_id)
@@ -1221,8 +1222,18 @@ class GEMPRO(object):
             else:
                 pepstats_file = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=repseq,
                                                                                             outdir=gene_folder,
-                                                                                            force_rerun=False)
+                                                                                            force_rerun=force_rerun)
                 pepstats_parsed = ssbio.sequence.properties.residues.emboss_pepstats_parser(pepstats_file)
+                g.annotation['sequence']['representative']['properties'].update(pepstats_parsed.copy())
+
+                pepstats_parsed['gene'] = gene_id
+                seq_prop_pre_df.append(pepstats_parsed)
+
+        cols = ['gene', 'percent_acidic', 'percent_aliphatic', 'percent_aromatic', 'percent_basic', 'percent_charged',
+                'percent_non-polar', 'percent_polar', 'percent_small', 'percent_tiny']
+
+        self.df_sequence_properties = pd.DataFrame.from_records(seq_prop_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
+        log.info('Created sequence property dataframe. See the "df_sequence_properties" attribute.')
 
     # TODO: get this done
     def run_pipeline(self):
