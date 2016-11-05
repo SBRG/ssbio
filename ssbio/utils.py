@@ -14,6 +14,10 @@ from collections import defaultdict
 from contextlib import contextmanager
 from collections import OrderedDict, Callable
 import distutils.spawn
+import subprocess
+import logging
+log = logging.getLogger(__name__)
+
 
 try:
     from IPython.display import clear_output
@@ -146,6 +150,21 @@ def program_exists(prog_name):
         return True
     else:
         return False
+
+
+def command_runner(program, args, force_rerun, outfile):
+    # Check if pepstats is installed
+    if not program_exists(program):
+        raise OSError('{}: program not installed'.format(program))
+
+    # Check for force rerunning
+    if force_rerun(flag=force_rerun, outfile=outfile):
+        cmd = '{} {}'.format(program, args)
+        command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = command.communicate()
+        log.debug('{}: Ran program, output to {}'.format(program, outfile))
+    else:
+        log.debug('{}: Output already exists'.format(outfile))
 
 
 def dict_head(d, disp=5):

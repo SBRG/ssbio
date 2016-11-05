@@ -22,6 +22,7 @@ import ssbio.structure.properties.residues
 import ssbio.structure.properties.quality
 from ssbio.structure.cleanpdb import CleanPDB
 from ssbio.structure.pdbioext import PDBIOExt
+import ssbio.sequence.properties.residues
 
 from cobra.core import Gene
 from cobra.core import DictList
@@ -224,6 +225,7 @@ class GEMPRO(object):
                                                                           'kegg_id'      : None,
                                                                           'seq_len'      : 0,
                                                                           'pdbs'         : [],
+                                                                          'properties'   : {},
                                                                           'seq_file'     : None,
                                                                           'metadata_file': None}}
                 if 'structure' not in new_gene.annotation.keys():
@@ -249,6 +251,7 @@ class GEMPRO(object):
                                                                    'kegg_id'      : None,
                                                                    'seq_len'      : 0,
                                                                    'pdbs'         : [],
+                                                                   'properties'   : {},
                                                                    'seq_file'     : None,
                                                                    'metadata_file': None}}
                 if 'structure' not in x.annotation.keys():
@@ -282,6 +285,7 @@ class GEMPRO(object):
                                                                   'kegg_id'      : None,
                                                                   'seq_len'      : 0,
                                                                   'pdbs'         : [],
+                                                                  'properties'   : {},
                                                                   'seq_file'     : None,
                                                                   'metadata_file': None}}
             new_gene.annotation['structure'] = {'homology'      : {},
@@ -1202,22 +1206,23 @@ class GEMPRO(object):
     def homology_modeling_prep(self):
         pass
 
-    def get_pdbs_for_gene(self, gene):
-        """Return the list of PDB IDs mapped to a gene.
-
-        Returns:
-            list: List of PDB IDs
+    def calculate_sequence_properties(self, force_rerun=False):
+        """Run EMBOSS pepstats on all representative sequences
 
         """
-        if isinstance(gene, str):
-            gene = self.genes.get_by_id(gene)
+        for g in tqdm(self.genes):
+            gene_id = str(g.id)
+            gene_folder = op.join(self.sequence_dir, gene_id)
+            repseq = g.annotation['sequence']['representative']['seq_file']
 
-        pdbs = []
-        if len(gene.annotation['structure']['pdb']) > 0:
-            keys = list(gene.annotation['structure']['pdb'].keys())
-            pdbs = list(set([x[:4] for x in keys]))
-
-        return pdbs
+            if not repseq:
+                log.warning('{}: No representative sequence available'.format(gene_id))
+                continue
+            else:
+                pepstats_file = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=repseq,
+                                                                                            outdir=gene_folder,
+                                                                                            force_rerun=False)
+                pepstats_parsed = ssbio.sequence.properties.residues.emboss_pepstats_parser(pepstats_file)
 
     # TODO: get this done
     def run_pipeline(self):

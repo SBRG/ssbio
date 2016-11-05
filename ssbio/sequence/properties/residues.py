@@ -38,21 +38,6 @@ def sequence_properties(seq_str):
     return info_dict
 
 
-def _emboss_pepstats_runner(pepstats_args, force_rerun, outfile):
-    # Check if pepstats is installed
-    if not ssbio.utils.program_exists('pepstats'):
-        raise OSError('EMBOSS package not installed.')
-
-    # Check for force rerunning
-    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        cmd = 'pepstats {}'.format(pepstats_args)
-        command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = command.communicate()
-        log.debug('Ran pepstats')
-    else:
-        log.debug('Pepstats output already exists')
-
-
 def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', force_rerun=False):
     """Run EMBOSS pepstats on a sequence string, or FASTA file.
 
@@ -72,8 +57,8 @@ def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', 
     outfile = ssbio.utils.outfile_name_maker(inname=infile, outfile=outfile, outdir=outdir, outext=outext)
 
     # Run pepstats
-    args = '-sequence="{}" -outfile="{}"'.format(infile, outfile)
-    _emboss_pepstats_runner(pepstats_args=args, force_rerun=force_rerun, outfile=outfile)
+    pepstats_args = '-sequence="{}" -outfile="{}"'.format(infile, outfile)
+    ssbio.utils.command_runner(program='pepstats', args=pepstats_args, force_rerun=force_rerun, outfile=outfile)
 
     return outfile
 
@@ -96,11 +81,40 @@ def emboss_pepstats_on_str(instring, outfile, outdir='', outext='.pepstats', for
     outfile = ssbio.utils.outfile_name_maker(inname='seq_str', outfile=outfile, outdir=outdir, outext=outext)
 
     # Run pepstats
-    args = '-sequence=asis::{} -outfile="{}"'.format(instring, outfile)
-    _emboss_pepstats_runner(pepstats_args=args, force_rerun=force_rerun, outfile=outfile)
+    pepstats_args = '-sequence=asis::{} -outfile="{}"'.format(instring, outfile)
+    ssbio.utils.command_runner(program='pepstats', args=pepstats_args, force_rerun=force_rerun, outfile=outfile)
 
     return outfile
 
+
+def emboss_pepstats_parser(infile):
+    """Get dictionary of pepstats results.
+
+    Args:
+        infile: Path to pepstats outfile
+
+    Returns:
+        dict: Parsed information from pepstats
+
+    TODO:
+        Only currently parsing the bottom of the file for percentages of properties.
+
+    """
+    with open(infile) as f:
+        lines = f.read().split('\n')
+
+    info_dict = {}
+
+    for l in lines[38:47]:
+        info = l.split('\t')
+        cleaninfo = list(filter(lambda x: x != '', info))
+        prop = cleaninfo[0]
+        num = cleaninfo[2]
+        percent = float(cleaninfo[-1]) / float(100)
+
+        info_dict[prop] = percent
+
+    return info_dict
 
 #
 # AAdict = {
