@@ -152,13 +152,13 @@ def program_exists(prog_name):
         return False
 
 
-def command_runner(program, args, force_rerun, outfile):
+def command_runner(program, args, force_rerun_flag, outfile):
     # Check if pepstats is installed
     if not program_exists(program):
         raise OSError('{}: program not installed'.format(program))
 
     # Check for force rerunning
-    if force_rerun(flag=force_rerun, outfile=outfile):
+    if force_rerun(flag=force_rerun_flag, outfile=outfile):
         cmd = '{} {}'.format(program, args)
         command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = command.communicate()
