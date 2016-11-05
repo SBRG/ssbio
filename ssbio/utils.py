@@ -162,7 +162,6 @@ def command_runner(program, args, force_rerun_flag, outfile):
         cmd = '{} {}'.format(program, args)
         command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = command.communicate()
-        print(out, err)
         log.debug('{}: Ran program, output to {}'.format(program, outfile))
     else:
         log.debug('{}: Output already exists'.format(outfile))

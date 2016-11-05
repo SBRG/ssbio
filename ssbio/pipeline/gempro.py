@@ -1215,12 +1215,12 @@ class GEMPRO(object):
             gene_id = str(g.id)
             gene_folder = op.join(self.sequence_dir, gene_id)
             repseq = g.annotation['sequence']['representative']['seq_file']
-            repseq_path = op.join(gene_folder, repseq)
 
             if not repseq:
                 log.warning('{}: No representative sequence available'.format(gene_id))
                 continue
             else:
+                repseq_path = op.join(gene_folder, repseq)
                 pepstats_file = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=repseq_path,
                                                                                             outdir=gene_folder,
                                                                                             force_rerun=force_rerun)
