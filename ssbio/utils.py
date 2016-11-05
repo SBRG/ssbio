@@ -13,6 +13,7 @@ import collections
 from collections import defaultdict
 from contextlib import contextmanager
 from collections import OrderedDict, Callable
+import distutils.spawn
 
 try:
     from IPython.display import clear_output
@@ -52,6 +53,86 @@ def split_folder_and_path(filepath):
     extension = splitext[1]
 
     return dirname, filename_without_extension, extension
+
+
+def outfile_name_maker(infile, outfile='', outdir=''):
+    """Create a default name for an output file based on the infile name, unless a output name is specified.
+
+    Args:
+        infile: Path to input file.
+        outfile: Optional specified name of output file.
+        outdir: Optional path to output directory
+
+    Returns:
+        str: Path to final output destination
+
+    Examples:
+
+        >>> outfile_name_maker(infile='P00001.fasta')
+        'P00001.out'
+
+        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.aln')
+        'P00001_aligned.out'
+
+        >>> outfile_name_maker(infile='P00001.fasta', outfile='P00001_aligned.aln', outdir='/my/dir/')
+        '/my/dir/P00001_aligned.aln'
+
+    """
+    if not outfile:
+        orig_dir, orig_file_noext, orig_ext = split_folder_and_path(infile)
+        outfile = '{}.out'.format(orig_file_noext)
+
+    outfile = op.join(outdir, outfile)
+
+    return outfile
+
+
+def force_rerun(flag, outfile):
+    """Check if we should force rerunning of a command if an output file exists.
+
+    Args:
+        flag (bool): Flag to force rerun
+        outfile (str): Path to output file which may already exist
+
+    Returns:
+        bool: If we should force rerunning of a command
+
+    Examples:
+        >>> force_rerun(flag=False, outfile='/not/existing/file.txt')
+        True
+
+        >>> force_rerun(flag=True, outfile='/existing/file.txt')
+        True
+
+        >>> force_rerun(flag=False, outfile='/existing/file.txt')
+        False
+
+    """
+    # If flag is True, always run
+    if flag:
+        return True
+    # If flag is False but file doesn't exist, also run
+    elif not flag and not op.exists(outfile):
+        return True
+    # Otherwise, do not run
+    else:
+        return False
+
+
+def program_exists(prog_name):
+    """Check if a program is available as a command line executable on a system.
+
+    Args:
+        prog_name: Name of the program.
+
+    Returns:
+        bool: True if the program is available.
+
+    """
+    if distutils.spawn.find_executable(prog_name):
+        return True
+    else:
+        return False
 
 
 def dict_head(d, disp=5):

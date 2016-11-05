@@ -1,9 +1,55 @@
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
-
+import ssbio.utils
+import subprocess
 
 def sequence_properties(seq_str):
+    """Utiize Biopython's ProteinAnalysis module to return general sequence properties of an amino acid string.
+
+    Args:
+        seq_str: String representation of a amino acid sequence
+
+    Returns:
+        dict: Dictionary of sequence properties. Some definitions include:
+        instability_index: Any value above 40 means the protein is unstable (has a short half life).
+        secondary_structure_fraction: Percentage of protein in helix, turn or sheet
+
+    TODO:
+        Finish definitions of dictionary
+
+    """
+
     analysed_seq = ProteinAnalysis(seq_str)
-    return analysed_seq
+
+    info_dict = {}
+    info_dict['amino_acids_content'] = analysed_seq.count_amino_acids()
+    info_dict['amino_acids_percent'] = analysed_seq.get_amino_acids_percent()
+    info_dict['length'] = analysed_seq.length
+    info_dict['monoisotopic'] = analysed_seq.monoisotopic
+    info_dict['molecular_weight'] = analysed_seq.molecular_weight()
+    info_dict['aromaticity'] = analysed_seq.aromaticity()
+    info_dict['instability_index'] = analysed_seq.instability_index()
+    info_dict['flexibility'] = analysed_seq.flexibility()
+    info_dict['isoelectric_point'] = analysed_seq.isoelectric_point()
+    info_dict['secondary_structure_fraction'] = analysed_seq.secondary_structure_fraction()
+
+    return info_dict
+
+
+def emboss_pepstats(infile, outfile='', outdir='', force_rerun=False):
+    # Check if pepstats is installed
+    if not ssbio.utils.program_exists('pepstats'):
+        raise OSError('EMBOSS package not installed.')
+
+    outfile = ssbio.utils.outfile_name_maker(infile=infile, outfile=outfile, outdir=outdir)
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        cmd = 'pepstats -sequence="{}" -outfile="{}"'.format(infile, outfile)
+        command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = command.communicate()
+        print(out, err)
+
+    return outfile
+
+
 
 #
 # AAdict = {
