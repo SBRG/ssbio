@@ -1259,28 +1259,33 @@ class GEMPRO(object):
             if not kwargs['kegg_organism_code']:
                 raise TypeError('kegg_organism_code needed')
 
-            # KEGG mapping of gene ids
+            print('Running KEGG mapping...')
             self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
 
         if sequence_mapping_engine == 'uniprot' or sequence_mapping_engine == 'all':
             if not kwargs['model_gene_source']:
                 raise TypeError('UniProt model_gene_source needed')
 
+            print('Running UniProt mapping...')
             self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
 
+        print('Setting representative sequences...')
         self.set_representative_sequence()
 
-        current_structure_mapping_engines = ['uniprot', 'homology', 'all'] # 'blast'
+        current_structure_mapping_engines = ['uniprot', 'itasser', 'all'] # 'blast'
         if structure_mapping_engine not in current_structure_mapping_engines:
             raise ValueError('Structure mapping engine not available')
 
         if structure_mapping_engine == 'uniprot' or structure_mapping_engine == 'all':
+            print('Mapping UniProt IDs to the PDB...')
             self.map_uniprot_to_pdb()
 
-        if structure_mapping_engine == 'homology' or structure_mapping_engine == 'all':
+        if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
+            print('Copying I-TASSER models...')
             self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
                                     custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
 
+        print('Setting representative Structures...')
         self.set_representative_structure()
 
 #
