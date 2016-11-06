@@ -158,10 +158,6 @@ class GEMPRO(object):
             else:
                 log.debug('Directory already exists: {}'.format(directory))
 
-        # Main attributes
-        cols = ['gene', 'uniprot_acc', 'kegg_id', 'seq_len', 'pdbs', 'seq_file', 'metadata_file']
-        self.df_sequence_mapping = pd.DataFrame(columns=cols)
-        self.missing_mapping = []
 
         # Load the model
         if gem_file_path and gem_file_type:
@@ -764,7 +760,7 @@ class GEMPRO(object):
                         best_structure_dict['rank'] = rank
 
                         # For saving in the Gene annotation
-                        to_add_to_annotation[(currpdb, currchain)] = best_structure_dict.copy()
+                        to_add_to_annotation[str(currpdb) + ';' + str(currchain)] = best_structure_dict.copy()
 
                         # For saving in the summary dataframe
                         best_structure_dict['gene'] = gene_id
@@ -865,6 +861,7 @@ class GEMPRO(object):
                         blast_dict['seq_num_similar'] = blast_result['hit_num_similar']
 
                         # For saving in Gene annotation
+                        # TODO:
                         to_add_to_annotation[(pdb, chain)] = blast_dict.copy()
 
                         # For saving in summary dataframe
@@ -1077,7 +1074,7 @@ class GEMPRO(object):
                     all_pdbs_and_chains = list(g.annotation['structure']['pdb'].keys())
                     convert_to_dict = utils.DefaultOrderedDict(list)
                     for x in all_pdbs_and_chains:
-                        convert_to_dict[x[0]].append(x[1])
+                        convert_to_dict[x.split(';')[0]].append(x.split(';')[1])
 
                     for pdb, chains in convert_to_dict.items():
                         # Download the PDB
@@ -1111,8 +1108,8 @@ class GEMPRO(object):
                             # If found_good_pdb = True, set as representative
                             # If not, move on to the next potential PDB
                             if found_good_pdb:
-                                orig_pdb_data = g.annotation['structure']['pdb'][(pdb, chain)]
-                                g.annotation['structure']['representative']['structure_id'] = (pdb, chain)
+                                orig_pdb_data = g.annotation['structure']['pdb'][str(pdb) + ';' + str(chain)]
+                                g.annotation['structure']['representative']['structure_id'] = str(pdb) + ';' + str(chain)
                                 g.annotation['structure']['representative']['seq_coverage'] = orig_pdb_data['seq_coverage']
                                 g.annotation['structure']['representative']['original_pdb_file'] = op.basename(pdb_file)
 
