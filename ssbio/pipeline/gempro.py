@@ -1295,7 +1295,7 @@ class GEMPRO(object):
                     log.warning('{}: MSMS failed to run on {}'.format(clean_pdb))
                     continue
 
-                g.annotation['structure']['representative']['properties']['msms_file'] = outfile
+                g.annotation['structure']['representative']['properties']['msms_file'] = op.basename(outfile)
 
         if len(self.missing_msms) > 0:
             log.warning('{} gene(s) failed calculation. Inspect the "missing_msms" attribute.'.format(len(self.missing_msms)))
