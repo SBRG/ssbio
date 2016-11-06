@@ -69,6 +69,7 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
         req = requests.get(download_link)
 
         # Raise error if request fails
+        # TODO: will fail if PDB is not available for something like a large structure. example: 5iqr
         req.raise_for_status()
 
         with open(outfile, 'w') as f:

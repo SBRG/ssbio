@@ -10,7 +10,7 @@ from bioservices.uniprot import UniProt
 from bioservices import KEGG
 
 from Bio import SeqIO
-
+import requests
 from ssbio import utils
 import ssbio.cobra.utils
 import ssbio.databases.kegg
@@ -1069,8 +1069,12 @@ class GEMPRO(object):
 
                     for pdb, chains in convert_to_dict.items():
                         # Download the PDB
-                        pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
+                        try:
+                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
                                                                           outdir=gene_struct_dir, force_rerun=force_rerun)
+                        except requests.exceptions.HTTPError:
+                            log.warning('{}: PDB file not available'.format(pdb))
+                            continue
 
                         # Get the sequences of the chains
                         chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file)
@@ -1194,6 +1198,7 @@ class GEMPRO(object):
 
                 adder = g.annotation['structure']['pdb'][k].copy()
                 adder['chemicals'] = ';'.join(adder['chemicals'])
+                # TODO: error when taxonomy name does not exist for some PDBs
                 if isinstance(adder['taxonomy_name'], list):
                     adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
                 adder['gene'] = gene_id
