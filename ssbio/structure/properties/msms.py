@@ -1,5 +1,6 @@
 from Bio import PDB
 from ssbio.structure.pdbioext import PDBIOExt
+from collections import defaultdict
 import os
 import os.path as op
 import pandas as pd
@@ -36,9 +37,9 @@ def msms_output(pdb_file, outfile='', outdir='', outext='_msms.json', force_reru
         model = my_structure.first_model
         rd = PDB.ResidueDepth(model, pdb_file)
 
-        clean_rd = {}
+        clean_rd = defaultdict(dict)
         for k,v in rd.property_dict.items():
-            clean_rd[k[0]] = {k[1][1]: v}
+            clean_rd[k[0]].update({k[1][1]: v})
 
         with open(outfile, 'w') as ff:
             json.dump(clean_rd, ff)
