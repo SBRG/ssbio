@@ -102,7 +102,7 @@ class GEMPRO(object):
     """
 
 
-    def __init__(self, gem_name, root_dir, gem_file_path=None, gem_file_type=None, genes_list=None):
+    def __init__(self, gem_name, root_dir, gem_file_path=None, gem_file_type=None, genes_list=None, genes_and_sequences=None):
         """Initialize the GEM-PRO project with a GEM or a list of genes.
 
         Specify the name of your project, along with the root directory where a folder with that name will be created.
@@ -186,10 +186,15 @@ class GEMPRO(object):
             self.genes = genes_list
             log.info('Number of genes: {}'.format(len(self._genes)))
 
-        # If neither a model or a list of gene IDs is input, you can still add_genes_by_id later
+        # Or, load a dictionary of genes and their sequences
+        elif genes_and_sequences:
+            self.genes = list(genes_and_sequences.keys())
+            self.manual_seq_mapping(genes_and_sequences)
+
+        # If neither a model or genes are input, you can still add_genes_by_id later
         else:
             self.genes = []
-            log.warning('No model or list of genes input.')
+            log.warning('No model or genes input')
 
     @property
     def genes(self):
@@ -1207,7 +1212,7 @@ class GEMPRO(object):
         pass
 
     def calculate_sequence_properties(self, force_rerun=False):
-        """Run EMBOSS pepstats on all representative sequences
+        """Run EMBOSS pepstats and biopython ProteinAnalysis on all representative sequences
 
         """
         seq_prop_pre_df = []
@@ -1236,8 +1241,7 @@ class GEMPRO(object):
         self.df_sequence_properties = pd.DataFrame.from_records(seq_prop_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
         log.info('Created sequence property dataframe. See the "df_sequence_properties" attribute.')
 
-    # TODO: get this done
-    def run_pipeline(self):
+    def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
         """Run the entire GEM-PRO pipeline.
 
         Options include:
@@ -1246,15 +1250,37 @@ class GEMPRO(object):
         Returns:
 
         """
-        pass
+        current_sequence_mapping_engines = ['kegg', 'uniprot', 'all']
+        if sequence_mapping_engine not in current_sequence_mapping_engines:
+            raise ValueError('Sequence mapping engine not available')
 
-    # def property_calculationexample:
-        # for all genes
-            # run the property calculation which will:
-            # save the information as a dict
-            # optionally save the raw output file
-            # update the gene annotation - represenative structure will have new keys
+        if sequence_mapping_engine == 'kegg' or sequence_mapping_engine == 'all':
+            if not kwargs['kegg_organism_code']:
+                raise TypeError('kegg_organism_code needed')
 
+            # KEGG mapping of gene ids
+            self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
+
+        if sequence_mapping_engine == 'uniprot' or sequence_mapping_engine == 'all':
+            if not kwargs['model_gene_source']:
+                raise TypeError('UniProt model_gene_source needed')
+
+            self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
+
+        self.set_representative_sequence()
+
+        current_structure_mapping_engines = ['uniprot', 'homology', 'all'] # 'blast'
+        if structure_mapping_engine not in current_structure_mapping_engines:
+            raise ValueError('Structure mapping engine not available')
+
+        if structure_mapping_engine == 'uniprot' or structure_mapping_engine == 'all':
+            self.map_uniprot_to_pdb()
+
+        if structure_mapping_engine == 'homology' or structure_mapping_engine == 'all':
+            self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
+                                    custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
+
+        self.set_representative_structure()
 
 #
 # if __name__ == '__main__':

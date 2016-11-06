@@ -15,14 +15,25 @@ from Bio import Entrez
 from tqdm import tqdm
 
 from ssbio import utils
-
+import ssbio.sequence.alignment
+from collections import defaultdict
 date = utils.Date()
+from ssbio.pipeline.gempro import GEMPRO
 
 import sys
 import logging
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
+
+
+class BaseStrain(GEMPRO):
+    """Class to represent a base strain which has GEM-PRO annotations.
+    """
+
+    def __init__(self, gem_name, root_dir, gem_file_path, gem_file_type):
+        GEMPRO.__init__(gem_name=gem_name, root_dir=root_dir, gem_file_path=gem_file_path, gem_file_type=gem_file_type)
+        self.run_pipeline()
 
 
 class ATLAS():
@@ -205,6 +216,8 @@ class ATLAS():
 
         genomes = self.genome_id_to_fasta_file
 
+        self.base_gene_to_strain_genes = defaultdict(list)
+
         for strain_id, fasta_file in tqdm(genomes.items()):
             if strain_id not in self.orthology_matrix.columns:
                 log.warning('No orthologous genes found for organism {}'.format(strain_id))
@@ -226,6 +239,8 @@ class ATLAS():
                 # Get and write the strain sequence
                 strain_seq_record = strain_sequences[strain_g_id]
                 outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
+                self.base_gene_to_strain_genes[base_g_id].append(outfile)
+
                 if not op.exists(op.join(gene_dir, outfile)):
                     with open(op.join(gene_dir, outfile), 'w') as f:
                         SeqIO.write(strain_seq_record, f, "fasta")
@@ -233,6 +248,25 @@ class ATLAS():
             log.debug('Wrote all sequences for strain {}'.format(strain_id))
 
         log.info('Wrote all individual gene sequences for all strains.')
+
+    def align_orthologous_genes_pairwise(self):
+        """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it.
+
+        """
+        for base_g_id, strain_g_fastas in tqdm(self.base_gene_to_strain_genes.items()):
+            # Get the path of the base strain FASTA
+
+            # Run the needle alignment for all strain genes
+            for strain_g_fasta in strain_g_fastas:
+                ssbio.sequence.alignment.run_needle_alignment_on_files()
+
+    def align_orthologous_genes_multiple(self):
+        """For each gene in the base strain, run a
+
+        Returns:
+
+        """
+        pass
 
     def build_strain_specific_models(self):
         """Using the orthologous genes matrix, write strain specific models.

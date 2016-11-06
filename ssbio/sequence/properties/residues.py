@@ -5,7 +5,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def sequence_properties(seq_str):
+def biopython_protein_analysis_on_str(seq_str):
     """Utiize Biopython's ProteinAnalysis module to return general sequence properties of an amino acid string.
 
     Args:
@@ -24,14 +24,14 @@ def sequence_properties(seq_str):
     analysed_seq = ProteinAnalysis(seq_str)
 
     info_dict = {}
-    info_dict['amino_acids_content'] = analysed_seq.count_amino_acids()
-    info_dict['amino_acids_percent'] = analysed_seq.get_amino_acids_percent()
-    info_dict['length'] = analysed_seq.length
+    # info_dict['amino_acids_content'] = analysed_seq.count_amino_acids()
+    # info_dict['amino_acids_percent'] = analysed_seq.get_amino_acids_percent()
+    # info_dict['length'] = analysed_seq.length
     info_dict['monoisotopic'] = analysed_seq.monoisotopic
     info_dict['molecular_weight'] = analysed_seq.molecular_weight()
     info_dict['aromaticity'] = analysed_seq.aromaticity()
     info_dict['instability_index'] = analysed_seq.instability_index()
-    info_dict['flexibility'] = analysed_seq.flexibility()
+    # info_dict['flexibility'] = analysed_seq.flexibility()
     info_dict['isoelectric_point'] = analysed_seq.isoelectric_point()
     info_dict['secondary_structure_fraction'] = analysed_seq.secondary_structure_fraction()
 
