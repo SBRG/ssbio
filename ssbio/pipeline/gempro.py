@@ -861,8 +861,7 @@ class GEMPRO(object):
                         blast_dict['seq_num_similar'] = blast_result['hit_num_similar']
 
                         # For saving in Gene annotation
-                        # TODO:
-                        to_add_to_annotation[(pdb, chain)] = blast_dict.copy()
+                        to_add_to_annotation[pdb + ';' + chain] = blast_dict.copy()
 
                         # For saving in summary dataframe
                         blast_dict['gene'] = gene_id
