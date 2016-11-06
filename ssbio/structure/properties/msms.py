@@ -49,51 +49,26 @@ def msms_output(pdb_file, outfile='', outdir='', outext='_msms.json', force_reru
 
         return outfile
 
-        # Old code to make dataframe of results
-        # akeys = list(rd)
-        # msms_pre_df = []
-        # if len(akeys) == 0:
-        #     raise AssertionError('Error running MSMS')
-        # else:
-        #     # Save the average and alpha-carbon residue depths
-        #     for j in akeys:
-                    # don't need to use, just check property_dict
-        #         chain = [x.id for x in PDB.Selection.unfold_entities(j[0], 'C')][0]
-        #         seqnum = j[0].id[1]
-        #         re_depth = j[1][0]
-        #         ca_depth = j[1][1]
-        #
-        #         if chain == ' ':
-        #             chain = 'X'
-        #
-        #         msms_pre_df.append([chain, seqnum, re_depth, ca_depth])
-        #
-        # cols = ['chain', 'resnum', 'res_depth', 'ca_depth']
-        # msms_df = pd.DataFrame.from_records(msms_pre_df)
-        # msms_df = msms_df.rename(columns=cols)
-        #
-        # msms_df.to_csv(outfile)
-        #
-        # return outfile
 
-def residue_depth(anslist):
-    '''Computes the average residue and CA depth
-    Returns a dictionary of "redepth" and "cadepth" (floats)
-    '''
-    depth_info = {}
+# TODO: What distance defines a surface/buried residue?
+# TODO: function to take a list of residue numbers and return a dictionary of their location
+def resnum_list_to_exposure(chain_id, residue_numbers, msms_json, exposed_cutoff=2.5):
+    """Get a dictionary defining each residue number as surface or buried.
 
-    if anslist != ['NA', 'NA', 'NA', 'NA']:
-        redepth = [x[2] for x in anslist]
-        cadepth = [x[3] for x in anslist]
-        redepth = [x for x in redepth if x is not None]
-        cadepth = [x for x in cadepth if x is not None]
-        depth_info['ssb_avg_res_depth'] = sum(redepth) / len(redepth)
-        depth_info['ssb_ca_depth'] = sum(cadepth) / len(cadepth)
-    else:
-        depth_info['ssb_avg_res_depth'] = None
-        depth_info['ssb_ca_depth'] = None
+    Args:
+        chain_id:
+        residue_numbers:
+        msms_json:
+        exposed_cutoff:
 
-    return depth_info
+    Returns:
+
+    """
+    results = {}
+
+    with open(msms_json, 'r') as f:
+        msms = json.load(f)
+
 
 if __name__ == '__main__':
     import argparse
@@ -121,10 +96,6 @@ if __name__ == '__main__':
             continue
 
         msmsinfo.append([f, msms_stuff])
-
-        red_dict = residue_depth(msms_stuff)
-        red_dict['ssb_file'] = f
-        redinfo.append(red_dict)
 
     DF_PROP_MSMS = pd.DataFrame(msmsinfo)
     DF_PROP_MSMS.columns = ['ssb_file', 'ssb_msms']

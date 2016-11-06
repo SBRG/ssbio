@@ -5,6 +5,12 @@ import logging
 log = logging.getLogger(__name__)
 
 
+# TODO: function to predict secondary structure (PSIPRED)
+# TODO: function to predict solvent accessibility/resdepth just based on sequence (SCRATCH, RDPred)
+# TODO:
+# See more: https://www.researchgate.net/publication/235633540_Recent_Advances_in_Predicting_Functional_Impact_of_Single_Amino_Acid_Polymorphisms_A_Review_of_Useful_Features_Computational_Methods_and_Available_Tools
+
+
 def biopython_protein_analysis_on_str(seq_str):
     """Utiize Biopython's ProteinAnalysis module to return general sequence properties of an amino acid string.
 

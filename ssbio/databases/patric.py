@@ -50,6 +50,6 @@ def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_re
         ftp.quit()
     # TODO: check exceptions
     except:
-        return
+        return None
 
     return outfile

@@ -33,7 +33,7 @@ def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapexten
 
     """
 
-    # TODO: add check for needle installation
+    # TODO: rewrite using utils functions
     # TODO: use below code for running on str instead of biopython
     # If you don't want to save the output file, just run the alignment and return the raw results
     if not outfile and not outdir:
@@ -93,7 +93,7 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
 
     """
 
-    # TODO: add check for needle installation
+    # TODO: rewrite using utils functions
     # If you don't want to save the output file, just run the alignment and return the raw results
     # TODO: are IDs needed?
     if not outfile and not outdir:
