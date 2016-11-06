@@ -79,6 +79,8 @@ class SequenceProp(object):
         self.uniprot = uniprot
         self.representative = representative
 
+    # TODO: methods to return full path of files
+
 
 class GEMPRO(object):
     """Generic class to represent all information of a GEM-PRO for a GEM.
@@ -567,6 +569,7 @@ class GEMPRO(object):
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
             log.info('Created UniProt metadata dataframe.')
 
+    # TODO: should also have a seq --> uniprot id function (has to be 100% match)
     def manual_seq_mapping(self, gene_to_seq_dict):
         """Read a manual input dictionary of model gene IDs --> protein sequences.
 
@@ -1288,7 +1291,7 @@ class GEMPRO(object):
                                     custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
 
         print('Setting representative structures...')
-        self.set_representative_structure()
+        self.set_representative_structure(always_use_homology=kwargs['always_use_homology'])
 
 
 if __name__ == '__main__':
