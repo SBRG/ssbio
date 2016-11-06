@@ -38,7 +38,7 @@ def msms_output(pdb_file, outfile='', outdir='', outext='_msms.json', force_reru
 
         clean_rd = {}
         for k,v in rd.property_dict.items():
-            clean_rd[(k[0], k[1][1])] = v
+            clean_rd[k[0]] = {k[1][1]: v}
 
         with open(outfile, 'w') as ff:
             json.dump(clean_rd, ff)
