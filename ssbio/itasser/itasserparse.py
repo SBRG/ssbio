@@ -6,7 +6,7 @@ import logging
 log = logging.getLogger(__name__)
 import time
 
-def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=''):
+def organize_itasser_models(raw_dir, copy_to_dir, model_to_use='model1.pdb', rename_model_to=''):
     """Reorganize the raw information from I-TASSER modeling.
 
     - Copies the model1.pdb file and COACH results (if they exist) to specified folder
@@ -19,10 +19,11 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=''):
 
     hom_dict = {}
 
+    # TODO: speedup by parsing new file (which for me is on a SSD not a HDD so much faster)
+
     # Best homology model is "model1.pdb"
-    model = 'model1.pdb'
-    old_model_path = op.join(raw_dir, model)
-    new_model_path = op.join(copy_to_dir, model)
+    old_model_path = op.join(raw_dir, model_to_use)
+    new_model_path = op.join(copy_to_dir, model_to_use)
     if rename_model_to:
         new_model_path = op.join(copy_to_dir, '{}.pdb'.format(rename_model_to))
     if op.exists(old_model_path):
@@ -47,9 +48,12 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=''):
     old_init_dat = op.join(raw_dir, init_dat)
     new_init_dat = op.join(dest_itasser_dir, init_dat)
     if op.exists(old_init_dat):
-        hom_dict.update(parse_init_dat(old_init_dat))
+        if not op.exists(new_init_dat):
+            hom_dict.update(parse_init_dat(old_init_dat))
         # if not op.exists(new_init_dat):
         #     shutil.copy2(old_init_dat, new_init_dat)
+        else:
+            hom_dict.update(parse_cscore(new_init_dat))
 
     # seq.dat
     seq_dat = 'seq.dat'
@@ -65,9 +69,11 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=''):
     old_cscore = op.join(raw_dir, cscore)
     new_cscore = op.join(dest_itasser_dir, cscore)
     if op.exists(old_cscore):
-        hom_dict.update(parse_cscore(old_cscore))
         if not op.exists(new_cscore):
+            hom_dict.update(parse_cscore(old_cscore))
             shutil.copy2(old_cscore, new_cscore)
+        else:
+            hom_dict.update(parse_cscore(new_cscore))
 
     ### COACH (binding site prediction) results
     model1_coach_folder = op.join(raw_dir, 'model1', 'coach')
@@ -140,6 +146,7 @@ def parse_init_dat(infile):
     """
     init_dict = {}
 
+    log.debug('{}: Reading file...')
     with open(infile, 'r') as f:
         # Get first 2 lines of file
         head = [next(f).strip() for x in range(2)]
