@@ -913,7 +913,8 @@ class GEMPRO(object):
                     os.mkdir(dest_gene_dir)
 
                 # Just copy the file to the structure directory and store the file name
-                shutil.copy2(hdict['model_file'], dest_gene_dir)
+                if not op.exists(op.join(dest_gene_dir, op.basename(hdict['model_file']))):
+                    shutil.copy2(hdict['model_file'], dest_gene_dir)
 
                 g.annotation['structure']['homology'][hid] = hdict
                 log.debug('{}: updated homology model information and copied model file.'.format(gene_id))
