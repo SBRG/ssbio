@@ -5,6 +5,8 @@ import os
 import os.path as op
 import pandas as pd
 import ssbio.utils
+import logging
+log = logging.getLogger(__name__)
 import json
 
 
@@ -30,6 +32,7 @@ def msms_output(pdb_file, outfile='', outdir='', outext='_msms.json', force_reru
     outfile = ssbio.utils.outfile_name_maker(inname=pdb_file, outfile=outfile, outdir=outdir, outext=outext)
 
     if not ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        log.debug('{}: already ran MSMS and force_rerun={}'.format(outfile, force_rerun))
         return outfile
 
     else:
