@@ -3,58 +3,74 @@ from ssbio.structure.pdbioext import PDBIOExt
 import os
 import os.path as op
 import pandas as pd
+import ssbio.utils
+import json
 
 
-def msms_output(pdb_file, outdir=None, force_rerun=False):
+def msms_output(pdb_file, outfile='', outdir='', outext='_msms.json', force_rerun=False):
     """Run MSMS (through Biopython) on a PDB file.
 
-    Saves the result dataframe
+    Saves the result dataframe for the PDB file. The dataframe contains:
+        chain: chain ID
+        resnum: residue number (PDB numbering)
+        res_depth: average depth of all atoms in a residue
+        ca_depth: depth of the alpha carbon atom
+
+    Depths are in units Angstroms. 1A = 10^-10 m = 1nm
 
     Args:
-        pdb_file:
+        pdb_file: path to PDB file
 
     Returns:
+        str: path to saved Pandas DataFrame of residue and alpha-carbon depths.
 
     """
-    basename = op.splitext(op.basename(pdb_file))[0]
+    # Create the output file name
+    outfile = ssbio.utils.outfile_name_maker(inname=pdb_file, outfile=outfile, outdir=outdir, outext=outext)
 
-    if outdir:
-        outfile = op.join(outdir, basename + '_msms.df')
-    else:
-        outfile = basename + '_msms.df'
-
-    if op.exists(outfile) and force_rerun==False:
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         return outfile
 
-    my_structure = PDBIOExt(pdb_file)
-    model = my_structure.first_model
-    rd = PDB.ResidueDepth(model, pdb_file)
-
-    akeys = list(rd)
-    if len(akeys) == 0:
-        akeys = [('<Residue UNKNOWN het=  resseq=0 icode= >', (0, 0))]
-
-    anslist = []
-    if akeys == [('NA', ('NA', 'NA'))]:
-        anslist = ["NA", "NA", "NA", "NA"]
-        # print "warning: error at index:"+str(len(msmslist))
-
     else:
-        for j in akeys:
-            chain = [x.id for x in PDB.Selection.unfold_entities(j[0], 'C')][0]
-            seqnum = j[0].id[1]
-            re_depth = j[1][0]
-            ca_depth = j[1][1]
-            if chain == ' ':
-                chain = 'X'
-            anslist.append([chain, seqnum, re_depth, ca_depth])
+        my_structure = PDBIOExt(pdb_file)
+        model = my_structure.first_model
+        rd = PDB.ResidueDepth(model, pdb_file)
 
-    msms_df = pd.DataFrame(anslist)
-    msms_df = msms_df.rename(columns={0:'chain',1:'resnum',2:'res_depth',3:'ca_depth'})
+        clean_rd = {}
+        for k,v in rd.property_dict.items():
+            clean_rd[(k[0], k[1][1])] = v
 
-    msms_df.to_csv(outfile)
+        with open(outfile, 'w') as ff:
+            json.dump(clean_rd, ff)
 
-    return outfile
+        return outfile
+
+        # Old code to make dataframe of results
+        # akeys = list(rd)
+        # msms_pre_df = []
+        # if len(akeys) == 0:
+        #     raise AssertionError('Error running MSMS')
+        # else:
+        #     # Save the average and alpha-carbon residue depths
+        #     for j in akeys:
+                    # don't need to use, just check property_dict
+        #         chain = [x.id for x in PDB.Selection.unfold_entities(j[0], 'C')][0]
+        #         seqnum = j[0].id[1]
+        #         re_depth = j[1][0]
+        #         ca_depth = j[1][1]
+        #
+        #         if chain == ' ':
+        #             chain = 'X'
+        #
+        #         msms_pre_df.append([chain, seqnum, re_depth, ca_depth])
+        #
+        # cols = ['chain', 'resnum', 'res_depth', 'ca_depth']
+        # msms_df = pd.DataFrame.from_records(msms_pre_df)
+        # msms_df = msms_df.rename(columns=cols)
+        #
+        # msms_df.to_csv(outfile)
+        #
+        # return outfile
 
 def residue_depth(anslist):
     '''Computes the average residue and CA depth

@@ -23,6 +23,7 @@ import ssbio.structure.properties.quality
 from ssbio.structure.cleanpdb import CleanPDB
 from ssbio.structure.pdbioext import PDBIOExt
 import ssbio.sequence.properties.residues
+import ssbio.structure.properties.msms
 
 from cobra.core import Gene
 from cobra.core import DictList
@@ -1166,7 +1167,7 @@ class GEMPRO(object):
             creates a metadata table.
 
         Args:
-            force_rerun (bool):
+            force_rerun (bool): If you want to overwrite any existing mappings and files
 
         """
         pdb_pre_df = []
@@ -1255,6 +1256,44 @@ class GEMPRO(object):
 
         self.df_sequence_properties = pd.DataFrame.from_records(seq_prop_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
         log.info('Created sequence property dataframe. See the "df_sequence_properties" attribute.')
+
+    def calculate_residue_depth(self, force_rerun=False):
+        """Run MSMS on all representative structures, save a json file per structure that contains
+            the average residue depth per residue, and the alpha-carbon depth. Units are in Angstroms.
+
+        Args:
+            force_rerun (bool): If you want to overwrite any existing files
+
+        """
+        self.missing_msms = {}
+
+        for g in tqdm(self.genes):
+            gene_id = g.id
+            gene_structure_dir = op.join(self.structure_single_chain_dir, gene_id)
+            clean_pdb = g.annotation['structure']['representative']['clean_pdb_file']
+
+            if not clean_pdb:
+                log.warning('{}: No representative structure available'.format(gene_id))
+                continue
+            else:
+                infile = op.join(gene_structure_dir, clean_pdb)
+
+                try:
+                    outfile = ssbio.structure.properties.msms.msms_output(pdb_file=infile,
+                                                                            outdir=gene_structure_dir,
+                                                                            force_rerun=force_rerun)
+                # Log if MSMS was not run on a file
+                except AssertionError:
+                    self.missing_msms[gene_id] = infile
+                    log.warning('{}: MSMS failed to run on {}'.format(clean_pdb))
+                    continue
+
+                g.annotation['structure']['representative']['properties']['msms_file'] = outfile
+
+        if len(self.missing_msms) > 0:
+            log.warning('{} gene(s) failed calculation. Inspect the "missing_msms" attribute.'.format(len(self.missing_msms)))
+
+        log.info('Completed calculations of residue depth')
 
     def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
         """Run the entire GEM-PRO pipeline.
