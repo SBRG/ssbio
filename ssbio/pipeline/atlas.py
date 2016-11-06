@@ -150,13 +150,16 @@ class ATLAS():
         if list_of_ncbi_ids:
             if not email_for_ncbi:
                 raise ValueError('Input an email if downloading from NCBI')
+            log.info('Downloading genomes from NCBI...')
             self.strains_to_fasta_file.update(self.download_genome_cds_ncbi(list_of_patric_ids, email_for_ncbi))
         if list_of_patric_ids:
+            log.info('Downloading genomes from PATRIC...')
             self.strains_to_fasta_file.update(self.download_genome_cds_patric(list_of_patric_ids))
         if dict_of_genomes:
+            log.info('Loading existing genomes...')
             self.strains_to_fasta_file.update(dict_of_genomes)
 
-        self.orthology_matrix = pd.DataFrame()
+        self.df_orthology_matrix = pd.DataFrame()
         self.strains = DictList([])
         self._reference_genome = base_genome_id
 
@@ -215,7 +218,7 @@ class ATLAS():
             raise ValueError('Reference genome ID not in list of genomes.')
         log.info('Set reference genome to ID {}'.format(reference_genome_id))
 
-    def find_bbh(self):
+    def get_orthology_matrix(self):
         """Run run_makeblastdb, run_bidirectional_blast, and calculate_bbh for both DNA and protein sequences.
 
         """
@@ -244,75 +247,33 @@ class ATLAS():
                                                                         self.reference_genome, self.blast_seq_type),
                                                                     outdir=self.atlas_data_dir)
 
-        log.info('Saved orthology matrix at {}'.format(ortho_matrix))
+        log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
 
-        self.orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
-
-    def write_orthologous_gene_sequences(self):
-        """For each organism, write their orthologous gene files named like <STRAIN>_<BASESTRAIN_GENE>.faa
-
-        """
-        if len(self.orthology_matrix) == 0:
-            raise RuntimeError('Empty orthology matrix')
-
-        genomes = self.strains_to_fasta_file
-
-        self.base_gene_to_strain_genes = defaultdict(list)
-
-        for strain_id, fasta_file in tqdm(genomes.items()):
-            if strain_id not in self.orthology_matrix.columns:
-                log.warning('No orthologous genes found for organism {}'.format(strain_id))
-                continue
-
-            # Load the strain FASTA file
-            strain_sequences = SeqIO.index(fasta_file, 'fasta')
-            log.debug('Loaded {}'.format(fasta_file))
-
-            # Get the list of orthologous genes
-            base_to_strain = self.orthology_matrix[pd.notnull(self.orthology_matrix[strain_id])][strain_id].to_dict()
-            for base_g_id, strain_g_id in base_to_strain.items():
-
-                # Make the gene directory
-                gene_dir = op.join(self.seq_atlas_gene_dir, base_g_id)
-                if not op.exists(gene_dir):
-                    os.mkdir(gene_dir)
-
-                # Get and write the strain sequence
-                strain_seq_record = strain_sequences[strain_g_id]
-                outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
-                self.base_gene_to_strain_genes[base_g_id].append(outfile)
-
-                if not op.exists(op.join(gene_dir, outfile)):
-                    with open(op.join(gene_dir, outfile), 'w') as f:
-                        SeqIO.write(strain_seq_record, f, "fasta")
-
-            log.debug('Wrote all sequences for strain {}'.format(strain_id))
-
-        log.info('Wrote all individual gene sequences for all strains.')
+        self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
 
     def build_strain_specific_models(self):
         """Using the orthologous genes matrix, write strain specific models.
 
         """
-        if len(self.orthology_matrix) == 0:
+        if len(self.df_orthology_matrix) == 0:
             raise RuntimeError('Empty orthology matrix')
 
         if not hasattr(self, 'model'):
             raise RuntimeError('No GEM loaded')
 
         # For each genome, create the strain specific model
-        for strain_id in self.genome_id_to_fasta_file.keys():
+        for strain_id in self.strains_to_fasta_file.keys():
             # Get a list of genes which do not have orthology in the strain
-            not_in_strain = self.orthology_matrix[pd.isnull(self.orthology_matrix[strain_id])][strain_id].index.tolist()
+            not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
 
             # Make a copy of the base strain
-            my_new_strain_model = self.model.copy()
+            my_new_strain_model = self.base_strain_gempro.model.copy()
             my_new_strain_model._trimmed = False
             my_new_strain_model._trimmed_genes = []
             my_new_strain_model._trimmed_reactions = {}
 
             # Filter out genes which do not show up in the base strain model
-            model_genes = [x.id for x in self.model.genes]
+            model_genes = [x.id for x in self.base_strain_gempro.model.genes]
             genes_to_remove = list(set(not_in_strain).intersection(set(model_genes)))
 
             if len(genes_to_remove) == 0:
@@ -337,10 +298,56 @@ class ATLAS():
             # Save the strain specific file
             outfile = op.join(self.atlas_model_files, '{}.json'.format(strain_id))
             cobra.io.save_json_model(my_new_strain_model, outfile)
-            self.genome_id_to_strain_model[strain_id] = outfile
+            self.strains.append(my_new_strain_model)
             log.debug('{}: saved model at {}'.format(strain_id, outfile))
 
             del my_new_strain_model
+
+        log.info('Created {} new strain-specific models'.format(len(self.strains)))
+
+    def write_orthologous_gene_sequences(self):
+        """For each organism, write their orthologous gene files named like <STRAIN>_<BASESTRAIN_GENE>.faa
+
+        """
+        if len(self.df_orthology_matrix) == 0:
+            raise RuntimeError('Empty orthology matrix')
+
+        genomes = self.strains_to_fasta_file
+
+        self.base_gene_to_strain_genes = defaultdict(list)
+
+        for strain_id, fasta_file in tqdm(genomes.items()):
+            if strain_id not in self.df_orthology_matrix.columns:
+                log.warning('No orthologous genes found for organism {}'.format(strain_id))
+                continue
+
+            # Load the strain FASTA file
+            strain_sequences = SeqIO.index(fasta_file, 'fasta')
+            log.debug('Loaded {}'.format(fasta_file))
+
+            # Get the list of orthologous genes
+            base_to_strain = self.df_orthology_matrix[pd.notnull(self.df_orthology_matrix[strain_id])][strain_id].to_dict()
+            for base_g_id, strain_g_id in base_to_strain.items():
+
+                # Make the gene directory
+                gene_dir = op.join(self.seq_atlas_gene_dir, base_g_id)
+                if not op.exists(gene_dir):
+                    os.mkdir(gene_dir)
+
+                # Get and write the strain sequence
+                strain_seq_record = strain_sequences[strain_g_id]
+                outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
+                self.base_gene_to_strain_genes[base_g_id].append(outfile)
+
+                if not op.exists(op.join(gene_dir, outfile)):
+                    with open(op.join(gene_dir, outfile), 'w') as f:
+                        SeqIO.write(strain_seq_record, f, "fasta")
+
+            log.debug('Wrote all sequences for strain {}'.format(strain_id))
+
+        log.info('Wrote all individual gene sequences for all strains.')
+
+
 
     def align_orthologous_genes_pairwise(self):
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it.
