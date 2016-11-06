@@ -961,7 +961,7 @@ class GEMPRO(object):
         #                    runtype=runtype, print_exec=True, data_dir=data_dir, project_id=project,
         #                    slurm_email=email, slurm_username=username)
 
-    def get_itasser_models(self, homology_raw_dir, custom_itasser_name_mapping=None):
+    def get_itasser_models(self, homology_raw_dir, custom_itasser_name_mapping=None, force_rerun=False):
         """Copy generated homology models from a directory to the GEM-PRO directory.
 
         Args:
@@ -985,7 +985,10 @@ class GEMPRO(object):
             else:
                 orig_itasser_dir = op.join(homology_raw_dir, gene_id)
 
-            itasser_info = ssbio.itasser.itasserparse.organize_itasser_models(raw_dir=orig_itasser_dir, copy_to_dir=dest_gene_dir, rename_model_to=gene_id)
+            itasser_info = ssbio.itasser.itasserparse.organize_itasser_models(raw_dir=orig_itasser_dir,
+                                                                              copy_to_dir=dest_gene_dir,
+                                                                              rename_model_to=gene_id,
+                                                                              force_rerun=force_rerun)
 
             if itasser_info:
                 # Always set sequence coverage to 100% for an ITASSER model

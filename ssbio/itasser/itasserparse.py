@@ -6,7 +6,7 @@ import logging
 log = logging.getLogger(__name__)
 import time
 
-def organize_itasser_models(raw_dir, copy_to_dir, model_to_use='model1.pdb', rename_model_to=''):
+def organize_itasser_models(raw_dir, copy_to_dir, model_to_use='model1.pdb', rename_model_to='', force_rerun=False):
     """Reorganize the raw information from I-TASSER modeling.
 
     - Copies the model1.pdb file and COACH results (if they exist) to specified folder
@@ -18,8 +18,8 @@ def organize_itasser_models(raw_dir, copy_to_dir, model_to_use='model1.pdb', ren
     """
 
     hom_dict = {}
-
-    # TODO: speedup by parsing new file (which for me is on a SSD not a HDD so much faster)
+    # TODO: add force_rerun to more parts of this function
+    # TODO: use ssbio.utils function
 
     # Best homology model is "model1.pdb"
     old_model_path = op.join(raw_dir, model_to_use)
@@ -27,7 +27,7 @@ def organize_itasser_models(raw_dir, copy_to_dir, model_to_use='model1.pdb', ren
     if rename_model_to:
         new_model_path = op.join(copy_to_dir, '{}.pdb'.format(rename_model_to))
     if op.exists(old_model_path):
-        if not op.exists(new_model_path):
+        if not op.exists(new_model_path) or force_rerun:
             shutil.copy2(old_model_path, new_model_path)
         hom_dict['model_file'] = op.basename(new_model_path)
         hom_dict['model_date'] = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
