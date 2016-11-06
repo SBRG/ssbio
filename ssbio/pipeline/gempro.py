@@ -1290,9 +1290,9 @@ class GEMPRO(object):
                                                                             outdir=gene_structure_dir,
                                                                             force_rerun=force_rerun)
                 # Log if MSMS was not run on a file
-                except AssertionError as e:
+                except AssertionError:
                     self.missing_msms[gene_id] = infile
-                    log.warning('{}: MSMS failed to run on {}'.format(clean_pdb))
+                    log.warning('{}: MSMS failed to run on {}'.format(gene_id, clean_pdb))
                     continue
 
                 g.annotation['structure']['representative']['properties']['msms_file'] = op.basename(outfile)
