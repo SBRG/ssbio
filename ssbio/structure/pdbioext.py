@@ -2,11 +2,16 @@ import os
 import os.path as op
 from Bio import PDB
 from Bio.PDB import PDBIO
+import logging
+log = logging.getLogger(__name__)
 
 # NOTE: MMCIFParser needs to be modified according to
 # https://github.com/biopython/biopython/issues/523
 # Otherwise this will throw an error with the normal Biopython distribution
 cifp = PDB.MMCIFParser(QUIET=True)
+# TODO: fix the mmcif stuff and add a new mmcifparser class in ssbio
+# see for fixes: https://github.com/nmih/biopython/commit/d03425227fac016f3d4d59ac6d3332fec8ebfead
+
 pdbp = PDB.PDBParser(PERMISSIVE=True, QUIET=True)
 
 
@@ -18,16 +23,20 @@ class PDBIOExt(PDBIO):
         super(PDBIO, self).__init__()
         self.in_file = in_file
 
+        log.debug('{}: Loading structure...'.format(in_file))
+        # TODO: make infile type explicit instead of parsing the file name
         if '.cif' in self.in_file:
             structure = cifp.get_structure('mycif', self.in_file)
         else:
             structure = pdbp.get_structure('mypdb', self.in_file)
+
         self.structure = structure
         self.first_model = structure[0]
 
         # TODO: need to properly learn about extending a class
         self.use_model_flag=0
 
+    # TODO: replace with function in utils module
     def _output_filepath(self, custom_name='', custom_ext='', out_suffix='', out_dir=None):
         """Returns an output file path based on the input filename to write a modified file.
 

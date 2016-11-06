@@ -52,7 +52,8 @@ class StructureProp(object):
                               'resolution'         : float('inf'),
                               'original_pdb_file'  : None,
                               'original_mmcif_file': None,
-                              'clean_pdb_file'     : None}
+                              'clean_pdb_file'     : None,
+                              'properties': {}}
         self.homology = homology
         self.pdb = pdb
         self.representative = representative
@@ -242,7 +243,8 @@ class GEMPRO(object):
                                                         'representative': {'structure_id'     : None,
                                                                            'seq_coverage'     : 0,
                                                                            'original_pdb_file': None,
-                                                                           'clean_pdb_file'   : None}}
+                                                                           'clean_pdb_file'   : None,
+                                                                           'properties': {}}}
                 tmp_list.append(new_gene)
             self._genes = DictList(tmp_list)
         else:
@@ -268,7 +270,8 @@ class GEMPRO(object):
                                                  'representative': {'structure_id'     : None,
                                                                     'seq_coverage'     : 0,
                                                                     'original_pdb_file': None,
-                                                                    'clean_pdb_file'   : None}}
+                                                                    'clean_pdb_file'   : None,
+                                                                    'properties': {}}}
             self._genes = genes_list
 
     def add_genes_by_id(self, genes_list):
@@ -301,7 +304,8 @@ class GEMPRO(object):
                                                 'representative': {'structure_id'     : None,
                                                                    'seq_coverage'     : 0,
                                                                    'original_pdb_file': None,
-                                                                   'clean_pdb_file'   : None}}
+                                                                   'clean_pdb_file'   : None,
+                                                                   'properties': {}}}
             new_genes.append(new_gene)
 
         # Add unique genes only
