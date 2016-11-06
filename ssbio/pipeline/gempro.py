@@ -1231,6 +1231,8 @@ class GEMPRO(object):
                                                                                             outdir=gene_folder,
                                                                                             force_rerun=force_rerun)
                 pepstats_parsed = ssbio.sequence.properties.residues.emboss_pepstats_parser(pepstats_file)
+
+                # TODO: also run biopython ProteinAnalysis
                 g.annotation['sequence']['representative']['properties'].update(pepstats_parsed.copy())
 
                 pepstats_parsed['gene'] = gene_id
@@ -1272,7 +1274,7 @@ class GEMPRO(object):
         print('Setting representative sequences...')
         self.set_representative_sequence()
 
-        current_structure_mapping_engines = ['uniprot', 'itasser', 'all'] # 'blast'
+        current_structure_mapping_engines = ['uniprot', 'itasser', 'all'] # 'blast', 'manual_homology'
         if structure_mapping_engine not in current_structure_mapping_engines:
             raise ValueError('Structure mapping engine not available')
 
@@ -1285,14 +1287,15 @@ class GEMPRO(object):
             self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
                                     custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
 
-        print('Setting representative Structures...')
+        print('Setting representative structures...')
         self.set_representative_structure()
 
-#
-# if __name__ == '__main__':
-#     # run the GEM-PRO pipeline!
-#
-#     # parse arguments
+
+if __name__ == '__main__':
+    pass
+    # Run the GEM-PRO pipeline!
+
+    # Parse arguments
 #     p = argparse.ArgumentParser(description='Runs the GEM-PRO pipeline')
 #     p.add_argument('gemfile', help='Path to the GEM file')
 #     p.add_argument('gemname', help='Name you would like to use to refer to this GEM')
