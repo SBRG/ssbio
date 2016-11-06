@@ -115,6 +115,9 @@ def force_rerun(flag, outfile):
         bool: If we should force rerunning of a command
 
     Examples:
+        >>> force_rerun(flag=True, outfile='/not/existing/file.txt')
+        True
+
         >>> force_rerun(flag=False, outfile='/not/existing/file.txt')
         True
 

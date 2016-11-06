@@ -28,7 +28,7 @@ def msms_output(pdb_file, outfile='', outdir='', outext='_msms.json', force_reru
     # Create the output file name
     outfile = ssbio.utils.outfile_name_maker(inname=pdb_file, outfile=outfile, outdir=outdir, outext=outext)
 
-    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+    if not ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         return outfile
 
     else:
