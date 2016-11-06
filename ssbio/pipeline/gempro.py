@@ -1053,6 +1053,10 @@ class GEMPRO(object):
             gene_seq_dir = op.join(self.sequence_dir, gene_id)
             gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
 
+            # Make the destination structure folder
+            if not op.exists(gene_struct_dir):
+                os.mkdir(gene_struct_dir)
+
             if use_pdb:
                 try:
                     # Get the representative sequence
