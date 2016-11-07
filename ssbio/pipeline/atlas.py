@@ -36,7 +36,7 @@ class AnnotatedModel(Model):
     def __init__(self, model, name=None):
         Model.__init__(self, id_or_model=model, name=name)
         # Obtain list of all gene ids
-        self.genes = self.model.genes
+        self._genes = model.genes
 
     @property
     def genes(self):
