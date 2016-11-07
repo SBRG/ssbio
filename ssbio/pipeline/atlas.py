@@ -422,7 +422,7 @@ class ATLAS():
             gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
 
             # Get gene file in all strains if it shows up as functional
-            for strain_model in tqdm(self.strain_models):
+            for strain_model in self.strain_models:
                 strain_id = strain_model.id
                 strain_gene = strain_model.genes.get_by_id(base_gene_id)
 
