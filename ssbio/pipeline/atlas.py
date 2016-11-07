@@ -33,8 +33,9 @@ class AnnotatedModel(object):
     """Class to represent a strain which is just a minimal GEM-PRO object
     """
 
-    def __init__(self, model, name=None):
-        self.genes = model.genes
+    def __init__(self, model, reset_annotation=True):
+        if reset_annotation:
+            self.genes = model.genes
 
     @property
     def genes(self):
@@ -50,12 +51,14 @@ class AnnotatedModel(object):
             genes_list: DictList of COBRApy Gene objects, or list of gene IDs
 
         """
-
+        # Delete sequence annotation since that changes. Keep representative structure for reference as base_structure
         for x in genes_dict_list:
-            if 'sequence' not in x.annotation.keys():
-                x.annotation['sequence'] = {'seq_len'      : 0,
-                                            'seq_file'     : None,
-                                            'alignment_file': None}
+            x.annotation['sequence'] = {'seq_len'      : 0,
+                                        'seq_file'     : None,
+                                        'alignment_file': None,
+                                        'properties': {}
+                                        }
+            x.annotation['structure'] = {'base_structure': x.annotation['structure']['representative']}
         self._genes = genes_dict_list
 
 
