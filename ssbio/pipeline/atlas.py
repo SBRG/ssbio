@@ -161,6 +161,7 @@ class ATLAS():
                 continue
 
             base_strain_model_copy = copy.deepcopy(self.base_strain_gempro.model)
+            base_strain_model_copy.id = strain_id
             self.strain_models.append(AtlasModel(model=base_strain_model_copy,
                                                  genome_file_name=strain_fasta))
 
