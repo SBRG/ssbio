@@ -29,13 +29,11 @@ log = logging.getLogger(__name__)
 
 
 # TODO: consolidate this and GEMPRO class into something simpler
-class AnnotatedModel(Model):
+class AnnotatedModel(object):
     """Class to represent a strain which is just a minimal GEM-PRO object
     """
 
     def __init__(self, model, name=None):
-        Model.__init__(self, id_or_model=model, name=name)
-        # Obtain list of all gene ids
         self.genes = model.genes
 
     @property
