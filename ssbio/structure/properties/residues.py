@@ -20,11 +20,11 @@ def hse_output(pdb_file):
     """
     The solvent exposure of an amino acid residue is important for analyzing,
     understanding and predicting aspects of protein structure and function [73].
-    A residue’s solvent exposure can be classified as four categories: exposed, partly exposed,
+    A residue's solvent exposure can be classified as four categories: exposed, partly exposed,
     buried and deeply buried residues. Hamelryck  et al. [73] established a new 2D measure that provides a
     different view of solvent exposure, i.e. half-sphere exposure (HSE). By conceptually dividing the sphere
     of a residue into two halves- HSE-up and HSE-down, HSE provides a more detailed description of an amino
-    acid residue’s spatial neighborhood. HSE is calculated by the hsexpo module implemented in the BioPython
+    acid residue's spatial neighborhood. HSE is calculated by the hsexpo module implemented in the BioPython
     package [74] from a PDB file.
 
     http://onlinelibrary.wiley.com/doi/10.1002/prot.20379/abstract
