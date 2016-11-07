@@ -183,9 +183,6 @@ class ATLAS():
         self.base_strain_gempro_genome_file = op.basename(strains_to_fasta_file[base_genome_id])
         self.base_strain_gempro_genome_path = op.join(self.seq_atlas_org_dir, self.base_strain_gempro_genome_file)
 
-        # Create the orthology matrix
-        self.df_orthology_matrix = pd.DataFrame()
-
     def download_genome_cds_patric(self, ids, force_rerun=False):
         """Download genome files from PATRIC
 
@@ -280,6 +277,10 @@ class ATLAS():
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
 
+        # Filter the matrix for genes within our base model only
+        base_strain_gene_ids = [x.id for x in self.base_strain_gempro.model.genes]
+        self.df_orthology_matrix_filtered = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
+
         # Remove extraneous strains from our analysis
         to_remove = []
         for i, strain_model in enumerate(self.strain_models):
@@ -370,7 +371,7 @@ class ATLAS():
             strain_sequences = SeqIO.index(strain_fasta, 'fasta')
             log.debug('Loaded {}'.format(strain_fasta))
 
-            # Get the list of orthologous genes
+            # Get the list of orthologous genes, ignoring genes outside our context of the base model
             base_to_strain = self.df_orthology_matrix[pd.notnull(self.df_orthology_matrix[strain_id])][strain_id].to_dict()
             for base_g_id, strain_g_id in base_to_strain.items():
 
