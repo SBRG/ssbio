@@ -23,6 +23,7 @@ from cobra.core import DictList
 from cobra.core import Model
 import sys
 import logging
+import copy
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -163,7 +164,7 @@ class ATLAS():
 
         """
         # Make a copy of the base strain
-        my_new_strain_model = self.base_strain_gempro.model.copy()
+        my_new_strain_model = copy.deepcopy(self.base_strain_gempro.model)
         my_new_strain_model._trimmed = False
         my_new_strain_model._trimmed_genes = []
         my_new_strain_model._trimmed_reactions = {}
