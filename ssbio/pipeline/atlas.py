@@ -277,10 +277,6 @@ class ATLAS():
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
 
-        # Filter the matrix for genes within our base model only
-        base_strain_gene_ids = [x.id for x in self.base_strain_gempro.model.genes]
-        self.df_orthology_matrix_filtered = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
-
         # Remove extraneous strains from our analysis
         to_remove = []
         for i, strain_model in enumerate(self.strain_models):
@@ -296,12 +292,15 @@ class ATLAS():
                 log.info('{}: Strain has no differences from the base. Will remove this strain from analysis.')
                 to_remove.append(i)
                 continue
-
         if to_remove:
             # Remove strains with no differences
             for x in to_remove:
                 self.strain_models.pop(x)
             log.info('Removed {} strains from analysis'.format(len(to_remove)))
+
+        # Filter the matrix for genes within our base model only
+        base_strain_gene_ids = [x.id for x in self.base_strain_gempro.model.genes]
+        self.df_orthology_matrix_filtered = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
 
         log.info('{} strains to be analyzed'.format(len(self.strain_models)))
 
@@ -337,7 +336,7 @@ class ATLAS():
         """Using the orthologous genes matrix, write strain specific models.
 
         """
-        if len(self.df_orthology_matrix) == 0:
+        if len(self.df_orthology_matrix_filtered) == 0:
             raise RuntimeError('Empty orthology matrix')
 
         # For each genome, create the strain specific model
@@ -345,7 +344,7 @@ class ATLAS():
             strain_id = strain_model.id
 
             # Get a list of genes which do not have orthology in the strain
-            not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
+            not_in_strain = self.df_orthology_matrix_filtered[pd.isnull(self.df_orthology_matrix_filtered[strain_id])][strain_id].index.tolist()
 
             self.pare_down_model(model_to_be_modified=strain_model, genes_to_remove=not_in_strain)
 
@@ -360,7 +359,7 @@ class ATLAS():
         """For each organism, write their orthologous gene files named like <STRAIN>_<BASESTRAIN_GENE>.faa
 
         """
-        if len(self.df_orthology_matrix) == 0:
+        if len(self.df_orthology_matrix_filtered) == 0:
             raise RuntimeError('Empty orthology matrix')
 
         for strain_model in tqdm(self.strain_models):
@@ -372,7 +371,7 @@ class ATLAS():
             log.debug('Loaded {}'.format(strain_fasta))
 
             # Get the list of orthologous genes, ignoring genes outside our context of the base model
-            base_to_strain = self.df_orthology_matrix[pd.notnull(self.df_orthology_matrix[strain_id])][strain_id].to_dict()
+            base_to_strain = self.df_orthology_matrix_filtered[pd.notnull(self.df_orthology_matrix_filtered[strain_id])][strain_id].to_dict()
             for base_g_id, strain_g_id in base_to_strain.items():
 
                 # Make the gene directory
