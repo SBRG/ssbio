@@ -34,9 +34,10 @@ class AnnotatedModel(object):
     """Class to represent a strain which is just a minimal GEM-PRO object
     """
 
-    def __init__(self, model, reset_annotation=True):
+    def __init__(self, id, model, reset_annotation=True):
         if reset_annotation:
             self.genes = model.genes
+        self.id = id
 
     @property
     def genes(self):
@@ -151,48 +152,8 @@ class ATLAS():
             self.strains_to_fasta_file.update(dict_of_genomes)
 
         self.df_orthology_matrix = pd.DataFrame()
-        self.strains = DictList([])
+        self.strain_models = DictList([])
         self._reference_genome = base_genome_id
-
-    def create_strain_model(self, genes_to_remove, strain_id, strain_name=''):
-        """Create a strain specific model
-
-        Args:
-            list_of_strain_ids:
-
-        Returns:
-
-        """
-        # Make a copy of the base strain
-        my_new_strain_model = copy.deepcopy(self.base_strain_gempro.model)
-        my_new_strain_model._trimmed = False
-        my_new_strain_model._trimmed_genes = []
-        my_new_strain_model._trimmed_reactions = {}
-
-        # Filter out genes in genes_to_remove which do not show up in the base strain model
-        model_genes = [x.id for x in self.base_strain_gempro.genes]
-        genes_to_remove = list(set(genes_to_remove).intersection(set(model_genes)))
-
-        if len(genes_to_remove) == 0:
-            log.debug('No genes marked for removal from base strain')
-        else:
-            log.debug('{} genes marked for removal from base strain'.format(len(genes_to_remove)))
-
-            # Change the model's name to correspond with the strain
-            my_new_strain_model.id = strain_id
-
-            if strain_name:
-                my_new_strain_model.name = strain_name
-
-            # Delete genes!
-            cobra.manipulation.delete_model_genes(my_new_strain_model, genes_to_remove)
-
-            if my_new_strain_model._trimmed:
-                log.info('{}: deleted {} reactions, {} genes'.format(strain_id,
-                                                                     len(my_new_strain_model._trimmed_reactions),
-                                                                     len(my_new_strain_model._trimmed_genes)))
-
-        return AnnotatedModel(my_new_strain_model)
 
     def download_genome_cds_patric(self, ids, force_rerun=False):
         """Download genome files from PATRIC
@@ -282,6 +243,46 @@ class ATLAS():
 
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
 
+    def create_strain_model(self, genes_to_remove, strain_id, strain_name=''):
+        """Create a strain specific model
+
+        Args:
+            list_of_strain_ids:
+
+        Returns:
+
+        """
+        # Make a copy of the base strain (IT MUST BE A DEEP COPY)
+        my_new_strain_model = copy.deepcopy(self.base_strain_gempro.model)
+        my_new_strain_model._trimmed = False
+        my_new_strain_model._trimmed_genes = []
+        my_new_strain_model._trimmed_reactions = {}
+
+        # Filter out genes in genes_to_remove which do not show up in the base strain model
+        model_genes = [x.id for x in self.base_strain_gempro.genes]
+        genes_to_remove = list(set(genes_to_remove).intersection(set(model_genes)))
+
+        if len(genes_to_remove) == 0:
+            log.debug('No genes marked for removal from base strain')
+        else:
+            log.debug('{} genes marked for removal from base strain'.format(len(genes_to_remove)))
+
+            # Change the model's name to correspond with the strain
+            my_new_strain_model.id = strain_id
+
+            if strain_name:
+                my_new_strain_model.name = strain_name
+
+            # Delete genes!
+            cobra.manipulation.delete_model_genes(my_new_strain_model, genes_to_remove)
+
+            if my_new_strain_model._trimmed:
+                log.info('{}: deleted {} reactions, {} genes'.format(strain_id,
+                                                                     len(my_new_strain_model._trimmed_reactions),
+                                                                     len(my_new_strain_model._trimmed_genes)))
+
+        return AnnotatedModel(id=strain_id, model=my_new_strain_model)
+
     def build_strain_specific_models(self):
         """Using the orthologous genes matrix, write strain specific models.
 
@@ -294,18 +295,17 @@ class ATLAS():
             # Get a list of genes which do not have orthology in the strain
             not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
 
-            strain_model = self.create_strain_model(self.base_strain_gempro.model,
-                                                    genes_to_remove=not_in_strain,
+            strain_model = self.create_strain_model(genes_to_remove=not_in_strain,
                                                     strain_id=strain_id,
                                                     strain_name=strain_id) # TODO: allow strain name input somewhere
 
             # Save the strain specific file
             outfile = op.join(self.atlas_model_files, '{}.json'.format(strain_id))
             cobra.io.save_json_model(strain_model, outfile)
-            self.strains.append(strain_model)
+            self.strain_models.append(strain_model)
             log.debug('{}: saved model at {}'.format(strain_id, outfile))
 
-        log.info('Created {} new strain-specific models'.format(len(self.strains)))
+        log.info('Created {} new strain-specific models'.format(len(self.strain_models)))
 
     def write_orthologous_gene_sequences(self):
         """For each organism, write their orthologous gene files named like <STRAIN>_<BASESTRAIN_GENE>.faa
