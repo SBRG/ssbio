@@ -467,7 +467,7 @@ class ATLAS():
             info_pre_df.append(info_dict)
 
         # Save a dataframe of the file mapping info
-        cols = ['gene', 'mutation_count', 'mutation_percent']
+        cols = ['gene', 'num_strains_with_gene', 'mutation_count', 'mutation_percent']
         self.df_alignment_stats = pd.DataFrame.from_records(info_pre_df, columns=cols)
         log.info('Created alignment statistics dataframe. See the "df_alignment_stats" attribute.')
 
