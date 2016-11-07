@@ -413,6 +413,10 @@ class ATLAS():
             # Get base strain gene fasta file path
             base_gene_id = base_gene.id
             base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
+            if not base_gene_seq_file:
+                log.warning('{}: No representative sequence set in base strain'.format(base_gene_id))
+                continue
+
             base_gene_seq_path = op.join(self.base_strain_gempro.sequence_dir, base_gene_id, base_gene_seq_file)
 
             gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
