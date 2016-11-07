@@ -1,6 +1,7 @@
 import os
 import os.path as op
 import pandas as pd
+import numpy as np
 import ssbio.cobra.utils
 import ssbio.sequence.blast
 import ssbio.sequence.fasta
@@ -298,8 +299,17 @@ class ATLAS():
                 self.strain_models.pop(x)
             log.info('Removed {} strains from analysis'.format(len(to_remove)))
 
-        # Filter the matrix for genes within our base model only
+        # Also need to check for potential gene IDs that are in the model and not in the orthology matrix
+        # This is probably because: the CDS FASTA file for the base strain did not contain the correct ID
+        # for the gene and consequently was not included in the orthology matrix
+        # We should add these genes to the orthology matrix and set them as not present in the other strains
         base_strain_gene_ids = [x.id for x in self.base_strain_gempro.model.genes]
+        in_base_strain_but_not_orthology = [x for x in base_strain_gene_ids if x not in self.df_orthology_matrix.index.tolist()]
+        for notinorth in in_base_strain_but_not_orthology:
+            # Add empty row
+            self.df_orthology_matrix.ix[notinorth] = np.nan
+
+        # Filter the matrix for genes within our base model only
         self.df_orthology_matrix_filtered = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
         log.info('Created base model specific "df_orthology_matrix_filtered" attribute.'.format(ortho_matrix))
 
@@ -399,7 +409,7 @@ class ATLAS():
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it.
 
         """
-        for base_gene in self.base_strain_gempro.genes:
+        for base_gene in tqdm(self.base_strain_gempro.genes):
             # Get base strain gene fasta file path
             base_gene_id = base_gene.id
             base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
@@ -408,7 +418,7 @@ class ATLAS():
             gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
 
             # Get gene file in all strains if it shows up as functional
-            for strain_model in self.strain_models:
+            for strain_model in tqdm(self.strain_models):
                 strain_id = strain_model.id
                 strain_gene = strain_model.genes.get_by_id(base_gene_id)
 
