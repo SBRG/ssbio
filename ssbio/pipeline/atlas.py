@@ -37,45 +37,24 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
 
 
-# TODO: consolidate this and GEMPRO class into something simpler
-class AtlasModel(object):
-    """Class to represent a model within the ATLAS analysis
+class AtlasModel(Model):
+    """Class to represent a model within the ATLAS analysis. Just adding some fields to the annotation attributes.
     """
 
-    def __init__(self, id, model, genome_file_name):
-        self.genes = model.genes
-        self.id = id
-        self.model = model
-        self.model.annotation['genome_file'] = op.basename(genome_file_name)
+    def __init__(self, model, genome_file_name):
+        Model.__init__(self, model)
+        self.annotation['genome_file'] = op.basename(genome_file_name)
+
+        for g in model.genes:
+            g.annotation['sequence'] = {'seq_len'       : 0,
+                                        'seq_file'      : None,
+                                        'pairwise_alignment_file': None,
+                                        'properties'    : {}
+                                        }
+            g.annotation['structure'] = {'base_structure': x.annotation['structure']['representative']}
 
     def get_genome_file_path(self, genome_file_dir):
-        return op.join(genome_file_dir, self.model.annotation['genome_file'])
-
-    @property
-    def genes(self):
-        return self._genes
-
-    @genes.setter
-    def genes(self, genes_dict_list):
-        """Set the genes attribute to be a DictList of COBRApy Gene objects.
-
-        Extra "annotation" fields will be added to the objects.
-
-        Args:
-            genes_list: DictList of COBRApy Gene objects, or list of gene IDs
-
-        """
-        # Delete sequence annotation since that changes. Keep representative structure for reference as base_structure
-        for i, x in enumerate(genes_dict_list):
-            if not x.functional:
-                genes_dict_list.pop(i)
-            x.annotation['sequence'] = {'seq_len'      : 0,
-                                        'seq_file'     : None,
-                                        'alignment_file': None,
-                                        'properties': {}
-                                        }
-            x.annotation['structure'] = {'base_structure': x.annotation['structure']['representative']}
-        self._genes = genes_dict_list
+        return op.join(genome_file_dir, self.annotation['genome_file'])
 
 
 class ATLAS():
@@ -173,6 +152,7 @@ class ATLAS():
         # Create initial strain models that are just copies of the base strain with a resetted annotation
         self.strain_ids = []
         self.strain_models = DictList([])
+        log.info('Creating strain specific models based on the base model...')
         for strain_id, strain_fasta in tqdm(strains_to_fasta_file.items()):
             self.strain_ids.append(strain_id)
 
@@ -181,8 +161,7 @@ class ATLAS():
                 continue
 
             base_strain_model_copy = copy.deepcopy(self.base_strain_gempro.model)
-            self.strain_models.append(AtlasModel(id=strain_id,
-                                                 model=base_strain_model_copy,
+            self.strain_models.append(AtlasModel(model=base_strain_model_copy,
                                                  genome_file_name=strain_fasta))
 
         # Set the base, reference genome
@@ -313,8 +292,6 @@ class ATLAS():
         Args:
             list_of_strain_ids:
 
-        Returns:
-
         """
         model_to_be_modified._trimmed = False
         model_to_be_modified._trimmed_genes = []
@@ -337,8 +314,6 @@ class ATLAS():
                                                                      len(model_to_be_modified._trimmed_reactions),
                                                                      len(model_to_be_modified._trimmed_genes)))
 
-        return model_to_be_modified
-
     def build_strain_specific_models(self):
         """Using the orthologous genes matrix, write strain specific models.
 
@@ -347,19 +322,17 @@ class ATLAS():
             raise RuntimeError('Empty orthology matrix')
 
         # For each genome, create the strain specific model
-        for strain_atlas_model in tqdm(self.strain_models):
-            strain_id = strain_atlas_model.id
-            strain_model = strain_atlas_model.model
+        for strain_model in tqdm(self.strain_models):
+            strain_id = strain_model.id
 
             # Get a list of genes which do not have orthology in the strain
             not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
 
-            new_strain_model = self.pare_down_model(model_to_be_modified=strain_model,
-                                                    genes_to_remove=not_in_strain)
+            self.pare_down_model(model_to_be_modified=strain_model, genes_to_remove=not_in_strain)
 
             # Save the strain specific file
             outfile = op.join(self.atlas_model_files, '{}.json'.format(strain_id))
-            cobra.io.save_json_model(new_strain_model, outfile)
+            cobra.io.save_json_model(strain_model, outfile)
             log.debug('{}: saved model at {}'.format(strain_id, outfile))
 
         log.info('Created {} new strain-specific models'.format(len(self.strain_models)))
@@ -409,12 +382,21 @@ class ATLAS():
         """
         pass
         # for base_gene in self.base_strain_gempro.genes:
+        #     # Get base strain gene fasta file path
         #     base_gene_id = base_gene.id
         #     base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
         #     base_gene_seq_path = op.join(self.base_strain_gempro.sequence_dir, base_gene_id, base_gene_seq_file)
         #
+        #     # Get gene file in all strains if it shows up as functional
         #     for strain_model in self.strain_models:
+        #         strain_id = strain_model.id
+        #         strain_gene = strain_model.get_by_id(base_gene_id)
         #
+        #         if not strain_gene.functional:
+        #             log.debug('{}: gene not functional in strain {}, not aligning'.format(base_gene_id, strain_id))
+        #             continue
+        #
+        #         strain_gene_seq_file = strain_gene.annotation['sequence']['seq_file']
         #         ssbio.sequence.alignment.run_needle_alignment_on_files()
 
     def align_orthologous_genes_multiple(self):
@@ -431,19 +413,20 @@ class ATLAS():
         """Find what nutrients must be added to allow them to grow in minimal media
 
         """
-        for strain_id, strain_model in self.genome_id_to_strain_model.items():
-            model = ssbio.cobra.utils.model_loader(gem_file_path=strain_model, gem_file_type='json')
-
-            # Optimize the strain model for growth
-            model.optimize()
-
-            if model.solution.f < 0.00001:
-                log.info('Gap filling {}'.format(strain_id))
-                # Run GrowMatch with only exchange reactions
-                solution = cobra.flux_analysis.growMatch(model, dm_rxns=False, ex_rxns=True, iterations=1)
-
-                # Open the exchange reactions determined using GrowMatch
-                for rxn in solution[0]:
-                    rxn = rxn.id.replace('_reverse', '')
-                    model.reactions[model.reactions.index(rxn)].lower_bound = -1
+        pass
+        # for strain_id, strain_model in self.genome_id_to_strain_model.items():
+        #     model = ssbio.cobra.utils.model_loader(gem_file_path=strain_model, gem_file_type='json')
+        #
+        #     # Optimize the strain model for growth
+        #     model.optimize()
+        #
+        #     if model.solution.f < 0.00001:
+        #         log.info('Gap filling {}'.format(strain_id))
+        #         # Run GrowMatch with only exchange reactions
+        #         solution = cobra.flux_analysis.growMatch(model, dm_rxns=False, ex_rxns=True, iterations=1)
+        #
+        #         # Open the exchange reactions determined using GrowMatch
+        #         for rxn in solution[0]:
+        #             rxn = rxn.id.replace('_reverse', '')
+        #             model.reactions[model.reactions.index(rxn)].lower_bound = -1
 
