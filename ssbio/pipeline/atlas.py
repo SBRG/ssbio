@@ -416,7 +416,7 @@ class ATLAS():
                                                                                    faa_a=base_gene_seq_path,
                                                                                    faa_b=strain_gene_seq_path,
                                                                                    outdir=gene_dir,
-                                                                                   outfile=)
+                                                                                   outfile='')
 
     def align_orthologous_genes_multiple(self):
         """For each gene in the base strain, run a
