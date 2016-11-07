@@ -461,6 +461,7 @@ class ATLAS():
             if num_strains_with_gene == 0:
                 continue
 
+            info_dict['num_strains_with_gene'] = num_strains_with_gene
             info_dict['mutation_count'] = mutation_count
             info_dict['mutation_percent'] = mutation_count / float(num_strains_with_gene*base_gene_seq_len)
             info_pre_df.append(info_dict)
