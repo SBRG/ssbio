@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 
 try:
     from IPython.display import clear_output
-
     have_ipython = True
 except ImportError:
     have_ipython = False
