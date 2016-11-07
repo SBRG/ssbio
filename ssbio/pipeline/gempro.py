@@ -391,27 +391,28 @@ class GEMPRO(object):
             # Save in Gene
             g.annotation['sequence']['kegg'].update(kegg_dict)
 
-            # Also check if KEGG sequence matches a potentially set representative sequence
-            # Do not add any info if a UniProt ID was already mapped though, we want to use that
-            if g.annotation['sequence']['representative']['seq_len'] > 0 and not g.annotation['sequence']['representative']['uniprot_acc']:
-                ### Check if sequences are the same
+            if sequence_file:
+                # Also check if KEGG sequence matches a potentially set representative sequence
+                # Do not add any info if a UniProt ID was already mapped though, we want to use that
+                if g.annotation['sequence']['representative']['seq_len'] > 0 and not g.annotation['sequence']['representative']['uniprot_acc']:
+                    ### Check if sequences are the same
 
-                # Load already set representative sequence
-                rep_seq_file = g.annotation['sequence']['representative']['seq_file']
-                rep_seq_path = op.join(self.sequence_dir, gene_id, rep_seq_file)
-                rep_seq = SeqIO.read(open(rep_seq_path), 'fasta')
+                    # Load already set representative sequence
+                    rep_seq_file = g.annotation['sequence']['representative']['seq_file']
+                    rep_seq_path = op.join(self.sequence_dir, gene_id, rep_seq_file)
+                    rep_seq = SeqIO.read(open(rep_seq_path), 'fasta')
 
-                # Load kegg sequence
-                kegg_seq = SeqIO.read(open(sequence_file), 'fasta')
+                    # Load kegg sequence
+                    kegg_seq = SeqIO.read(open(sequence_file), 'fasta')
 
-                # Test equality
-                if str(rep_seq.seq) == str(kegg_seq.seq):
-                    # If equal, fill in representative sequence fields with kegg metadata but still use
-                    # the already set sequence file
-                    your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'metadata_file']
-                    for_saving = {your_key: kegg_dict[your_key] for your_key in your_keys if
-                                  your_key in kegg_dict}
-                    g.annotation['sequence']['representative'].update(for_saving)
+                    # Test equality
+                    if str(rep_seq.seq) == str(kegg_seq.seq):
+                        # If equal, fill in representative sequence fields with kegg metadata but still use
+                        # the already set sequence file
+                        your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'metadata_file']
+                        for_saving = {your_key: kegg_dict[your_key] for your_key in your_keys if
+                                      your_key in kegg_dict}
+                        g.annotation['sequence']['representative'].update(for_saving)
 
             # Save in dataframe
             kegg_dict['gene'] = gene_id
