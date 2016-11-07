@@ -56,6 +56,13 @@ class AtlasModel(Model):
     def get_genome_file_path(self, genome_file_dir):
         return op.join(genome_file_dir, self.annotation['genome_file'])
 
+    def get_gene_sequence_path(self, gene_id, gene_dir):
+        g = self.genes.get_by_id(gene_id)
+        if not g.annotation['sequence']['seq_file']:
+            raise IOError('{}: Sequence does not exist'.format(gene_id))
+        g_seq_path = op.join(gene_dir, g.annotation['sequence']['seq_file'])
+        return g_seq_path
+
 
 class ATLAS():
     """Class to represent an ATLAS workflow to carry out multi-strain comparisons
@@ -245,16 +252,20 @@ class ATLAS():
             g_folder, g_name, g_ext = utils.split_folder_and_path(g_file)
 
             # Run bidirectional BLAST
-            b1, b2 = ssbio.sequence.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
-                                                                  dbtype=self.blast_seq_type, outdir=self.seq_atlas_org_dir)
+            log.debug('{} vs {}: Running bidirectional BLAST'.format(r_name, g_name))
+            r_vs_g, g_vs_r = ssbio.sequence.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
+                                                                          dbtype=self.blast_seq_type,
+                                                                          outdir=self.seq_atlas_org_dir)
 
             # Using the BLAST files, find the BBH
-            bbh = ssbio.sequence.blast.calculate_bbh(blast_results_1=b1, blast_results_2=b2,
+            log.debug('{} vs {}: Finding BBHs'.format(r_name, g_name))
+            bbh = ssbio.sequence.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
                                                      r_name=r_name, g_name=g_name,
                                                      outdir=self.seq_atlas_org_dir)
             bbh_files[strain_model.id] = bbh
 
         # Make the orthologous genes matrix
+        log.debug('Creating orthology matrix')
         ortho_matrix = ssbio.sequence.blast.create_orthology_matrix(r_name=r_name,
                                                                     genome_to_bbh_files=bbh_files,
                                                                     outname='{}_{}_orthology.csv'.format(r_name, self.blast_seq_type),
@@ -279,12 +290,13 @@ class ATLAS():
                 to_remove.append(i)
                 continue
 
-        # Remove strains with no differences
-        for x in to_remove:
-            self.strain_models.pop(x)
+        if to_remove:
+            # Remove strains with no differences
+            for x in to_remove:
+                self.strain_models.pop(x)
+            log.info('Removed {} strains from analysis'.format(len(to_remove)))
 
-        log.info('Removed {} strains from analysis'.format(len(to_remove)))
-        log.info('{} strains remain in analysis'.format(len(self.strain_models)))
+        log.info('{} strains to be analyzed'.format(len(self.strain_models)))
 
     def pare_down_model(self, model_to_be_modified, genes_to_remove):
         """Remove genes from a model. Directly modifies the model.
@@ -380,24 +392,31 @@ class ATLAS():
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it.
 
         """
-        pass
-        # for base_gene in self.base_strain_gempro.genes:
-        #     # Get base strain gene fasta file path
-        #     base_gene_id = base_gene.id
-        #     base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
-        #     base_gene_seq_path = op.join(self.base_strain_gempro.sequence_dir, base_gene_id, base_gene_seq_file)
-        #
-        #     # Get gene file in all strains if it shows up as functional
-        #     for strain_model in self.strain_models:
-        #         strain_id = strain_model.id
-        #         strain_gene = strain_model.get_by_id(base_gene_id)
-        #
-        #         if not strain_gene.functional:
-        #             log.debug('{}: gene not functional in strain {}, not aligning'.format(base_gene_id, strain_id))
-        #             continue
-        #
-        #         strain_gene_seq_file = strain_gene.annotation['sequence']['seq_file']
-        #         ssbio.sequence.alignment.run_needle_alignment_on_files()
+        for base_gene in self.base_strain_gempro.genes:
+            # Get base strain gene fasta file path
+            base_gene_id = base_gene.id
+            base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
+            base_gene_seq_path = op.join(self.base_strain_gempro.sequence_dir, base_gene_id, base_gene_seq_file)
+
+            gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
+
+            # Get gene file in all strains if it shows up as functional
+            for strain_model in self.strain_models:
+                strain_id = strain_model.id
+                strain_gene = strain_model.get_by_id(base_gene_id)
+
+                if not strain_gene.functional:
+                    log.debug('{}: gene not present in strain {}, not aligning'.format(base_gene_id, strain_id))
+                    continue
+
+                strain_gene_seq_path = strain_model.get_gene_sequence_path(base_gene_id, gene_dir)
+
+                alignment = ssbio.sequence.alignment.run_needle_alignment_on_files(id_a=base_gene_id,
+                                                                                   id_b=strain_id,
+                                                                                   faa_a=base_gene_seq_path,
+                                                                                   faa_b=strain_gene_seq_path,
+                                                                                   outdir=gene_dir,
+                                                                                   outfile=)
 
     def align_orthologous_genes_multiple(self):
         """For each gene in the base strain, run a

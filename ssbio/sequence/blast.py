@@ -49,7 +49,7 @@ def run_makeblastdb(infile, dbtype, outdir=''):
     else:
         retval = subprocess.call('makeblastdb -in {} -dbtype {} -out {}'.format(infile, dbtype, outfile_basename), shell=True)
         if retval == 0:
-            log.info('Made BLAST database at {}'.format(outfile_basename))
+            log.debug('Made BLAST database at {}'.format(outfile_basename))
             return outfile_all
         else:
             log.error('Error running makeblastdb!')
@@ -87,35 +87,35 @@ def run_bidirectional_blast(reference, other_genome, dbtype, outdir=''):
     run_makeblastdb(infile=reference, dbtype=dbtype, outdir=outdir)
     run_makeblastdb(infile=other_genome, dbtype=dbtype, outdir=outdir)
 
-    # Genome vs reference
-    outfile1 = g_name + '_vs_' + r_name + '_blast.out'
-    outfile1 = op.join(outdir, outfile1)
-    if op.exists(outfile1) and os.stat(outfile1).st_size != 0:
-        log.debug('{} vs {} BLAST already run'.format(g_name, r_name))
-    else:
-        cmd = '{} -query {} -db {} -outfmt 6 -out {}'.format(command, other_genome, op.join(r_folder, r_name), outfile1)
-        log.debug('Running: {}'.format(cmd))
-        retval = subprocess.call(cmd, shell=True)
-        if retval == 0:
-            log.info('BLASTed {} vs {}'.format(g_name, r_name))
-        else:
-            log.error('Error running {}, exit code {}'.format(command, retval))
-
     # Reference vs genome
-    outfile2 = r_name + '_vs_' + g_name + '_blast.out'
-    outfile2 = op.join(outdir, outfile2)
-    if op.exists(outfile2) and os.stat(outfile2).st_size != 0:
+    r_vs_g = r_name + '_vs_' + g_name + '_blast.out'
+    r_vs_g = op.join(outdir, r_vs_g)
+    if op.exists(r_vs_g) and os.stat(r_vs_g).st_size != 0:
         log.debug('{} vs {} BLAST already run'.format(r_name, g_name))
     else:
-        cmd = '{} -query {} -db {} -outfmt 6 -out {}'.format(command, reference, op.join(g_folder, g_name), outfile2)
+        cmd = '{} -query {} -db {} -outfmt 6 -out {}'.format(command, reference, op.join(g_folder, g_name), r_vs_g)
         log.debug('Running: {}'.format(cmd))
         retval = subprocess.call(cmd, shell=True)
         if retval == 0:
-            log.info('BLASTed {} vs {}'.format(g_name, r_name))
+            log.debug('BLASTed {} vs {}'.format(g_name, r_name))
         else:
             log.error('Error running {}, exit code {}'.format(command, retval))
 
-    return outfile1, outfile2
+    # Genome vs reference
+    g_vs_r = g_name + '_vs_' + r_name + '_blast.out'
+    g_vs_r = op.join(outdir, g_vs_r)
+    if op.exists(g_vs_r) and os.stat(g_vs_r).st_size != 0:
+        log.debug('{} vs {} BLAST already run'.format(g_name, r_name))
+    else:
+        cmd = '{} -query {} -db {} -outfmt 6 -out {}'.format(command, other_genome, op.join(r_folder, r_name), g_vs_r)
+        log.debug('Running: {}'.format(cmd))
+        retval = subprocess.call(cmd, shell=True)
+        if retval == 0:
+            log.debug('BLASTed {} vs {}'.format(g_name, r_name))
+        else:
+            log.error('Error running {}, exit code {}'.format(command, retval))
+
+    return r_vs_g, g_vs_r
 
 
 def calculate_bbh(blast_results_1, blast_results_2, r_name, g_name, outdir=''):
@@ -145,7 +145,7 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name, g_name, outdir=''):
         return outfile
 
     out = pd.DataFrame()
-    log.info('Finding BBHs for {} vs. {}'.format(r_name, g_name))
+    log.debug('Finding BBHs for {} vs. {}'.format(r_name, g_name))
 
     for g in bbh1[pd.notnull(bbh1.gene)].gene.unique():
         res = bbh1[bbh1.gene == g]
@@ -165,7 +165,7 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name, g_name, outdir=''):
         out = pd.concat([out, pd.DataFrame(best_hit).transpose()])
 
     out.to_csv(outfile)
-    log.info('{} vs {} BLAST BBHs saved at {}'.format(r_name, g_name, outfile))
+    log.debug('{} vs {} BLAST BBHs saved at {}'.format(r_name, g_name, outfile))
     return outfile
 
 
