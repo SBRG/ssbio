@@ -661,6 +661,7 @@ class GEMPRO(object):
 
         """
         # TODO: clean up this code!
+        # TODO: check erol's notebook to see why uniprot_accs are not being set
         seq_mapping_pre_df = []
 
         for gene in self.genes:
