@@ -409,7 +409,7 @@ class ATLAS():
             # Get gene file in all strains if it shows up as functional
             for strain_model in self.strain_models:
                 strain_id = strain_model.id
-                strain_gene = strain_model.get_by_id(base_gene_id)
+                strain_gene = strain_model.genes.get_by_id(base_gene_id)
 
                 if not strain_gene.functional:
                     log.debug('{}: gene not present in strain {}, not aligning'.format(base_gene_id, strain_id))
