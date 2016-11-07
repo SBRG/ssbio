@@ -396,6 +396,7 @@ class ATLAS():
 
                 # Save the filename in the strain model's gene annotation
                 strain_model.genes.get_by_id(base_g_id).annotation['sequence']['seq_file'] = outfile
+                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['seq_len'] = len(strain_seq_record.seq)
 
                 if not op.exists(op.join(gene_dir, outfile)):
                     with open(op.join(gene_dir, outfile), 'w') as f:
@@ -409,10 +410,14 @@ class ATLAS():
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it.
 
         """
+        info_pre_df = []
+
         for base_gene in tqdm(self.base_strain_gempro.genes):
             # Get base strain gene fasta file path
             base_gene_id = base_gene.id
             base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
+            base_gene_seq_len = base_gene.annotation['sequence']['representative']['seq_len']
+
             if not base_gene_seq_file:
                 log.warning('{}: No representative sequence set in base strain'.format(base_gene_id))
                 continue
@@ -420,6 +425,11 @@ class ATLAS():
             base_gene_seq_path = op.join(self.base_strain_gempro.sequence_dir, base_gene_id, base_gene_seq_file)
 
             gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
+
+            info_dict = {}
+            info_dict['gene'] = base_gene_id
+            mutation_count = 0
+            num_strains_with_gene = 0
 
             # Get gene file in all strains if it shows up as functional
             for strain_model in self.strain_models:
@@ -441,16 +451,60 @@ class ATLAS():
                 # Save in strain gene annotation
                 strain_gene.annotation['sequence']['alignment_file'] = op.basename(alignment_file)
 
-                # alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
+                # Some stuff you can count
+                alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
+
+                num_mutations = len(alignment_df[alignment_df.type == 'mutation'])
+                mutation_count += num_mutations
+                num_strains_with_gene += 1
+
+            info_dict['mutation_count'] = mutation_count
+            info_dict['mutation_percent'] = mutation_count / float(num_strains_with_gene*base_gene_seq_len)
+            info_pre_df.append(info_dict)
+
+        # Save a dataframe of the file mapping info
+        cols = ['gene', 'mutation_count', 'mutation_percent']
+        self.df_alignment_stats = pd.DataFrame.from_records(info_pre_df, columns=cols)
+        log.info('Created alignment statistics dataframe. See the "df_alignment_stats" attribute.')
 
     def align_orthologous_genes_multiple(self):
-        """For each gene in the base strain, run a
+        """For each gene in the base strain, run a multiple alignment to all orthologous strain genes
 
         Returns:
 
         """
         pass
 
+    def per_gene_total_num_mutations(self, gene_id):
+        """Simply return the total number of mutations for a gene, summed over all strains.
+
+        Returns:
+            int: Total number of point mutations that show up in a gene throughout all strains
+
+        """
+        total_num_mutations = 0
+
+        gene_dir = op.join(self.seq_atlas_gene_dir, gene_id)
+
+        if not op.exists(gene_dir):
+            raise ValueError('{}: Gene does not exist'.format(gene_id))
+
+        for strain_model in tqdm(self.strain_models):
+            strain_id = strain_model.id
+            strain_gene = strain_model.genes.get_by_id(gene_id)
+
+            if not strain_gene.functional:
+                log.debug('{}: gene not present in strain {}, not counting'.format(gene_id, strain_id))
+                continue
+
+            alignment_file = op.join(gene_dir, strain_gene.annotation['sequence']['alignment_file'])
+            alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
+
+            num_mutations = len(alignment_df[alignment_df.type == 'mutation'])
+
+            total_num_mutations += num_mutations
+
+        return total_num_mutations
 
 
     def predict_auxotrophies(self):
