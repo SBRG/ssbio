@@ -391,6 +391,28 @@ class GEMPRO(object):
             # Save in Gene
             g.annotation['sequence']['kegg'].update(kegg_dict)
 
+            # Also check if KEGG sequence matches a potentially set representative sequence
+            # Do not add any info if a UniProt ID was already mapped though, we want to use that
+            if g.annotation['sequence']['representative']['seq_len'] > 0 and not g.annotation['sequence']['representative']['uniprot_acc']:
+                ### Check if sequences are the same
+
+                # Load already set representative sequence
+                rep_seq_file = g.annotation['sequence']['representative']['seq_file']
+                rep_seq_path = op.join(self.sequence_dir, gene_id, rep_seq_file)
+                rep_seq = SeqIO.read(open(rep_seq_path), 'fasta')
+
+                # Load kegg sequence
+                kegg_seq = SeqIO.read(open(sequence_file), 'fasta')
+
+                # Test equality
+                if str(rep_seq.seq) == str(kegg_seq.seq):
+                    # If equal, fill in representative sequence fields with kegg metadata but still use
+                    # the already set sequence file
+                    your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'metadata_file']
+                    for_saving = {your_key: kegg_dict[your_key] for your_key in your_keys if
+                                  your_key in kegg_dict}
+                    g.annotation['sequence']['representative'].update(for_saving)
+
             # Save in dataframe
             kegg_dict['gene'] = gene_id
             kegg_pre_df.append(kegg_dict)
@@ -477,9 +499,31 @@ class GEMPRO(object):
                     uniprot_dict.update(metadata)
 
                     # Save in Gene
+                    # TODO: fix default representation for pdbs
                     if 'pdbs' not in uniprot_dict:
                         uniprot_dict['pdbs'] = []
                     g.annotation['sequence']['uniprot'][str(mapped_uniprot)] = uniprot_dict
+
+                    # Also check if UniProt sequence matches a potentially set representative sequence
+                    if g.annotation['sequence']['representative']['seq_len'] > 0:
+                        ### Check if sequences are the same
+
+                        # Load already set representative sequence
+                        rep_seq_file = g.annotation['sequence']['representative']['seq_file']
+                        rep_seq_path = op.join(self.sequence_dir, gene_id, rep_seq_file)
+                        rep_seq = SeqIO.read(open(rep_seq_path), 'fasta')
+
+                        # Load uniprot sequence
+                        unip_seq = SeqIO.read(open(sequence_file), 'fasta')
+
+                        # Test equality
+                        if str(rep_seq.seq) == str(unip_seq.seq):
+                            # If equal, fill in representative sequence fields with uniprot metadata but still use
+                            # the already set sequence file
+                            your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'metadata_file']
+                            for_saving = {your_key: uniprot_dict[your_key] for your_key in your_keys if
+                                          your_key in uniprot_dict}
+                            g.annotation['sequence']['representative'].update(for_saving)
 
                     # Add info to dataframe
                     # TODO: empty pdb lists should be NaN in the dataframe
@@ -577,7 +621,7 @@ class GEMPRO(object):
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
             log.info('Created UniProt metadata dataframe.')
 
-    # TODO: should also have a seq --> uniprot id function (has to be 100% match)
+    # TODO: should also have a seq --> uniprot id function (has to be 100% match) (what about organism?)
     def manual_seq_mapping(self, gene_to_seq_dict):
         """Read a manual input dictionary of model gene IDs --> protein sequences.
 
@@ -662,7 +706,8 @@ class GEMPRO(object):
                 for_saving = { your_key: uni_prop[your_key] for your_key in your_keys if your_key in uni_prop}
                 seq_prop['representative'].update(for_saving)
                 genedict.update(for_saving)
-                genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
+                if 'kegg_id' in genedict:
+                    genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
                 log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
 
             # If there are both UniProt and KEGG annotations...
