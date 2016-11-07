@@ -20,6 +20,7 @@ from collections import defaultdict
 date = utils.Date()
 from ssbio.pipeline.gempro import GEMPRO
 from cobra.core import DictList
+from cobra.core import Model
 import sys
 import logging
 
@@ -28,26 +29,14 @@ log = logging.getLogger(__name__)
 
 
 # TODO: consolidate this and GEMPRO class into something simpler
-class Strain(object):
+class AnnotatedModel(Model):
     """Class to represent a strain which is just a minimal GEM-PRO object
     """
 
-    def __init__(self, gem_file_path, gem_file_type):
-        # Load the model
-        if gem_file_path and gem_file_type:
-            self.model = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type)
-            log.info('Loaded model: {}'.format(gem_file_path))
-
-            # Obtain list of all gene ids
-            self.genes = self.model.genes
-
-            # Log information on the number of things
-            log.info('Number of reactions: {}'.format(len(self.model.reactions)))
-            log.info(
-                    'Number of reactions linked to a gene: {}'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
-            log.info(
-                    'Number of genes (excluding spontaneous): {}'.format(ssbio.cobra.utils.true_num_genes(self.model)))
-            log.info('Number of metabolites: {}'.format(len(self.model.metabolites)))
+    def __init__(self, model, name=None):
+        Model.__init__(self, id_or_model=model, name=name)
+        # Obtain list of all gene ids
+        self.genes = self.model.genes
 
     @property
     def genes(self):
@@ -163,6 +152,47 @@ class ATLAS():
         self.strains = DictList([])
         self._reference_genome = base_genome_id
 
+    def create_strain_model(self, base_model, genes_to_remove, strain_id, strain_name=''):
+        """Create a strain specific model
+
+        Args:
+            list_of_strain_ids:
+
+        Returns:
+
+        """
+        # Make a copy of the base strain
+        my_new_strain_model = base_model.copy()
+        my_new_strain_model._trimmed = False
+        my_new_strain_model._trimmed_genes = []
+        my_new_strain_model._trimmed_reactions = {}
+
+        # Filter out genes in genes_to_remove which do not show up in the base strain model
+        model_genes = [x.id for x in base_model.genes]
+        genes_to_remove = list(set(genes_to_remove).intersection(set(model_genes)))
+
+        if len(genes_to_remove) == 0:
+            log.debug('No genes marked for removal from base strain')
+        else:
+            log.debug('{} genes marked for removal from base strain'.format(len(genes_to_remove)))
+
+            # Change the model's name to correspond with the strain
+            my_new_strain_model.id = strain_id
+
+            if strain_name:
+                my_new_strain_model.name = strain_name
+
+            # Delete genes!
+            cobra.manipulation.delete_model_genes(my_new_strain_model, genes_to_remove)
+
+            if my_new_strain_model._trimmed:
+                log.info('{}: deleted {} reactions, {} genes'.format(strain_id,
+                                                                     len(my_new_strain_model._trimmed_reactions),
+                                                                     len(my_new_strain_model._trimmed_genes)))
+
+        return AnnotatedModel(my_new_strain_model)
+
+
     def download_genome_cds_patric(self, ids, force_rerun=False):
         """Download genome files from PATRIC
 
@@ -258,50 +288,21 @@ class ATLAS():
         if len(self.df_orthology_matrix) == 0:
             raise RuntimeError('Empty orthology matrix')
 
-        if not hasattr(self, 'model'):
-            raise RuntimeError('No GEM loaded')
-
         # For each genome, create the strain specific model
         for strain_id in self.strains_to_fasta_file.keys():
             # Get a list of genes which do not have orthology in the strain
             not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
 
-            # Make a copy of the base strain
-            my_new_strain_model = self.base_strain_gempro.model.copy()
-            my_new_strain_model._trimmed = False
-            my_new_strain_model._trimmed_genes = []
-            my_new_strain_model._trimmed_reactions = {}
-
-            # Filter out genes which do not show up in the base strain model
-            model_genes = [x.id for x in self.base_strain_gempro.model.genes]
-            genes_to_remove = list(set(not_in_strain).intersection(set(model_genes)))
-
-            if len(genes_to_remove) == 0:
-                log.debug('No genes marked for removal from base strain')
-            else:
-                log.debug('{} genes marked for removal from base strain'.format(len(genes_to_remove)))
-
-                # Change the model's name to correspond with the strain
-                my_new_strain_model.id = strain_id
-
-                # TODO: allow input of model name as well (use a name:id mapping dict or something)
-                # my_new_strain_model.name = strain_name
-
-                # Delete genes!
-                cobra.manipulation.delete_model_genes(my_new_strain_model, genes_to_remove)
-
-                if my_new_strain_model._trimmed == True:
-                    log.info('{}: deleted {} reactions, {} genes'.format(strain_id,
-                                                                         len(my_new_strain_model._trimmed_reactions),
-                                                                         len(my_new_strain_model._trimmed_genes)))
+            strain_model = self.create_strain_model(self.base_strain_gempro.model,
+                                                    genes_to_remove=not_in_strain,
+                                                    strain_id=strain_id,
+                                                    strain_name=strain_id) # TODO: allow strain name input somewhere
 
             # Save the strain specific file
             outfile = op.join(self.atlas_model_files, '{}.json'.format(strain_id))
-            cobra.io.save_json_model(my_new_strain_model, outfile)
-            self.strains.append(my_new_strain_model)
+            cobra.io.save_json_model(strain_model, outfile)
+            self.strains.append(strain_model)
             log.debug('{}: saved model at {}'.format(strain_id, outfile))
-
-            del my_new_strain_model
 
         log.info('Created {} new strain-specific models'.format(len(self.strains)))
 
