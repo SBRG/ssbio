@@ -47,7 +47,7 @@ def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapexten
     else:
         # Make a default name if no outfile is set
         if not outfile:
-            outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+            outfile = op.join(outdir, '{}_{}.needle'.format(id_a, id_b))
         else:
             outfile = op.join(outdir, outfile)
 
@@ -117,7 +117,7 @@ def run_needle_alignment_on_str(id_a, seq_a, id_b, seq_b, gapopen=10, gapextend=
     else:
         # Make a default name if no outfile is set
         if not outfile:
-            outfile = op.join(outdir, '{}_{}_align.txt'.format(id_a, id_b))
+            outfile = op.join(outdir, '{}_{}.needle'.format(id_a, id_b))
         else:
             outfile = op.join(outdir, outfile)
 

@@ -33,6 +33,11 @@ import logging
 import copy
 import shutil
 
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
 
@@ -240,6 +245,7 @@ class ATLAS():
         """Run run_makeblastdb, run_bidirectional_blast, and calculate_bbh for both DNA and protein sequences.
 
         """
+        # TODO: probably best to split this function up to allow for force_rerunning of different parts
         # Get the path to the reference genome
         r_file = self.base_strain_gempro_genome_path
         r_folder, r_name, r_ext = utils.split_folder_and_path(r_file)
@@ -378,7 +384,7 @@ class ATLAS():
                 outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
 
                 # Save the filename in the strain model's gene annotation
-                strain_model.genes.get_by_id(strain_g_id).annotation['seq_file'] = outfile
+                strain_model.genes.get_by_id(base_g_id).annotation['seq_file'] = outfile
 
                 if not op.exists(op.join(gene_dir, outfile)):
                     with open(op.join(gene_dir, outfile), 'w') as f:
@@ -415,8 +421,9 @@ class ATLAS():
                                                                                    id_b=strain_id,
                                                                                    faa_a=base_gene_seq_path,
                                                                                    faa_b=strain_gene_seq_path,
-                                                                                   outdir=gene_dir,
-                                                                                   outfile='')
+                                                                                   outdir=gene_dir)
+                # TODO: behavior of run needle may change to always writing file and returning file path
+                alignment_df = ssbio.sequence.alignment.get_alignment_df(StringIO(alignment))
 
     def align_orthologous_genes_multiple(self):
         """For each gene in the base strain, run a
