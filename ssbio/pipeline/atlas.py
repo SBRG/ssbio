@@ -54,7 +54,7 @@ class AtlasModel(Model):
         for g in model.genes:
             g.annotation['sequence'] = {'seq_len'       : 0,
                                         'seq_file'      : None,
-                                        'pairwise_alignment_file': None,
+                                        'alignment_file': None,
                                         'properties'    : {}
                                         }
             g.annotation['structure'] = {'base_structure': g.annotation['structure']['representative']}
@@ -432,13 +432,16 @@ class ATLAS():
 
                 strain_gene_seq_path = strain_model.get_gene_sequence_path(base_gene_id, gene_dir)
 
-                alignment = ssbio.sequence.alignment.run_needle_alignment_on_files(id_a=base_gene_id,
-                                                                                   id_b=strain_id,
-                                                                                   faa_a=base_gene_seq_path,
-                                                                                   faa_b=strain_gene_seq_path,
-                                                                                   outdir=gene_dir)
-                # TODO: behavior of run needle may change to always writing file and returning file path
-                alignment_df = ssbio.sequence.alignment.get_alignment_df(StringIO(alignment))
+                alignment_file = ssbio.sequence.alignment.run_needle_alignment_on_files(id_a=base_gene_id,
+                                                                                       id_b=strain_id,
+                                                                                       faa_a=base_gene_seq_path,
+                                                                                       faa_b=strain_gene_seq_path,
+                                                                                       outdir=gene_dir)
+
+                # Save in strain gene annotation
+                strain_gene.annotation['sequence']['alignment_file'] = op.basename(alignment_file)
+
+                # alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
 
     def align_orthologous_genes_multiple(self):
         """For each gene in the base strain, run a
