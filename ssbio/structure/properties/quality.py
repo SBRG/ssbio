@@ -9,11 +9,6 @@ from ssbio.utils import percentage_to_float
 import logging
 log = logging.getLogger(__name__)
 
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
 
 def sequence_checker(reference_id, reference_sequence, structure_id, structure_sequence, gapopen=10, gapextend=0.5,
                      allow_missing_on_termini=0, allow_mutants=False, allow_deletions=False,
