@@ -239,8 +239,9 @@ class ATLAS():
 
         bbh_files = {}
 
-        for strain_model in self.strain_models:
+        for strain_model in tqdm(self.strain_models):
             g_file = strain_model.get_genome_file_path(self.seq_atlas_org_dir)
+            # TODO: replace usages of g_name with strain_model.id instead for consistency
             g_folder, g_name, g_ext = utils.split_folder_and_path(g_file)
 
             # Run bidirectional BLAST
@@ -251,7 +252,7 @@ class ATLAS():
             bbh = ssbio.sequence.blast.calculate_bbh(blast_results_1=b1, blast_results_2=b2,
                                                      r_name=r_name, g_name=g_name,
                                                      outdir=self.seq_atlas_org_dir)
-            bbh_files[g_name] = bbh
+            bbh_files[strain_model.id] = bbh
 
         # Make the orthologous genes matrix
         ortho_matrix = ssbio.sequence.blast.create_orthology_matrix(r_name=r_name,
@@ -260,8 +261,6 @@ class ATLAS():
                                                                     outdir=self.atlas_data_dir)
 
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
-
-        # TODO: check what the column names are!!
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
 
         # Remove extraneous strains from our analysis
