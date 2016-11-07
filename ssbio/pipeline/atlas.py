@@ -152,7 +152,7 @@ class ATLAS():
         self.strains = DictList([])
         self._reference_genome = base_genome_id
 
-    def create_strain_model(self, base_model, genes_to_remove, strain_id, strain_name=''):
+    def create_strain_model(self, genes_to_remove, strain_id, strain_name=''):
         """Create a strain specific model
 
         Args:
@@ -162,13 +162,13 @@ class ATLAS():
 
         """
         # Make a copy of the base strain
-        my_new_strain_model = base_model.copy()
+        my_new_strain_model = self.base_strain_gempro.model.copy()
         my_new_strain_model._trimmed = False
         my_new_strain_model._trimmed_genes = []
         my_new_strain_model._trimmed_reactions = {}
 
         # Filter out genes in genes_to_remove which do not show up in the base strain model
-        model_genes = [x.id for x in base_model.genes]
+        model_genes = [x.id for x in self.base_strain_gempro.genes]
         genes_to_remove = list(set(genes_to_remove).intersection(set(model_genes)))
 
         if len(genes_to_remove) == 0:
@@ -191,7 +191,6 @@ class ATLAS():
                                                                      len(my_new_strain_model._trimmed_genes)))
 
         return AnnotatedModel(my_new_strain_model)
-
 
     def download_genome_cds_patric(self, ids, force_rerun=False):
         """Download genome files from PATRIC
