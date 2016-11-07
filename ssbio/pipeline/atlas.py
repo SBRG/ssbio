@@ -51,7 +51,7 @@ class AtlasModel(Model):
                                         'pairwise_alignment_file': None,
                                         'properties'    : {}
                                         }
-            g.annotation['structure'] = {'base_structure': x.annotation['structure']['representative']}
+            g.annotation['structure'] = {'base_structure': g.annotation['structure']['representative']}
 
     def get_genome_file_path(self, genome_file_dir):
         return op.join(genome_file_dir, self.annotation['genome_file'])
