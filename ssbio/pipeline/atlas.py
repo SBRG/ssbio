@@ -66,7 +66,9 @@ class AtlasModel(object):
 
         """
         # Delete sequence annotation since that changes. Keep representative structure for reference as base_structure
-        for x in genes_dict_list:
+        for i, x in enumerate(genes_dict_list):
+            if not x.functional:
+                genes_dict_list.pop(i)
             x.annotation['sequence'] = {'seq_len'      : 0,
                                         'seq_file'     : None,
                                         'alignment_file': None,
@@ -171,7 +173,7 @@ class ATLAS():
         # Create initial strain models that are just copies of the base strain with a resetted annotation
         self.strain_ids = []
         self.strain_models = DictList([])
-        for strain_id, strain_fasta in strains_to_fasta_file.items():
+        for strain_id, strain_fasta in tqdm(strains_to_fasta_file.items()):
             self.strain_ids.append(strain_id)
 
             if strain_id == base_genome_id:
@@ -345,8 +347,9 @@ class ATLAS():
             raise RuntimeError('Empty orthology matrix')
 
         # For each genome, create the strain specific model
-        for strain_model in tqdm(self.strain_models):
-            strain_id = strain_model.id
+        for strain_atlas_model in tqdm(self.strain_models):
+            strain_id = strain_atlas_model.id
+            strain_model = strain_atlas_model.model
 
             # Get a list of genes which do not have orthology in the strain
             not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
