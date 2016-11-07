@@ -181,8 +181,7 @@ class ATLAS():
             base_strain_model_copy = copy.deepcopy(self.base_strain_gempro.model)
             self.strain_models.append(AtlasModel(id=strain_id,
                                                  model=base_strain_model_copy,
-                                                 genome_file_name=strain_fasta,
-                                                 reset_annotation=True))
+                                                 genome_file_name=strain_fasta))
 
         # Set the base, reference genome
         self._reference_genome = base_genome_id
