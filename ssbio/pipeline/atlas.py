@@ -301,6 +301,7 @@ class ATLAS():
         # Filter the matrix for genes within our base model only
         base_strain_gene_ids = [x.id for x in self.base_strain_gempro.model.genes]
         self.df_orthology_matrix_filtered = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
+        log.info('Created base model specific "df_orthology_matrix_filtered" attribute.'.format(ortho_matrix))
 
         log.info('{} strains to be analyzed'.format(len(self.strain_models)))
 
@@ -384,7 +385,7 @@ class ATLAS():
                 outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
 
                 # Save the filename in the strain model's gene annotation
-                strain_model.genes.get_by_id(base_g_id).annotation['seq_file'] = outfile
+                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['seq_file'] = outfile
 
                 if not op.exists(op.join(gene_dir, outfile)):
                     with open(op.join(gene_dir, outfile), 'w') as f:
