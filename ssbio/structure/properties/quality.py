@@ -48,7 +48,7 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
     """
 
     # Run the needle (global) alignment
-    raw_alignment_results = ssbio.sequence.alignment.run_needle_alignment_on_str(id_a=reference_id,
+    outpath = ssbio.sequence.alignment.run_needle_alignment_on_str(id_a=reference_id,
                                                                                  seq_a=reference_sequence,
                                                                                  id_b=structure_id,
                                                                                  seq_b=structure_sequence,
@@ -58,7 +58,7 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
                                                                                  outfile=outfile,
                                                                                  force_rerun=force_rerun)
     # Parse the alignment results
-    summary_df = ssbio.sequence.alignment.get_alignment_summary_df(StringIO(raw_alignment_results))
+    summary_df = ssbio.sequence.alignment.get_alignment_summary_df(outpath)
 
     # Get cutoff stuff ready
     ref_seq_len = len(reference_sequence)
