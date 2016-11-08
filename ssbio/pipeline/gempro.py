@@ -413,6 +413,8 @@ class GEMPRO(object):
                         for_saving = {your_key: kegg_dict[your_key] for your_key in your_keys if
                                       your_key in kegg_dict}
                         g.annotation['sequence']['representative'].update(for_saving)
+                    else:
+                        log.warning('{}: manually added sequence does not match mapped KEGG sequence.'.format(gene_id))
 
             # Save in dataframe
             kegg_dict['gene'] = gene_id
@@ -525,6 +527,8 @@ class GEMPRO(object):
                             for_saving = {your_key: uniprot_dict[your_key] for your_key in your_keys if
                                           your_key in uniprot_dict}
                             g.annotation['sequence']['representative'].update(for_saving)
+                        else:
+                            log.warning('{}: manually added sequence does not match mapped UniProt sequence.'.format(gene_id))
 
                     # Add info to dataframe
                     # TODO: empty pdb lists should be NaN in the dataframe

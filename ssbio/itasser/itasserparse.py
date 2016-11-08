@@ -6,7 +6,7 @@ import logging
 log = logging.getLogger(__name__)
 import time
 
-def organize_itasser_models(raw_dir, copy_to_dir, model_to_use='model1.pdb', rename_model_to='', force_rerun=False):
+def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to, model_to_use='model1.pdb', force_rerun=False):
     """Reorganize the raw information from I-TASSER modeling.
 
     - Copies the model1.pdb file and COACH results (if they exist) to specified folder
