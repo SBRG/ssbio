@@ -797,7 +797,7 @@ class GEMPRO(object):
 
                     for best_structure in best_structures:
                         currpdb = str(best_structure['pdb_id'].lower())
-                        currchain = str(best_structure['chain_id'].upper())
+                        currchain = str(best_structure['chain_id'])
 
                         # TODO: fix caching
                         # pdb_rel = ssbio.databases.pdb.get_release_date(currpdb)
@@ -905,7 +905,7 @@ class GEMPRO(object):
                     # pdb_rel = ssbio.databases.pdb.get_release_date(pdb)
 
                     for chain in chains:
-                        chain = str(chain.upper())
+                        chain = str(chain)
                         blast_dict = {}
                         blast_dict['pdb_id'] = pdb
                         blast_dict['pdb_chain_id'] = chain
