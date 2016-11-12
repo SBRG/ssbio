@@ -1041,7 +1041,7 @@ class GEMPRO(object):
 
             itasser_info = ssbio.itasser.itasserparse.organize_itasser_models(raw_dir=orig_itasser_dir,
                                                                               copy_to_dir=dest_gene_dir,
-                                                                              rename_model_to=gene_id,
+                                                                              rename_model_to=gene_id + '_model1',
                                                                               force_rerun=force_rerun)
 
             if itasser_info:

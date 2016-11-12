@@ -454,6 +454,15 @@ class ATLAS():
                 # Some stuff you can count
                 alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
 
+                # TODO: also count: number of unique mutations (have to consider position, amino acid change)
+                # indels? (average length of insertion, deletion)
+                # TODO: can i also "save" the alignment somehow? not the dataframe?
+                # TODO: keep track of strain with most mutations, least mutations
+                # TODO: keep track of strains that conserve the length of the protein, others that extend or truncate it
+                # need statistical test for that too (how long is "extended"/"truncated"?)
+                # TODO: number of strains with at least 1 mutations
+                # TODO: number of strains with <5% mutated, 5-10%, etc
+
                 num_mutations = len(alignment_df[alignment_df.type == 'mutation'])
                 mutation_count += num_mutations
                 num_strains_with_gene += 1

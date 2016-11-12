@@ -23,6 +23,8 @@ def run_makeblastdb(infile, dbtype, outdir=''):
 
     """
 
+    # TODO: rewrite using utils function command
+
     # Output location
     og_dir, name, ext = utils.split_folder_and_path(infile)
     if not outdir:
@@ -175,10 +177,10 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=80, bitscore
     Args:
         r_name (str): name of the reference genome
         genome_to_bbh_files (dict): mapping of genome names to the BBH files
-        pid_cutoff:
-        bitscore_cutoff:
-        outname:
-        outdir:
+        pid_cutoff: Min percent identity between BLAST hits to filter for
+        bitscore_cutoff: Min bitscore cutoff between BLAST hits to filter for
+        outname: Name of output file of orthology matrix
+        outdir: Path to output directory
 
     Returns:
         Path to orthologous genes matrix.
