@@ -11,7 +11,6 @@ from Bio import PDB
 # from Bio import Struct
 from Bio.PDB.HSExposure import HSExposureCA, HSExposureCB, ExposureCN
 
-
 # TODO: network representation of structure ("neighborhood" stuff)?
 
 
@@ -109,9 +108,6 @@ def get_pdb_seqs(pdb_file):
     return structure_seqs
 
 
-
-
-
 # @cachetools.func.ttl_cache(maxsize=1000)
 def get_pdb_res_starts(pdb_file):
     """Return a dictionary of the first residue number in each chain of a PDB file
@@ -195,4 +191,5 @@ def get_pdb_res_starts(pdb_file):
 #     my_structure = s.as_protein()
 #     ss = my_structure.search_ss_bonds(threshold=threshold_new)
 #
+#     return len(list(ss))
 #     return len(list(ss))

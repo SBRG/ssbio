@@ -16,7 +16,8 @@ pdbp = PDB.PDBParser(PERMISSIVE=True, QUIET=True)
 
 
 class PDBIOExt(PDBIO):
-    """Class to load either PDB or mmCIF files into a Biopython Structure object
+    """Class to load either PDB or mmCIF files into a Biopython Structure object.
+        This is needed for the CleanPDB and MutatePDB classes, in order to use the custom_selection flag.
     """
 
     def __init__(self, in_file):

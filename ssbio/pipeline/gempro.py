@@ -373,6 +373,9 @@ class GEMPRO(object):
                         # 'DBLINKS': {'NCBI-GeneID': '100763844', 'NCBI-ProteinID': 'XP_003514445'}
                         # 'ORTHOLOGY': {'K00473': 'procollagen-lysine,2-oxoglutarate 5-dioxygenase 1 [EC:1.14.11.4]'},
                         # 'PATHWAY': {'cge00310': 'Lysine degradation'},
+                    if 'DBLINKS' in kegg_parsed.keys():
+                        if 'NCBI-ProteinID' in kegg_parsed['DBLINKS']:
+                            kegg_dict['refseq'] = str(kegg_parsed['DBLINKS']['NCBI-ProteinID'])
 
             # Download kegg sequence
             sequence_file = ssbio.databases.kegg.download_kegg_aa_seq(organism_code=kegg_organism_code,
