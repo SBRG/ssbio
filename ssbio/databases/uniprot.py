@@ -1,5 +1,5 @@
 import pandas as pd
-
+usimport ssbio.utils
 try:
     from StringIO import StringIO
 except ImportError:
@@ -17,7 +17,6 @@ from dateutil.parser import parse as dateparse
 import warnings
 import re
 # import cachetools
-from ssbio import utils
 import requests
 import os.path as op
 
@@ -56,7 +55,7 @@ def get_fasta(uniprot_id):
         raise ValueError("Invalid UniProt ID!")
 
     # silencing the "Will be moved to Biokit" message
-    with utils.suppress_stdout():
+    with ssbio.utils.suppress_stdout():
         return bsup.get_fasta_sequence(uniprot_id)
 
 
@@ -97,7 +96,7 @@ def uniprot_reviewed_checker_batch(uniprot_ids):
     Returns:
         A dictionary of {UniProtID: Boolean}
     """
-    uniprot_ids = utils.force_list(uniprot_ids)
+    uniprot_ids = ssbio.utils.force_list(uniprot_ids)
 
     invalid_ids = [i for i in uniprot_ids if not is_valid_uniprot_id(i)]
     uniprot_ids = [i for i in uniprot_ids if is_valid_uniprot_id(i)]
@@ -181,11 +180,9 @@ def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
 
     """
     url = 'http://www.uniprot.org/uniprot/{}.{}'.format(uniprot_id, filetype)
-    outfile = '{}.{}'.format(uniprot_id, filetype)
-    if outdir:
-        outfile = op.join(outdir, outfile)
+    outfile = op.join(outdir, '{}.{}'.format(uniprot_id, filetype))
 
-    if not op.exists(outfile) and not force_rerun:
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         urlrequest.urlretrieve(url, outfile)
 
     return outfile
