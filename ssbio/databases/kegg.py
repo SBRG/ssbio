@@ -4,6 +4,7 @@ SEVEN_DAYS = 60 * 60 * 24 * 7
 from bioservices import KEGG
 kegg = KEGG()
 import io
+import ssbio.utils
 
 
 def download_kegg_gene_metadata(organism_code, gene_id, outdir='', force_rerun=False):
@@ -19,8 +20,7 @@ def download_kegg_gene_metadata(organism_code, gene_id, outdir='', force_rerun=F
 
     """
     outfile = op.join(outdir, '{}-{}.kegg'.format(organism_code, gene_id))
-    if not op.exists(outfile) or not force_rerun:
-
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         raw_text = kegg.get("{}:{}".format(organism_code, gene_id))
         if raw_text == 404:
             return
@@ -44,8 +44,7 @@ def download_kegg_aa_seq(organism_code, gene_id, outdir='', force_rerun=False):
 
     """
     outfile = op.join(outdir, '{}-{}.faa'.format(organism_code, gene_id))
-    if not op.exists(outfile) or not force_rerun:
-
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         raw_text = kegg.get("{}:{}".format(organism_code, gene_id), option='aaseq')
         if raw_text == 404:
             return
