@@ -407,7 +407,7 @@ class GEMPRO(object):
                 kegg_prop.uniprot_acc = kegg_to_uniprot[kegg_g]
 
             # Save in Gene
-            g.annotation['sequence']['kegg'] = kegg_prop
+            g.annotation['sequence']['kegg'] = kegg_dict
 
             if sequence_file:
                 # Also check if KEGG sequence matches a potentially set representative sequence
