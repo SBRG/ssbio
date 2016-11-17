@@ -19,7 +19,7 @@ def download_kegg_gene_metadata(organism_code, gene_id, outdir='', force_rerun=F
 
     """
     outfile = op.join(outdir, '{}-{}.kegg'.format(organism_code, gene_id))
-    if not op.exists(outfile) and not force_rerun:
+    if not op.exists(outfile) or not force_rerun:
 
         raw_text = kegg.get("{}:{}".format(organism_code, gene_id))
         if raw_text == 404:
@@ -44,7 +44,7 @@ def download_kegg_aa_seq(organism_code, gene_id, outdir='', force_rerun=False):
 
     """
     outfile = op.join(outdir, '{}-{}.faa'.format(organism_code, gene_id))
-    if not op.exists(outfile) and not force_rerun:
+    if not op.exists(outfile) or not force_rerun:
 
         raw_text = kegg.get("{}:{}".format(organism_code, gene_id), option='aaseq')
         if raw_text == 404:
