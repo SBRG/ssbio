@@ -1,5 +1,5 @@
 import pandas as pd
-usimport ssbio.utils
+import ssbio.utils
 try:
     from StringIO import StringIO
 except ImportError:
