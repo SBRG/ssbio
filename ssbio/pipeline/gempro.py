@@ -397,7 +397,7 @@ class GEMPRO(object):
                                                                       gene_id=kegg_g,
                                                                       outdir=gene_folder,
                                                                       force_rerun=force_rerun)
-            kegg_prop = KEGGProp(ident=kegg_organism_code + ':' + kegg_g,
+            kegg_prop = KEGGProp(kegg_id=kegg_organism_code + ':' + kegg_g,
                                  sequence_file=sequence_file,
                                  metadata_file=metadata_file)
             kegg_dict = kegg_prop.get_dict()
