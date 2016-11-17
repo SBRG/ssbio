@@ -76,12 +76,22 @@ class StructureProp(object):
 
 class SequenceProp(object):
     def __init__(self, kegg_id=None, kegg_sequence_file=None, kegg_metadata_file=None,
-                 uniprot_id=None, representative=None):
+                 uniprot_ids=None, representative=None):
+
         self.kegg = KEGGProp(kegg_id, kegg_sequence_file, kegg_metadata_file)
+
+        if not uniprot_ids:
+            uniprot_ids = []
+        uniprots = {}
+        for x in uniprot_ids:
+            uniprots[x] = UniProtProp(uniprot_acc=x)
+        self.uniprot = uniprots
+
+
 
 
 class UniProtProp(object):
-    def __init__(self, ident=''):
+    def __init__(self, uniprot_acc=''):
         pass
 
 class KEGGProp(object):
@@ -147,7 +157,6 @@ class GEMPRO(object):
     Each step may generate a report and also allow input of manual mappings if applicable.
     """
 
-
     def __init__(self, gem_name, root_dir, gem_file_path=None, gem_file_type=None, genes_list=None, genes_and_sequences=None):
         """Initialize the GEM-PRO project with a GEM or a list of genes.
 
@@ -199,7 +208,6 @@ class GEMPRO(object):
                 log.info('Created directory: {}'.format(directory))
             else:
                 log.debug('Directory already exists: {}'.format(directory))
-
 
         # Load the model
         if gem_file_path and gem_file_type:
