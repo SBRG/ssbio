@@ -47,6 +47,14 @@ bs_unip = UniProt()
 bs_kegg = KEGG()
 
 
+class RepresentativeSequence(object):
+    pass
+
+
+class RepresentativeStructure(object):
+    pass
+
+
 # TODO using these classes in the annotation field will work
 class StructureProp(object):
     def __init__(self, homology=None, pdb=None, representative=None):
@@ -67,28 +75,55 @@ class StructureProp(object):
 
 
 class SequenceProp(object):
-    def __init__(self, kegg=None, uniprot=None, representative=None):
-        if not kegg:
-            kegg = {'uniprot_acc'  : None,
-                    'kegg_id'      : None,
-                    'seq_len'      : 0,
-                    'pdbs'         : [],
-                    'seq_file'     : None,
-                    'metadata_file': None}
-        if not uniprot:
-            uniprot = {}
-        if not representative:
-            representative = {'uniprot_acc'  : None,
-                              'kegg_id'      : None,
-                              'seq_len'      : 0,
-                              'pdbs'         : [],
-                              'seq_file'     : None,
-                              'metadata_file': None}
-        self.kegg = kegg
-        self.uniprot = uniprot
-        self.representative = representative
+    def __init__(self, kegg_id=None, kegg_sequence_file=None, kegg_metadata_file=None,
+                 uniprot_id=None, representative=None):
+        self.kegg = KEGGProp(kegg_id, kegg_sequence_file, kegg_metadata_file)
 
-    # TODO: methods to return full path of files
+
+class UniProtProp(object):
+    def __init__(self, ident=''):
+        pass
+
+class KEGGProp(object):
+    def __init__(self, kegg_id=None, sequence_file=None, metadata_file=None):
+
+        if not kegg_id:
+            kegg_id = ''
+        if not sequence_file:
+            sequence_file = ''
+        if not metadata_file:
+            metadata_file = ''
+
+        self.kegg_id = kegg_id
+        self.refseq = None
+        self.uniprot_acc = None
+        self.pdbs = []
+        self.seq_len = 0
+        self.seq_file = op.basename(sequence_file)
+        self.metadata_file = op.basename(metadata_file)
+
+        if not metadata_file:
+            # TODO: parse metadata on the fly using ID only
+            self.refseq = ''
+            self.uniprot_acc = ''
+            self.pdbs = []
+            self.seq_len = 0
+        else:
+            with open(metadata_file) as mf:
+                kegg_parsed = bs_kegg.parse(mf.read())
+
+            if 'STRUCTURE' in kegg_parsed.keys():
+                self.pdbs = str(kegg_parsed['STRUCTURE']['PDB']).split(' ')
+            if 'DBLINKS' in kegg_parsed.keys():
+                if 'UniProt' in kegg_parsed['DBLINKS']:
+                    self.uniprot_acc = str(kegg_parsed['DBLINKS']['UniProt'])
+                if 'NCBI-ProteinID' in kegg_parsed['DBLINKS']:
+                    self.refseq = str(kegg_parsed['DBLINKS']['NCBI-ProteinID'])
+
+            self.seq_len = len(SeqIO.read(open(sequence_file), "fasta"))
+
+    def get_dict(self):
+        return self.__dict__
 
 
 class GEMPRO(object):
@@ -351,48 +386,28 @@ class GEMPRO(object):
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            # For saving the KEGG dataframe
-            kegg_dict = {}
-
             # Download kegg metadata
             metadata_file = ssbio.databases.kegg.download_kegg_gene_metadata(organism_code=kegg_organism_code,
                                                                              gene_id=kegg_g,
                                                                              outdir=gene_folder,
                                                                              force_rerun=force_rerun)
-            if metadata_file:
-                kegg_dict['metadata_file'] = op.basename(metadata_file)
-
-                # parse PDB mapping from metadata file
-                # in some cases, KEGG IDs do not map to a UniProt ID - this is to ensure we get the PDB mapping
-                with open(metadata_file) as mf:
-                    kegg_parsed = bs_kegg.parse(mf.read())
-                    if 'STRUCTURE' in kegg_parsed.keys():
-                        kegg_dict['pdbs'] = str(kegg_parsed['STRUCTURE']['PDB']).split(' ')
-                        # TODO: there is a lot more you can get from the KEGG metadata file, examples below
-                        # (consider saving it in the DF and in gene)
-                        # 'DBLINKS': {'NCBI-GeneID': '100763844', 'NCBI-ProteinID': 'XP_003514445'}
-                        # 'ORTHOLOGY': {'K00473': 'procollagen-lysine,2-oxoglutarate 5-dioxygenase 1 [EC:1.14.11.4]'},
-                        # 'PATHWAY': {'cge00310': 'Lysine degradation'},
-                    if 'DBLINKS' in kegg_parsed.keys():
-                        if 'NCBI-ProteinID' in kegg_parsed['DBLINKS']:
-                            kegg_dict['refseq'] = str(kegg_parsed['DBLINKS']['NCBI-ProteinID'])
 
             # Download kegg sequence
             sequence_file = ssbio.databases.kegg.download_kegg_aa_seq(organism_code=kegg_organism_code,
                                                                       gene_id=kegg_g,
                                                                       outdir=gene_folder,
                                                                       force_rerun=force_rerun)
-            if sequence_file:
-                kegg_dict['kegg_id'] = kegg_organism_code + ':' + kegg_g
-                # kegg_dict['seq'] = str(SeqIO.read(open(sequence_file), 'fasta').seq)
-                kegg_dict['seq_file'] = op.basename(sequence_file)
-                kegg_dict['seq_len'] = len(SeqIO.read(open(sequence_file), "fasta"))
+            kegg_prop = KEGGProp(ident=kegg_organism_code + ':' + kegg_g,
+                                 sequence_file=sequence_file,
+                                 metadata_file=metadata_file)
+            kegg_dict = kegg_prop.get_dict()
 
+            # Update potentially old UniProt ID
             if kegg_g in kegg_to_uniprot.keys():
-                kegg_dict['uniprot_acc'] = kegg_to_uniprot[kegg_g]
+                kegg_prop.uniprot_acc = kegg_to_uniprot[kegg_g]
 
             # Save in Gene
-            g.annotation['sequence']['kegg'].update(kegg_dict)
+            g.annotation['sequence']['kegg'] = kegg_prop
 
             if sequence_file:
                 # Also check if KEGG sequence matches a potentially set representative sequence
