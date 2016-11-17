@@ -123,7 +123,7 @@ class KEGGProp(object):
             self.seq_len = len(SeqIO.read(open(sequence_file), "fasta"))
 
     def get_dict(self):
-        return self.__dict__
+        return self.__dict__.copy()
 
 
 class GEMPRO(object):
