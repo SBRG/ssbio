@@ -5,8 +5,11 @@ import os
 import logging
 log = logging.getLogger(__name__)
 import time
+from ssbio.structure.pdbioext import PDBIOExt
+from ssbio.structure.cleanpdb import CleanPDB
+import ssbio.utils
 
-def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to, model_to_use='model1.pdb', force_rerun=False):
+def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=None, model_to_use='model1', force_rerun=False):
     """Reorganize the raw information from I-TASSER modeling.
 
     - Copies the model1.pdb file and COACH results (if they exist) to specified folder
@@ -22,13 +25,24 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to, model_to_use=
     # TODO: use ssbio.utils function
 
     # Best homology model is "model1.pdb"
-    old_model_path = op.join(raw_dir, model_to_use)
-    new_model_path = op.join(copy_to_dir, model_to_use)
+    old_model_path = op.join(raw_dir, '{}.pdb'.format(model_to_use))
+
     if rename_model_to:
-        new_model_path = op.join(copy_to_dir, '{}.pdb'.format(rename_model_to))
+        new_filename = rename_model_to
+    else:
+        new_filename = model_to_use
+    new_model_path = op.join(copy_to_dir, '{}.pdb'.format(new_filename))
+
     if op.exists(old_model_path):
-        if not op.exists(new_model_path) or force_rerun:
-            shutil.copy2(old_model_path, new_model_path)
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_model_path):
+
+            # Clean it
+            custom_clean = CleanPDB()
+            my_pdb = PDBIOExt(old_model_path)
+            default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
+                                                   custom_name=new_filename,
+                                                   out_dir=copy_to_dir)
+
         hom_dict['model_file'] = op.basename(new_model_path)
         hom_dict['model_date'] = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
     else:
@@ -36,9 +50,7 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to, model_to_use=
         return hom_dict
 
     ### Other modeling results
-    dest_itasser_dir = op.join(copy_to_dir, 'itasser')
-    if rename_model_to:
-        dest_itasser_dir = op.join(copy_to_dir, '{}_itasser'.format(rename_model_to))
+    dest_itasser_dir = op.join(copy_to_dir, '{}_itasser'.format(new_filename))
     if not op.exists(dest_itasser_dir) and op.exists(old_model_path):
         os.mkdir(dest_itasser_dir)
 
