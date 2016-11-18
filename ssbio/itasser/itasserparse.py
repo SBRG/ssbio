@@ -41,7 +41,8 @@ def organize_itasser_models(raw_dir, copy_to_dir, rename_model_to=None, model_to
             my_pdb = PDBIOExt(old_model_path)
             default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
                                                    custom_name=new_filename,
-                                                   out_dir=copy_to_dir)
+                                                   out_dir=copy_to_dir,
+                                                   out_suffix='')
 
         hom_dict['model_file'] = op.basename(new_model_path)
         hom_dict['model_date'] = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
