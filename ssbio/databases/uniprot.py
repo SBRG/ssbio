@@ -408,6 +408,3 @@ def parse_uniprot_txt_file(infile):
 #
 #         uniprot_metadata_final[uniprot_id] = uniprot_metadata_dict
 #     return uniprot_metadata_final
-
-if __name__ == '__main__':
-    pass

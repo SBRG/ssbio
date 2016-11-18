@@ -88,49 +88,47 @@ class SequenceProp(object):
         self.uniprot = uniprots
 
 
-
-
-class UniProtProp(object):
-    def __init__(self, uniprot_acc=''):
-        pass
-
-class KEGGProp(object):
-    def __init__(self, kegg_id=None, sequence_file=None, metadata_file=None):
-
-        if not kegg_id:
-            kegg_id = ''
+class SeqProp(object):
+    def __init__(self, ident=None, sequence_file=None, metadata_file=None):
+        if not ident:
+            ident = ''
         if not sequence_file:
             sequence_file = ''
         if not metadata_file:
             metadata_file = ''
 
-        self.kegg_id = kegg_id
+        self.ident = ident
+        self.kegg = None
         self.refseq = None
-        self.uniprot_acc = None
+        self.uniprot = None
         self.pdbs = []
         self.seq_len = 0
         self.seq_file = op.basename(sequence_file)
         self.metadata_file = op.basename(metadata_file)
 
-        if not metadata_file:
-            # TODO: parse metadata on the fly using ID only
-            self.refseq = ''
-            self.uniprot_acc = ''
-            self.pdbs = []
-            self.seq_len = 0
-        else:
-            with open(metadata_file) as mf:
-                kegg_parsed = bs_kegg.parse(mf.read())
-
-            if 'STRUCTURE' in kegg_parsed.keys():
-                self.pdbs = str(kegg_parsed['STRUCTURE']['PDB']).split(' ')
-            if 'DBLINKS' in kegg_parsed.keys():
-                if 'UniProt' in kegg_parsed['DBLINKS']:
-                    self.uniprot_acc = str(kegg_parsed['DBLINKS']['UniProt'])
-                if 'NCBI-ProteinID' in kegg_parsed['DBLINKS']:
-                    self.refseq = str(kegg_parsed['DBLINKS']['NCBI-ProteinID'])
-
+        if sequence_file:
             self.seq_len = len(SeqIO.read(open(sequence_file), "fasta"))
+
+
+class UniProtProp(SeqProp):
+    def __init__(self, uniprot_acc=None, sequence_file=None, metadata_file=None):
+
+        SeqProp.__init__(self, sequence_file=sequence_file, metadata_file=metadata_file)
+
+        if uniprot_acc:
+            self.uniprot = uniprot_acc
+
+        if metadata_file:
+            metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
+
+
+class KEGGProp(SeqProp):
+    def __init__(self, kegg_id=None, sequence_file=None, metadata_file=None):
+
+        SeqProp.__init__(self, sequence_file=sequence_file, metadata_file=metadata_file)
+
+        if kegg_id:
+            self.kegg = kegg_id
 
     def get_dict(self):
         return self.__dict__.copy()
