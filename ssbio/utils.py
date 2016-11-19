@@ -442,12 +442,8 @@ def input_list_parser(instring, filetype=''):
     >>> input_list_parser('/path/to/file.txt')
     ['/path/to/file.txt']
 
-    >>> input_list_parser('')
-
-        1. /path/to/folder -> list of files in folder (full paths)
-        2. /path/to/file ->
-        3. file1,file2 -> list of files
-        4.
+    >>> input_list_parser('file1.txt file2.txt')
+    ['file1.txt', 'file2.txt']
 
     Args:
         instring:
@@ -469,7 +465,7 @@ def input_list_parser(instring, filetype=''):
         return force_list(instring)
 
     else:
-        return instring.split(',')
+        return instring.split(' ')
 
 
 def flatlist_dropdup(list_of_lists):
