@@ -1,34 +1,89 @@
+import os
+import sys
 import datetime
 import os.path as op
 import glob
-import os
 import pandas as pd
-from contextlib import contextmanager
-import sys, os
-
-import os
-import sys
-import time
-import collections
-from collections import defaultdict
-from contextlib import contextmanager
-from collections import OrderedDict, Callable
+import contextlib
+import logging
 import distutils.spawn
 import subprocess
-import logging
-log = logging.getLogger(__name__)
-
-
+from collections import OrderedDict
+from collections import Callable
 try:
     from IPython.display import clear_output
     have_ipython = True
 except ImportError:
     have_ipython = False
 
+log = logging.getLogger(__name__)
 
-@contextmanager
+
+class Date():
+    """Various methods to return formatted dates for today.
+    """
+    def __init__(self):
+        self.short_date = self.short_date_prefix()
+
+    def short_date_prefix(self):
+        today = datetime.date.today()
+        return today.strftime('%y%m%d')
+
+
+class DefaultOrderedDict(OrderedDict):
+    """Class to combine defaultdict and OrderedDict.
+    Source: http://stackoverflow.com/a/6190500/562769
+
+    """
+    def __init__(self, default_factory=None, *a, **kw):
+        if (default_factory is not None and
+                not isinstance(default_factory, Callable)):
+            raise TypeError('first argument must be callable')
+        OrderedDict.__init__(self, *a, **kw)
+        self.default_factory = default_factory
+
+    def __getitem__(self, key):
+        try:
+            return OrderedDict.__getitem__(self, key)
+        except KeyError:
+            return self.__missing__(key)
+
+    def __missing__(self, key):
+        if self.default_factory is None:
+            raise KeyError(key)
+        self[key] = value = self.default_factory()
+        return value
+
+    def __reduce__(self):
+        if self.default_factory is None:
+            args = tuple()
+        else:
+            args = self.default_factory,
+        return type(self), args, None, None, self.items()
+
+    def copy(self):
+        return self.__copy__()
+
+    def __copy__(self):
+        return type(self)(self.default_factory, self)
+
+    def __deepcopy__(self, memo):
+        import copy
+        return type(self)(self.default_factory,
+                          copy.deepcopy(self.items()))
+
+    def __repr__(self):
+        return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
+                                               OrderedDict.__repr__(self))
+
+
+@contextlib.contextmanager
 def suppress_stdout():
-    """Suppress stout messages.
+    """Suppress the stdout of any function.
+
+    Usage:
+    with ssbio.utils.suppress_stdout():
+        my_function_here()
     """
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
@@ -43,10 +98,10 @@ def split_folder_and_path(filepath):
     """Split a file path into its folder, filename, and extension
 
     Args:
-        path (str): path to a file
+        path (str): Path to a file
 
     Returns:
-        Tuple of (folder, filename (without extension), extension)
+        tuple: of (folder, filename (without extension), extension)
 
     """
     dirname = op.dirname(filepath)
@@ -62,12 +117,13 @@ def outfile_name_maker(inname, outext='', outfile='', outdir=''):
     """Create a default name for an output file based on the inname name, unless a output name is specified.
 
     Args:
-        inname: Path to input file.
+        inname: Path to input file
+        outext: Optional specified extension for output file (with the "."). Default is ".out".
         outfile: Optional specified name of output file.
-        outdir: Optional path to output directory
+        outdir: Optional path to output directory.
 
     Returns:
-        str: Path to final output destination
+        str: Path to final output destination.
 
     Examples:
 
@@ -107,8 +163,8 @@ def force_rerun(flag, outfile):
     """Check if we should force rerunning of a command if an output file exists.
 
     Args:
-        flag (bool): Flag to force rerun
-        outfile (str): Path to output file which may already exist
+        flag (bool): Flag to force rerun.
+        outfile (str): Path to output file which may already exist.
 
     Returns:
         bool: If we should force rerunning of a command
@@ -155,6 +211,19 @@ def program_exists(prog_name):
 
 
 def command_runner(program, args, force_rerun_flag, outfile):
+    """Run a program with command-line arguments.
+
+    Args:
+        program: Name of the program.
+        args: Any program flags as they would be formatted in the command-line (ie. "-i test.in -o test.out").
+        force_rerun_flag: If the program should be rerun even if the output file exists.
+        outfile: Name out the output file which may have been generated.
+            This does not specify what the outfile will be, that should be done in the args.
+
+    Returns:
+        bool: If the program ran successfully.
+
+    """
     # Check if pepstats is installed
     if not program_exists(program):
         raise OSError('{}: program not installed'.format(program))
@@ -169,41 +238,36 @@ def command_runner(program, args, force_rerun_flag, outfile):
         log.debug('{}: Output already exists'.format(outfile))
 
 
-def dict_head(d, disp=5):
-    """Return the head of a dictionary.
+def dict_head(d, N=5):
+    """Return the head of a dictionary. It will be random!
 
-    Returns the first 5 key/value pairs in a dictionary
+    Default is to return the first 5 key/value pairs in a dictionary.
 
     Args:
-        d: dictionary to get head
-        disp: number of elements to display
+        d: Dictionary to get head.
+        N: Number of elements to display.
 
     Returns:
-        Dict
+        dict: the first N items of the dictionary.
 
     """
-    return {k: d[k] for k in list(d.keys())[:disp]}
+    return {k: d[k] for k in list(d.keys())[:N]}
 
 
-def rank_dated_files(pattern, dir):
-    """Search a directory for files that match a pattern. Return an ordered list of these files.
+def rank_dated_files(pattern, dir, descending=True):
+    """Search a directory for files that match a pattern. Return an ordered list of these files by filename.
 
     Args:
-        pattern: glob pattern to search for
+        pattern: The glob pattern to search for.
+        dir: Path to directory where the files will be searched for.
+        descending: Default True, will sort alphabetically by descending order.
 
     Returns:
-        Rank-ordered list, usually by date (shortdate format, e.g. 161010).
-        The most recent file will be in position 0.
+        list: Rank-ordered list by filename.
 
     """
     files = glob.glob(op.join(dir, pattern))
-    return sorted(files, reverse=True)
-
-
-def input_parser(args):
-    """Parse command line inputs
-    """
-    pass
+    return sorted(files, reverse=descending)
 
 
 def find(lst, a, case_sensitive=True):
@@ -212,6 +276,7 @@ def find(lst, a, case_sensitive=True):
     Args:
         lst: list of values
         a: object(s) to check equality
+        case_sensitive: if the search should be case sensitive
 
     Returns:
         list: list of indicies of lst which equal a
@@ -232,9 +297,10 @@ def not_find(lst, a, case_sensitive=True):
     Args:
         lst: list of values
         a: object(s) to check inequality
+        case_sensitive: if the search should be case sensitive
 
     Returns:
-        list: list of indicies of lst which do not equal a
+        list: list of indices of lst which do not equal a
 
     """
     a = force_list(a)
@@ -252,6 +318,7 @@ def filter_list(lst, takeout, case_sensitive=True):
     Args:
         lst: Original list of values
         takeout: Object or objects to remove from lst
+        case_sensitive: if the search should be case sensitive
 
     Returns:
         list: Filtered list of values
@@ -278,17 +345,6 @@ def filter_list_by_indices(lst, indices):
 
     """
     return [x for i, x in enumerate(lst) if i in indices]
-
-
-@contextmanager
-def suppress_stdout():
-    with open(os.devnull, "w") as devnull:
-        old_stdout = sys.stdout
-        sys.stdout = devnull
-        try:
-            yield
-        finally:
-            sys.stdout = old_stdout
 
 
 def force_string(val=None):
@@ -348,18 +404,50 @@ def force_upper_list(val=None):
     return [x.upper() for x in force_list(val)]
 
 
-def split_list(a_list):
-    half = len(a_list) // 2
-    return a_list[:half], a_list[half:]
+def split_list_by_n(l, n):
+    """Split a list into lists of size n.
+
+    Args:
+        l: List of stuff.
+        n: Size of new lists.
+
+    Returns:
+        list: List of lists each of size n derived from l.
+
+    """
+    n = max(1, n)
+    return (l[i:i+n] for i in xrange(0, len(l), n))
+
+
+def split_list_into_n_lists(l, n):
+    """Split a list into n lists.
+
+    Args:
+        l: List of stuff.
+        n: Number of new lists to generate.
+
+    Returns:
+        list: List of n lists.
+
+    """
+    return [l[i::n] for i in xrange(n)]
 
 
 def input_list_parser(instring, filetype=''):
-    """Always return a list of files with varying input
+    """Always return a list of files with varying input.
 
-    1. /path/to/folder -> list of files in folder (full paths)
-    2. /path/to/file -> list of files (singular list)
-    3. file1,file2 -> list of files
-    4.
+    >>> input_list_parser('/path/to/folder/')
+    ['/path/to/folder/file1.txt', '/path/to/folder/file2.txt', '/path/to/folder/file3.txt']
+
+    >>> input_list_parser('/path/to/file.txt')
+    ['/path/to/file.txt']
+
+    >>> input_list_parser('')
+
+        1. /path/to/folder -> list of files in folder (full paths)
+        2. /path/to/file ->
+        3. file1,file2 -> list of files
+        4.
 
     Args:
         instring:
@@ -385,35 +473,43 @@ def input_list_parser(instring, filetype=''):
 
 
 def flatlist_dropdup(list_of_lists):
-    return list(set([str(item) for sublist in list_of_lists for item in sublist]))
+    """Make a single list out of a list of lists, and drop all duplicates.
 
+    Args:
+        list_of_lists: List of lists.
 
-def chunks(l, n):
-    """ Yield successive n-sized chunks from l.
+    Returns:
+        list: List of single objects.
+
     """
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+    return list(set([str(item) for sublist in list_of_lists for item in sublist]))
 
 
 def combinations(iterable, r):
     """Calculate combinations
-    combinations('ABCD', 2) --> AB AC AD BC BD CD
-    combinations(range(4), 3) --> 012 013 023 123
+
+    >>> list(combinations('ABCD',2))
+    [['A', 'B'], ['A', 'C'], ['A', 'D'], ['B', 'C'], ['B', 'D'], ['C', 'D']]
+
+    >>> list(combinations(range(4), 3))
+    [[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]]
 
     Args:
-        iterable:
-        r:
+        iterable: Any iterable object.
+        r: Size of combination.
 
-    Returns:
+    Yields:
+        list: Combination of size r.
 
     """
-
     pool = tuple(iterable)
     n = len(pool)
     if r > n:
         return
+
     indices = list(range(r))
     yield list(pool[i] for i in indices)
+
     while True:
         for i in reversed(range(r)):
             if indices[i] != i + n - r:
@@ -426,58 +522,17 @@ def combinations(iterable, r):
         yield list(pool[i] for i in indices)
 
 
-class Date():
-    def __init__(self):
-        self.short_date = self.date_prefix()
-
-    def date_prefix(self):
-        today = datetime.date.today()
-        return today.strftime('%y%m%d')
-
-
-class DefaultOrderedDict(OrderedDict):
-    # Source: http://stackoverflow.com/a/6190500/562769
-    def __init__(self, default_factory=None, *a, **kw):
-        if (default_factory is not None and
-                not isinstance(default_factory, Callable)):
-            raise TypeError('first argument must be callable')
-        OrderedDict.__init__(self, *a, **kw)
-        self.default_factory = default_factory
-
-    def __getitem__(self, key):
-        try:
-            return OrderedDict.__getitem__(self, key)
-        except KeyError:
-            return self.__missing__(key)
-
-    def __missing__(self, key):
-        if self.default_factory is None:
-            raise KeyError(key)
-        self[key] = value = self.default_factory()
-        return value
-
-    def __reduce__(self):
-        if self.default_factory is None:
-            args = tuple()
-        else:
-            args = self.default_factory,
-        return type(self), args, None, None, self.items()
-
-    def copy(self):
-        return self.__copy__()
-
-    def __copy__(self):
-        return type(self)(self.default_factory, self)
-
-    def __deepcopy__(self, memo):
-        import copy
-        return type(self)(self.default_factory,
-                          copy.deepcopy(self.items()))
-
-    def __repr__(self):
-        return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
-                                               OrderedDict.__repr__(self))
-
-
 def percentage_to_float(x):
+    """Convert a string representation of a percentage to float.
+
+    >>> percentage_to_float('55%')
+    0.55
+
+    Args:
+        x: String representation of a percentage
+
+    Returns:
+        float: Percentage in decimal form
+
+    """
     return float(x.strip('%')) / 100

@@ -54,7 +54,7 @@ def get_fasta(uniprot_id):
     if not is_valid_uniprot_id(uniprot_id):
         raise ValueError("Invalid UniProt ID!")
 
-    # silencing the "Will be moved to Biokit" message
+    # Silencing the "Will be moved to Biokit" message
     with ssbio.utils.suppress_stdout():
         return bsup.get_fasta_sequence(uniprot_id)
 
