@@ -78,11 +78,10 @@ if __name__ == '__main__':
 
     p = argparse.ArgumentParser(description='Runs MSMS on a PDB file or folder')
     p.add_argument('infile', help='PDB file or folder', type=str, nargs='+')
-    p.add_argument('--summary', action='store_false')
+    p.add_argument('--summary', action='store_true)
     args = p.parse_args()
 
     print(args)
-    infiles = utils.input_list_parser(args.infile)
 
     msmsinfo = []
     redinfo = []
