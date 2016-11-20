@@ -416,7 +416,7 @@ def split_list_by_n(l, n):
 
     """
     n = max(1, n)
-    return (l[i:i+n] for i in xrange(0, len(l), n))
+    return list(l[i:i+n] for i in range(0, len(l), n))
 
 
 def split_list_into_n_lists(l, n):
@@ -430,42 +430,43 @@ def split_list_into_n_lists(l, n):
         list: List of n lists.
 
     """
-    return [l[i::n] for i in xrange(n)]
+    return [l[i::n] for i in range(n)]
 
 
-def input_list_parser(instring, filetype=''):
+def input_list_parser(infile_list):
     """Always return a list of files with varying input.
 
-    >>> input_list_parser('/path/to/folder/')
+    >>> input_list_parser(['/path/to/folder/'])
     ['/path/to/folder/file1.txt', '/path/to/folder/file2.txt', '/path/to/folder/file3.txt']
 
-    >>> input_list_parser('/path/to/file.txt')
+    >>> input_list_parser(['/path/to/file.txt'])
     ['/path/to/file.txt']
 
-    >>> input_list_parser('file1.txt file2.txt')
-    ['file1.txt', 'file2.txt']
+    >>> input_list_parser(['file1.txt'])
+    ['file1.txt']
 
     Args:
-        instring:
+        infile_list: List of arguments
 
     Returns:
+        list: Standardized list of files
 
     """
-    if filetype:
-        # TODO
-        searchstring = '*'
-    else:
-        searchstring = '*'
 
-    if op.isdir(instring):
-        os.chdir(instring)
-        return glob.glob('*')
+    final_list_of_files = []
 
-    if op.isfile(instring):
-        return force_list(instring)
+    for x in infile_list:
 
-    else:
-        return instring.split(' ')
+        # If the input is a folder
+        if op.isdir(x):
+            os.chdir(x)
+            final_list_of_files.extend(glob.glob('*'))
+
+        # If the input is a file
+        if op.isfile(x):
+            final_list_of_files.append(x)
+
+    return final_list_of_files
 
 
 def flatlist_dropdup(list_of_lists):

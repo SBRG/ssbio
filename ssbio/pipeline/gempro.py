@@ -1364,9 +1364,9 @@ class GEMPRO(object):
                 infile = op.join(gene_structure_dir, clean_pdb)
 
                 try:
-                    outfile = ssbio.structure.properties.msms.msms_output(pdb_file=infile,
-                                                                            outdir=gene_structure_dir,
-                                                                            force_rerun=force_rerun)
+                    outfile = ssbio.structure.properties.msms.run_msms(pdb_file=infile,
+                                                                       outdir=gene_structure_dir,
+                                                                       force_rerun=force_rerun)
                 # Log if MSMS was not run on a file
                 except AssertionError:
                     self.missing_msms[gene_id] = infile
