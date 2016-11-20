@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     msms_errors = []
 
-    for f in tqdm(infiles, leave=True):
+    for f in tqdm(args.infile, leave=True):
         try:
             msms_stuff = msms_output(f)
         except:
