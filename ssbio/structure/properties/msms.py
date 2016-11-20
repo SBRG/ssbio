@@ -78,9 +78,10 @@ if __name__ == '__main__':
 
     p = argparse.ArgumentParser(description='Runs MSMS on a PDB file or folder')
     p.add_argument('infile', help='PDB file or folder', type=str, nargs='+')
+    p.add_argument('--summary', action='store_false')
     args = p.parse_args()
 
-    print(args.infile)
+    print(args)
     infiles = utils.input_list_parser(args.infile)
 
     msmsinfo = []
@@ -97,10 +98,11 @@ if __name__ == '__main__':
 
         msmsinfo.append([f, msms_stuff])
 
-    # TODO: change behavior of dataframe stuff and printing errors
-    DF_PROP_MSMS = pd.DataFrame(msmsinfo)
-    DF_PROP_MSMS.columns = ['ssb_file', 'ssb_msms']
-    DF_PROP_MSMS.to_csv('DF_PROP_MSMS.csv')
+    if args.summary:
+        # TODO: change behavior of dataframe stuff and printing errors
+        DF_PROP_MSMS = pd.DataFrame(msmsinfo)
+        DF_PROP_MSMS.columns = ['ssb_file', 'ssb_msms']
+        DF_PROP_MSMS.to_csv('DF_PROP_MSMS.csv')
 
     print('Errors with: {}'.format(msms_errors))
     print('Saved DF at: {}'.format('DF_PROP_MSMS.csv'))
