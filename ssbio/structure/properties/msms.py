@@ -35,7 +35,7 @@ def run_msms(pdb_file, outfile='', outdir='', outext='_msms.json', force_rerun=F
         force_rerun: Rerun MSMS even if results exist already
 
     Returns:
-        str: path to saved json file of residue and alpha-carbon depths
+        str: Path to saved json file of residue and alpha-carbon depths
 
     """
     # Create the output file name
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     if args.summary:
         pass
         # TODO: what to save as a summary? Average residue depth of entire protein?
-        log.info('Saved DF at: {}'.format('{}-df_msms_summary.csv'.format(ssbio.utils.Date().short_date)))
+        log.info('Saved DF at: {}'.format('{}-df_msms_summary.csv'.format(ssbio.utils.todays_short_date())))
 
     if msms_errors:
         log.warning('Errors with: {}'.format(msms_errors))

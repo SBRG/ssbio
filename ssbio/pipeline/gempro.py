@@ -262,6 +262,7 @@ class GEMPRO(object):
         if not isinstance(genes_list, DictList):
             tmp_list = []
             for x in list(set(genes_list)):
+                x = str(x)
                 new_gene = Gene(id=x)
 
                 # TODO: if we don't define dictionaries like this we risk pointing to the same object for some reason
@@ -670,7 +671,7 @@ class GEMPRO(object):
 
             gene.annotation['sequence']['representative']['seq_len'] = len(s)
 
-            gene_folder = op.join(self.sequence_dir, g)
+            gene_folder = op.join(self.sequence_dir, str(g))
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
