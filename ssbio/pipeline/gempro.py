@@ -667,11 +667,12 @@ class GEMPRO(object):
 
         # save the sequence information in individual FASTA files
         for g, s in gene_to_seq_dict.items():
+            g = str(g)
             gene = self.genes.get_by_id(g)
 
             gene.annotation['sequence']['representative']['seq_len'] = len(s)
 
-            gene_folder = op.join(self.sequence_dir, str(g))
+            gene_folder = op.join(self.sequence_dir, g)
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
