@@ -30,6 +30,11 @@ class Date():
         return today.strftime('%y%m%d')
 
 
+def todays_short_date():
+    today = Date()
+    return today.short_date
+
+
 class DefaultOrderedDict(OrderedDict):
     """Class to combine defaultdict and OrderedDict.
     Source: http://stackoverflow.com/a/6190500/562769

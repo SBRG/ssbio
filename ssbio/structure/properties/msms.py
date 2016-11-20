@@ -88,9 +88,8 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description='Run MSMS to calculate residue depth on a file, files, or a directory. Save a JSON file of results per structure.')
     p.add_argument('infile', help='PDB file, files, or folder', type=str, nargs='+')
     p.add_argument('--summary', action='store_true', help='Save a summary DataFrame of results.')
-    args = p.parse_args()
 
-    print(args)
+    args = p.parse_args()
     infiles = ssbio.utils.input_list_parser(args.infile)
 
     msms_errors = []
@@ -105,7 +104,7 @@ if __name__ == '__main__':
     if args.summary:
         pass
         # TODO: what to save as a summary? Average residue depth of entire protein?
-        log.info('Saved DF at: {}'.format('DF_PROP_MSMS.csv'))
+        log.info('Saved DF at: {}'.format('{}-df_msms_summary.csv'.format(ssbio.utils.Date().short_date)))
 
     if msms_errors:
         log.warning('Errors with: {}'.format(msms_errors))
