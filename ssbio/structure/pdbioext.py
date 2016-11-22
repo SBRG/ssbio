@@ -28,7 +28,8 @@ class PDBIOExt(PDBIO):
         if file_type.lower() == 'mmcif' or file_type.lower() == 'cif':
             structure = cifp.get_structure(structure_id='ssbio_cif', filename=structure_file)
 
-        # If there are multiple models (NMR), use the first model as the structure
+        # If there are multiple models (NMR), use the first model as the representative structure
+        # TODO: if we do this, we lose header info on the PDB
         if len(structure) > 1:
             structure = structure[0]
             log.debug('{}: using first model'.format(structure_file))
@@ -38,6 +39,7 @@ class PDBIOExt(PDBIO):
 
         # Set this structure as the main one
         self.set_structure(structure)
+        self.first_model = structure[0]
 
     def write_pdb(self, custom_name='', custom_ext='', out_suffix='new', out_dir=None, custom_selection=None):
         """Write a new PDB file for the Structure's FIRST MODEL.

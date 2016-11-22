@@ -176,7 +176,6 @@ def download_and_clean_pdb(pdb_id, chain_id, output_dir, file_type='pdb', output
     """
     my_pdb_file = download_and_load_pdb(pdb_id, output_dir=output_dir)
     my_pdb = PDBIOExt(my_pdb_file)
-    my_model = my_pdb.first_model
 
     # clean pdb and save a file with only these chains of interest
     # suffix appended with chains (1fat_A_B_cleaned.pdb)
