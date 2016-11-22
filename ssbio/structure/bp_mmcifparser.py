@@ -7,7 +7,8 @@ from ssbio.structure.bp_mmcif2dict import MMCIF2DictFix
 
 
 class MMCIFParserFix(MMCIFParser):
-    """Parse a PDB file and return a Structure object."""
+    """Fixes for MMCIFParser according to biopython#481 and biopython#523
+    """
 
     def __init__(self, QUIET=True):
         super(MMCIFParserFix, self).__init__(QUIET=QUIET)
