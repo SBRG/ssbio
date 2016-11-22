@@ -3,14 +3,13 @@ from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 
 
 class MMCIF2DictFix(MMCIF2Dict):
-    """Fixes for MMCIF2Dict according to biopython#481 and biopython#523
+    """Fixes for MMCIF2Dict according to biopython#481 and biopython#523. Methods override parent.
     """
 
     def __init__(self, filename):
         super(MMCIF2DictFix, self).__init__(filename=filename)
 
     def _tokenize(self, handle):
-        print('this working?')
         for line in handle:
             if line.startswith("#"):
                 continue

@@ -7,7 +7,7 @@ from ssbio.structure.bp_mmcif2dict import MMCIF2DictFix
 
 
 class MMCIFParserFix(MMCIFParser):
-    """Fixes for MMCIFParser according to biopython#481 and biopython#523
+    """Fixes for MMCIFParser according to biopython#481 and biopython#523. Methods override parent.
     """
 
     def __init__(self, QUIET=True):
