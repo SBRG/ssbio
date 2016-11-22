@@ -1081,6 +1081,7 @@ class GEMPRO(object):
                 # TODO: should probably just do the alignment to make sure (representative sequences can change)
                 copied = copy.deepcopy(itasser_parse.modeling_results)
                 copied['seq_coverage'] = 1
+                copied['model_file'] = op.basename(itasser_parse.structure_path)
                 g.annotation['structure']['homology'][gene_id] = copied
 
                 copied['gene'] = gene_id
@@ -1102,7 +1103,7 @@ class GEMPRO(object):
                 'top_go_bp_c_score', 'top_go_cc_go_id', 'top_go_cc_go_term', 'top_go_cc_c_score']
         self.df_itasser = pd.DataFrame.from_records(itasser_pre_df, columns=cols)
 
-        log.info('Completed copying of I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.')
+        log.info('Completed copying of {} I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.'.format(len(self.df_itasser)))
 
     def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage',
                                      allow_missing_on_termini=0.1, allow_mutants=True, allow_deletions=False,

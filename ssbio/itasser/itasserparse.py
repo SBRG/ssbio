@@ -36,7 +36,7 @@ class ITASSERParse():
         ### MODEL1.PDB THINGS
         old_model_path = op.join(original_results_path, '{}.pdb'.format(model_to_use))
         if not op.exists(old_model_path):
-            log.warning('{}: No homology model available'.format(old_model_path))
+            log.debug('{}: No homology model available'.format(old_model_path))
             self.structure_path = None
         else:
             self.structure_path = old_model_path
