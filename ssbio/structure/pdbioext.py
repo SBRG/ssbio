@@ -1,7 +1,8 @@
 import ssbio.utils
 from ssbio.structure.bp_mmcifparser import MMCIFParserFix
-from Bio.PDB import PDBParser
-from Bio.PDB import PDBIO
+from Bio.PDB.PDBParser import PDBParser
+from Bio.PDB.PDBIO import PDBIO
+from Bio.PDB.PDBIO import Select
 
 import logging
 log = logging.getLogger(__name__)
@@ -54,6 +55,8 @@ class PDBIOExt(PDBIO):
             out_file: filepath of new PDB file
 
         """
+        if not custom_selection:
+            custom_selection = Select()
 
         # Prepare the output file path
         outfile = ssbio.utils.outfile_name_maker(inname=self.structure_file,
