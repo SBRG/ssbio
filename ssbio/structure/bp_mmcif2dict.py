@@ -1,5 +1,5 @@
 import shlex
-from Bio.PDB import MMCIF2Dict
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 
 
 class MMCIF2DictFix(MMCIF2Dict):

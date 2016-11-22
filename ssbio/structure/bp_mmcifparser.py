@@ -1,9 +1,10 @@
 import numpy
 import warnings
-from Bio.PDB import MMCIFParser
+from Bio.PDB.MMCIFParser import MMCIFParser
 from Bio.PDB.PDBExceptions import PDBConstructionException
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from ssbio.structure.bp_mmcif2dict import MMCIF2DictFix
+
 
 class MMCIFParserFix(MMCIFParser):
     """Parse a PDB file and return a Structure object."""
