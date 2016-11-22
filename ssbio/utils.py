@@ -119,7 +119,7 @@ def split_folder_and_path(filepath):
     return dirname, filename_without_extension, extension
 
 
-def outfile_name_maker(inname, outext='.out', outfile='', outdir='', append_to_name=''):
+def outfile_maker(inname, outext='.out', outname='', outdir='', append_to_name=''):
     """Create a default name for an output file based on the inname name, unless a output name is specified.
 
     Args:
@@ -133,45 +133,57 @@ def outfile_name_maker(inname, outext='.out', outfile='', outdir='', append_to_n
 
     Examples:
 
-        >>> outfile_name_maker(inname='P00001.fasta')
+        >>> outfile_maker(inname='P00001.fasta')
         'P00001.out'
 
-        >>> outfile_name_maker(inname='P00001.fasta', append_to_name='_new')
+        >>> outfile_maker(inname='P00001.fasta', append_to_name='_new')
         'P00001_new.out'
 
-        >>> outfile_name_maker(inname='P00001.fasta', outext='.mao')
+        >>> outfile_maker(inname='P00001.fasta', outext='.mao')
         'P00001.mao'
 
-        >>> outfile_name_maker(inname='P00001.fasta', outext='.mao', append_to_name='_new')
+        >>> outfile_maker(inname='P00001.fasta', outext='.mao', append_to_name='_new')
         'P00001_new.mao'
 
-        >>> outfile_name_maker(inname='P00001.fasta', outext='.new', outfile='P00001_aligned')
+        >>> outfile_maker(inname='P00001.fasta', outext='.new', outname='P00001_aligned')
         'P00001_aligned.new'
 
-        >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned')
+        >>> outfile_maker(inname='P00001.fasta', outname='P00001_aligned')
         'P00001_aligned.out'
 
-        >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned', append_to_name='_new')
+        >>> outfile_maker(inname='P00001.fasta', outname='P00001_aligned', append_to_name='_new')
         'P00001_aligned_new.out'
 
-        >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/')
+        >>> outfile_maker(inname='P00001.fasta', outname='P00001_aligned', outdir='/my/dir/')
+        '/my/dir/P00001_aligned.out'
+
+        >>> outfile_maker(inname='/test/other/dir/P00001.fasta', append_to_name='_new')
+        '/test/other/dir/P00001_new.out'
+
+        >>> outfile_maker(inname='/test/other/dir/P00001.fasta', outname='P00001_aligned')
+        '/test/other/dir/P00001_aligned.out'
+
+        >>> outfile_maker(inname='/test/other/dir/P00001.fasta', outname='P00001_aligned', outdir='/my/dir/')
         '/my/dir/P00001_aligned.out'
 
     """
 
+    orig_dir, orig_name, orig_ext = split_folder_and_path(inname)
+
     # If output filename not provided, default is to take name of inname
-    if not outfile:
-        orig_dir, outfile, orig_ext = split_folder_and_path(inname)
+    if not outname:
+        outname = orig_name
+
+    # Create new path in the same directory of old path if a new one isn't specified
+    if not outdir:
+        outdir = orig_dir
 
     # Append additional stuff to the filename if specified
     if append_to_name:
-        outfile = outfile + append_to_name
+        outname = outname + append_to_name
 
     # Join the output filename and output extension
-    final_outfile = '{}{}'.format(outfile, outext)
-
-    # Join the output directory and output filename
-    final_outfile = op.join(outdir, final_outfile)
+    final_outfile = op.join(outdir, '{}{}'.format(outname, outext))
 
     return final_outfile
 
@@ -212,34 +224,6 @@ def force_rerun(flag, outfile):
     # Otherwise, do not run
     else:
         return False
-
-
-def copy_file_to_new_location(infile, copy_to_folder, rename_to=None):
-    """Copy a file to a folder (which must exist) and optionally rename it to something else.
-
-    Args:
-        infile: Path to file
-        copy_to_folder: Path to folder to copy to
-        rename_to: Optional name of new file
-
-    Returns:
-        str: Path to new copied file
-
-    """
-    orig_name = op.basename(infile)
-    if rename_to:
-        new_path = op.join(copy_to_folder, rename_to)
-    else:
-        new_path = op.join(copy_to_folder, orig_name)
-
-    shutil.copy2(infile, new_path)
-
-    if op.isfile(new_path):
-        log.debug('{}: copied {}'.format(new_path, orig_name))
-    else:
-        log.debug('{}: error copying {}'.format(new_path, orig_name))
-
-    return new_path
 
 
 def program_exists(prog_name):

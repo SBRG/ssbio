@@ -41,15 +41,16 @@ class PDBIOExt(PDBIO):
             self.set_structure(structure)
             self.first_model = structure[0]
 
-    def write_pdb(self, custom_name='', out_suffix='_new', out_dir=None, custom_selection=None):
+    def write_pdb(self, custom_name='', out_suffix='', out_dir=None, custom_selection=None):
         """Write a new PDB file for the Structure's FIRST MODEL.
 
         Set custom_selection to a PDB.Select class for custom SMCRA selections.
 
         Args:
-            out_suffix: string to append to new PDB file - default is "_new"
-            outdir: optional directory to output the file
-            custom_selection: optional custom selection class
+            custom_name: Filename of the new file (without extension)
+            out_suffix: Optional string to append to new PDB file
+            out_dir: Optional directory to output the file
+            custom_selection: Optional custom selection class
 
         Returns:
             out_file: filepath of new PDB file
@@ -58,12 +59,17 @@ class PDBIOExt(PDBIO):
         if not custom_selection:
             custom_selection = Select()
 
+        # If no output directory, custom name, or suffix is specified, add a suffix "_new"
+        if not out_dir or not custom_name:
+            if not out_suffix:
+                out_suffix = '_new'
+
         # Prepare the output file path
-        outfile = ssbio.utils.outfile_name_maker(inname=self.structure_file,
-                                                 outfile=custom_name,
-                                                 append_to_name=out_suffix,
-                                                 outdir=out_dir,
-                                                 outext='.pdb')
+        outfile = ssbio.utils.outfile_maker(inname=self.structure_file,
+                                            outname=custom_name,
+                                            append_to_name=out_suffix,
+                                            outdir=out_dir,
+                                            outext='.pdb')
         try:
             self.save(outfile, custom_selection)
         except TypeError:

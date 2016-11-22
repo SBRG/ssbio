@@ -1,4 +1,5 @@
 import os
+import copy
 import os.path as op
 import numpy as np
 import shutil
@@ -24,7 +25,7 @@ import ssbio.databases.kegg
 import ssbio.databases.uniprot
 import ssbio.databases.pdb
 import ssbio.sequence.fasta
-import ssbio.itasser.itasserparse
+from ssbio.itasser.itasserparse import ITASSERParse
 import ssbio.structure.properties.residues
 import ssbio.structure.properties.quality
 from ssbio.structure.cleanpdb import CleanPDB
@@ -1054,34 +1055,51 @@ class GEMPRO(object):
 
         for g in tqdm(self.genes):
             gene_id = g.id
+            itasser_name = gene_id + '_model1'
 
-            # Make the destination structure folder
+            # Make the destination structure folder and other results folder
             dest_gene_dir = op.join(self.structure_single_chain_dir, gene_id)
             if not op.exists(dest_gene_dir):
                 os.mkdir(dest_gene_dir)
 
+            dest_itasser_extra_dir = op.join(dest_gene_dir, '{}_itasser'.format(itasser_name))
+            if not op.exists(dest_itasser_extra_dir):
+                os.mkdir(dest_itasser_extra_dir)
+
             if custom_itasser_name_mapping and gene_id in custom_itasser_name_mapping:
-                orig_itasser_dir = op.join(homology_raw_dir, custom_itasser_name_mapping[gene_id])
+                hom_id = custom_itasser_name_mapping[gene_id]
             else:
-                orig_itasser_dir = op.join(homology_raw_dir, gene_id)
+                hom_id = gene_id
+            orig_itasser_dir = op.join(homology_raw_dir, hom_id)
 
-            itasser_info = ssbio.itasser.itasserparse.organize_itasser_models(raw_dir=orig_itasser_dir,
-                                                                              copy_to_dir=dest_gene_dir,
-                                                                              rename_model_to=gene_id + '_model1',
-                                                                              force_rerun=force_rerun)
+            itasser_parse = ITASSERParse(original_results_path=orig_itasser_dir, create_dfs=True)
+            itasser_parse.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
+            itasser_parse.save_dataframes(outdir=dest_itasser_extra_dir)
 
-            if itasser_info:
+            if itasser_parse.modeling_results:
                 # Always set sequence coverage to 100% for an ITASSER model
-                itasser_info['seq_coverage'] = 1
-                g.annotation['structure']['homology'][gene_id] = itasser_info.copy()
+                # TODO: should probably just do the alignment to make sure (representative sequences can change)
+                copied = copy.deepcopy(itasser_parse.modeling_results)
+                copied['seq_coverage'] = 1
+                g.annotation['structure']['homology'][gene_id] = copied
 
-                itasser_info['gene'] = gene_id
-                itasser_pre_df.append(itasser_info)
+                copied['gene'] = gene_id
+                itasser_pre_df.append(copied)
             else:
                 log.debug('{}: No homology model available.'.format(gene_id))
 
-        cols = ['gene', 'model_file', 'model_date', 'difficulty', 'top_template_pdb', 'top_template_chain', 'c_score',
-                'tm_score', 'tm_score_err', 'rmsd', 'rmsd_err']
+        cols = ['gene', 'model_file', 'model_date', 'difficulty',
+                'top_template_pdb', 'top_template_chain', 'c_score',
+                'tm_score', 'tm_score_err', 'rmsd', 'rmsd_err',
+                'top_bsite_site_num', 'top_bsite_c_score', 'top_bsite_cluster_size', 'top_bsite_algorithm',
+                'top_bsite_pdb_template_id', 'top_bsite_pdb_template_chain', 'top_bsite_pdb_ligand',
+                'top_bsite_binding_location_coords', 'top_bsite_c_score_method', 'top_bsite_binding_residues',
+                'top_bsite_ligand_cluster_counts',
+                'top_ec_pdb_template_id', 'top_ec_pdb_template_chain', 'top_ec_tm_score', 'top_ec_rmsd',
+                'top_ec_seq_ident', 'top_ec_seq_coverage', 'top_ec_c_score', 'top_ec_ec_number',
+                'top_ec_binding_residues',
+                'top_go_mf_go_id', 'top_go_mf_go_term', 'top_go_mf_c_score', 'top_go_bp_go_id', 'top_go_bp_go_term',
+                'top_go_bp_c_score', 'top_go_cc_go_id', 'top_go_cc_go_term', 'top_go_cc_c_score']
         self.df_itasser = pd.DataFrame.from_records(itasser_pre_df, columns=cols)
 
         log.info('Completed copying of I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.')

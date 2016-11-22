@@ -20,7 +20,7 @@ class TestMutatePDB(unittest.TestCase):
         muts = [('A',0,'Y')]
 
         for infile, outfile in files:
-            outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
+            outfile_new = '{}{}.pdb'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path, file_type='pdb')
@@ -44,11 +44,11 @@ class TestMutatePDB(unittest.TestCase):
         files = [('1kf6.pdb', '1kf6_clean_mutated_tester.pdb')]
 
         working_dir = 'test_structures'
-        out_suffix = '_mutated'
+        out_suffix = '_clean_mutated'
         muts = [('A', 0, 'Y')]
 
         for infile, outfile in files:
-            outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
+            outfile_new = '{}{}.pdb'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path, file_type='pdb')
@@ -58,12 +58,12 @@ class TestMutatePDB(unittest.TestCase):
 
             my_pdb = PDBIOExt(my_clean_pdb, file_type='pdb')
             custom_mutate = MutatePDB(muts)
-            default_mutated_pdb = my_pdb.write_pdb(custom_selection=custom_mutate, out_suffix=out_suffix,
+            default_mutated_pdb = my_pdb.write_pdb(custom_selection=custom_mutate, out_suffix='_mutated',
                                                    out_dir=tempfile.gettempdir())
             default_mutated_pdb_basename = op.basename(default_mutated_pdb)
 
             # test if the filename is correct
-            self.assertEqual(default_mutated_pdb_basename, '1kf6_clean_mutated')
+            self.assertEqual(default_mutated_pdb_basename, outfile_new)
 
             # test if the file contents are equal
             self.assertEqual(open(default_mutated_pdb, 'r').read(),

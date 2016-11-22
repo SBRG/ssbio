@@ -20,7 +20,7 @@ class TestCleanPDB(unittest.TestCase):
         custom_clean = CleanPDB()
 
         for infile,outfile in files:
-            outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
+            outfile_new = '{}{}.pdb'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path, file_type='pdb')
@@ -46,7 +46,7 @@ class TestCleanPDB(unittest.TestCase):
         custom_clean = CleanPDB(keep_chains='A')
 
         for infile, outfile in files:
-            outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
+            outfile_new = '{}{}.pdb'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path, file_type='pdb')

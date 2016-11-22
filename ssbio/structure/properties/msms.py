@@ -39,7 +39,7 @@ def run_msms(pdb_file, outfile='', outdir='', outext='_msms.json', force_rerun=F
 
     """
     # Create the output file name
-    outfile = ssbio.utils.outfile_name_maker(inname=pdb_file, outfile=outfile, outdir=outdir, outext=outext)
+    outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
 
     if not ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         log.debug('{}: already ran MSMS and force_rerun={}'.format(outfile, force_rerun))

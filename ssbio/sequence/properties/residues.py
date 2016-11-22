@@ -60,7 +60,7 @@ def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', 
     """
 
     # Create the output file name
-    outfile = ssbio.utils.outfile_name_maker(inname=infile, outfile=outfile, outdir=outdir, outext=outext)
+    outfile = ssbio.utils.outfile_maker(inname=infile, outname=outfile, outdir=outdir, outext=outext)
 
     # Run pepstats
     pepstats_args = '-sequence="{}" -outfile="{}"'.format(infile, outfile)
@@ -84,7 +84,7 @@ def emboss_pepstats_on_str(instring, outfile, outdir='', outext='.pepstats', for
 
     """
     # Create the output file name
-    outfile = ssbio.utils.outfile_name_maker(inname='seq_str', outfile=outfile, outdir=outdir, outext=outext)
+    outfile = ssbio.utils.outfile_maker(inname='seq_str', outname=outfile, outdir=outdir, outext=outext)
 
     # Run pepstats
     pepstats_args = '-sequence=asis::{} -outfile="{}"'.format(instring, outfile)
