@@ -1200,7 +1200,7 @@ class GEMPRO(object):
                                 custom_clean = CleanPDB(keep_chains=chain)
                                 my_pdb = PDBIOExt(pdb_file)
                                 default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
-                                                                       out_suffix='{}_clean'.format(chain),
+                                                                       out_suffix='_{}_clean'.format(chain),
                                                                        out_dir=gene_struct_dir)
                                 default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
@@ -1237,7 +1237,7 @@ class GEMPRO(object):
                 custom_clean = CleanPDB()
                 my_pdb = PDBIOExt(op.join(gene_struct_dir, original_pdb_file))
                 default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
-                                                       out_suffix='clean',
+                                                       out_suffix='_clean',
                                                        out_dir=gene_struct_dir)
                 default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
