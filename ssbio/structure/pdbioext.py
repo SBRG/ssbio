@@ -41,14 +41,14 @@ class PDBIOExt(PDBIO):
         self.set_structure(structure)
         self.first_model = structure[0]
 
-    def write_pdb(self, custom_name='', custom_ext='', out_suffix='new', out_dir=None, custom_selection=None):
+    def write_pdb(self, custom_name='', out_suffix='_new', outdir=None, custom_selection=None):
         """Write a new PDB file for the Structure's FIRST MODEL.
 
         Set custom_selection to a PDB.Select class for custom SMCRA selections.
 
         Args:
             out_suffix: string to append to new PDB file - default is "_new"
-            out_dir: optional directory to output the file
+            outdir: optional directory to output the file
             custom_selection: optional custom selection class
 
         Returns:
@@ -57,7 +57,7 @@ class PDBIOExt(PDBIO):
         """
 
         # Prepare the output file path
-        outfile = ssbio.utils.outfile_name_maker(inname=self.structure_file, outext=custom_ext, outfile=custom_name, outdir=out_dir, append_to_name=out_suffix)
+        outfile = ssbio.utils.outfile_name_maker(inname=self.structure_file, outfile=custom_name, append_to_name=out_suffix, outdir=outdir, outext='.pdb')
         self.save(outfile, custom_selection)
 
         return outfile

@@ -187,7 +187,7 @@ def download_and_clean_pdb(pdb_id, chain_id, output_dir, file_type='pdb', output
     else:
         my_new_pdb_id = '{}_{}_cleaned'.format(pdb_id, chain_id)
 
-    my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, custom_ext='.pdb', out_suffix='',
+    my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, out_suffix='',
                                     out_dir=output_dir, custom_selection=my_cleaner)
 
     return my_clean_pdb
