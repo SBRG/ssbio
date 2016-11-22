@@ -135,20 +135,22 @@ class ITASSERParse():
         for f in self._main_files_to_copy:
             old_file_path = op.join(self.results_path, f)
             new_file_path = op.join(dest_itasser_dir, f)
-            if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_file_path):
-                shutil.copy2(old_file_path, new_file_path)
-                log.debug('{}: copied from {}'.format(new_file_path, old_file_path))
-            else:
-                log.debug('{}: file already exists'.format(new_file_path))
+            if op.exists(old_file_path):
+                if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_file_path):
+                    shutil.copy2(old_file_path, new_file_path)
+                    log.debug('{}: copied from {}'.format(new_file_path, old_file_path))
+                else:
+                    log.debug('{}: file already exists'.format(new_file_path))
 
         for ff in self._coach_files_to_copy:
             old_file_path = op.join(self.results_path, 'model1/coach/', ff)
             new_file_path = op.join(dest_itasser_dir, ff)
-            if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_file_path):
-                shutil.copy2(old_file_path, new_file_path)
-                log.debug('{}: copied from {}'.format(new_file_path, old_file_path))
-            else:
-                log.debug('{}: file already exists'.format(new_file_path))
+            if op.exists(old_file_path):
+                if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_file_path):
+                    shutil.copy2(old_file_path, new_file_path)
+                    log.debug('{}: copied from {}'.format(new_file_path, old_file_path))
+                else:
+                    log.debug('{}: file already exists'.format(new_file_path))
 
     def save_dataframes(self, outdir):
         """Save all attributes that start with "df_" into a specified directory.
