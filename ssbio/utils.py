@@ -8,6 +8,7 @@ import contextlib
 import logging
 import distutils.spawn
 import subprocess
+import shutil
 from collections import OrderedDict
 from collections import Callable
 try:
@@ -118,7 +119,7 @@ def split_folder_and_path(filepath):
     return dirname, filename_without_extension, extension
 
 
-def outfile_name_maker(inname, outext='', outfile='', outdir=''):
+def outfile_name_maker(inname, outext='.out', outfile='', outdir='', append_to_name=''):
     """Create a default name for an output file based on the inname name, unless a output name is specified.
 
     Args:
@@ -135,8 +136,14 @@ def outfile_name_maker(inname, outext='', outfile='', outdir=''):
         >>> outfile_name_maker(inname='P00001.fasta')
         'P00001.out'
 
+        >>> outfile_name_maker(inname='P00001.fasta', append_to_name='_new')
+        'P00001_new.out'
+
         >>> outfile_name_maker(inname='P00001.fasta', outext='.mao')
         'P00001.mao'
+
+        >>> outfile_name_maker(inname='P00001.fasta', outext='.mao', append_to_name='_new')
+        'P00001_new.mao'
 
         >>> outfile_name_maker(inname='P00001.fasta', outext='.new', outfile='P00001_aligned')
         'P00001_aligned.new'
@@ -144,24 +151,29 @@ def outfile_name_maker(inname, outext='', outfile='', outdir=''):
         >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned')
         'P00001_aligned.out'
 
+        >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned', append_to_name='_new')
+        'P00001_aligned_new.out'
+
         >>> outfile_name_maker(inname='P00001.fasta', outfile='P00001_aligned', outdir='/my/dir/')
-        '/my/dir/P00001_aligned'
+        '/my/dir/P00001_aligned.out'
 
     """
-    # If extension not provided, default is "out"
-    if not outext:
-        outext = '.out'
 
     # If output filename not provided, default is to take name of inname
     if not outfile:
         orig_dir, outfile, orig_ext = split_folder_and_path(inname)
 
-    # Join the output filename and output extension
-    outfile = '{}{}'.format(outfile, outext)
-    # Join the output directory and output filename
-    outfile = op.join(outdir, outfile)
+    # Append additional stuff to the filename if specified
+    if append_to_name:
+        outfile = outfile + append_to_name
 
-    return outfile
+    # Join the output filename and output extension
+    final_outfile = '{}{}'.format(outfile, outext)
+
+    # Join the output directory and output filename
+    final_outfile = op.join(outdir, final_outfile)
+
+    return final_outfile
 
 
 def force_rerun(flag, outfile):
@@ -197,6 +209,34 @@ def force_rerun(flag, outfile):
     # Otherwise, do not run
     else:
         return False
+
+
+def copy_file_to_new_location(infile, copy_to_folder, rename_to=None):
+    """Copy a file to a folder (which must exist) and optionally rename it to something else.
+
+    Args:
+        infile: Path to file
+        copy_to_folder: Path to folder to copy to
+        rename_to: Optional name of new file
+
+    Returns:
+        str: Path to new copied file
+
+    """
+    orig_name = op.basename(infile)
+    if rename_to:
+        new_path = op.join(copy_to_folder, rename_to)
+    else:
+        new_path = op.join(copy_to_folder, orig_name)
+
+    shutil.copy2(infile, new_path)
+
+    if op.isfile(new_path):
+        log.debug('{}: copied {}'.format(new_path, orig_name))
+    else:
+        log.debug('{}: error copying {}'.format(new_path, orig_name))
+
+    return new_path
 
 
 def program_exists(prog_name):
