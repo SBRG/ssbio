@@ -116,16 +116,16 @@ class ITASSERParse():
 
         new_model_path = op.join(copy_to_dir, '{}.pdb'.format(rename_model_to))
 
-        if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_model_path):
-            # Clean and save it
-            custom_clean = CleanPDB()
-            my_pdb = PDBIOExt(self.structure_path, file_type='pdb')
-            new_model_path = my_pdb.write_pdb(custom_selection=custom_clean,
-                                              custom_name=rename_model_to,
-                                              out_dir=copy_to_dir)
-
-        # Update the structure_path to be the copied, clean file
-        self.structure_path = new_model_path
+        if self.structure_path:
+            if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_model_path):
+                # Clean and save it
+                custom_clean = CleanPDB()
+                my_pdb = PDBIOExt(self.structure_path, file_type='pdb')
+                new_model_path = my_pdb.write_pdb(custom_selection=custom_clean,
+                                                  custom_name=rename_model_to,
+                                                  out_dir=copy_to_dir)
+            # Update the structure_path to be the copied, clean file
+            self.structure_path = new_model_path
 
         # Other modeling results - store in a new folder
         dest_itasser_dir = op.join(copy_to_dir, '{}_itasser'.format(rename_model_to))
