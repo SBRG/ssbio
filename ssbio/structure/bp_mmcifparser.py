@@ -10,7 +10,7 @@ class MMCIFParserFix(MMCIFParser):
     """Parse a PDB file and return a Structure object."""
 
     def __init__(self, QUIET=True):
-        super(MMCIFParserFix, self).__init__()
+        super(MMCIFParserFix, self).__init__(QUIET=QUIET)
 
     def get_structure(self, structure_id, filename):
         with warnings.catch_warnings():
