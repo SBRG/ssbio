@@ -1187,13 +1187,14 @@ class GEMPRO(object):
                                                                               force_rerun=force_rerun)
 
                             log.debug('{}: downloaded PDB file'.format(pdb))
+                            break
                         except requests.exceptions.HTTPError:
                             file_type = 'cif'
                             pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type=file_type, header=False,
                                                                               outdir=gene_struct_dir,
                                                                               force_rerun=force_rerun)
                             log.debug('{}: download mmCIF file'.format(pdb))
-                        else:
+                        except:
                             log.warning('{}: PDB file not available'.format(pdb))
                             continue
 
