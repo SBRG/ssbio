@@ -1213,9 +1213,9 @@ class GEMPRO(object):
                                                                                                  allow_deletions=allow_deletions,
                                                                                                  allow_insertions=allow_insertions,
                                                                                                  allow_unresolved=allow_unresolved,
-                                                                                                 outfile='{}_{}_align.txt'.format(gene_id, pdb+'_'+chain),
-                                                                                                 outdir=gene_struct_dir,
-                                                                                                 force_rerun=force_rerun) # TODO: change outfile to .needle
+                                                                                                 outfile='{}_{}.needle'.format(gene_id, pdb+'_'+chain),
+                                                                                                 outdir=gene_seq_dir,
+                                                                                                 force_rerun=force_rerun)
 
                             # If found_good_pdb = True, set as representative
                             # If not, move on to the next potential PDB
