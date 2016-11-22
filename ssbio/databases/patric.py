@@ -28,6 +28,7 @@ def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_re
     else:
         raise ValueError('seqtype must be "dna" or "protein"')
 
+    # TODO: use utils functions here
     # path and filename parsing
     if outfile:
         outfile = op.join(outdir, '{}.{}'.format(outfile, extension))

@@ -1163,8 +1163,15 @@ class GEMPRO(object):
                         # Download the PDB
                         try:
                             pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
-                                                                          outdir=gene_struct_dir, force_rerun=force_rerun)
+                                                                              outdir=gene_struct_dir,
+                                                                              force_rerun=force_rerun)
+                            log.debug('{}: downloaded PDB file'.format(pdb))
                         except requests.exceptions.HTTPError:
+                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='cif', header=False,
+                                                                              outdir=gene_struct_dir,
+                                                                              force_rerun=force_rerun)
+                            log.debug('{}: download mmCIF file'.format(pdb))
+                        else:
                             log.warning('{}: PDB file not available'.format(pdb))
                             continue
 
