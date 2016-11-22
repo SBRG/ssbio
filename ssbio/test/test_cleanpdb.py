@@ -16,11 +16,11 @@ class TestCleanPDB(unittest.TestCase):
                  ('E04142.pdb', 'E04142_clean_tester.pdb'), ('1cbn.pdb', '1cbn_clean_tester.pdb')]
 
         working_dir = 'test_structures'
-        out_suffix = 'clean'
+        out_suffix = '_clean'
         custom_clean = CleanPDB()
 
         for infile,outfile in files:
-            outfile_new = '{}_{}.pdb'.format(op.splitext(infile)[0], out_suffix)
+            outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path)
@@ -42,11 +42,11 @@ class TestCleanPDB(unittest.TestCase):
         files = [('1kf6.pdb', '1kf6_clean_chainA_tester.pdb')]
 
         working_dir = 'test_structures'
-        out_suffix = 'clean_chainA'
+        out_suffix = '_clean_chainA'
         custom_clean = CleanPDB(keep_chains='A')
 
         for infile, outfile in files:
-            outfile_new = '{}_{}.pdb'.format(op.splitext(infile)[0], out_suffix)
+            outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path)
@@ -55,6 +55,7 @@ class TestCleanPDB(unittest.TestCase):
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
             # test if the filename is correct
+            print(default_cleaned_pdb_basename, outfile_new)
             self.assertEqual(default_cleaned_pdb_basename, outfile_new)
 
             # test if the file contents are equal
