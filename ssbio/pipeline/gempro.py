@@ -1162,12 +1162,15 @@ class GEMPRO(object):
                     for pdb, chains in convert_to_dict.items():
                         # Download the PDB
                         try:
-                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='pdb', header=False,
+                            file_type = 'pdb'
+                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type=file_type, header=False,
                                                                               outdir=gene_struct_dir,
                                                                               force_rerun=force_rerun)
+
                             log.debug('{}: downloaded PDB file'.format(pdb))
                         except requests.exceptions.HTTPError:
-                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type='cif', header=False,
+                            file_type = 'cif'
+                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type=file_type, header=False,
                                                                               outdir=gene_struct_dir,
                                                                               force_rerun=force_rerun)
                             log.debug('{}: download mmCIF file'.format(pdb))
@@ -1176,7 +1179,7 @@ class GEMPRO(object):
                             continue
 
                         # Get the sequences of the chains
-                        chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file)
+                        chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file, file_type=file_type)
 
                         for chain in chains:
                             chain_seq = chain_to_seq[chain]
@@ -1205,7 +1208,7 @@ class GEMPRO(object):
 
                                 # Clean it
                                 custom_clean = CleanPDB(keep_chains=chain)
-                                my_pdb = PDBIOExt(pdb_file)
+                                my_pdb = PDBIOExt(pdb_file, file_type=file_type)
                                 default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
                                                                        out_suffix='_{}_clean'.format(chain),
                                                                        out_dir=gene_struct_dir)
@@ -1242,7 +1245,7 @@ class GEMPRO(object):
 
                 # Clean it
                 custom_clean = CleanPDB()
-                my_pdb = PDBIOExt(op.join(gene_struct_dir, original_pdb_file))
+                my_pdb = PDBIOExt(op.join(gene_struct_dir, original_pdb_file), file_type='pdb')
                 default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
                                                        out_suffix='_clean',
                                                        out_dir=gene_struct_dir)

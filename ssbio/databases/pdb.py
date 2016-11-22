@@ -7,11 +7,11 @@ from io import BytesIO
 # import cachetools
 # from repoze.lru import lru_cache
 import gzip
+import ssbio.utils
 
 from Bio.PDB import PDBList
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
-from ssbio import utils
 from ssbio.structure.cleanpdb import CleanPDB
 from ssbio.structure.pdbioext import PDBIOExt
 
@@ -39,10 +39,13 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
     Args:
         pdb_id: PDB ID
         file_type: pdb, pdb.gz, cif, cif.gz, xml.gz
-        outdir: optional output directory
-        outfile: optional output name
+        outdir: Optional output directory
+        outfile: Optional output name
+        header: If only the header file should be downloaded
+        force_rerun: If the file should be downloaded again even if it exists
 
     Returns:
+        str: Path to outfile
 
     """
     pdb_id = pdb_id.lower()
@@ -64,12 +67,12 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
         else:
             outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
 
-    if not op.exists(outfile) and not force_rerun:
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
         req = requests.get(download_link)
 
         # Raise error if request fails
-        # TODO: will fail if PDB is not available for something like a large structure. example: 5iqr
+        # TODO: will fail if PDB is not available for something like a large structure. example: 5iqr and file_type=pdb
         req.raise_for_status()
 
         with open(outfile, 'w') as f:
@@ -128,11 +131,11 @@ def parse_mmcif_header(infile):
         log.debug('{}: No resolution field'.format(infile))
 
     if '_chem_comp.id' in mmdict:
-        chemicals_filtered = utils.filter_list_by_indices(mmdict['_chem_comp.id'],
-                                                            utils.not_find(mmdict['_chem_comp.type'],
+        chemicals_filtered = ssbio.utils.filter_list_by_indices(mmdict['_chem_comp.id'],
+                                                            ssbio.utils.not_find(mmdict['_chem_comp.type'],
                                                                            chemical_types_exclude,
                                                                            case_sensitive=False))
-        chemicals_fitered = utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=True)
+        chemicals_fitered = ssbio.utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=True)
         newdict['chemicals'] = chemicals_fitered
     else:
         log.debug('{}: No chemical composition field'.format(infile))
@@ -145,52 +148,52 @@ def parse_mmcif_header(infile):
     return newdict
 
 
-def download_and_load_pdb(pdb_id, output_dir, file_type='pdb'):
-    """Download a PDB ID to a specified output directory, and of a specified file format (currently only .pdb supported)
+# def download_and_load_pdb(pdb_id, output_dir, file_type='pdb'):
+#     """Download a PDB ID to a specified output directory, and of a specified file format (currently only .pdb supported)
+#
+#     Args:
+#         pdb_id: valid PDB ID
+#         output_dir: path to output directory
+#         file_type: pdb, xml, mmcif - TODO: add support
+#
+#     Returns: PDBIOExt object
+#
+#     """
+#     pdbl = PDBList()
+#     # TODO: currently saves as .ent file
+#     file_loc = pdbl.retrieve_pdb_file(pdb_id, pdir=output_dir)
+#     return file_loc
 
-    Args:
-        pdb_id: valid PDB ID
-        output_dir: path to output directory
-        file_type: pdb, xml, mmcif - TODO: add support
 
-    Returns: PDBIOExt object
-
-    """
-    pdbl = PDBList()
-    # TODO: currently saves as .ent file
-    file_loc = pdbl.retrieve_pdb_file(pdb_id, pdir=output_dir)
-    return file_loc
-
-
-def download_and_clean_pdb(pdb_id, chain_id, output_dir, file_type='pdb', output_name=''):
-    """Download the original PDB ID as well as a "cleaned" version of it including only the chain of interest.
-
-    Args:
-        pdb_id:
-        chain_id:
-        output_dir:
-        file_type:
-
-    Returns:
-
-    """
-    my_pdb_file = download_and_load_pdb(pdb_id, output_dir=output_dir)
-    my_pdb = PDBIOExt(my_pdb_file)
-
-    # clean pdb and save a file with only these chains of interest
-    # suffix appended with chains (1fat_A_B_cleaned.pdb)
-    print('Cleaning PDB structure {} and keeping chain {}...'.format(pdb_id, chain_id))
-    my_cleaner = CleanPDB(keep_chains=[chain_id])
-
-    if output_name:
-        my_new_pdb_id = output_name
-    else:
-        my_new_pdb_id = '{}_{}_cleaned'.format(pdb_id, chain_id)
-
-    my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, out_suffix='',
-                                    out_dir=output_dir, custom_selection=my_cleaner)
-
-    return my_clean_pdb
+# def download_and_clean_pdb(pdb_id, chain_id, output_dir, file_type='pdb', output_name=''):
+#     """Download the original PDB ID as well as a "cleaned" version of it including only the chain of interest.
+#
+#     Args:
+#         pdb_id:
+#         chain_id:
+#         output_dir:
+#         file_type:
+#
+#     Returns:
+#
+#     """
+#     my_pdb_file = download_and_load_pdb(pdb_id, output_dir=output_dir)
+#     my_pdb = PDBIOExt(my_pdb_file)
+#
+#     # clean pdb and save a file with only these chains of interest
+#     # suffix appended with chains (1fat_A_B_cleaned.pdb)
+#     print('Cleaning PDB structure {} and keeping chain {}...'.format(pdb_id, chain_id))
+#     my_cleaner = CleanPDB(keep_chains=[chain_id])
+#
+#     if output_name:
+#         my_new_pdb_id = output_name
+#     else:
+#         my_new_pdb_id = '{}_{}_cleaned'.format(pdb_id, chain_id)
+#
+#     my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, out_suffix='',
+#                                     out_dir=output_dir, custom_selection=my_cleaner)
+#
+#     return my_clean_pdb
 
 
 # TODO: check this for python 2
@@ -392,7 +395,7 @@ def pdb_current_checker(pdb_ids):
         dict: Dictionary of {pdb_id: <status>}, where status can be
             "theoretical", "current", or a list of PDB IDs giving the non-obsolete entry
     """
-    pdb_ids = utils.force_lower_list(pdb_ids)
+    pdb_ids = ssbio.utils.force_lower_list(pdb_ids)
 
     log.debug('Checking list of PDBs: {}'.format(pdb_ids))
 
@@ -422,7 +425,7 @@ def update_pdb_list(pdb_ids):
         Updated list of PDB IDs
 
     """
-    pdb_ids = utils.force_lower_list(pdb_ids)
+    pdb_ids = ssbio.utils.force_lower_list(pdb_ids)
     checked = pdb_current_checker(pdb_ids)
 
     new_pdb_ids = []

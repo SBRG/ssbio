@@ -191,7 +191,7 @@ if __name__ == '__main__':
     for pdb in tqdm(pdbs):
         if op.isdir(pdb):
             continue
-        my_pdb = PDBIOExt(pdb)
+        my_pdb = PDBIOExt(pdb, file_type='pdb')
         my_cleaner = CleanPDB(remove_atom_alt=args.keepalt, remove_atom_hydrogen=args.keephydro, keep_atom_alt_id='A', add_atom_occ=True,
                               remove_res_hetero=args.keephetero, add_chain_id_if_empty='X', keep_chains=chains)
         my_clean_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, out_dir=out_dir, custom_selection=my_cleaner)

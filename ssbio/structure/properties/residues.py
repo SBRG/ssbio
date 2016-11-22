@@ -15,7 +15,7 @@ from Bio.PDB.HSExposure import HSExposureCA, HSExposureCB, ExposureCN
 
 
 # TODO: half sphere exposure
-def hse_output(pdb_file):
+def hse_output(pdb_file, file_type):
     """
     The solvent exposure of an amino acid residue is important for analyzing,
     understanding and predicting aspects of protein structure and function [73].
@@ -35,7 +35,7 @@ def hse_output(pdb_file):
 
     """
     # Get the first model
-    my_structure = PDBIOExt(pdb_file)
+    my_structure = PDBIOExt(pdb_file, file_type=file_type)
     model = my_structure.first_model
 
     # Calculate HSEalpha
@@ -48,7 +48,7 @@ def hse_output(pdb_file):
     return
 
 
-def get_pdb_seqs(pdb_file):
+def get_pdb_seqs(pdb_file, file_type):
     """Get a dictionary of a PDB file's sequences.
 
     Special cases include:
@@ -64,7 +64,7 @@ def get_pdb_seqs(pdb_file):
 
     """
     # Get the first model
-    my_structure = PDBIOExt(pdb_file)
+    my_structure = PDBIOExt(pdb_file, file_type=file_type)
     model = my_structure.first_model
 
     structure_seqs = {}
@@ -109,7 +109,7 @@ def get_pdb_seqs(pdb_file):
 
 
 # @cachetools.func.ttl_cache(maxsize=1000)
-def get_pdb_res_starts(pdb_file):
+def get_pdb_res_starts(pdb_file, file_type):
     """Return a dictionary of the first residue number in each chain of a PDB file
 
     Args:
@@ -119,7 +119,7 @@ def get_pdb_res_starts(pdb_file):
         start_residues: dictionary of {chainID: firstResNum, ...}
 
     """
-    my_structure = PDBIOExt(pdb_file)
+    my_structure = PDBIOExt(pdb_file, file_type=file_type)
     model = my_structure.first_model
 
     start_residues = {}

@@ -17,7 +17,7 @@ class PDBIOExt(PDBIO):
     Also adds some logging methods.
     """
 
-    def __init__(self, structure_file, file_type='pdb'):
+    def __init__(self, structure_file, file_type):
         super(PDBIOExt, self).__init__()
 
         self.structure_file = structure_file
@@ -61,7 +61,13 @@ class PDBIOExt(PDBIO):
                                                  append_to_name=out_suffix,
                                                  outdir=out_dir,
                                                  outext='.pdb')
-        self.save(outfile, custom_selection)
+        try:
+            self.save(outfile, custom_selection)
+        except TypeError:
+            # If trying to save something that can't be saved as a PDB (example: 5iqr.cif), log an error and return None
+            # The error thrown by PDBIO.py is "TypeError: %c requires int or char"
+            log.error('{}: unable to save structure in PDB file format'.format(self.structure_file))
+            return None
 
         return outfile
 

@@ -83,11 +83,11 @@ if __name__ == '__main__':
 
     mutations = parse_mutation_input(args.mutations)
 
-    my_pdb = PDBIOExt(args.infile)
+    my_pdb = PDBIOExt(args.infile, file_type='pdb')
     if args.clean:
         my_cleaner = CleanPDB(keep_chains=[x[0] for x in mutations])
         my_clean_pdb = my_pdb.write_pdb(out_suffix='clean', out_dir=tempfile.gettempdir(), custom_selection=my_cleaner)
-        my_pdb = PDBIOExt(my_clean_pdb)
+        my_pdb = PDBIOExt(my_clean_pdb, file_type='pdb')
 
     my_mutation = MutatePDB(mutations)
     my_mutated_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, out_dir='mutated_pdbs', custom_selection=my_mutation)

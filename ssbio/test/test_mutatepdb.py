@@ -23,7 +23,7 @@ class TestMutatePDB(unittest.TestCase):
             outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
-            my_pdb = PDBIOExt(infile_path)
+            my_pdb = PDBIOExt(infile_path, file_type='pdb')
             custom_mutate = MutatePDB(muts)
             default_mutated_pdb = my_pdb.write_pdb(custom_selection=custom_mutate, out_suffix=out_suffix,
                                                    out_dir=tempfile.gettempdir())
@@ -51,12 +51,12 @@ class TestMutatePDB(unittest.TestCase):
             outfile_new = '{}{}'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
-            my_pdb = PDBIOExt(infile_path)
+            my_pdb = PDBIOExt(infile_path, file_type='pdb')
             my_cleaner = CleanPDB(keep_chains=[m[0] for m in muts])
             my_clean_pdb = my_pdb.write_pdb(out_suffix='_clean', out_dir=tempfile.gettempdir(),
                                             custom_selection=my_cleaner)
 
-            my_pdb = PDBIOExt(my_clean_pdb)
+            my_pdb = PDBIOExt(my_clean_pdb, file_type='pdb')
             custom_mutate = MutatePDB(muts)
             default_mutated_pdb = my_pdb.write_pdb(custom_selection=custom_mutate, out_suffix=out_suffix,
                                                    out_dir=tempfile.gettempdir())

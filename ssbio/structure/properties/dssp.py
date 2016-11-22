@@ -33,18 +33,20 @@ AAdict = {'CYS': 'polar',
 
 # @cachetools.func.ttl_cache(maxsize=300)
 def dssp_dataframe(filename):
-    """
-    Calculation of various properties utilizing the DSSP program.
+    """Calculation of various properties utilizing the DSSP program.
 
     DSSP must be installed for biopython to properly call it.
     Install using apt-get on Ubuntu
     or from: http://swift.cmbi.ru.nl/gv/dssp/
 
-    Input: PDB or CIF structure file
-    Output: Dictionary of properties
+    Args:
+        filename: PDB or CIF structure file
+
+    Returns:
+        dict: Dictionary of properties
     """
 
-    my_structure = PDBIOExt(filename)
+    my_structure = PDBIOExt(filename, file_type='pdb')
     model = my_structure.first_model
     try:
         dssp = PDB.DSSP(model, filename)

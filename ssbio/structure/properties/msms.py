@@ -47,7 +47,7 @@ def run_msms(pdb_file, outfile='', outdir='', outext='_msms.json', force_rerun=F
 
     else:
         # Load the structure
-        my_structure = PDBIOExt(pdb_file)
+        my_structure = PDBIOExt(pdb_file, file_type='pdb')
         model = my_structure.first_model
 
         # Run MSMS with Biopython
