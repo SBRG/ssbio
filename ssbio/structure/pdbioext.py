@@ -20,6 +20,8 @@ class PDBIOExt(PDBIO):
     def __init__(self, structure_file, file_type='pdb'):
         super(PDBIOExt, self).__init__()
 
+        self.structure_file = structure_file
+
         # Load the structure
         if file_type.lower() == 'pdb':
             structure = pdbp.get_structure(id='ssbio_pdb', file=structure_file)
@@ -29,6 +31,10 @@ class PDBIOExt(PDBIO):
         # If there are multiple models (NMR), use the first model as the structure
         if len(structure) > 1:
             structure = structure[0]
+            log.debug('{}: using first model'.format(structure_file))
+
+        if len(structure) == 0:
+            log.error('{}: no models in structure!'.format(structure_file))
 
         # Set this structure as the main one
         self.set_structure(structure)
@@ -49,8 +55,7 @@ class PDBIOExt(PDBIO):
         """
 
         # Prepare the output file path
-        outfile = ssbio.utils.outfile_name_maker(inname=self.infile, outext=custom_ext, outfile=custom_name, outdir=out_dir, append_to_name=out_suffix)
-        self.set_structure(self.first_model)
+        outfile = ssbio.utils.outfile_name_maker(inname=self.structure_file, outext=custom_ext, outfile=custom_name, outdir=out_dir, append_to_name=out_suffix)
         self.save(outfile, custom_selection)
 
         return outfile
