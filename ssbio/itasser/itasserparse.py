@@ -23,8 +23,9 @@ class ITASSERParse():
 
         Args:
             original_results_path: Path to I-TASSER modeling folder
+            create_dfs: If data frames should be created for COACH results
+            coach_results_folder: Path to original COACH results
             model_to_use: Which I-TASSER model to use. Default is "model1"
-            force_rerun: If files should be copied even if they already exist
         """
         self.results_path = original_results_path
         self.model_to_use = model_to_use
@@ -68,36 +69,41 @@ class ITASSERParse():
             bsites_inf_path = op.join(coach_folder, 'Bsites.inf')
             if op.exists(bsites_inf_path):
                 parsed_bsites = self.parse_bsites_inf(infile=bsites_inf_path, create_df=create_dfs)
-                tmp = {'top_bsite_'+k: v for k, v in parsed_bsites[0].items()}
-                self.modeling_results.update(tmp)
+                if parsed_bsites:
+                    tmp = {'top_bsite_'+k: v for k, v in parsed_bsites[0].items()}
+                    self.modeling_results.update(tmp)
 
             # Parse EC.dat
             ec_dat_path = op.join(coach_folder, 'EC.dat')
             if op.exists(ec_dat_path):
                 parsed_ec = self.parse_ec(infile=ec_dat_path, create_df=create_dfs)
-                tmp = {'top_ec_' + k: v for k, v in parsed_ec[0].items()}
-                self.modeling_results.update(tmp)
+                if parsed_ec:
+                    tmp = {'top_ec_' + k: v for k, v in parsed_ec[0].items()}
+                    self.modeling_results.update(tmp)
 
             # Parse GO_MF.dat
             go_mf_dat_path = op.join(coach_folder, 'GO_MF.dat')
             if op.exists(go_mf_dat_path):
                 parsed_go_mf = self.parse_go(infile=go_mf_dat_path, create_df=create_dfs)
-                tmp = {'top_go_mf_' + k: v for k, v in parsed_go_mf[0].items()}
-                self.modeling_results.update(tmp)
+                if parsed_go_mf:
+                    tmp = {'top_go_mf_' + k: v for k, v in parsed_go_mf[0].items()}
+                    self.modeling_results.update(tmp)
 
             # Parse GO_BP.dat
             go_bp_dat_path = op.join(coach_folder, 'GO_BP.dat')
             if op.exists(go_bp_dat_path):
                 parsed_go_bp = self.parse_go(infile=go_bp_dat_path, create_df=create_dfs)
-                tmp = {'top_go_bp_' + k: v for k, v in parsed_go_bp[0].items()}
-                self.modeling_results.update(tmp)
+                if parsed_go_bp:
+                    tmp = {'top_go_bp_' + k: v for k, v in parsed_go_bp[0].items()}
+                    self.modeling_results.update(tmp)
 
             # Parse GO_CC.dat
             go_cc_dat_path = op.join(coach_folder, 'GO_CC.dat')
             if op.exists(go_cc_dat_path):
                 parsed_go_cc = self.parse_go(infile=go_cc_dat_path, create_df=create_dfs)
-                tmp = {'top_go_cc_' + k: v for k, v in parsed_go_cc[0].items()}
-                self.modeling_results.update(tmp)
+                if parsed_go_cc:
+                    tmp = {'top_go_cc_' + k: v for k, v in parsed_go_cc[0].items()}
+                    self.modeling_results.update(tmp)
 
     def copy_results(self, copy_to_dir, rename_model_to=None, force_rerun=False):
         """Copy the raw information from I-TASSER modeling to a new folder.
