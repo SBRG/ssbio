@@ -1081,7 +1081,6 @@ class GEMPRO(object):
                 # TODO: should probably just do the alignment to make sure (representative sequences can change)
                 copied = copy.deepcopy(itasser_parse.modeling_results)
                 copied['seq_coverage'] = 1
-                copied['model_file'] = op.basename(itasser_parse.structure_path)
                 g.annotation['structure']['homology'][gene_id] = copied
 
                 copied['gene'] = gene_id

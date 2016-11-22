@@ -43,6 +43,7 @@ class ITASSERParse():
             self.structure_path = old_model_path
             # Save model creation date
             self.modeling_results['model_date'] = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
+            self.modeling_results['model_file'] = op.basename(self.structure_path)
 
         ### MODELING RESULTS
         # Parse init.dat
@@ -132,6 +133,7 @@ class ITASSERParse():
                                                   out_dir=copy_to_dir)
             # Update the structure_path to be the copied, clean file
             self.structure_path = new_model_path
+            self.modeling_results['model_file'] = op.basename(new_model_path)
 
             # Other modeling results - store in a new folder
             dest_itasser_dir = op.join(copy_to_dir, '{}_itasser'.format(rename_model_to))
