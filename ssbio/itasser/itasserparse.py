@@ -14,7 +14,7 @@ class ITASSERParse():
     """Parse all available information for an I-TASSER modeling run.
     """
 
-    _main_files_to_copy = ['model1.pdb', 'seq.dat', 'cscore']
+    _main_files_to_copy = ['seq.dat', 'cscore']
     _coach_files_to_copy = ['Bsites.inf', 'EC.dat', 'GO_MF.dat', 'GO_BP.dat', 'GO_CC.dat']
 
     def __init__(self, original_results_path, create_dfs=False,
@@ -127,10 +127,10 @@ class ITASSERParse():
             # Update the structure_path to be the copied, clean file
             self.structure_path = new_model_path
 
-        # Other modeling results - store in a new folder
-        dest_itasser_dir = op.join(copy_to_dir, '{}_itasser'.format(rename_model_to))
-        if not op.exists(dest_itasser_dir):
-            os.mkdir(dest_itasser_dir)
+            # Other modeling results - store in a new folder
+            dest_itasser_dir = op.join(copy_to_dir, '{}_itasser'.format(rename_model_to))
+            if not op.exists(dest_itasser_dir):
+                os.mkdir(dest_itasser_dir)
 
         for f in self._main_files_to_copy:
             old_file_path = op.join(self.results_path, f)
