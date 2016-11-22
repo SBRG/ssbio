@@ -5,7 +5,7 @@ from Bio.PDB import MMCIF2Dict
 class MMCIF2DictFix(MMCIF2Dict):
 
     def __init__(self, filename):
-        super(MMCIF2DictFix, self).__init__(filename)
+        super(MMCIF2DictFix, self).__init__()
 
     def _tokenize(self, handle):
         for line in handle:
