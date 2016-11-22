@@ -206,6 +206,9 @@ def force_rerun(flag, outfile):
     # If flag is False but file doesn't exist, also run
     elif not flag and not op.exists(outfile):
         return True
+    # If flag is False but filesize of output is 0, also run
+    elif not flag and not os.stat(outfile).st_size != 0:
+        return True
     # Otherwise, do not run
     else:
         return False
