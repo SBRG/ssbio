@@ -32,15 +32,18 @@ AAdict = {'CYS': 'polar',
           'SEC': 'polar'}
 
 # @cachetools.func.ttl_cache(maxsize=300)
-def dssp_dataframe(filename):
+def dssp_dataframe(filename, file_type):
     """Calculation of various properties utilizing the DSSP program.
 
     DSSP must be installed for biopython to properly call it.
-    Install using apt-get on Ubuntu
-    or from: http://swift.cmbi.ru.nl/gv/dssp/
+
+    Install on Ubuntu using:
+    > sudo apt-get install dssp
+
+    Or from source at: http://swift.cmbi.ru.nl/gv/dssp/
 
     Args:
-        filename: PDB or CIF structure file
+        filename: PDB or mmCIF structure file
 
     Returns:
         dict: Dictionary of properties
@@ -224,13 +227,13 @@ def calc_surface_buried(dssp_df):
         return sbinfo
 
 
-def all_dssp_props(filename):
+def all_dssp_props(filename, file_type):
     '''Returns a large dictionary of SASA, secondary structure
     composition, and surface/buried composition. Values are computed using DSSP.
     Input: PDB or MMCIF filename
     Output: Dictionary of values obtained from dssp
     '''
-    t = dssp_dataframe(filename)
+    t = dssp_dataframe(filename, file_type)
     # print(t)
     sasa = calc_sasa(t)
     sstr = calc_sec_struct_composition(t)

@@ -1,8 +1,8 @@
 from Bio import PDB
 import argparse
 import textwrap
-import glob
 import os
+import ssbio.utils
 import os.path as op
 
 from ssbio.structure.pdbioext import PDBIOExt
@@ -28,13 +28,13 @@ class CleanPDB(PDB.Select):
         """Initialize the parameters which indicate what cleaning will occur
 
         Args:
-            remove_atom_alt:
-            remove_atom_hydrogen:
-            keep_atom_alt_id:
-            add_atom_occ:
-            remove_res_hetero:
-            add_chain_id_if_empty:
-            keep_chains:
+            remove_atom_alt: Remove alternate positions
+            remove_atom_hydrogen: Remove hydrogen atoms
+            keep_atom_alt_id: If removing alternate positions, which alternate ID to keep
+            add_atom_occ: Add atom occupancy fields if not present
+            remove_res_hetero: Remove all HETATMs
+            add_chain_id_if_empty: Add a chain ID if not present
+            keep_chains: Keep only these chains
         """
         self.remove_atom_alt = remove_atom_alt
         self.remove_atom_hydrogen = remove_atom_hydrogen
@@ -75,7 +75,7 @@ class CleanPDB(PDB.Select):
         # If the you want to remove hydrogens and the atom is a H, remove it
         if self.remove_atom_hydrogen and atom.element == 'H':
             return False
-        # If you want to remove alternate locations, and the alternate location is not the one you want to keep, remove it
+        # If you want to remove alternate locations, and the alt location isn't the one you want to keep, remove it
         elif self.remove_atom_alt and atom.is_disordered() and atom.get_altloc() != self.keep_atom_alt_id:
             return False
         else:
@@ -88,58 +88,9 @@ class CleanPDB(PDB.Select):
             return True
 
 
-# # TODO: does CleanPDB add the TERs?
-# def add_ter_to_pdb(infile, outfile_name=None):
-#     '''
-#     Adds 'TER' cards to a PDB file when encountering:
-#     - a OXT atom - indicating the end of an amino acid chain
-#     - a ATOM to HETATM change - indicating a cofactor or ligand
-#     - a HETATM change to a new residue - indicating a new cofactor or ligand
-#     Input: any PDB file
-#     Output: the path to the fixed pdb file
-#     '''
-#     with open(infile,'r') as pdb_file:
-#         lines = pdb_file.readlines()
-#
-#     # open new file to write to
-#     if not outfile_name:
-#         outfile = os.path.splitext(os.path.basename(infile))[0] + '_fix.pdb'
-#     else:
-#         outfile = outfile_name
-#
-#     with open(outfile,'w') as new_pdb_file:
-#
-#         for line in lines:
-#             # grab residue name to compare with previous residue name
-#             resname = line[17:20]
-#             # if AMBER added an OXT, that is usually the end of the protein chain
-#             if 'OXT' in line:
-#                 new_pdb_file.write(line)
-#                 new_pdb_file.write('TER\n')
-#
-#             # TODO: this should be manual input
-#             elif 'MG' in line:
-#                 new_pdb_file.write(line)
-#                 new_pdb_file.write('TER\n')
-#
-#             # if there is a change from ATOM to HETATM, that usually indicates the presence of a cofactor/ligand
-#             # also check if the previous resname was different - could be a start of a new cofactor/ligand
-#             elif 'HETATM' in line and ('ATOM' in lines[lines.index(line)-1] or resname != prev_resname):
-#                 resname = line[17:20]
-#                 new_pdb_file.write('TER\n')
-#                 new_pdb_file.write(line)
-#             else:
-#                 new_pdb_file.write(line)
-#             prev_resname = resname
-#
-#     return outfile
-
-
 if __name__ == '__main__':
-    # load inputs from command line
-
     p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                description=textwrap.dedent('''\
+                                description=textwrap.dedent("""\
                                 Clean PDB files - cleanpdb.py
                                 -----------------------------
                                 This script will automatically:
@@ -165,34 +116,47 @@ if __name__ == '__main__':
 
                                 Example: clean a whole directory of PDB
                                 $ cleanpdb /path/to/pdb/files
-                                '''))
+                                """))
     p.add_argument('infile', help='PDB file or folder you want to clean', nargs='+', type=str)
-    p.add_argument('--outsuffix', '-o', default='clean', help='Suffix appended to PDB file')
-    p.add_argument('--chain', '-c', help='Keep only specified chains')
-    p.add_argument('--keephydro', '-hy', action='store_false', help='Keep hydrogen atoms')
-    p.add_argument('--keephetero', '-ht', action='store_false', help='Keep hetero atoms')
+    p.add_argument('--outsuffix', '-os', default='_clean', help='Suffix appended to PDB file')
+    p.add_argument('--outdir', '-od', default='clean_pdbs', help='Directory to output clean PDBs')
+    p.add_argument('--chain', '-c', default=None, help='Keep only specified chains')
+    p.add_argument('--keephydro', '-hy', action='store_false', help='Keep hydrogen atoms (default is to remove)')
+    p.add_argument('--keephetero', '-ht', action='store_false', help='Keep hetero atoms (default is to remove)')
     # TODO: if this flag is present, the alternate positions seem to switch line positions
-    p.add_argument('--keepalt', '-ka', action='store_false', help='Keep alternate positions')
+    p.add_argument('--keepalt', '-ka', action='store_false', help='Keep alternate positions (default is to remove)')
+    p.add_argument('--force', '-f', action='store_true', help='Force rerunning of cleaning even if the clean PDB exists')
     args = p.parse_args()
 
-    out_dir = 'clean_pdbs'
     if args.chain:
-        chains = args.chain.split(',')
-    else:
-        chains = args.chain
+        args.chain = args.chain.split(',')
 
-    # TODO: improve arg parsing for files/dirs
-    if len(args.infile) == 1 and op.isdir(args.infile[0]):
-        os.chdir(args.infile[0])
-        pdbs = glob.glob('*.pdb')
-    else:
-        pdbs = args.infile
+    if not op.isdir(args.outdir):
+        os.mkdir(args.outdir)
 
-    for pdb in tqdm(pdbs):
-        if op.isdir(pdb):
-            continue
-        my_pdb = PDBIOExt(pdb, file_type='pdb')
-        my_cleaner = CleanPDB(remove_atom_alt=args.keepalt, remove_atom_hydrogen=args.keephydro, keep_atom_alt_id='A', add_atom_occ=True,
-                              remove_res_hetero=args.keephetero, add_chain_id_if_empty='X', keep_chains=chains)
-        my_clean_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, out_dir=out_dir, custom_selection=my_cleaner)
-    print('Clean PDBs at: {}'.format(out_dir))
+    infiles = ssbio.utils.input_list_parser(args.infile)
+
+    for pdb in tqdm(infiles):
+
+        outfile = ssbio.utils.outfile_maker(inname=pdb,
+                                            append_to_name=args.outsuffix,
+                                            outdir=args.outdir,
+                                            outext='.pdb')
+
+        if ssbio.utils.force_rerun(flag=args.force, outfile=outfile):
+
+            my_pdb = PDBIOExt(pdb, file_type='pdb')
+            my_cleaner = CleanPDB(remove_atom_alt=args.keepalt,
+                                  remove_atom_hydrogen=args.keephydro,
+                                  keep_atom_alt_id='A',
+                                  add_atom_occ=True,
+                                  remove_res_hetero=args.keephetero,
+                                  add_chain_id_if_empty='X',
+                                  keep_chains=args.chain)
+
+            my_clean_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix,
+                                            out_dir=args.outdir,
+                                            custom_selection=my_cleaner,
+                                            force_rerun=args.force)
+
+    print('Clean PDBs at: {}'.format(args.outdir))

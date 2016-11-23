@@ -1057,15 +1057,6 @@ class GEMPRO(object):
             gene_id = g.id
             itasser_name = gene_id + '_model1'
 
-            # Make the destination structure folder and other results folder
-            dest_gene_dir = op.join(self.structure_single_chain_dir, gene_id)
-            if not op.exists(dest_gene_dir):
-                os.mkdir(dest_gene_dir)
-
-            dest_itasser_extra_dir = op.join(dest_gene_dir, '{}_itasser'.format(itasser_name))
-            if not op.exists(dest_itasser_extra_dir):
-                os.mkdir(dest_itasser_extra_dir)
-
             if custom_itasser_name_mapping and gene_id in custom_itasser_name_mapping:
                 hom_id = custom_itasser_name_mapping[gene_id]
             else:
@@ -1073,10 +1064,20 @@ class GEMPRO(object):
             orig_itasser_dir = op.join(homology_raw_dir, hom_id)
 
             itasser_parse = ITASSERParse(original_results_path=orig_itasser_dir, create_dfs=True)
-            itasser_parse.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
-            itasser_parse.save_dataframes(outdir=dest_itasser_extra_dir)
 
             if itasser_parse.modeling_results:
+                # Make the destination structure folder and other results folder
+                dest_gene_dir = op.join(self.structure_single_chain_dir, gene_id)
+                if not op.exists(dest_gene_dir):
+                    os.mkdir(dest_gene_dir)
+
+                dest_itasser_extra_dir = op.join(dest_gene_dir, '{}_itasser'.format(itasser_name))
+                if not op.exists(dest_itasser_extra_dir):
+                    os.mkdir(dest_itasser_extra_dir)
+
+                itasser_parse.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
+                itasser_parse.save_dataframes(outdir=dest_itasser_extra_dir)
+
                 # Always set sequence coverage to 100% for an ITASSER model
                 # TODO: should probably just do the alignment to make sure (representative sequences can change)
                 copied = copy.deepcopy(itasser_parse.modeling_results)
@@ -1101,6 +1102,7 @@ class GEMPRO(object):
                 'top_go_mf_go_id', 'top_go_mf_go_term', 'top_go_mf_c_score', 'top_go_bp_go_id', 'top_go_bp_go_term',
                 'top_go_bp_c_score', 'top_go_cc_go_id', 'top_go_cc_go_term', 'top_go_cc_c_score']
         self.df_itasser = pd.DataFrame.from_records(itasser_pre_df, columns=cols)
+        self.df_itasser.dropna(axis=1, how='all', inplace=True)
 
         log.info('Completed copying of {} I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.'.format(len(self.df_itasser)))
 

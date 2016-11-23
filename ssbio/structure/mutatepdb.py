@@ -1,10 +1,14 @@
 #!/usr/bin/env python
+import tempfile
+from ssbio.structure.pdbioext import PDBIOExt
+from ssbio.structure.cleanpdb import CleanPDB
 
+import argparse
 from Bio import PDB
-
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import aa3
 from Bio.PDB.Polypeptide import one_to_three
+
 
 class MutatePDB(PDB.Select):
     """Selection rules to mutate a PDB file
@@ -23,10 +27,10 @@ class MutatePDB(PDB.Select):
             residue_number:
             mutate_to:
         """
-        self.mutation_list = [(i[0], int(i[1]), self.standard_resname(i[2])) for i in mutation_list]
+        self.mutation_list = [(i[0], int(i[1]), self._standard_resname(i[2])) for i in mutation_list]
         self.chains_and_residues = [(i[0], int(i[1])) for i in mutation_list]
 
-    def standard_resname(self, res):
+    def _standard_resname(self, res):
         resname3 = res.upper()
         if resname3 not in list(aa3) and resname3 not in list(aa1):
             # TODO: mutation to selenocysteine (U;SEC) is not working
@@ -62,22 +66,17 @@ class MutatePDB(PDB.Select):
 
         return True
 
+
 def parse_mutation_input(instr):
     init_split = instr.split(',')
     second_split = [tuple(i.split('.')) for i in init_split]
     return second_split
 
 if __name__ == '__main__':
-    import tempfile
-    from ssbio.structure.pdbioext import PDBIOExt
-    from ssbio.structure.cleanpdb import CleanPDB
-
-    # # load inputs from command line
-    import argparse
     p = argparse.ArgumentParser(description='Mutates a PDB file')
     p.add_argument('infile', help='PDB file you want to mutate')
     p.add_argument('mutations', help='Mutations in the form of Chain1.ResNum1.Mutation1,Chain2.ResNum2.Mutation2. Example: A.4.TYR,B.4.TYR')
-    p.add_argument('--outsuffix', '-o', default='mutated', help='Suffix appended to PDB file')
+    p.add_argument('--outsuffix', '-o', default='_mutated', help='Suffix appended to PDB file')
     p.add_argument('--clean', '-c', action='store_true', help='Clean PDB and keep only chain with mutation')
     args = p.parse_args()
 
@@ -86,7 +85,7 @@ if __name__ == '__main__':
     my_pdb = PDBIOExt(args.infile, file_type='pdb')
     if args.clean:
         my_cleaner = CleanPDB(keep_chains=[x[0] for x in mutations])
-        my_clean_pdb = my_pdb.write_pdb(out_suffix='clean', out_dir=tempfile.gettempdir(), custom_selection=my_cleaner)
+        my_clean_pdb = my_pdb.write_pdb(out_suffix='_clean', out_dir=tempfile.gettempdir(), custom_selection=my_cleaner)
         my_pdb = PDBIOExt(my_clean_pdb, file_type='pdb')
 
     my_mutation = MutatePDB(mutations)

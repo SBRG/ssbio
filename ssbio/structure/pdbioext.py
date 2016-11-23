@@ -41,7 +41,7 @@ class PDBIOExt(PDBIO):
             self.set_structure(structure)
             self.first_model = structure[0]
 
-    def write_pdb(self, custom_name='', out_suffix='', out_dir=None, custom_selection=None):
+    def write_pdb(self, custom_name='', out_suffix='', out_dir=None, custom_selection=None, force_rerun=False):
         """Write a new PDB file for the Structure's FIRST MODEL.
 
         Set custom_selection to a PDB.Select class for custom SMCRA selections.
@@ -71,7 +71,8 @@ class PDBIOExt(PDBIO):
                                             outdir=out_dir,
                                             outext='.pdb')
         try:
-            self.save(outfile, custom_selection)
+            if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+                self.save(outfile, custom_selection)
         except TypeError:
             # If trying to save something that can't be saved as a PDB (example: 5iqr.cif), log an error and return None
             # The error thrown by PDBIO.py is "TypeError: %c requires int or char"

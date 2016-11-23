@@ -94,9 +94,10 @@ if __name__ == '__main__':
 
     msms_errors = []
 
-    for f in tqdm(infiles, leave=True):
+    for f in tqdm(infiles):
         try:
             msms_stuff = run_msms(f)
+            # TODO: what exception to check?
         except:
             msms_errors.append(f)
             continue
