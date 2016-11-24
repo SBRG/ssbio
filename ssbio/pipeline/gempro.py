@@ -867,7 +867,7 @@ class GEMPRO(object):
 
                     g.annotation['structure']['pdb'] = to_add_to_annotation
 
-                    log.debug('{}: {} PDB/chain pairs mapped'.format(gene_id, to_add_to_annotation))
+                    log.debug('{}: {} PDB/chain pairs mapped'.format(gene_id, len(to_add_to_annotation)))
                 else:
                     log.debug('{}: No PDB/chain pairs mapped'.format(gene_id))
 
@@ -1210,6 +1210,9 @@ class GEMPRO(object):
                         chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file, file_type=file_type)
 
                         for chain in chains:
+                            if chain not in chain_to_seq:
+                                log.warning('{}: chain {} not found in structure!'.format(pdb, chain))
+                                continue
                             chain_seq = chain_to_seq[chain]
 
                             # Compare representative sequence to structure sequence
