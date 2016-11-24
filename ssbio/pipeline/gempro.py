@@ -290,6 +290,7 @@ class GEMPRO(object):
                                                         'pdb'           : OrderedDict(),
                                                         'representative': {'structure_id'     : None,
                                                                            'seq_coverage'     : 0,
+                                                                           'is_experimental'  : False,
                                                                            'original_pdb_file': None,
                                                                            'clean_pdb_file'   : None,
                                                                            'properties': {}}}
@@ -317,6 +318,7 @@ class GEMPRO(object):
                                                  'pdb'           : OrderedDict(),
                                                  'representative': {'structure_id'     : None,
                                                                     'seq_coverage'     : 0,
+                                                                    'is_experimental'  : False,
                                                                     'original_pdb_file': None,
                                                                     'clean_pdb_file'   : None,
                                                                     'properties': {}}}
@@ -351,6 +353,7 @@ class GEMPRO(object):
                                                 'pdb'           : OrderedDict(),
                                                 'representative': {'structure_id'     : None,
                                                                    'seq_coverage'     : 0,
+                                                                   'is_experimental'  : False,
                                                                    'original_pdb_file': None,
                                                                    'clean_pdb_file'   : None,
                                                                    'properties': {}}}
@@ -1233,6 +1236,7 @@ class GEMPRO(object):
                             # If not, move on to the next potential PDB
                             if found_good_pdb:
                                 orig_pdb_data = g.annotation['structure']['pdb'][str(pdb) + ';' + str(chain)]
+                                g.annotation['structure']['representative']['is_experimental'] = True
                                 g.annotation['structure']['representative']['structure_id'] = str(pdb) + ';' + str(chain)
                                 g.annotation['structure']['representative']['seq_coverage'] = orig_pdb_data['seq_coverage']
                                 g.annotation['structure']['representative']['original_pdb_file'] = op.basename(pdb_file)
