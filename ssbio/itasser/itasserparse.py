@@ -201,7 +201,7 @@ class ITASSERParse():
         """
         init_dict = {}
 
-        log.debug('{}: Reading file...')
+        log.debug('{}: Reading file...'.format(infile))
         with open(infile, 'r') as f:
             # Get first 2 lines of file
             head = [next(f).strip() for x in range(2)]

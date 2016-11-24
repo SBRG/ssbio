@@ -1075,7 +1075,12 @@ class GEMPRO(object):
                 if not op.exists(dest_itasser_extra_dir):
                     os.mkdir(dest_itasser_extra_dir)
 
-                itasser_parse.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
+                try:
+                    itasser_parse.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
+                except Exception as e:
+                    print(e)
+                    print(g, orig_itasser_dir)
+                    break
                 itasser_parse.save_dataframes(outdir=dest_itasser_extra_dir)
 
                 # Always set sequence coverage to 100% for an ITASSER model
