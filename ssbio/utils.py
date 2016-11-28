@@ -8,7 +8,7 @@ import contextlib
 import logging
 import distutils.spawn
 import subprocess
-import shutil
+import shlex
 from collections import OrderedDict
 from collections import Callable
 try:
@@ -242,7 +242,7 @@ def program_exists(prog_name):
         return False
 
 
-def command_runner(program, args, force_rerun_flag, outfile):
+def command_runner(shell_command, force_rerun_flag, outfile, silent=False):
     """Run a program with command-line arguments.
 
     Args:
@@ -256,16 +256,23 @@ def command_runner(program, args, force_rerun_flag, outfile):
         bool: If the program ran successfully.
 
     """
-    # Check if pepstats is installed
-    if not program_exists(program):
+    program_and_args = shlex.split(shell_command)
+
+    # Check if program is installed
+    if not program_exists(program_and_args[0]):
         raise OSError('{}: program not installed'.format(program))
 
     # Check for force rerunning
     if force_rerun(flag=force_rerun_flag, outfile=outfile):
-        cmd = '{} {}'.format(program, args)
-        command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = command.communicate()
+        if silent:
+            command = subprocess.Popen(program_and_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = command.communicate()
+            ret = command.returncode
+        else:
+            # Prints output
+            ret = subprocess.call(program_and_args)
 
+        # TODO: check return code and log properly
         log.debug('{}: Ran program, output to {}'.format(program, outfile))
     else:
         log.debug('{}: Output already exists'.format(outfile))

@@ -63,8 +63,10 @@ def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', 
     outfile = ssbio.utils.outfile_maker(inname=infile, outname=outfile, outdir=outdir, outext=outext)
 
     # Run pepstats
+    program = 'pepstats'
     pepstats_args = '-sequence="{}" -outfile="{}"'.format(infile, outfile)
-    ssbio.utils.command_runner(program='pepstats', args=pepstats_args, force_rerun_flag=force_rerun, outfile=outfile)
+    cmd_string = '{} {}'.format(program, pepstats_args)
+    ssbio.utils.command_runner(cmd_string, force_rerun_flag=force_rerun, outfile=outfile)
 
     return outfile
 
@@ -87,8 +89,10 @@ def emboss_pepstats_on_str(instring, outfile, outdir='', outext='.pepstats', for
     outfile = ssbio.utils.outfile_maker(inname='seq_str', outname=outfile, outdir=outdir, outext=outext)
 
     # Run pepstats
+    program = 'pepstats'
     pepstats_args = '-sequence=asis::{} -outfile="{}"'.format(instring, outfile)
-    ssbio.utils.command_runner(program='pepstats', args=pepstats_args, force_rerun_flag=force_rerun, outfile=outfile)
+    cmd_string = '{} {}'.format(program, pepstats_args)
+    ssbio.utils.command_runner(cmd_string, force_rerun_flag=force_rerun, outfile=outfile)
 
     return outfile
 
