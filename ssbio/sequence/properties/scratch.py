@@ -43,10 +43,10 @@ class SCRATCH():
 
         outname = op.join(outdir, outname)
 
-        self.out_sspro = '{}.out.ss'.format(outname)
-        self.out_sspro8 = '{}.out.ss8'.format(outname)
-        self.out_accpro = '{}.out.acc'.format(outname)
-        self.out_accpro20 = '{}.out.acc20'.format(outname)
+        self.out_sspro = '{}.ss'.format(outname)
+        self.out_sspro8 = '{}.ss8'.format(outname)
+        self.out_accpro = '{}.acc'.format(outname)
+        self.out_accpro20 = '{}.acc20'.format(outname)
 
         ssbio.utils.command_runner(program=path_to_scratch,
                                    args='{} {}'.format(self.seq_file, outname),
@@ -179,12 +179,12 @@ class SCRATCH():
 
 
 def read_accpro20(infile):
-    """Read the accpro20 output (.out.acc20) and return the parsed FASTA records.
+    """Read the accpro20 output (.acc20) and return the parsed FASTA records.
 
     Keeps the spaces between the accessibility numbers.
 
     Args:
-        infile: Path to .out.acc20 file
+        infile: Path to .acc20 file
 
     Returns:
         dict: Dictionary of accessibilities with keys as the ID
