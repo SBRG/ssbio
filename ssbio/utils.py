@@ -264,10 +264,12 @@ def command_runner(program, args, force_rerun_flag, outfile, silent=False):
     if force_rerun(flag=force_rerun_flag, outfile=outfile):
         cmd = '{} {}'.format(program, args)
         command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = command.communicate()
+
         if not silent:
-            print(out.decode('ascii'))
-            print(err.decode('ascii'))
+            for stdout_line in iter(command.stdout.readline.readline, ""):
+                yield stdout_line
+
+        out, err = command.communicate()
         log.debug('{}: Ran program, output to {}'.format(program, outfile))
     else:
         log.debug('{}: Output already exists'.format(outfile))
