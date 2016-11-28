@@ -242,7 +242,7 @@ def program_exists(prog_name):
         return False
 
 
-def command_runner(program, args, force_rerun_flag, outfile, silent=False):
+def command_runner(program, args, force_rerun_flag, outfile):
     """Run a program with command-line arguments.
 
     Args:
@@ -265,10 +265,6 @@ def command_runner(program, args, force_rerun_flag, outfile, silent=False):
         cmd = '{} {}'.format(program, args)
         command = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = command.communicate()
-
-        if not silent:
-            for stdout_line in iter(command.stdout.readline.readline, ""):
-                print(stdout_line)
 
         log.debug('{}: Ran program, output to {}'.format(program, outfile))
     else:
