@@ -267,6 +267,7 @@ def command_runner(program, args, force_rerun_flag, outfile, silent=False):
         out, err = command.communicate()
         if not silent:
             print(out.decode('ascii'))
+            print(err.decode('ascii'))
         log.debug('{}: Ran program, output to {}'.format(program, outfile))
     else:
         log.debug('{}: Output already exists'.format(outfile))
