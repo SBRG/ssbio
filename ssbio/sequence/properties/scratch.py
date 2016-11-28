@@ -48,8 +48,7 @@ class SCRATCH():
         self.out_accpro = '{}.acc'.format(outname)
         self.out_accpro20 = '{}.acc20'.format(outname)
 
-        ssbio.utils.command_runner(program=path_to_scratch,
-                                   args='{} {}'.format(self.seq_file, outname),
+        ssbio.utils.command_runner(program_and_args='{} {} {}'.format(path_to_scratch, self.seq_file, outname),
                                    outfile='{}.ss'.format(outname),
                                    force_rerun_flag=force_rerun)
 
