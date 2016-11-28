@@ -12,7 +12,6 @@ date = utils.Date()
 # TODO: what if i want to write one fasta file for multiple sequences?
 
 
-
 def write_fasta_file(seq_str, ident, description='',
                      extension='faa', outdir=None, overwrite=False, ignore_alphabet=False):
     '''
@@ -89,7 +88,17 @@ def load_fasta_file(filename):
     else:
         raise IOError('File does not exist.')
 
+def load_seq_str_as_temp_file(self, seq_str):
+    """Load a sequence string and return a temporary path to the FASTA file.
 
+    Args:
+        seq_str:
+
+    Returns:
+        str: File path to FASTA file in temporary directory
+
+    """
+    pass
 
 
 if __name__ == '__main__':
