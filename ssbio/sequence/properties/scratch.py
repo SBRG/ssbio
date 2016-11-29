@@ -24,7 +24,7 @@ class SCRATCH():
         if seq_str:
             self.seq_file = ssbio.sequence.fasta.load_seq_str_as_temp_file(seq_str)
 
-    def run_scratch(self, path_to_scratch, outname=None, outdir=None, force_rerun=False):
+    def run_scratch(self, path_to_scratch, num_cores=1, outname=None, outdir=None, force_rerun=False):
         """Run SCRATCH on the seq_file that was loaded into the class.
 
         Args:
@@ -48,7 +48,8 @@ class SCRATCH():
         self.out_accpro = '{}.acc'.format(outname)
         self.out_accpro20 = '{}.acc20'.format(outname)
 
-        ssbio.utils.command_runner(shell_command='{} {} {}'.format(path_to_scratch, self.seq_file, outname),
+        # TODO: check for multiple output files in command_runner
+        ssbio.utils.command_runner(shell_command='{} {} {} {}'.format(path_to_scratch, self.seq_file, outname, num_cores),
                                    outfile='{}.ss'.format(outname),
                                    force_rerun_flag=force_rerun)
 

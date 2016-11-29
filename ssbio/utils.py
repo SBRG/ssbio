@@ -1,3 +1,4 @@
+from __future__ import print_function # Only Python 2.x
 import os
 import sys
 import datetime
@@ -9,6 +10,7 @@ import logging
 import distutils.spawn
 import subprocess
 import shlex
+
 from collections import OrderedDict
 from collections import Callable
 try:
@@ -260,7 +262,7 @@ def command_runner(shell_command, force_rerun_flag, outfile, silent=False):
 
     # Check if program is installed
     if not program_exists(program_and_args[0]):
-        raise OSError('{}: program not installed'.format(program))
+        raise OSError('{}: program not installed'.format(program_and_args[0]))
 
     # Check for force rerunning
     if force_rerun(flag=force_rerun_flag, outfile=outfile):
@@ -270,12 +272,23 @@ def command_runner(shell_command, force_rerun_flag, outfile, silent=False):
             ret = command.returncode
         else:
             # Prints output
-            ret = subprocess.call(program_and_args)
+            for path in execute(program_and_args):
+                print(path, end="")
 
         # TODO: check return code and log properly
-        log.debug('{}: Ran program, output to {}'.format(program, outfile))
+        log.debug('{}: Ran program, output to {}'.format(program_and_args[0], outfile))
     else:
         log.debug('{}: Output already exists'.format(outfile))
+
+
+def execute(cmd):
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    for stdout_line in iter(popen.stdout.readline, ""):
+        yield stdout_line
+    popen.stdout.close()
+    return_code = popen.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd)
 
 
 def dict_head(d, N=5):
