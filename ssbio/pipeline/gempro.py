@@ -5,14 +5,15 @@ import numpy as np
 import shutil
 import pandas as pd
 
-from tqdm import tqdm
-# try:
-#     from IPython.display import clear_output
-#     have_ipython = True
-#     from tqdm import tqdm_notebook as tqdm
-# except ImportError:
-#     have_ipython = False
-#     from tqdm import tqdm
+# from tqdm import tqdm
+# TODO: This does not work properly in the IPython terminal (it works in the notebook)
+try:
+    from IPython.display import clear_output
+    have_ipython = True
+    from tqdm import tqdm_notebook as tqdm
+except ImportError:
+    have_ipython = False
+    from tqdm import tqdm
 
 from collections import OrderedDict
 
@@ -394,6 +395,7 @@ class GEMPRO(object):
             else:
                 kegg_g = gene_id
 
+            # TODO: why always make it? i think it should only be made if data is found
             # Always make the gene specific folder under the sequence_files directory
             gene_folder = op.join(self.sequence_dir, gene_id)
             if not op.exists(gene_folder):
@@ -696,7 +698,6 @@ class GEMPRO(object):
 
         """
         # TODO: clean up this code!
-        # TODO: check erol's notebook to see why uniprot_accs are not being set
         seq_mapping_pre_df = []
 
         for gene in self.genes:
@@ -787,6 +788,8 @@ class GEMPRO(object):
         cols = ['gene', 'uniprot_acc', 'kegg_id', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
         tmp = pd.DataFrame.from_records(seq_mapping_pre_df, columns=cols)
 
+        # TODO: info on genes that could be mapped!
+
         # Info on genes that could not be mapped
         self.missing_mapping = tmp[pd.isnull(tmp.seq_file)].gene.unique().tolist()
         if len(self.missing_mapping) > 0:
@@ -798,6 +801,30 @@ class GEMPRO(object):
         # mapping_df_outfile = op.join(self.data_dir, 'df_sequence_mapping.csv')
         # self.df_sequence_mapping.to_csv(mapping_df_outfile)
         log.info('Created sequence mapping dataframe. See the "df_sequence_mapping" attribute.')
+
+    def write_representative_sequences_file(self, outname, outdir=None):
+        """Write all the model's sequences as a single FASTA file
+
+        Args:
+            outname: Name of FASTA file without the extension
+            outdir: Path to output file
+
+        """
+        if not outdir:
+            outdir = self.sequence_dir
+
+        tmp = {}
+        for x in self.genes:
+            seq_file = x.annotation['sequence']['representative']['seq_file']
+            if seq_file:
+                # Load the sequence fasta
+                seq_record = ssbio.sequence.fasta.load_fasta_file(op.join(self.sequence_dir, x.id, seq_file))[0]
+                # Save the ID as the model's ID
+                tmp[x.id] = str(seq_record.seq)
+
+        outfile = ssbio.sequence.fasta.write_fasta_file(indict=tmp, outname=outname, outdir=outdir)
+
+        log.info('{}: wrote all representative sequences to file'.format(outfile))
 
     def map_uniprot_to_pdb(self, seq_ident_cutoff=0, force_rerun=False):
         """Map UniProt IDs to a ranked list of PDB structures available.
@@ -1440,25 +1467,37 @@ class GEMPRO(object):
             raise ValueError('Sequence mapping engine not available')
 
         if sequence_mapping_engine == 'kegg' or sequence_mapping_engine == 'all':
-            if not kwargs['kegg_organism_code']:
+            if 'kegg_organism_code' not in kwargs:
                 raise TypeError('kegg_organism_code needed')
 
-            print('Running KEGG mapping...')
-            self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
-
         if sequence_mapping_engine == 'uniprot' or sequence_mapping_engine == 'all':
-            if not kwargs['model_gene_source']:
+            if 'model_gene_source' not in kwargs:
                 raise TypeError('UniProt model_gene_source needed')
 
-            print('Running UniProt mapping...')
-            self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
+        print('Running KEGG mapping...')
+        # TODO: better way of passing optional arguments to these things - yaml? There are too many if statements to check for things
+        if 'custom_gene_mapping' in kwargs:
+            self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'], custom_gene_mapping=kwargs['custom_gene_mapping'])
+        else:
+            self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
+
+        print('Running UniProt mapping...')
+        self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
 
         print('Setting representative sequences...')
         self.set_representative_sequence()
 
-        current_structure_mapping_engines = ['uniprot', 'itasser', 'all'] # 'blast', 'manual_homology'
+        current_structure_mapping_engines = ['uniprot', 'itasser', 'all', 'none'] # 'blast', 'manual_homology'
         if structure_mapping_engine not in current_structure_mapping_engines:
             raise ValueError('Structure mapping engine not available')
+
+        if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
+            if 'homology_raw_dir' not in kwargs:
+                raise TypeError('Path to homology models needed as homology_raw_dir')
+
+        if not structure_mapping_engine == 'none':
+            if 'always_use_homology' not in kwargs:
+                raise TypeError('Flag always_use_homology needed')
 
         if structure_mapping_engine == 'uniprot' or structure_mapping_engine == 'all':
             print('Mapping UniProt IDs to the PDB...')
@@ -1469,8 +1508,9 @@ class GEMPRO(object):
             self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
                                     custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
 
-        print('Setting representative structures...')
-        self.set_representative_structure(always_use_homology=kwargs['always_use_homology'])
+        if not structure_mapping_engine == 'none':
+            print('Setting representative structures...')
+            self.set_representative_structure(always_use_homology=kwargs['always_use_homology'])
 
 
 if __name__ == '__main__':
