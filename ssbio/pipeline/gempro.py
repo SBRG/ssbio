@@ -125,6 +125,8 @@ class UniProtProp(SeqProp):
         if metadata_file:
             metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
 
+            # TODO: populate SeqProp fields with parsed metadata
+
 
 class KEGGProp(SeqProp):
     def __init__(self, kegg_id=None, sequence_file=None, metadata_file=None):
@@ -133,6 +135,8 @@ class KEGGProp(SeqProp):
 
         if kegg_id:
             self.kegg = kegg_id
+
+        # TODO: populate SeqProp fields with parsed metadata
 
     def get_dict(self):
         return self.__dict__.copy()
@@ -272,15 +276,15 @@ class GEMPRO(object):
                 # TODO: if we don't define dictionaries like this we risk pointing to the same object for some reason
                 # is there a better way to do this?
                 if 'sequence' not in new_gene.annotation.keys():
-                    new_gene.annotation['sequence'] = {'kegg'          : {'uniprot_acc'  : None,
-                                                                          'kegg_id'      : None,
+                    new_gene.annotation['sequence'] = {'kegg'          : {'uniprot'  : None,
+                                                                          'kegg'      : None,
                                                                           'seq_len'      : 0,
                                                                           'pdbs'         : [],
                                                                           'seq_file'     : None,
                                                                           'metadata_file': None},
                                                        'uniprot'       : {},
-                                                       'representative': {'uniprot_acc'  : None,
-                                                                          'kegg_id'      : None,
+                                                       'representative': {'uniprot'  : None,
+                                                                          'kegg'      : None,
                                                                           'seq_len'      : 0,
                                                                           'pdbs'         : [],
                                                                           'properties'   : {},
@@ -300,15 +304,15 @@ class GEMPRO(object):
         else:
             for x in genes_list:
                 if 'sequence' not in x.annotation.keys():
-                    x.annotation['sequence'] = {'kegg'          : {'uniprot_acc'  : None,
-                                                                   'kegg_id'      : None,
+                    x.annotation['sequence'] = {'kegg'          : {'uniprot'  : None,
+                                                                   'kegg'      : None,
                                                                    'seq_len'      : 0,
                                                                    'pdbs'         : [],
                                                                    'seq_file'     : None,
                                                                    'metadata_file': None},
                                                 'uniprot'       : {},
-                                                'representative': {'uniprot_acc'  : None,
-                                                                   'kegg_id'      : None,
+                                                'representative': {'uniprot'  : None,
+                                                                   'kegg'      : None,
                                                                    'seq_len'      : 0,
                                                                    'pdbs'         : [],
                                                                    'properties'   : {},
@@ -336,15 +340,15 @@ class GEMPRO(object):
         new_genes = []
         for x in list(set(genes_list)):
             new_gene = Gene(id=x)
-            new_gene.annotation['sequence'] = {'kegg'          : {'uniprot_acc'  : None,
-                                                                  'kegg_id'      : None,
+            new_gene.annotation['sequence'] = {'kegg'          : {'uniprot'  : None,
+                                                                  'kegg'      : None,
                                                                   'seq_len'      : 0,
                                                                   'pdbs'         : [],
                                                                   'seq_file'     : None,
                                                                   'metadata_file': None},
                                                'uniprot'       : {},
-                                               'representative': {'uniprot_acc'  : None,
-                                                                  'kegg_id'      : None,
+                                               'representative': {'uniprot'  : None,
+                                                                  'kegg'      : None,
                                                                   'seq_len'      : 0,
                                                                   'pdbs'         : [],
                                                                   'properties'   : {},
@@ -419,7 +423,7 @@ class GEMPRO(object):
 
             # Update potentially old UniProt ID
             if kegg_g in kegg_to_uniprot.keys():
-                kegg_prop.uniprot_acc = kegg_to_uniprot[kegg_g]
+                kegg_prop.uniprot = kegg_to_uniprot[kegg_g]
 
             # Save in Gene
             g.annotation['sequence']['kegg'] = kegg_dict
@@ -427,7 +431,7 @@ class GEMPRO(object):
             if sequence_file:
                 # Also check if KEGG sequence matches a potentially set representative sequence
                 # Do not add any info if a UniProt ID was already mapped though, we want to use that
-                if g.annotation['sequence']['representative']['seq_len'] > 0 and not g.annotation['sequence']['representative']['uniprot_acc']:
+                if g.annotation['sequence']['representative']['seq_len'] > 0 and not g.annotation['sequence']['representative']['uniprot']:
                     ### Check if sequences are the same
 
                     # Load already set representative sequence
@@ -442,7 +446,7 @@ class GEMPRO(object):
                     if str(rep_seq.seq) == str(kegg_seq.seq):
                         # If equal, fill in representative sequence fields with kegg metadata but still use
                         # the already set sequence file
-                        your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'metadata_file']
+                        your_keys = ['kegg', 'uniprot', 'pdbs', 'metadata_file']
                         for_saving = {your_key: kegg_dict[your_key] for your_key in your_keys if
                                       your_key in kegg_dict}
                         g.annotation['sequence']['representative'].update(for_saving)
@@ -456,12 +460,12 @@ class GEMPRO(object):
             log.debug('{}: Loaded KEGG information for gene'.format(gene_id))
 
         # Save a dataframe of the file mapping info
-        cols = ['gene', 'uniprot_acc', 'kegg_id', 'seq_len', 'pdbs', 'seq_file', 'metadata_file']
+        cols = ['gene', 'uniprot', 'kegg', 'seq_len', 'pdbs', 'seq_file', 'metadata_file']
         self.df_kegg_metadata = pd.DataFrame.from_records(kegg_pre_df, columns=cols)
         log.info('Created KEGG metadata dataframe. See the "df_kegg_metadata" attribute.')
 
         # Info on genes that could not be mapped
-        self.missing_kegg_mapping = self.df_kegg_metadata[pd.isnull(self.df_kegg_metadata.kegg_id)].gene.unique().tolist()
+        self.missing_kegg_mapping = self.df_kegg_metadata[pd.isnull(self.df_kegg_metadata.kegg)].gene.unique().tolist()
         if len(self.missing_kegg_mapping) > 0:
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_kegg_mapping" attribute.'.format(len(self.missing_kegg_mapping)))
 
@@ -513,7 +517,7 @@ class GEMPRO(object):
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
 
-                    uniprot_dict['uniprot_acc'] = str(mapped_uniprot)
+                    uniprot_dict['uniprot'] = str(mapped_uniprot)
 
                     # Download uniprot metadata
                     metadata_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot,
@@ -556,7 +560,7 @@ class GEMPRO(object):
                         if str(rep_seq.seq) == str(unip_seq.seq):
                             # If equal, fill in representative sequence fields with uniprot metadata but still use
                             # the already set sequence file
-                            your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'metadata_file']
+                            your_keys = ['kegg', 'uniprot', 'pdbs', 'metadata_file']
                             for_saving = {your_key: uniprot_dict[your_key] for your_key in your_keys if
                                           your_key in uniprot_dict}
                             g.annotation['sequence']['representative'].update(for_saving)
@@ -573,12 +577,12 @@ class GEMPRO(object):
             self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).reset_index(drop=True)
             log.info('Updated existing UniProt dataframe.')
         else:
-            cols = ['gene', 'uniprot_acc', 'seq_len', 'seq_file', 'pdbs', 'gene_name', 'reviewed', 'kegg_id', 'refseq',
+            cols = ['gene', 'uniprot', 'seq_len', 'seq_file', 'pdbs', 'gene_name', 'reviewed', 'kegg', 'refseq',
                     'ec_number', 'pfam', 'description', 'entry_version', 'seq_version', 'metadata_file']
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
             log.info('Created UniProt metadata dataframe. See the "df_uniprot_metadata" attribute.')
 
-        self.missing_uniprot_mapping = self.df_uniprot_metadata[pd.isnull(self.df_uniprot_metadata.kegg_id)].gene.unique().tolist()
+        self.missing_uniprot_mapping = self.df_uniprot_metadata[pd.isnull(self.df_uniprot_metadata.kegg)].gene.unique().tolist()
         # Info on genes that could not be mapped
         if len(self.missing_uniprot_mapping) > 0:
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_uniprot_mapping" attribute.'.format(
@@ -601,7 +605,7 @@ class GEMPRO(object):
             gene = self.genes.get_by_id(g)
 
             uniprot_dict = {}
-            uniprot_dict['uniprot_acc'] = u
+            uniprot_dict['uniprot'] = u
 
             # Make the gene folder
             gene_folder = op.join(self.sequence_dir, g)
@@ -628,7 +632,7 @@ class GEMPRO(object):
             # TODO: Setting as representative for now, but should also save in uniprot key
             if 'pdbs' not in uniprot_dict:
                 uniprot_dict['pdbs'] = []
-            your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
+            your_keys = ['kegg', 'uniprot', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
             for_saving = {your_key: uniprot_dict[your_key] for your_key in your_keys if your_key in uniprot_dict}
             gene.annotation['sequence']['representative'].update(for_saving)
 
@@ -653,8 +657,8 @@ class GEMPRO(object):
             self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).reset_index(drop=True)
             log.info('Updated existing UniProt dataframe.')
         else:
-            cols = ['gene', 'uniprot_acc', 'seq_len', 'seq_file', 'pdbs', 'gene_name', 'reviewed',
-                    'kegg_id', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
+            cols = ['gene', 'uniprot', 'seq_len', 'seq_file', 'pdbs', 'gene_name', 'reviewed',
+                    'kegg', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
                     'metadata_file']
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
             log.info('Created UniProt metadata dataframe.')
@@ -711,11 +715,11 @@ class GEMPRO(object):
             if seq_prop['representative']['seq_len'] > 0:
                 genedict['metadata_file'] = seq_prop['representative']['metadata_file']
                 genedict['pdbs'] = seq_prop['representative']['pdbs']
-                genedict['uniprot_acc'] = seq_prop['representative']['uniprot_acc']
-                if isinstance(seq_prop['representative']['kegg_id'], list):
-                    genedict['kegg_id'] = ';'.join(seq_prop['representative']['kegg_id'])
+                genedict['uniprot'] = seq_prop['representative']['uniprot']
+                if isinstance(seq_prop['representative']['kegg'], list):
+                    genedict['kegg'] = ';'.join(seq_prop['representative']['kegg'])
                 else:
-                    genedict['kegg_id'] = seq_prop['representative']['kegg_id']
+                    genedict['kegg'] = seq_prop['representative']['kegg']
                 genedict['seq_len'] = seq_prop['representative']['seq_len']
                 genedict['seq_file'] = seq_prop['representative']['seq_file']
                 log.debug('Representative sequence already set for {}'.format(g))
@@ -740,19 +744,19 @@ class GEMPRO(object):
                 best_u = sorted_by_second[0][0]
 
                 uni_prop = seq_prop['uniprot'][best_u]
-                your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
+                your_keys = ['kegg', 'uniprot', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
                 for_saving = { your_key: uni_prop[your_key] for your_key in your_keys if your_key in uni_prop}
                 seq_prop['representative'].update(for_saving)
                 genedict.update(for_saving)
-                if 'kegg_id' in genedict:
-                    genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
+                if 'kegg' in genedict:
+                    genedict['kegg'] = ';'.join(genedict['kegg'])
                 log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
 
             # If there are both UniProt and KEGG annotations...
             elif seq_prop['kegg']['seq_len'] > 0 and len(seq_prop['uniprot']) > 0:
                 # Use KEGG if the mapped UniProt is unique, and it has PDBs
                 kegg_prop = seq_prop['kegg']
-                if len(kegg_prop['pdbs']) > 0 and kegg_prop['uniprot_acc'] not in seq_prop['uniprot'].keys():
+                if len(kegg_prop['pdbs']) > 0 and kegg_prop['uniprot'] not in seq_prop['uniprot'].keys():
                     seq_prop['representative'].update(kegg_prop)
                     genedict.update(kegg_prop)
                     log.debug('{}: Representative sequence set from KEGG'.format(g))
@@ -766,14 +770,14 @@ class GEMPRO(object):
                     best_u = sorted_by_second[0][0]
 
                     uni_prop = seq_prop['uniprot'][best_u]
-                    your_keys = ['kegg_id', 'uniprot_acc', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
+                    your_keys = ['kegg', 'uniprot', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
                     for_saving = {your_key: uni_prop[your_key] for your_key in your_keys if your_key in uni_prop}
                     seq_prop['representative'].update(for_saving)
                     genedict.update(for_saving)
 
                     # For saving in dataframe, save as string
-                    if 'kegg_id' in genedict:
-                        genedict['kegg_id'] = ';'.join(genedict['kegg_id'])
+                    if 'kegg' in genedict:
+                        genedict['kegg'] = ';'.join(genedict['kegg'])
 
                     log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
 
@@ -785,7 +789,7 @@ class GEMPRO(object):
             genedict['gene'] = g
             seq_mapping_pre_df.append(genedict)
 
-        cols = ['gene', 'uniprot_acc', 'kegg_id', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
+        cols = ['gene', 'uniprot', 'kegg', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
         tmp = pd.DataFrame.from_records(seq_mapping_pre_df, columns=cols)
 
         # TODO: info on genes that could be mapped!
@@ -836,7 +840,7 @@ class GEMPRO(object):
 
         for g in tqdm(self.genes):
             gene_id = str(g.id)
-            uniprot_id = g.annotation['sequence']['representative']['uniprot_acc']
+            uniprot_id = g.annotation['sequence']['representative']['uniprot']
 
             if not uniprot_id:
                 # Check if a representative sequence was set
@@ -863,7 +867,7 @@ class GEMPRO(object):
                         best_structure_dict = {}
                         best_structure_dict['pdb_id'] = currpdb
                         best_structure_dict['pdb_chain_id'] = currchain
-                        best_structure_dict['uniprot_acc'] = uniprot_id
+                        best_structure_dict['uniprot'] = uniprot_id
                         best_structure_dict['experimental_method'] = best_structure['experimental_method']
                         best_structure_dict['resolution'] = best_structure['resolution']
                         best_structure_dict['seq_coverage'] = best_structure['coverage']
@@ -900,7 +904,7 @@ class GEMPRO(object):
                 else:
                     log.debug('{}: No PDB/chain pairs mapped'.format(gene_id))
 
-        cols = ['gene', 'uniprot_acc', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'seq_coverage',
+        cols = ['gene', 'uniprot', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'seq_coverage',
                 'taxonomy_id', 'pdb_start', 'pdb_end', 'unp_start', 'unp_end', 'rank'] #'release_date',
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
 
