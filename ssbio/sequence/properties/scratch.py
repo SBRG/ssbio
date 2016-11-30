@@ -18,6 +18,8 @@ class SCRATCH():
             - @ all cutoffs in 5% increments from 0 to 100
     """
 
+    # TODO: also provide summary dataframes
+
     def __init__(self, project_name, seq_file=None, seq_str=None):
         self.project_name = project_name
         self.seq_file = seq_file

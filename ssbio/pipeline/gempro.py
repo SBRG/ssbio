@@ -458,8 +458,9 @@ class GEMPRO(object):
         self.df_kegg_metadata = pd.DataFrame.from_records(kegg_pre_df, columns=cols)
         log.info('Created KEGG metadata dataframe. See the "df_kegg_metadata" attribute.')
 
+        # TODO: standardize missing fields in DFs. should missing seqs have a Nan in seq_len, or be 0?
         # Info on genes that could not be mapped
-        self.missing_kegg_mapping = self.df_kegg_metadata[pd.isnull(self.df_kegg_metadata.kegg)].gene.unique().tolist()
+        self.missing_kegg_mapping = self.df_kegg_metadata[self.df_kegg_metadata.seq_len == 0].gene.unique().tolist()
         if len(self.missing_kegg_mapping) > 0:
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_kegg_mapping" attribute.'.format(len(self.missing_kegg_mapping)))
 
@@ -576,7 +577,8 @@ class GEMPRO(object):
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
             log.info('Created UniProt metadata dataframe. See the "df_uniprot_metadata" attribute.')
 
-        self.missing_uniprot_mapping = self.df_uniprot_metadata[pd.isnull(self.df_uniprot_metadata.kegg)].gene.unique().tolist()
+        # TODO: standardize missing fields in DFs. should missing seqs have a Nan in seq_len, or be 0?
+        self.missing_uniprot_mapping = self.df_uniprot_metadata[pd.isnull(self.df_uniprot_metadata.metadata_file)].gene.unique().tolist()
         # Info on genes that could not be mapped
         if len(self.missing_uniprot_mapping) > 0:
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_uniprot_mapping" attribute.'.format(

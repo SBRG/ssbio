@@ -40,7 +40,8 @@ class TestGEMPRO(unittest.TestCase):
         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
         self.my_gempro.add_genes_by_id(add_these)
 
-        self.will_not_map = ['b1417', 'b2092']
+        self.kegg_will_not_map = ['b1417', 'b2092']
+        self.uniprot_will_not_map = ['b1417', 'b2092']
 
     def test_gene_content(self):
         # Test that genes were correctly removed from self.genes (not the model, but the GEM-PRO genes list)
@@ -78,7 +79,8 @@ class TestGEMPRO(unittest.TestCase):
         3. Save KEGG related info into each GeneInfo object
         """
         kegg_organism_code = 'eco'
-        outfile_df = self.my_gempro.kegg_mapping_and_metadata(kegg_organism_code=kegg_organism_code)
+        self.my_gempro.kegg_mapping_and_metadata(kegg_organism_code=kegg_organism_code)
+        print(self.my_gempro.df_kegg_metadata)
 
         # 1.
         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
@@ -98,7 +100,7 @@ class TestGEMPRO(unittest.TestCase):
             self.assertTrue(op.exists(gene_structure_folder))
             self.assertTrue(g in self.my_gempro.df_kegg_metadata.gene.tolist())
 
-            if g in self.will_not_map:
+            if g in self.kegg_will_not_map:
                 self.assertTrue(g in self.my_gempro.missing_kegg_mapping)
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}-{}.faa'.format(kegg_organism_code, g))))
             else:
@@ -115,7 +117,8 @@ class TestGEMPRO(unittest.TestCase):
         2. Save individual sequence and metadata files per gene in the sequence_files folder
         3. Save UniProt related info into each GeneInfo object
         """
-        outfile_df = self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
+        self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
+        print(self.my_gempro.df_uniprot_metadata)
 
         # 1.
         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
@@ -135,7 +138,7 @@ class TestGEMPRO(unittest.TestCase):
             self.assertTrue(op.exists(gene_structure_folder))
             self.assertTrue(g in self.my_gempro.df_uniprot_metadata.gene.tolist())
 
-            if g in self.will_not_map:
+            if g in self.uniprot_will_not_map:
                 self.assertTrue(g in self.my_gempro.missing_uniprot_mapping)
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))
@@ -156,5 +159,4 @@ class TestGEMPRO(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        # self.tempdir.cleanup()
-        pass
+        self.tempdir.cleanup()
