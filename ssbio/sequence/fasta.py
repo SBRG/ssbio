@@ -1,5 +1,3 @@
-import os
-import os.path as op
 import ssbio.utils
 
 from Bio import SeqIO

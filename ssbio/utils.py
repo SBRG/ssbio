@@ -13,13 +13,18 @@ import shlex
 
 from collections import OrderedDict
 from collections import Callable
-try:
-    from IPython.display import clear_output
-    have_ipython = True
-except ImportError:
-    have_ipython = False
 
 log = logging.getLogger(__name__)
+
+
+def is_ipynb():
+    """Return True if the module is running in IPython kernel,
+    False if in IPython shell or other Python shell.
+
+    Copied from: http://stackoverflow.com/a/37661854/1592810
+    There are other methods there too
+    """
+    return 'ipykernel' in sys.modules
 
 
 class Date():

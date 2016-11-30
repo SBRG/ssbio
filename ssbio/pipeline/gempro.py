@@ -4,17 +4,6 @@ import os.path as op
 import numpy as np
 import shutil
 import pandas as pd
-
-# from tqdm import tqdm
-# TODO: This does not work properly in the IPython terminal (it works in the notebook)
-try:
-    from IPython.display import clear_output
-    have_ipython = True
-    from tqdm import tqdm_notebook as tqdm
-except ImportError:
-    have_ipython = False
-    from tqdm import tqdm
-
 from collections import OrderedDict
 
 from bioservices.uniprot import UniProt
@@ -38,6 +27,11 @@ import ssbio.structure.properties.msms
 
 from cobra.core import Gene
 from cobra.core import DictList
+
+if utils.is_ipynb():
+    from tqdm import tqdm_notebook as tqdm
+else:
+    from tqdm import tqdm
 
 import sys
 import logging

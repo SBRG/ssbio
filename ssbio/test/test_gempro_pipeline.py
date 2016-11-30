@@ -140,7 +140,7 @@ class TestGEMPRO(unittest.TestCase):
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))
             else:
-                uniprots = self.my_gempro.df_uniprot_metadata[self.my_gempro.df_uniprot_metadata.gene == g].uniprot_acc.unique().tolist()
+                uniprots = self.my_gempro.df_uniprot_metadata[self.my_gempro.df_uniprot_metadata.gene == g].uniprot.unique().tolist()
                 for u in uniprots:
                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))

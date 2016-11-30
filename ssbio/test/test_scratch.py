@@ -9,9 +9,9 @@ class TestSCRATCH(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.my_scratch = SCRATCH(project_name='test', seq_file='test_files/scratch/test.in')
-        self.my_scratch.run_scratch(path_to_scratch='~/software/scratch',
-                                    outname='test', outdir='test_files/scratch/',
+        self.my_scratch = SCRATCH(project_name='test', seq_file='test_files/scratch/test.fasta')
+        self.my_scratch.run_scratch(path_to_scratch='/home/nathan/software/SCRATCH-1D_1.1/bin/run_SCRATCH-1D_predictors.sh',
+                                    outname='test', outdir='test_files/scratch/', num_cores=4,
                                     force_rerun=False)
 
     def test_sspro_summary(self):
