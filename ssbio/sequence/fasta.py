@@ -1,53 +1,45 @@
-from Bio.Alphabet import IUPAC
 import os
 import os.path as op
+import ssbio.utils
+
 from Bio import SeqIO
 from Bio import Alphabet
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-
-from ssbio import utils
-date = utils.Date()
-
-# TODO: what if i want to write one fasta file for multiple sequences?
+from Bio.Alphabet import IUPAC
 
 
-def write_fasta_file(seq_str, ident, description='',
-                     extension='faa', outdir=None, overwrite=False, ignore_alphabet=False):
-    '''
-    This writes a fasta file for a single sequence string.
-    It also checks if the file exists already and returns the filename.
-    You can overwrite existing fasta files by setting overwrite=True
+def write_fasta_file(indict, outname, outdir=None, outext='.faa', force_rerun=False, ignore_alphabet=False):
+    """Write a FASTA file for a dictionary of IDs and their sequence strings.
 
-    Input:  seq_str (str) - amino acid string
-            ident (str) - ID of the sequence
-            outdir (str) - desired directory of file output
-            overwrite (bool) - if you want to overwrite existing files
-            ignore_alphabet (boolean): OPTIONAL check the alphabet to see if it contains valid amino acids.
-    Output: Filename of fasta file
-    '''
+    Args:
+        indict: Input dictionary with keys as IDs and values as sequence strings
+        outname: Name of the output file which will have outext appended to it
+        outdir: Path to directory to output sequences to
+        outext: Extension of FASTA file, default ".faa"
+        force_rerun: If file should be overwritten if it exists
+        ignore_alphabet: Check the sequence to see if it contains valid characters
 
-    if not description:
-        description_final = '{}-ssbioSeq'.format(date.short_date)
-    else:
-        description_final = '{}_{}-ssbioSeq'.format(description, date.short_date)
-    seq = load_seq_string(seq_str, ident=ident, desc=description_final, ignore_alphabet=ignore_alphabet)
-    outfile = "{}.{}".format(ident, extension)
+    Returns:
+        str: Path to output FASTA file.
 
-    if outdir:
-        if not op.exists(outdir):
-            os.mkdir(outdir)
-        outfile = op.join(outdir, outfile)
+    """
+    if not outdir:
+        outdir = ''
+    outfile = ssbio.utils.outfile_maker(inname='', outname=outname, outdir=outdir, outext=outext)
 
-    if op.isfile(outfile) and not overwrite:
-        return outfile
-    else:
-        SeqIO.write(seq, outfile, "fasta")
-        return outfile
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        seqs = []
+        for i,s in indict.items():
+            seq = load_seq_string(s, ident=i, ignore_alphabet=ignore_alphabet)
+            seqs.append(seq)
+        SeqIO.write(seqs, outfile, "fasta")
+
+    return outfile
 
 
 def load_seq_string(seq_string, ident, name='', desc='', ignore_alphabet=False):
-    """Load an amino acid sequence string.
+    """Load an amino acid sequence string as a SeqRecord object
 
     Args:
         seq_string (str): A protein amino acid sequence
@@ -66,9 +58,13 @@ def load_seq_string(seq_string, ident, name='', desc='', ignore_alphabet=False):
     if not Alphabet._verify_alphabet(my_seq) and not ignore_alphabet:
         raise ValueError('Sequence contains invalid characters')
 
+    if not desc:
+        desc = 'Loaded by ssbio on {}'.format(ssbio.utils.todays_long_date())
+
     my_seq_record = SeqRecord(my_seq, id=ident, name=name, description=desc)
 
     return my_seq_record
+
 
 def load_fasta_file(filename):
     """Load a FASTA file and returns the sequences as a list of SeqRecords
@@ -80,26 +76,7 @@ def load_fasta_file(filename):
         records (list): list of all sequences in the FASTA file as
         Biopython SeqRecord objects
     """
-    if os.path.exists(filename):
-        handle = open(filename, "r")
-        records = list(SeqIO.parse(handle, "fasta"))
-        handle.close()
-        return records
-    else:
-        raise IOError('File does not exist.')
-
-def load_seq_str_as_temp_file(self, seq_str):
-    """Load a sequence string and return a temporary path to the FASTA file.
-
-    Args:
-        seq_str:
-
-    Returns:
-        str: File path to FASTA file in temporary directory
-
-    """
-    pass
-
-
-if __name__ == '__main__':
-    print(write_fasta_file('ALALLALAL', ident='mypdb', outdir='/tmp/', overwrite=True))
+    handle = open(filename, "r")
+    records = list(SeqIO.parse(handle, "fasta"))
+    handle.close()
+    return records

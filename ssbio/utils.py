@@ -26,16 +26,19 @@ class Date():
     """Various methods to return formatted dates for today.
     """
     def __init__(self):
-        self.short_date = self.short_date_prefix()
-
-    def short_date_prefix(self):
-        today = datetime.date.today()
-        return today.strftime('%y%m%d')
+        self.today = datetime.date.today()
+        self.short_date = self.today.strftime('%y%m%d')
+        self.long_date = self.today.strftime('%Y-%m-%d')
 
 
 def todays_short_date():
     today = Date()
     return today.short_date
+
+
+def todays_long_date():
+    today = Date()
+    return today.long_date
 
 
 class DefaultOrderedDict(OrderedDict):

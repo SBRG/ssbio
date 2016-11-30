@@ -670,8 +670,7 @@ class GEMPRO(object):
                  ...}
 
         """
-
-        # save the sequence information in individual FASTA files
+        # Save the sequence information in individual FASTA files
         for g, s in gene_to_seq_dict.items():
             g = str(g)
             gene = self.genes.get_by_id(g)
@@ -682,7 +681,7 @@ class GEMPRO(object):
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            seq_file = ssbio.sequence.fasta.write_fasta_file(seq_str=s, ident=g, outdir=gene_folder)
+            seq_file = ssbio.sequence.fasta.write_fasta_file(indict={g:s}, outname=g, outdir=gene_folder)
             gene.annotation['sequence']['representative']['seq_file'] = op.basename(seq_file)
 
             log.debug('{}: Loaded manually defined sequence information'.format(g))

@@ -22,31 +22,23 @@ class TestFasta(unittest.TestCase):
         self.assertRaises(ValueError, fasta.load_seq_string, 'N-0t,V4L1DAA', ident)
 
     def test_write_fasta_file(self):
-        sequence = 'ASQAGIPSGVYNVIPCSRKNAKEVGEAICTDPLVSKISF'
-        ident = 'TEST'
-        custom_ext = 'fasta'
-        custom_id = 'TEST2'
+        tester = {'TEST': 'ASQAGIPSGVYNVIPCSRKNAKEVGEAICTDPLVSKISF'}
+        custom_ext = '.fasta'
+        custom_outname = 'TESTER'
         overwrite = True
 
         with tempfile.TemporaryDirectory() as custom_dir:
-            written_file_cusdir = fasta.write_fasta_file(
-                sequence, ident, outdir=custom_dir, overwrite=overwrite)
-            self.assertEqual(written_file_cusdir, os.path.join(
-                custom_dir, ident + '.faa'))
+            written_file_cusdir = fasta.write_fasta_file(tester, custom_outname,
+                                                         outdir=custom_dir, force_rerun=overwrite)
+            self.assertEqual(written_file_cusdir, os.path.join(custom_dir, custom_outname + '.faa'))
 
-            written_file_cusdirid = fasta.write_fasta_file(
-                sequence, custom_id, outdir=custom_dir, overwrite=overwrite)
-            self.assertEqual(written_file_cusdirid, os.path.join(
-                custom_dir, custom_id + '.faa'))
+            written_file_cusdirid = fasta.write_fasta_file(tester, custom_outname,
+                                                           outdir=custom_dir, force_rerun=overwrite)
+            self.assertEqual(written_file_cusdirid, os.path.join(custom_dir, custom_outname + '.faa'))
 
-            written_file_cusdiridext = fasta.write_fasta_file(
-                sequence, custom_id, outdir=custom_dir, extension=custom_ext, overwrite=overwrite)
-            self.assertEqual(written_file_cusdiridext, os.path.join(
-                custom_dir, custom_id + '.' + custom_ext))
-
-            # TODO: test if file was overwritten? how to do that?
-            # written_file_cusdirnew = s.write_fasta_file(sequence, outdir=custom_dir, overwrite=overwrite)
-            # self.assertEqual(written_file_cusdirnew, os.path.join(custom_dir, ident + '.faa'))
+            written_file_cusdiridext = fasta.write_fasta_file(tester, custom_outname,
+                                                              outdir=custom_dir, outext=custom_ext, force_rerun=overwrite)
+            self.assertEqual(written_file_cusdiridext, os.path.join(custom_dir, custom_outname + custom_ext))
 
 if __name__ == "__main__":
     unittest.main()

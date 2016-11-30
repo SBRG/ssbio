@@ -57,7 +57,7 @@ class ITASSERPrep():
             self.prep_script_slurm(itasser_loc=itasser_loc,
                                    itlib_loc=itlib_loc)
 
-    def prep_folders(self, seq, description=''):
+    def prep_folders(self, seq):
         """Take in a sequence string and prepares the folder for it to run ITASSER
         """
         itasser_dir = op.join(self.root_dir, self.ident)
@@ -65,10 +65,11 @@ class ITASSERPrep():
         if not op.exists(itasser_dir):
             os.makedirs(itasser_dir)
 
-        fasta.write_fasta_file(seq_str=seq,
-                               ident='seq',
-                               description=description,
-                               extension='fasta',
+        tmp = {self.ident: seq}
+
+        fasta.write_fasta_file(indict=tmp,
+                               outname='seq',
+                               outext='.fasta',
                                outdir=itasser_dir)
         return itasser_dir
 
