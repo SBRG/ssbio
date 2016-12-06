@@ -178,6 +178,7 @@ def outfile_maker(inname, outext='.out', outname='', outdir='', append_to_name='
 
     """
 
+    # TODO: CHECK IF OUTNAME IS A VALID FILE NAME!
     orig_dir, orig_name, orig_ext = split_folder_and_path(inname)
 
     # If output filename not provided, default is to take name of inname

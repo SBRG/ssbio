@@ -1309,7 +1309,7 @@ class GEMPRO(object):
 
                 g.annotation['structure']['representative']['structure_id'] = top_homology
                 g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
-                g.annotation['structure']['representative']['original_pdb_file'] = original_pdb_file
+                g.annotation['structure']['representative']['original_pdb_file'] = op.basename(original_pdb_file)
 
                 # Clean it
                 custom_clean = CleanPDB()
