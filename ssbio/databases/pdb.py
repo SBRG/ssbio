@@ -491,7 +491,7 @@ def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0, f
         outfile = '{}.json'.format(outname)
 
     # Load a possibly existing json file
-    if outfile and ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+    if not ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         with open(outfile, 'r') as f:
             raw_data = json.load(f)
         log.debug('{}: Loaded existing json file'.format(uniprot_id))
