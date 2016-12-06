@@ -102,10 +102,17 @@ class SeqProp(object):
         self.pdbs = []
         self.seq_len = 0
         self.seq_file = op.basename(sequence_file)
+        self.seq_path = sequence_file
         self.metadata_file = op.basename(metadata_file)
 
         if sequence_file:
             self.seq_len = len(SeqIO.read(open(sequence_file), "fasta"))
+
+    def get_seq_str(self):
+        return str(self.get_seq.seq)
+
+    def get_seq(self):
+        return SeqIO.read(open(self.seq_path), "fasta")
 
 
 class UniProtProp(SeqProp):
@@ -844,7 +851,7 @@ class GEMPRO(object):
                 continue
             else:
                 best_structures = ssbio.databases.pdb.best_structures(uniprot_id,
-                                                                      outfile='{}_best_structures.json'.format(uniprot_id),
+                                                                      outname='{}_best_structures.json'.format(uniprot_id),
                                                                       outdir=op.join(self.sequence_dir, gene_id),
                                                                       seq_ident_cutoff=seq_ident_cutoff,
                                                                       force_rerun=force_rerun)

@@ -442,7 +442,7 @@ def update_pdb_list(pdb_ids):
     return list(set(new_pdb_ids))
 
 
-def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force_rerun=False):
+def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0, force_rerun=False):
     """Use the PDBe REST service to query for the best PDB structures for a UniProt ID.
 
         More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
@@ -477,10 +477,21 @@ def best_structures(uniprot_id, outfile='', outdir='', seq_ident_cutoff=0, force
             tax_id: taxonomic ID of the protein's original organism
 
     """
-    outfile = op.join(outdir, outfile)
+    outfile = ''
 
-    # Load the existing json file
-    if outfile and op.exists(outfile) and not force_rerun:
+    if not outdir:
+        outdir = ''
+
+    # if output dir is specified but not outname, use the uniprot
+    if not outname and outdir:
+        outname = uniprot_id
+
+    if outname:
+        outname = op.join(outdir, outname)
+        outfile = '{}.json'.format(outname)
+
+    # Load a possibly existing json file
+    if outfile and ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         with open(outfile, 'r') as f:
             raw_data = json.load(f)
         log.debug('{}: Loaded existing json file'.format(uniprot_id))
