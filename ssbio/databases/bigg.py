@@ -1,7 +1,9 @@
+import json
 import requests
 import tempfile
 import ssbio.databases.pdb
 import ssbio.utils
+import os.path as op
 from bioservices.uniprot import UniProt
 bs_unip = UniProt()
 
@@ -20,6 +22,11 @@ def get_pdbs_for_gene(bigg_model, bigg_gene, cache=False, cache_dir=tempfile.get
     my_structures = []
     gene_raw = requests.get('http://bigg.ucsd.edu/api/v2/models/{}/genes/{}'.format(bigg_model, bigg_gene))
     gene = gene_raw.json()
+
+    if cache:
+        outfile = op.join(cache_dir, '{}.json'.format(bigg_gene))
+        with open(outfile, 'w') as f:
+            json.dump(gene, f)
 
     uniprots = []
     if 'database_links' in gene:
