@@ -10,6 +10,8 @@ import logging
 import distutils.spawn
 import subprocess
 import shlex
+import requests
+import json
 
 from collections import OrderedDict
 from collections import Callable
@@ -236,6 +238,33 @@ def force_rerun(flag, outfile):
     else:
         return False
 
+def request_json(link, outfile, outdir=None, force_rerun_flag=False):
+    """Download a file in JSON format from a web request
+
+    Args:
+        link: Link to web request
+        outfile: Name of output file
+        outdir: Directory of output file
+        force_rerun_flag: If true, redownload the file
+
+    Returns:
+        dict: contents of the JSON request
+
+    """
+    if not outdir:
+        outdir = ''
+    outfile = op.join(outdir, outfile)
+
+    if force_rerun(flag=force_rerun_flag, outfile=outfile):
+        text_raw = requests.get(link)
+        my_dict = text_raw.json()
+        with open(outfile, 'w') as f:
+            json.dump(my_dict, f)
+    else:
+        with open(outfile, 'r') as f:
+            my_dict = json.load(f)
+
+    return my_dict
 
 def program_exists(prog_name):
     """Check if a program is available as a command line executable on a system.
