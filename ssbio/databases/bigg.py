@@ -5,6 +5,7 @@ import ssbio.databases.pdb
 import ssbio.utils
 import os.path as op
 from bioservices.uniprot import UniProt
+import ssbio.databases.uniprot
 bs_unip = UniProt()
 
 
@@ -37,6 +38,7 @@ def get_pdbs_for_gene(bigg_model, bigg_gene, cache_dir=tempfile.gettempdir()):
             gi_uniprots = bs_unip.mapping(fr='P_GI', to='ACC', query=gis).values()
             uniprots.extend(gi_uniprots)
             uniprots = ssbio.utils.flatlist_dropdup(uniprots)
+            uniprots = [x for x in uniprots if ssbio.databases.uniprot.is_valid_uniprot_id(x)]
 
     if uniprots:
         for u in uniprots:
