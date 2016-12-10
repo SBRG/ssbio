@@ -260,9 +260,12 @@ def request_json(link, outfile, outdir=None, force_rerun_flag=False):
         my_dict = text_raw.json()
         with open(outfile, 'w') as f:
             json.dump(my_dict, f)
+
+        log.debug('Loaded and saved {} to {}'.format(link, outfile))
     else:
         with open(outfile, 'r') as f:
             my_dict = json.load(f)
+        log.debug('Loaded {}'.format(outfile))
 
     return my_dict
 

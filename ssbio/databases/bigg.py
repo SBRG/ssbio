@@ -21,6 +21,7 @@ def get_pdbs_for_gene(bigg_model, bigg_gene, cache_dir=tempfile.gettempdir()):
     """
     my_structures = []
 
+    # Download gene info
     gene = ssbio.utils.request_json(link='http://bigg.ucsd.edu/api/v2/models/{}/genes/{}'.format(bigg_model, bigg_gene),
                                     outfile='{}_{}.json'.format(bigg_model, bigg_gene),
                                     outdir=cache_dir,
