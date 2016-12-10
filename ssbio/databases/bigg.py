@@ -21,15 +21,10 @@ def get_pdbs_for_gene(bigg_model, bigg_gene, cache_dir=tempfile.gettempdir()):
     """
     my_structures = []
 
-    outfile = op.join(cache_dir, '{}_genes.json'.format(bigg_model))
-    if not op.exists(outfile):
-        gene_raw = requests.get('http://bigg.ucsd.edu/api/v2/models/{}/genes/{}'.format(bigg_model, bigg_gene))
-        gene = gene_raw.json()
-        with open(outfile, 'w') as f:
-            json.dump(gene, f)
-    else:
-        with open(outfile, 'r') as f:
-            gene = json.load(f)
+    gene = ssbio.utils.request_json(link='http://bigg.ucsd.edu/api/v2/models/{}/genes/{}'.format(bigg_model, bigg_gene),
+                                    outfile='{}_{}.json'.format(bigg_model, bigg_gene),
+                                    outdir=cache_dir,
+                                    force_rerun_flag=False)
 
     uniprots = []
     if 'database_links' in gene:
