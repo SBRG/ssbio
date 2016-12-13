@@ -129,7 +129,35 @@ def get_pdb_res_starts(pdb_file, file_type):
 
     return start_residues
 
-#
+def site_centroid(residues, pdb_file):
+    """Get the XYZ coordinate of the center of a list of residues.
+
+    Args:
+        residues: List of residue numbers
+        pdb_file: Path to PDB file
+
+    Returns:
+        tuple: (X, Y, Z) coordinate of centroid
+
+    """
+    pass
+
+def distance_to_site(residue_of_interest, residues, pdb_file):
+    """Calculate the distance between an amino acid and a group of amino acids.
+
+    Args:
+        residue_of_interest: Residue number you are interested in (ie. a mutation)
+        residues: List of residue numbers
+
+    Returns:
+        float: Distance (in Angstroms) to the group of residues
+
+    """
+    centroid = site_centroid(residues, pdb_file)
+    pass
+
+
+    #
 # def magni(a, b, c):
 #     """Calculate the magnitude of distance vector
 #     """

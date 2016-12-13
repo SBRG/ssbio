@@ -1369,8 +1369,8 @@ class GEMPRO(object):
                 adder = g.annotation['structure']['pdb'][k].copy()
                 adder['chemicals'] = ';'.join(adder['chemicals'])
                 # TODO: error when taxonomy name does not exist for some PDBs
-                if isinstance(adder['taxonomy_name'], list):
-                    adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
+                # if isinstance(adder['taxonomy_name'], list):
+                #     adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
                 adder['gene'] = gene_id
                 pdb_pre_df.append(adder)
 
@@ -1379,10 +1379,10 @@ class GEMPRO(object):
             self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
             log.info('Updated existing PDB dataframe.')
         else:
-            cols = ['gene', 'pdb_id', 'pdb_chain_id', 'taxonomy_name', 'experimental_method',
+            cols = ['gene', 'pdb_id', 'pdb_chain_id', 'experimental_method',
                     'resolution', 'seq_coverage', 'chemicals', 'rank', 'release_date', 'blast_evalue', 'blast_score',
                     'seq_similar', 'seq_num_coverage', 'seq_num_similar',
-                    'pdb_file', 'mmcif_header']
+                    'pdb_file', 'mmcif_header'] # taxonomy_name
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
             log.info('Created PDB metadata dataframe.')
 
