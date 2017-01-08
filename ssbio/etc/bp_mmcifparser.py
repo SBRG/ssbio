@@ -1,9 +1,11 @@
-import numpy
 import warnings
+
+import numpy
 from Bio.PDB.MMCIFParser import MMCIFParser
 from Bio.PDB.PDBExceptions import PDBConstructionException
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
-from ssbio.structure.bp_mmcif2dict import MMCIF2DictFix
+
+from ssbio.etc.bp_mmcif2dict import MMCIF2DictFix
 
 
 class MMCIFParserFix(MMCIFParser):
@@ -31,7 +33,7 @@ class MMCIFParserFix(MMCIFParser):
             element_list = None
         seq_id_list = mmcif_dict["_atom_site.label_seq_id"]
         auth_seq_id_list = mmcif_dict["_atom_site.auth_seq_id"]
-        chain_id_list = mmcif_dict["_atom_site.label_asym_id"]
+        chain_id_list = mmcif_dict["_atom_site.auth_asym_id"]
         x_list = [float(x) for x in mmcif_dict["_atom_site.Cartn_x"]]
         y_list = [float(x) for x in mmcif_dict["_atom_site.Cartn_y"]]
         z_list = [float(x) for x in mmcif_dict["_atom_site.Cartn_z"]]
