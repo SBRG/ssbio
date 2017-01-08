@@ -1,12 +1,14 @@
 import glob
+import logging
 import os
+import os.path as op
 
 import numpy as np
 import pandas as pd
-import ssbio.sequence.alignment
+
+import ssbio.sequence.utils.alignment
 from ssbio.utils import percentage_to_float
 
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -43,20 +45,31 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
     """
 
     # Run the needle (global) alignment
-    outpath = ssbio.sequence.alignment.run_needle_alignment_on_str(id_a=reference_id,
-                                                                                 seq_a=reference_sequence,
-                                                                                 id_b=structure_id,
-                                                                                 seq_b=structure_sequence,
-                                                                                 gapopen=gapopen,
-                                                                                 gapextend=gapextend,
-                                                                                 outdir=outdir,
-                                                                                 outfile=outfile,
-                                                                                 force_rerun=force_rerun)
+    outpath = ssbio.sequence.utils.alignment.run_needle_alignment_on_str(id_a=reference_id,
+                                                                         seq_a=reference_sequence,
+                                                                         id_b=structure_id,
+                                                                         seq_b=structure_sequence,
+                                                                         gapopen=gapopen,
+                                                                         gapextend=gapextend,
+                                                                         outdir=outdir,
+                                                                         outfile=outfile,
+                                                                         force_rerun=force_rerun)
+
+    # TODO: why are there cases where the alignment fails?
+    try:
+        assert op.exists(outpath)
+    except AssertionError:
+        log.debug('{}: needle alignment file does not exist'.format(outpath))
+        return False
+
+    stats = ssbio.sequence.utils.alignment.needle_statistics(outpath)
+
     # Parse the alignment results
-    summary_df = ssbio.sequence.alignment.get_alignment_summary_df(outpath)
+    summary_df = ssbio.sequence.utils.alignment.get_alignment_summary_df(outpath)
 
     # Get cutoff stuff ready
     ref_seq_len = len(reference_sequence)
+    # TODO: should allow_missing_on_termini be a total percentage of missing?
     # If any differences appear before start, they are ignored
     start = ref_seq_len - ref_seq_len * (1 - allow_missing_on_termini)
     # If any differences appear before end, they are ignored
@@ -73,8 +86,10 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
         deletion_indices = summary_df[summary_df['type'] == 'deletion'].index
         # If there are no deletions, that's great
         if len(deletion_indices) == 0:
+            log.debug('No deletion regions')
             no_deletions_in_pdb = True
         else:
+            log.debug('{} deletion region(s)'.format(len(deletion_indices)))
             # If the deletion appears before or after the cutoff, that's also great
             for deletion_index in deletion_indices:
                 if summary_df.ix[deletion_index, 'id_a_stop'] < start or summary_df.ix[deletion_index, 'id_a_start'] > end:
@@ -91,8 +106,10 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
         insertion_indices = summary_df[summary_df['type'] == 'insertion'].index
         # If there are no insertions, that's great
         if len(insertion_indices) == 0:
+            log.debug('No insertion regions')
             no_insertions_in_pdb = True
         else:
+            log.debug('{} insertion region(s)'.format(len(insertion_indices)))
             # If the insertion appears before or after the cutoff, that's also great
             for insertion_index in insertion_indices:
                 if summary_df.ix[insertion_index, 'id_a_stop'] < start or summary_df.ix[insertion_index, 'id_a_start'] > end:
@@ -106,11 +123,13 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
 
     if not allow_mutants:
         # Get indices of the mutants
-        mutant_indices = summary_df[summary_df['type'] == 'mutant'].index
+        mutant_indices = summary_df[summary_df['type'] == 'mutation'].index
         # If there are no mutants, that's great
         if len(mutant_indices) == 0:
+            log.debug('No point mutations')
             no_mutants_in_pdb = True
         else:
+            log.debug('{} point mutation(s)'.format(len(mutant_indices)))
             # If the mutant appears before or after the cutoff, that's also great
             for mutant_index in mutant_indices:
                 if summary_df.ix[mutant_index, 'id_a_stop'] < start or summary_df.ix[mutant_index, 'id_a_start'] > end:
@@ -127,8 +146,10 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
         unresolved_indices = summary_df[summary_df['type'] == 'unresolved'].index
         # If there are no unresolved, that's great
         if len(unresolved_indices) == 0:
+            log.debug('No unresolved mutations')
             no_unresolved_in_pdb = True
         else:
+            log.debug('{} unresolved residue(s)'.format(len(unresolved_indices)))
             # If the unresolved residue appears before or after the cutoff, that's also great
             for unresolved_index in unresolved_indices:
                 if summary_df.ix[unresolved_index, 'id_a_stop'] < start or summary_df.ix[unresolved_index, 'id_a_start'] > end:
