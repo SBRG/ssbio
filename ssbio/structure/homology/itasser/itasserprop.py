@@ -16,6 +16,7 @@ class ITASSERProp(StructProp):
     """Parse all available information for an I-TASSER modeling run.
     """
 
+    # TODO: parse   1) predicted SS   2) predicted solvent acc    3) B-factor
     _main_files_to_copy = ['seq.dat', 'cscore']
     _coach_files_to_copy = ['Bsites.inf', 'EC.dat', 'GO_MF.dat', 'GO_BP.dat', 'GO_CC.dat']
 

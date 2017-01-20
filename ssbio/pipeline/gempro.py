@@ -580,7 +580,7 @@ class GEMPRO(object):
                             # Also add this chain to the chains attribute so we can save the info we get from best_structures
                             new_pdb.add_chain_ids(currchain)
 
-                            pdb_specific_keys = ['experimental_method','resolution','tax_id']
+                            pdb_specific_keys = ['experimental_method','resolution','taxonomy_name']
                             chain_specific_keys = ['coverage','start','end','unp_start','unp_end']
 
                             new_pdb.update(best_structure, only_keys=pdb_specific_keys)
@@ -609,7 +609,7 @@ class GEMPRO(object):
                     genes_without_a_structure.append(gene_id)
 
         cols = ['gene', 'uniprot', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'coverage',
-                'tax_id', 'start', 'end', 'unp_start', 'unp_end', 'rank']
+                'taxonomy_name', 'start', 'end', 'unp_start', 'unp_end', 'rank']
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
 
         log.info('Completed UniProt -> best PDB mapping. See the "df_pdb_ranking" attribute.')
@@ -944,6 +944,7 @@ class GEMPRO(object):
                 s.download_structure_file(outdir=gene_struct_dir, force_rerun=force_rerun, parse=False)
                 s.download_cif_header_file(outdir=gene_struct_dir, force_rerun=force_rerun)
 
+                # TODO: parse header file and store in pdb_pre_df
                 # pdb_pre_df.append(adder)
 
         # Save a dataframe of the PDB metadata

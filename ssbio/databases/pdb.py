@@ -38,8 +38,7 @@ class PDBProp(StructProp):
         self.experimental_method = None
         self.resolution = None
         self.date = None
-        self.tax_id = None
-        self.release_date = None
+        self.taxonomy_name = None
 
     # TODO: test using cif or mmtf file formats -- this is the global flag here (which is a dumb place to be)
     def download_structure_file(self, outdir, file_type='cif', force_rerun=False, parse=False):
@@ -49,6 +48,9 @@ class PDBProp(StructProp):
         log.debug('{}: downloaded {} file'.format(self.id, file_type))
         self.load_structure_file(pdb_file, file_type, parse)
 
+        if file_type=='cif':
+            self.update(parse_mmcif_header(pdb_file))
+
     def download_cif_header_file(self, outdir, force_rerun=False):
         file_type = 'cif'
         cif_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=True,
@@ -57,18 +59,7 @@ class PDBProp(StructProp):
         log.debug('{}: downloaded mmCIF file header'.format(self.id))
 
         cif_dict = parse_mmcif_header(cif_file)
-
-        # # Save annotation info
-        # cif_dict['pdb_file'] = op.basename(pdb_file)
-        # cif_dict['mmcif_header'] = op.basename(cif_file)
-        # g.annotation['structure']['pdb'][k].update(cif_dict)
-        #
-        # adder = g.annotation['structure']['pdb'][k].copy()
-        # adder['chemicals'] = ';'.join(adder['chemicals'])
-        # # TODO: error when taxonomy name does not exist for some PDBs
-        # # if isinstance(adder['taxonomy_name'], list):
-        # #     adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
-        # adder['gene'] = gene_id
+        self.update(cif_dict)
 
 def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
     """Download a structure from the RCSB PDB by ID. Specify the file type desired.
@@ -173,6 +164,22 @@ def parse_mmcif_header(infile):
 
     chemical_ids_exclude = ['HOH']
     chemical_types_exclude = ['l-peptide linking','peptide linking']
+
+    if '_struct.title' in mmdict:
+        newdict['pdb_title'] = mmdict['_struct.title']
+    else:
+        log.debug('{}: No title field'.format(infile))
+
+    if '_struct.pdbx_descriptor' in mmdict:
+        newdict['description'] = mmdict['_struct.pdbx_descriptor']
+    else:
+        log.debug('{}: no description field'),format(infile)
+
+    if '_database_PDB_rev.date' in mmdict:
+        newdict['date'] = mmdict['_database_PDB_rev.date']
+    else:
+        log.debug('{}: no date field'),format(infile)
+
 
     if '_exptl.method' in mmdict:
         newdict['experimental_method'] = mmdict['_exptl.method']

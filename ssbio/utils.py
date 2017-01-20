@@ -696,12 +696,12 @@ def remap( x, oMin, oMax, nMin, nMax ):
 
     #range check
     if oMin == oMax:
-        print("Warning: Zero input range")
-        return None
+        # print("Warning: Zero input range")
+        return x
 
     if nMin == nMax:
-        print("Warning: Zero output range")
-        return None
+        # print("Warning: Zero output range")
+        return x
 
     #check reversed input range
     reverseInput = False
@@ -732,6 +732,9 @@ def scale_calculator(multiplier, elements, rescale=None):
     """Get a dictionary of scales for each element in elements.
 
     Examples:
+        >>> scale_calculator(1, [2,7,8])
+        {8: 1, 2: 1, 7: 1}
+
         >>> scale_calculator(1, [2,2,2,3,4,5,5,6,7,8])
         {2: 3, 3: 1, 4: 1, 5: 2, 6: 1, 7: 1, 8: 1}
 
@@ -754,6 +757,11 @@ def scale_calculator(multiplier, elements, rescale=None):
         dict: Scaled values of mutiplier for each element in elements
 
     """
+
+    # TODO: think about what happens when:
+    # TODO: 1. there is only one (or n) of each element, and rescale is set to seomthing. what is the original min/max to scale from?
+    # TODO: 2. can we normalize the scale based on other counts? (ie. other gene mutation frequencies)
+
     if isinstance(elements, list):
         unique_elements = list(set(elements))
         scales = {}

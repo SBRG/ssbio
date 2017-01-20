@@ -412,19 +412,20 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
-    def view_structure(self, opacity=1):
+    def view_structure(self, opacity=1, gui=False):
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
-        view = nv.show_structure_file(self.structure_path)
+        view = nv.show_structure_file(self.structure_path, gui=gui)
         view.clear_representations()
         view.add_cartoon(selection='protein', color='silver', opacity=opacity)
         return view
 
-    def view_structure_with_mutations(self, mutations, color='red', unique_colors=False, opacity_range=(0.5,1), scale_range=(.7, 10)):
+    def view_structure_with_mutations(self, mutations, color='red', unique_colors=False, structure_opacity=0.5,
+                                      opacity_range=(0.5,1), scale_range=(.7, 10), gui=False):
         """Input a list of residue numbers to view on the structure. Or input a dictionary of residue numbers to counts.
 
         Args:
-            mutations:
+            mutations (int, list)
             color:
             opacity_range:
             scale_range:
@@ -432,10 +433,10 @@ class StructProp(Object):
         Returns:
 
         """
-        opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], mutations, rescale=(opacity_range))
-        scale_dict = ssbio.utils.scale_calculator(scale_range[0], mutations, rescale=(scale_range))
+        opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], mutations, rescale=opacity_range)
+        scale_dict = ssbio.utils.scale_calculator(scale_range[0], mutations, rescale=scale_range)
 
-        view = self.view_structure(opacity=.5)
+        view = self.view_structure(opacity=structure_opacity, gui=gui)
 
         if isinstance(mutations, list):
             unique_mutations = list(set(mutations))

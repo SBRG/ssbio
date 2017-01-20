@@ -25,7 +25,8 @@ class Protein(object):
 
     _representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs', 'sequence_len',
                                            'sequence_file', 'sequence_path', 'metadata_file', 'metadata_path']
-    _representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage']
+    _representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
+                                            'resolution','taxonomy_name']
 
     def __init__(self, ident):
         self.id = ident
@@ -481,6 +482,8 @@ class Protein(object):
                 # This will add all chains to the mapped_chains attribute if there are none
                 try:
                     pdb.download_structure_file(outdir=struct_outdir, force_rerun=force_rerun, parse=True)
+                    # TODO: add global flag of PDB file type and adjust for downloading the header here (and other places where pdb is downloaded)
+                    # pdb.download_cif_header_file(outdir=struct_outdir)
                 except requests.exceptions.HTTPError:
                     log.error('{}: structure file could not be downloaded'.format(pdb))
                     continue
@@ -590,7 +593,8 @@ class Protein(object):
 
         return to_structure_resnums
 
-    def view_all_mutations(self, grouped=False, color='red', unique_colors=True, opacity_range=(0.8,1), scale_range=(1,5)):
+    def view_all_mutations(self, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
+                           opacity_range=(0.8,1), scale_range=(1,5), gui=False):
         """Map all sequence alignment mutations to the structure.
 
         Args:
@@ -617,8 +621,10 @@ class Protein(object):
         if not grouped:
             view = self.representative_structure.view_structure_with_mutations(single_map_to_structure,
                                                                                color=color, unique_colors=unique_colors,
+                                                                               structure_opacity=structure_opacity,
                                                                                opacity_range=opacity_range,
-                                                                               scale_range=scale_range)
+                                                                               scale_range=scale_range,
+                                                                               gui=gui)
             return view
 
         else:
