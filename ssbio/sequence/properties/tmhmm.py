@@ -43,31 +43,43 @@ def parse_tmhmm_long(tmhmm_results):
     with open(tmhmm_results) as f:
         lines = f.read().splitlines()
 
-    infodict = defaultdict(str)
+    infodict = defaultdict(dict)
+
     for l in lines:
+        if 'Number of predicted TMHs:' in l:
+            gene = l.split(' Number')[0].strip('# ')
+            infodict[gene]['num_tm_helices'] = int(l.split(': ')[1])
+
         # Look for the lines with tab separations, these are the TM predicted regions
-        if '\t' not in l:
-            continue
+        if '\t' in l:
+            stuff = l.split('\t')
+            if stuff[1] == 'TMHMM2.0':
 
-        stuff = l.split('\t')
-        if stuff[1] == 'TMHMM2.0':
-            gene = stuff[0]
-            region = stuff[2:][0]
-            region_resnums = stuff[3].split()
-            region_start = region_resnums[0]
-            region_end = region_resnums[1]
+                gene = stuff[0]
+                region = stuff[2:][0]
+                region_resnums = stuff[3].split()
+                region_start = region_resnums[0]
+                region_end = region_resnums[1]
 
-            if region == 'outside':
-                info = 'O'
-            elif region == 'inside':
-                info = 'I'
-            elif region == 'TMhelix':
-                info = 'T'
-            else:
-                log.error('{}: unknown region type'.format(info))
-                info = '-'
+                if 'sequence' in infodict[gene]:
+                    tm_seq = infodict[gene]['sequence']
+                else:
+                    tm_seq = ''
 
-            for r in range(int(region_start), int(region_end) + 1):
-                infodict[gene] += info
+                if region == 'outside':
+                    info = 'O'
+                elif region == 'inside':
+                    info = 'I'
+                elif region == 'TMhelix':
+                    info = 'T'
+                else:
+                    log.error('{}: unknown region type'.format(info))
+                    info = '-'
+
+                for r in range(int(region_start), int(region_end) + 1):
+                    tm_seq += info
+
+                infodict[gene]['sequence'] = tm_seq
+
 
     return infodict
