@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='ssbio',
-        version='0.1',
+        version='1.0.0-alpha',
         author='Nathan Mih',
         author_email='nmih@ucsd.edu',
         license='MIT',
@@ -11,11 +11,11 @@ setup(
         packages=find_packages(),
         package_dir={'ssbio': 'ssbio'},
         package_data={'ssbio': ['ssbio/etc/*']},
-        scripts=['ssbio/structure/cleanpdb.py',
+        scripts=['ssbio/structure/utils/cleanpdb.py',
                  'ssbio/sequence/properties/aggregation_propensity.py',
                  'ssbio/sequence/properties/thermostability.py',
-                 'ssbio/structure/mutatepdb.py',
-                 'ssbio/structure/tleap.py',
+                 'ssbio/structure/utils/mutatepdb.py',
+                 'ssbio/structure/utils/tleap.py',
                  'ssbio/databases/drugbank.py',
                  'ssbio/structure/properties/msms.py'],
         long_description=open('README.md').read(),
@@ -26,5 +26,10 @@ setup(
                           'pandas',
                           'requests',
                           'bioservices',
-                          'xmltodict']
+                          'xmltodict',
+                          'six',
+                          'mmtf-python',
+                          'ujson',
+                          'awesome-slugify',
+                          'seaborn']
 )

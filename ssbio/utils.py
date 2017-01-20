@@ -1,4 +1,4 @@
-from __future__ import print_function # Only Python 2.x
+from __future__ import print_function
 import os
 import sys
 import datetime
@@ -12,7 +12,7 @@ import subprocess
 import shlex
 import requests
 import json
-
+import gzip
 from collections import OrderedDict
 from collections import Callable
 
@@ -25,6 +25,10 @@ def is_ipynb():
 
     Copied from: http://stackoverflow.com/a/37661854/1592810
     There are other methods there too
+
+    >>> is_ipynb()
+    False
+
     """
     return 'ipykernel' in sys.modules
 
@@ -238,6 +242,30 @@ def force_rerun(flag, outfile):
     else:
         return False
 
+
+def gunzip_file(infile, outfile, outdir=None, delete_original=False, force_rerun_flag=False):
+    if not outdir:
+        outdir = ''
+    outfile = op.join(outdir, outfile)
+
+    if force_rerun(flag=force_rerun_flag, outfile=outfile):
+        gz = gzip.open(infile, "rb")
+        decoded = gz.read()
+
+        with open(outfile, "wb") as new_file:
+            new_file.write(decoded)
+
+        gz.close()
+        log.debug('{}: file unzipped'.format(outfile))
+    else:
+        log.debug('{}: file already unzipped'.format(outfile))
+
+    if delete_original:
+        os.remove(infile)
+
+    return outfile
+
+
 def request_json(link, outfile, outdir=None, force_rerun_flag=False):
     """Download a file in JSON format from a web request
 
@@ -445,15 +473,21 @@ def force_string(val=None):
     """Force a string representation of an object
 
     Args:
-        val (str): object to parse into a string
+        val: object to parse into a string
 
     Returns:
-        String
+        str: String representation
 
     """
     if val is None:
         return ''
-    return val if isinstance(val, str) else ';'.join(val)
+    if isinstance(val, list):
+        newval = [str(x) for x in val]
+        return ';'.join(newval)
+    if isinstance(val, str):
+        return val
+    else:
+        return str(val)
 
 
 def force_list(val=None):
@@ -627,3 +661,116 @@ def percentage_to_float(x):
 
     """
     return float(x.strip('%')) / 100
+
+
+def make_dir(path):
+    """Make a directory if it does not already exist
+
+    Args:
+        path: Path to new directory
+
+    """
+    if not op.exists(path):
+        os.mkdir(path)
+        log.debug('{}: created folder'.format(path))
+    else:
+        log.debug('{}: folder already exists'.format(path))
+
+
+
+
+def remap( x, oMin, oMax, nMin, nMax ):
+    """Map to a 0 to 1 scale
+        http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+
+    Args:
+        x:
+        oMin:
+        oMax:
+        nMin:
+        nMax:
+
+    Returns:
+
+    """
+
+    #range check
+    if oMin == oMax:
+        print("Warning: Zero input range")
+        return None
+
+    if nMin == nMax:
+        print("Warning: Zero output range")
+        return None
+
+    #check reversed input range
+    reverseInput = False
+    oldMin = min( oMin, oMax )
+    oldMax = max( oMin, oMax )
+    if not oldMin == oMin:
+        reverseInput = True
+
+    #check reversed output range
+    reverseOutput = False
+    newMin = min( nMin, nMax )
+    newMax = max( nMin, nMax )
+    if not newMin == nMin :
+        reverseOutput = True
+
+    portion = (x-oldMin)*(newMax-newMin)/(oldMax-oldMin)
+    if reverseInput:
+        portion = (oldMax-x)*(newMax-newMin)/(oldMax-oldMin)
+
+    result = portion + newMin
+    if reverseOutput:
+        result = newMax - portion
+
+    return result
+
+
+def scale_calculator(multiplier, elements, rescale=None):
+    """Get a dictionary of scales for each element in elements.
+
+    Examples:
+        >>> scale_calculator(1, [2,2,2,3,4,5,5,6,7,8])
+        {2: 3, 3: 1, 4: 1, 5: 2, 6: 1, 7: 1, 8: 1}
+
+        >>> scale_calculator(1, [2,2,2,3,4,5,5,6,7,8], rescale=(0.5,1))
+        {2: 1.0, 3: 0.5, 4: 0.5, 5: 0.75, 6: 0.5, 7: 0.5, 8: 0.5}
+
+        >>> scale_calculator(1, {2:3, 3:1, 4:1, 5:2, 6:1, 7:1, 8:1}, rescale=(0.5,1))
+        {2: 1.0, 3: 0.5, 4: 0.5, 5: 0.75, 6: 0.5, 7: 0.5, 8: 0.5}
+
+        >>> scale_calculator(1, [(2,2,2),(3,),(4,),(5,),(5,),(6,7,8)], rescale=(0.5,1))
+        {(2, 2, 2): 0.5, (5,): 1.0, (3,): 0.5, (6, 7, 8): 0.5, (4,): 0.5}
+
+    Args:
+        mutiplier (int, float): Base float to be multiplied
+        elements (list, dict): Dictionary which contains object:count
+            or list of objects that may have repeats which will be counted
+        rescale (tuple): Min and max values to rescale to
+
+    Returns:
+        dict: Scaled values of mutiplier for each element in elements
+
+    """
+    if isinstance(elements, list):
+        unique_elements = list(set(elements))
+        scales = {}
+        for x in unique_elements:
+            count = elements.count(x)
+            scales[x] = multiplier * count
+    elif isinstance(elements, dict):
+        scales = {}
+        for k,count in elements.items():
+            scales[k] = multiplier * int(count)
+    else:
+        raise ValueError('Input list of elements or dictionary of elements & counts')
+
+    if not rescale:
+        return scales
+    else:
+        new_scales = {}
+        for k,v in scales.items():
+            new_scales[k] = remap(v, min(scales.values()), max(scales.values()), rescale[0], rescale[1])
+        return new_scales

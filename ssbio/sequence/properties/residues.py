@@ -1,6 +1,6 @@
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 import ssbio.utils
-import subprocess
+import ssbio.sequence.utils
 import logging
 log = logging.getLogger(__name__)
 
@@ -11,11 +11,13 @@ log = logging.getLogger(__name__)
 # See more: https://www.researchgate.net/publication/235633540_Recent_Advances_in_Predicting_Functional_Impact_of_Single_Amino_Acid_Polymorphisms_A_Review_of_Useful_Features_Computational_Methods_and_Available_Tools
 
 
-def biopython_protein_analysis_on_str(seq_str):
+def biopython_protein_analysis(inseq):
     """Utiize Biopython's ProteinAnalysis module to return general sequence properties of an amino acid string.
 
+    For full definitions see: http://biopython.org/DIST/docs/api/Bio.SeqUtils.ProtParam.ProteinAnalysis-class.html
+
     Args:
-        seq_str: String representation of a amino acid sequence
+        inseq: Amino acid sequence
 
     Returns:
         dict: Dictionary of sequence properties. Some definitions include:
@@ -27,7 +29,9 @@ def biopython_protein_analysis_on_str(seq_str):
 
     """
 
-    analysed_seq = ProteinAnalysis(seq_str)
+    inseq = ssbio.sequence.utils.cast_to_str(inseq)
+
+    analysed_seq = ProteinAnalysis(inseq)
 
     info_dict = {}
     # info_dict['amino_acids_content'] = analysed_seq.count_amino_acids()
@@ -37,15 +41,21 @@ def biopython_protein_analysis_on_str(seq_str):
     info_dict['molecular_weight'] = analysed_seq.molecular_weight()
     info_dict['aromaticity'] = analysed_seq.aromaticity()
     info_dict['instability_index'] = analysed_seq.instability_index()
+    # TODO: What is flexibility?
     # info_dict['flexibility'] = analysed_seq.flexibility()
     info_dict['isoelectric_point'] = analysed_seq.isoelectric_point()
-    info_dict['secondary_structure_fraction'] = analysed_seq.secondary_structure_fraction()
+
+    # Separated secondary_structure_fraction into each definition
+    # info_dict['secondary_structure_fraction'] = analysed_seq.secondary_structure_fraction()
+    info_dict['percent_helix_naive'] = analysed_seq.secondary_structure_fraction()[0]
+    info_dict['percent_turn_naive'] = analysed_seq.secondary_structure_fraction()[1]
+    info_dict['percent_sheet_naive'] = analysed_seq.secondary_structure_fraction()[2]
 
     return info_dict
 
 
 def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', force_rerun=False):
-    """Run EMBOSS pepstats on a sequence string, or FASTA file.
+    """Run EMBOSS pepstats on a FASTA file.
 
     Args:
         infile: Path to FASTA file
@@ -65,32 +75,6 @@ def emboss_pepstats_on_fasta(infile, outfile='', outdir='', outext='.pepstats', 
     # Run pepstats
     program = 'pepstats'
     pepstats_args = '-sequence="{}" -outfile="{}"'.format(infile, outfile)
-    cmd_string = '{} {}'.format(program, pepstats_args)
-    ssbio.utils.command_runner(cmd_string, force_rerun_flag=force_rerun, outfile=outfile, silent=True)
-
-    return outfile
-
-
-def emboss_pepstats_on_str(instring, outfile, outdir='', outext='.pepstats', force_rerun=False):
-    """Run EMBOSS pepstats on a sequence string, or FASTA file.
-
-    Args:
-        instring: Sequence string
-        outfile: Name of output file without extension
-        outdir: Path to output directory
-        outext: Extension of results file, default is ".pepstats"
-        force_rerun: Flag to rerun pepstats
-
-    Returns:
-        str: Path to output file.
-
-    """
-    # Create the output file name
-    outfile = ssbio.utils.outfile_maker(inname='seq_str', outname=outfile, outdir=outdir, outext=outext)
-
-    # Run pepstats
-    program = 'pepstats'
-    pepstats_args = '-sequence=asis::{} -outfile="{}"'.format(instring, outfile)
     cmd_string = '{} {}'.format(program, pepstats_args)
     ssbio.utils.command_runner(cmd_string, force_rerun_flag=force_rerun, outfile=outfile, silent=True)
 

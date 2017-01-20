@@ -1,7 +1,9 @@
 import os.path as op
-import unittest
 import tempfile
-import ssbio.sequence.alignment
+import unittest
+
+import ssbio.sequence.utils.alignment
+
 
 class TestSequenceAlignment(unittest.TestCase):
     """Unit tests for ssbio.sequence.alignment
@@ -16,10 +18,10 @@ class TestSequenceAlignment(unittest.TestCase):
         infile_b = op.join(working_dir, '1gn3_A.faa')
         test_outfile = op.join(working_dir, 'P9WGE7_1gn3_A_align.txt')
 
-        outfile = ssbio.sequence.alignment.run_needle_alignment_on_files(id_a='P9WGE7', faa_a=infile_a,
-                                                                         id_b='1gn3_A', faa_b=infile_b,
-                                                                         outdir=tempfile.gettempdir(),
-                                                                         outfile='test_alignment.txt')
+        outfile = ssbio.sequence.utils.alignment.run_needle_alignment_on_files(id_a='P9WGE7', faa_a=infile_a,
+                                                                               id_b='1gn3_A', faa_b=infile_b,
+                                                                               outdir=tempfile.gettempdir(),
+                                                                               outfile='test_alignment.txt')
 
         # test if the file content is correct
         # ignore the first 12 lines because it is dated
@@ -67,8 +69,7 @@ class TestSequenceAlignment(unittest.TestCase):
 
         outfile = op.join(tempfile.gettempdir(), 'test_alignment2.txt')
 
-        outpath = ssbio.sequence.alignment.run_needle_alignment_on_str(id_a='a', seq_a=str1,
-                                                                       id_b='b', seq_b=str2, outfile=outfile)
+        outpath = ssbio.sequence.utils.alignment.run_needle_alignment(seq_a=str1, seq_b=str2, outfile=outfile)
 
         # test if the result is the same
         # ignore the first 12 lines because it is dated

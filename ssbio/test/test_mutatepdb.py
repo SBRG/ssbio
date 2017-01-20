@@ -2,10 +2,9 @@ import os.path as op
 import tempfile
 import unittest
 
-from ssbio.structure.cleanpdb import CleanPDB
-from ssbio.structure.pdbioext import PDBIOExt
-
-from ssbio.structure.mutatepdb import MutatePDB
+from ssbio.structure.utils.cleanpdb import CleanPDB
+from ssbio.structure.utils.mutatepdb import MutatePDB
+from ssbio.structure.utils.pdbioext import PDBIOExt
 
 
 class TestMutatePDB(unittest.TestCase):
@@ -54,12 +53,12 @@ class TestMutatePDB(unittest.TestCase):
             my_pdb = PDBIOExt(infile_path, file_type='pdb')
             my_cleaner = CleanPDB(keep_chains=[m[0] for m in muts])
             my_clean_pdb = my_pdb.write_pdb(out_suffix='_clean', out_dir=tempfile.gettempdir(),
-                                            custom_selection=my_cleaner)
+                                            custom_selection=my_cleaner, force_rerun=True)
 
             my_pdb = PDBIOExt(my_clean_pdb, file_type='pdb')
             custom_mutate = MutatePDB(muts)
             default_mutated_pdb = my_pdb.write_pdb(custom_selection=custom_mutate, out_suffix='_mutated',
-                                                   out_dir=tempfile.gettempdir())
+                                                   out_dir=tempfile.gettempdir(), force_rerun=True)
             default_mutated_pdb_basename = op.basename(default_mutated_pdb)
 
             # test if the filename is correct

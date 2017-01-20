@@ -2,9 +2,8 @@ import os.path as op
 import tempfile
 import unittest
 
-from ssbio.structure.pdbioext import PDBIOExt
-
-from ssbio.structure.cleanpdb import CleanPDB
+from ssbio.structure.utils.cleanpdb import CleanPDB
+from ssbio.structure.utils.pdbioext import PDBIOExt
 
 
 class TestCleanPDB(unittest.TestCase):
@@ -24,7 +23,8 @@ class TestCleanPDB(unittest.TestCase):
             infile_path = op.join(working_dir, infile)
 
             my_pdb = PDBIOExt(infile_path, file_type='pdb')
-            default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix, out_dir=tempfile.gettempdir())
+            default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix,
+                                                   out_dir=tempfile.gettempdir(), force_rerun=True)
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
             # test if the filename is correct
@@ -51,11 +51,11 @@ class TestCleanPDB(unittest.TestCase):
 
             my_pdb = PDBIOExt(infile_path, file_type='pdb')
             default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix,
-                                                   out_dir=tempfile.gettempdir())
+                                                   out_dir=tempfile.gettempdir(), force_rerun=True)
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
             # test if the filename is correct
-            print(default_cleaned_pdb_basename, outfile_new)
+            # print(default_cleaned_pdb_basename, outfile_new)
             self.assertEqual(default_cleaned_pdb_basename, outfile_new)
 
             # test if the file contents are equal

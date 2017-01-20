@@ -1,26 +1,85 @@
+import os.path as op
+import re
+import warnings
+import bioservices
 import pandas as pd
+import requests
+from dateutil.parser import parse as dateparse
 import ssbio.utils
+from ssbio.sequence.seqprop import SeqProp
+
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
 try:
     import urllib.request as urlrequest
 except ImportError:
     import urllib as urlrequest
 
-import bioservices
+import logging
+log = logging.getLogger(__name__)
+
+
+# import cachetools
+# SEVEN_DAYS = 60 * 60 * 24 * 7
+
 bsup = bioservices.uniprot.UniProt()
 
-from dateutil.parser import parse as dateparse
-import warnings
-import re
-# import cachetools
-import requests
-import os.path as op
 
-SEVEN_DAYS = 60 * 60 * 24 * 7
+class UniProtProp(SeqProp):
+    """Class to parse through UniProt metadata all at once
+    """
+
+    def __init__(self, uniprot_acc, sequence_file=None, metadata_file=None):
+
+        SeqProp.__init__(self, ident=uniprot_acc, sequence_file=sequence_file, metadata_file=metadata_file)
+        self.ec_number = None
+        self.entry_version = None
+        self.pfam = None
+        self.reviewed = False
+        self.seq_version = None
+
+        if uniprot_acc:
+            if not is_valid_uniprot_id(uniprot_acc):
+                raise ValueError("Invalid UniProt ID!")
+            self.uniprot = uniprot_acc
+
+        if metadata_file:
+            self.load_metadata_file(metadata_file)
+
+    def load_metadata_file(self, metadata_file):
+        SeqProp.load_metadata_file(self, metadata_file)
+        self.update(parse_uniprot_txt_file(metadata_file))
+
+    def download_seq_file(self, outdir, force_rerun=False):
+        """Download and load the UniProt sequence file
+        """
+        uniprot_seq_file = download_uniprot_file(uniprot_id=self.id,
+                                                 filetype='fasta',
+                                                 outdir=outdir,
+                                                 force_rerun=force_rerun)
+
+        self.load_seq_file(uniprot_seq_file)
+
+    def download_metadata_file(self, outdir, force_rerun=False):
+        """Download and load the UniProt sequence file
+        """
+        uniprot_metadata_file = download_uniprot_file(uniprot_id=self.id,
+                                                 filetype='txt',
+                                                 outdir=outdir,
+                                                 force_rerun=force_rerun)
+
+        self.load_metadata_file(uniprot_metadata_file)
+
+    def ranking_score(self):
+        """Provide a score for this UniProt ID based on reviewed (True=1, False=0) + number of PDBs
+
+        Returns:
+            int: Scoring for this ID
+
+        """
+        return self.reviewed + self.num_pdbs()
 
 
 def is_valid_uniprot_id(instring):
@@ -41,14 +100,31 @@ def is_valid_uniprot_id(instring):
         return False
 
 
+# TODO: method to blast UniProt to find a 100% sequence match
+def blast_uniprot(seq_str, seq_ident=1, evalue=0.0001, reviewed_only=True):
+    """BLAST the UniProt db to find what IDs match the sequence input
+
+    Args:
+        seq_str: Sequence string
+        seq_ident: Percent identity to match
+        evalue: E-value of BLAST hit
+
+    Returns:
+
+
+    """
+    pass
+
+
 # @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def get_fasta(uniprot_id):
     """Get the protein sequence for a UniProt ID as a string.
 
     Args:
-        ident: a UniProt ID
+        uniprot_id: Valid UniProt ID
 
-    Returns: string of the protein (amino acid) sequence
+    Returns:
+        str: String of the protein (amino acid) sequence
 
     """
     if not is_valid_uniprot_id(uniprot_id):
@@ -67,7 +143,8 @@ def uniprot_reviewed_checker(uniprot_id):
         uniprot_id:
 
     Returns:
-        True or False
+        bool: If the entry is reviewed
+
     """
     if not is_valid_uniprot_id(uniprot_id):
         raise ValueError("Invalid UniProt ID!")
@@ -91,10 +168,11 @@ def uniprot_reviewed_checker_batch(uniprot_ids):
     """Batch check if uniprot IDs are reviewed or not
 
     Args:
-        uniprot_ids:
+        uniprot_ids: UniProt ID or list of UniProt IDs
 
     Returns:
         A dictionary of {UniProtID: Boolean}
+
     """
     uniprot_ids = ssbio.utils.force_list(uniprot_ids)
 
@@ -143,8 +221,18 @@ def uniprot_reviewed_checker_batch(uniprot_ids):
 
 
 def uniprot_ec(uniprot_id):
-    r = requests.post('http://www.uniprot.org/uniprot/?query=%s&columns=ec&format=tab' % uniprot_id)
+    """Retrieve the EC number annotation for a UniProt ID.
 
+    Args:
+        uniprot_id: Valid UniProt ID
+
+    Returns:
+
+    """
+    if not is_valid_uniprot_id(uniprot_id):
+        raise ValueError('Invalid UniProt ID')
+
+    r = requests.post('http://www.uniprot.org/uniprot/?query=%s&columns=ec&format=tab' % uniprot_id)
     ec = r.content.decode('utf-8').splitlines()[1]
 
     if len(ec) == 0:
@@ -154,6 +242,19 @@ def uniprot_ec(uniprot_id):
 
 
 def uniprot_sites(uniprot_id):
+    """Retrive a dictionary of UniProt sites
+
+    Sites are defined here: http://www.uniprot.org/help/site and here: http://www.uniprot.org/help/function_section
+
+    Args:
+        uniprot_id: Valid UniProt ID
+
+    Returns:
+
+    """
+    if not is_valid_uniprot_id(uniprot_id):
+        raise ValueError('Invalid UniProt ID')
+
     r = requests.post('http://www.uniprot.org/uniprot/%s.gff' % uniprot_id)
     gff = StringIO(r.content.decode('utf-8'))
 
@@ -169,18 +270,23 @@ def uniprot_sites(uniprot_id):
 
 
 def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
-    """Download any UniProt file for a UniProt ID/ACC
+    """Download a UniProt file for a UniProt ID/ACC
 
     Args:
-        uniprot_id:
+        uniprot_id: Valid UniProt ID
         filetype: txt, fasta, xml, rdf, or gff
-        outdir:
+        outdir: Directory to download the file
 
     Returns:
+        str: Absolute path to file
 
     """
-    url = 'http://www.uniprot.org/uniprot/{}.{}'.format(uniprot_id, filetype)
-    outfile = op.join(outdir, '{}.{}'.format(uniprot_id, filetype))
+    if not is_valid_uniprot_id(uniprot_id):
+        raise ValueError('Invalid UniProt ID')
+
+    my_file = '{}.{}'.format(uniprot_id, filetype)
+    url = 'http://www.uniprot.org/uniprot/{}'.format(my_file)
+    outfile = op.join(outdir, my_file)
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         urlrequest.urlretrieve(url, outfile)
@@ -188,9 +294,44 @@ def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
     return outfile
 
 
-def old_parse_uniprot_txt_file(infile):
+def parse_uniprot_txt_file(infile):
+    """Parse a raw UniProt metadata file and return a dictionary.
+
+    Args:
+        infile: Path to metadata file
+
+    Returns:
+        dict: Metadata dictionaruy
+
     """
-    from: boscoh/uniprot github
+    uniprot_metadata_dict = {}
+
+    metadata = old_parse_uniprot_txt_file(infile)
+    metadata_key = list(metadata.keys())[0]
+
+    uniprot_metadata_dict['sequence_len'] = len(str(metadata[metadata_key]['sequence']))
+    uniprot_metadata_dict['reviewed'] = metadata[metadata_key]['is_reviewed']
+    uniprot_metadata_dict['seq_version'] = metadata[metadata_key]['sequence_version']
+    uniprot_metadata_dict['entry_version'] = metadata[metadata_key]['entry_version']
+    if 'gene' in metadata[metadata_key]:
+        uniprot_metadata_dict['gene_name'] = metadata[metadata_key]['gene']
+    if 'description' in metadata[metadata_key]:
+        uniprot_metadata_dict['description'] = metadata[metadata_key]['description']
+    if 'refseq' in metadata[metadata_key]:
+        uniprot_metadata_dict['refseq'] = metadata[metadata_key]['refseq']
+    if 'kegg' in metadata[metadata_key]:
+        uniprot_metadata_dict['kegg'] = metadata[metadata_key]['kegg']
+    if 'ec' in metadata[metadata_key]:
+        uniprot_metadata_dict['ec_number'] = metadata[metadata_key]['ec']
+    if 'pfam' in metadata[metadata_key]:
+        uniprot_metadata_dict['pfam'] = metadata[metadata_key]['pfam']
+    if 'pdbs' in metadata[metadata_key]:
+        uniprot_metadata_dict['pdbs'] = list(set(metadata[metadata_key]['pdbs']))
+    return uniprot_metadata_dict
+
+
+def old_parse_uniprot_txt_file(infile):
+    """From: boscoh/uniprot github
     Parses the text of metadata retrieved from uniprot.org.
 
     Only a few fields have been parsed, but this provides a
@@ -316,35 +457,6 @@ def old_parse_uniprot_txt_file(infile):
     return metadata_by_seqid
 
 
-def parse_uniprot_txt_file(infile):
-    uniprot_metadata_dict = {}
-
-    metadata = old_parse_uniprot_txt_file(infile)
-    metadata_key = list(metadata.keys())[0]
-
-    # uniprot_metadata_dict['u_seq'] = metadata[metadata_key]['sequence']
-    uniprot_metadata_dict['seq_len'] = len(
-        str(metadata[metadata_key]['sequence']))
-    uniprot_metadata_dict['reviewed'] = metadata[metadata_key]['is_reviewed']
-    uniprot_metadata_dict['seq_version'] = metadata[metadata_key]['sequence_version']
-    uniprot_metadata_dict['entry_version'] = metadata[metadata_key]['entry_version']
-    if 'gene' in metadata[metadata_key]:
-        uniprot_metadata_dict['gene_name'] = metadata[metadata_key]['gene']
-    if 'description' in metadata[metadata_key]:
-        uniprot_metadata_dict['description'] = metadata[metadata_key]['description']
-    if 'refseq' in metadata[metadata_key]:
-        uniprot_metadata_dict['refseq'] = metadata[metadata_key]['refseq']
-    if 'kegg' in metadata[metadata_key]:
-        uniprot_metadata_dict['kegg_id'] = metadata[metadata_key]['kegg']
-    if 'ec' in metadata[metadata_key]:
-        uniprot_metadata_dict['ec_number'] = metadata[metadata_key]['ec']
-    if 'pfam' in metadata[metadata_key]:
-        uniprot_metadata_dict['pfam'] = metadata[metadata_key]['pfam']
-    if 'pdbs' in metadata[metadata_key]:
-        uniprot_metadata_dict['pdbs'] = list(set(metadata[metadata_key]['pdbs']))
-    return uniprot_metadata_dict
-
-
 # def uniprot_metadata_batch(uniprot_ids, outdir=None):
 #     '''
 #     Input: UniProt ID or IDs
@@ -408,3 +520,5 @@ def parse_uniprot_txt_file(infile):
 #
 #         uniprot_metadata_final[uniprot_id] = uniprot_metadata_dict
 #     return uniprot_metadata_final
+
+

@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+#PBS -e /global/project/projectdirs/m2009/nathan/GEM-PRO/iNJ661/P9WG73/err_P9WG73sim_4A
+#PBS -o /global/project/projectdirs/m2009/nathan/GEM-PRO/iNJ661/P9WG73/out_P9WG73sim_4A
+#PBS -l walltime=5:59:00
+
+use Math::Trig;
+
+########### setup  the environment and Working DIRectory ###
+$ENV{'PATH'}="/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/pgi/linux86/bin";
+$ENV{'LD_LIBRARY_PATH'}="/usr/local/lib:/usr/lib:/lib";
+
+##### report node -------->
+`hostname`=~/(\S+)/;
+$node=$1;
+printf "hostname: $node\n";
+$time=`date`;
+printf "starting time: $time";
+$pwd=`pwd`;
+printf "pwd: $pwd";
+#^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+$tag="P9WG73sim_4A";
+$inputdir="/global/project/projectdirs/m2009/nathan/GEM-PRO/iNJ661/P9WG73";
+$outputdir="/global/project/projectdirs/m2009/nathan/GEM-PRO/iNJ661/P9WG73";
+$commondir="/global/project/projectdirs/m2009/software/I-TASSER4.4/common";
+$bindir="/global/project/projectdirs/m2009/software/I-TASSER4.4/I-TASSERmod";
+################# directories #############################
+$work_dir="/tmp/nmih/$tag";
+`mkdir -p $work_dir`;
+chdir "$work_dir";
+`rm -f $work_dir/*`;
+
+################# copy program ###########################
+if(-s "$inputdir/expshort.dat")
+{
+    `cp -f $bindir/casres ./cas_$tag`;
+    `cp -f $inputdir/expshort.dat .`;
+    `cp -f $inputdir/explong.dat .`;
+    `cp -f $inputdir/Scontact.dat .`;
+}
+else
+{
+    `cp -f $bindir/cas ./cas_$tag`;
+}
+
+################# copy common files ######################
+`cp -f $commondir/contact.comm .`;
+`cp -f $commondir/profile3.comm .`;
+`cp -f $commondir/quasi3.comm .`;
+`cp -f $commondir/sidechain.comm .`;
+`cp -f $commondir/r13.comm .`;
+`cp -f $commondir/r14.comm .`;
+`cp -f $commondir/r14h.comm .`;
+`cp -f $commondir/r14e.comm .`;
+`cp -f $commondir/r15.comm .`;
+`cp -f $commondir/r15h.comm .`;
+`cp -f $commondir/r15e.comm .`;
+`cp -f $commondir/conf.comm ./conf.comm`;
+`cp -f $commondir/conf3.comm ./conf3.comm`;
+
+########### copy protein specifical input files ##########
+`cp -f $inputdir/seq.dat .`;
+`cp -f $inputdir/rmsinp .`;
+#`cp -f $inputdir/CA .`;
+#`cp -f $inputdir/pdb.pdb .`;
+`cp -f $inputdir/comb.dat ./comb.dat`;
+`cp -f $inputdir/combCA.dat ./combCA.dat`;
+`cp -f $inputdir/comb8CA.dat ./comb8CA.dat`;
+`cp -f $inputdir/dist.dat ./dist.dat`;
+`cp -f $inputdir/distL.dat ./distL.dat`;
+`cp -f $inputdir/exp.dat  ./exp.dat`;
+`cp -f $inputdir/init.dat ./init.dat`;
+`cp -f $inputdir/par.dat  ./par.dat`;
+`cp -f $inputdir/pair1.dat ./pair1.dat`;
+`cp -f $inputdir/pair3.dat ./pair3.dat`;
+
+$svmseq="no";
+if($svmseq eq "no")
+{
+    goto pos44;
+}
+`cp -f $inputdir/svmcon.dat.10 ./svmcon.dat`;
+`cp -f $inputdir/betacon.dat.10 ./betacon.dat`;
+`cp -f $inputdir/nncom.dat.10 ./nncom.dat`;
+`cp -f $inputdir/svmseqca6.dat.10 ./svmseqca6.dat`;
+`cp -f $inputdir/svmseqca7.dat.10 ./svmseqca7.dat`;
+`cp -f $inputdir/svmseqca8.dat.10 ./svmseqca8.dat`;
+`cp -f $inputdir/svmseqcb6.dat.10 ./svmseqcb6.dat`;
+`cp -f $inputdir/svmseqcb7.dat.10 ./svmseqcb7.dat`;
+`cp -f $inputdir/svmseqcb8.dat.10 ./svmseqcb8.dat`;
+`cp -f $inputdir/svmseqsg6.dat.10 ./svmseqsg6.dat`;
+`cp -f $inputdir/svmseqsg7.dat.10 ./svmseqsg7.dat`;
+`cp -f $inputdir/svmseqsg8.dat.10 ./svmseqsg8.dat`;
+
+ pos44:;
+################# make in.dd ##############################
+$ithr0=4;
+$random=100+4*13;
+$ncycle=int(500/1)+1;
+$inmod=`cat $bindir/in.mod`;
+$inmod=~s/\$HOUR\$/5/mg;
+$inmod=~s/\$RANDOM\$/$random/mg;
+$inmod=~s/\$NCYCLE\$/$ncycle/mg;
+$inmod=~s/\$NRUN\$/1/mg;
+$inmod=~s/\$SWITCH\$/1/mg;
+$inmod=~s/\$ITHR0\$/$ithr0/mg;
+open(indd,">in.dd");
+print indd "$inmod\n";
+close(indd);
+
+######## Copy initial useful stuffs back to output ########
+#`mkdir -p $outputdir`;
+`cp -f in.dd $outputdir/in4A.dd`;
+
+######## report node ###################################
+`hostname`=~/(\S+)/;
+$node=$1;
+$time=`date`;
+chop($time);
+$pwd=`pwd`;
+chop($pwd);
+print "hostname: $node\n";
+print "starting time: $time\n";
+printf "pwd: $pwd\n";
+system("echo hostname: \"$node\" > $outputdir/node_$tag");
+system("echo starting time: \"$time\" >> $outputdir/node_$tag");
+system("echo pwd: \"$pwd\" >> $outputdir/node_$tag");
+
+############# run job #################
+system("./cas_$tag");
+
+############# gzip trajectories ################
+`bzip2 rep*.tra`;
+
+############## Copy stuff back to output ##########
+`cp -f out.d       $outputdir/out4A`;
+for($j=1;$j<=16;$j++)
+{
+    if(-s "rep$j\.tra.bz2")
+    {
+	`cp -f rep$j\.tra.bz2 $outputdir/rep$j\.tra4A.bz2`;
+    }else{
+	#copy("rep$j\.tra","$outputdir/rep$j\.tra4A");
+	if(-e "rep$j\.tra"){
+		`cp  rep$j\.tra  $outputdir/rep$j\.tra4A`;
+	}
+    }
+}
+
+################# endding procedure ######################
+$time=`date`;
+printf "ending time: $time";
+`sync`;
+`sync`;
+sleep(1);
+`rm -fr $work_dir`;
+
+exit();
+

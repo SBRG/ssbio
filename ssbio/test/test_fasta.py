@@ -1,7 +1,8 @@
-import unittest
 import os
 import tempfile
-import ssbio.sequence.fasta as fasta
+import unittest
+
+import ssbio.sequence.utils.fasta as fasta
 
 
 class TestFasta(unittest.TestCase):

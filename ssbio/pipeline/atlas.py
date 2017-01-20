@@ -1,18 +1,17 @@
 import os
 import os.path as op
-import pandas as pd
+
+import cobra.flux_analysis
+import cobra.manipulation
 import numpy as np
+import pandas as pd
+import ssbio.sequence.utils.blast
+from Bio import SeqIO
+
 import ssbio.cobra.utils
-import ssbio.sequence.blast
-import ssbio.sequence.fasta
 import ssbio.databases.ncbi
 import ssbio.databases.patric
-
-import cobra.manipulation
-import cobra.flux_analysis
-
-from Bio import SeqIO
-from Bio import Entrez
+import ssbio.sequence.utils.fasta
 
 try:
     from IPython.display import clear_output
@@ -23,11 +22,10 @@ except ImportError:
     from tqdm import tqdm
 
 from ssbio import utils
-import ssbio.sequence.alignment
-from collections import defaultdict
+import ssbio.sequence.utils.alignment
+
 date = utils.Date()
 from ssbio.pipeline.gempro import GEMPRO
-from cobra.core import DictList
 from cobra.core import Model
 import sys
 import logging
@@ -39,9 +37,21 @@ try:
 except ImportError:
     from io import StringIO
 
+from cobra.core import DictList
+from cobra.core import Gene
+# Casting Gene objects into GenePro objects
+# This replaces any new instance of Genes with GenePros. Even when you load a model later using COBRApy methods
+# Use with caution!
+# See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
+from ssbio.core.genepro import GenePro
+def __new__(cls, *args, **kwargs):
+    if cls == Gene:
+        return object.__new__(GenePro)
+    return object.__new__(cls)
+Gene.__new__ = staticmethod(__new__)
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
-
 
 class AtlasModel(Model):
     """Class to represent a model within the ATLAS analysis. Just adding some fields to the annotation attributes.
@@ -52,8 +62,8 @@ class AtlasModel(Model):
         self.annotation['genome_file'] = op.basename(genome_file_name)
 
         for g in model.genes:
-            g.annotation['sequence'] = {'seq_len'       : 0,
-                                        'seq_file'      : None,
+            g.annotation['sequence'] = {'sequence_len'       : 0,
+                                        'sequence_file'      : None,
                                         'alignment_file': None,
                                         'properties'    : {}
                                         }
@@ -64,9 +74,9 @@ class AtlasModel(Model):
 
     def get_gene_sequence_path(self, gene_id, gene_dir):
         g = self.genes.get_by_id(gene_id)
-        if not g.annotation['sequence']['seq_file']:
+        if not g.annotation['sequence']['sequence_file']:
             raise IOError('{}: Sequence does not exist'.format(gene_id))
-        g_seq_path = op.join(gene_dir, g.annotation['sequence']['seq_file'])
+        g_seq_path = op.join(gene_dir, g.annotation['sequence']['sequence_file'])
         return g_seq_path
 
 
@@ -165,7 +175,7 @@ class ATLAS():
         # Create initial strain models that are just copies of the base strain with a resetted annotation
         self.strain_ids = []
         self.strain_models = DictList([])
-        log.info('Creating strain specific models based on the base model...')
+        log.info('Creating initial strain specific models based on the base model...')
         for strain_id, strain_fasta in tqdm(strains_to_fasta_file.items()):
             self.strain_ids.append(strain_id)
 
@@ -257,23 +267,23 @@ class ATLAS():
 
             # Run bidirectional BLAST
             log.debug('{} vs {}: Running bidirectional BLAST'.format(r_name, g_name))
-            r_vs_g, g_vs_r = ssbio.sequence.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
-                                                                          dbtype=self.blast_seq_type,
-                                                                          outdir=self.seq_atlas_org_dir)
+            r_vs_g, g_vs_r = ssbio.sequence.utils.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
+                                                                                dbtype=self.blast_seq_type,
+                                                                                outdir=self.seq_atlas_org_dir)
 
             # Using the BLAST files, find the BBH
             log.debug('{} vs {}: Finding BBHs'.format(r_name, g_name))
-            bbh = ssbio.sequence.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
-                                                     r_name=r_name, g_name=g_name,
-                                                     outdir=self.seq_atlas_org_dir)
+            bbh = ssbio.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
+                                                           r_name=r_name, g_name=g_name,
+                                                           outdir=self.seq_atlas_org_dir)
             bbh_files[strain_model.id] = bbh
 
         # Make the orthologous genes matrix
         log.debug('Creating orthology matrix')
-        ortho_matrix = ssbio.sequence.blast.create_orthology_matrix(r_name=r_name,
-                                                                    genome_to_bbh_files=bbh_files,
-                                                                    outname='{}_{}_orthology.csv'.format(r_name, self.blast_seq_type),
-                                                                    outdir=self.atlas_data_dir)
+        ortho_matrix = ssbio.sequence.utils.blast.create_orthology_matrix(r_name=r_name,
+                                                                          genome_to_bbh_files=bbh_files,
+                                                                          outname='{}_{}_orthology.csv'.format(r_name, self.blast_seq_type),
+                                                                          outdir=self.atlas_data_dir)
 
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
@@ -395,8 +405,8 @@ class ATLAS():
                 outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
 
                 # Save the filename in the strain model's gene annotation
-                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['seq_file'] = outfile
-                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['seq_len'] = len(strain_seq_record.seq)
+                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['sequence_file'] = outfile
+                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['sequence_len'] = len(strain_seq_record.seq)
 
                 if not op.exists(op.join(gene_dir, outfile)):
                     with open(op.join(gene_dir, outfile), 'w') as f:
@@ -415,8 +425,8 @@ class ATLAS():
         for base_gene in tqdm(self.base_strain_gempro.genes):
             # Get base strain gene fasta file path
             base_gene_id = base_gene.id
-            base_gene_seq_file = base_gene.annotation['sequence']['representative']['seq_file']
-            base_gene_seq_len = base_gene.annotation['sequence']['representative']['seq_len']
+            base_gene_seq_file = base_gene.annotation['sequence']['representative']['sequence_file']
+            base_gene_seq_len = base_gene.annotation['sequence']['representative']['sequence_len']
 
             if not base_gene_seq_file:
                 log.warning('{}: No representative sequence set in base strain'.format(base_gene_id))
@@ -442,17 +452,17 @@ class ATLAS():
 
                 strain_gene_seq_path = strain_model.get_gene_sequence_path(base_gene_id, gene_dir)
 
-                alignment_file = ssbio.sequence.alignment.run_needle_alignment_on_files(id_a=base_gene_id,
-                                                                                       id_b=strain_id,
-                                                                                       faa_a=base_gene_seq_path,
-                                                                                       faa_b=strain_gene_seq_path,
-                                                                                       outdir=gene_dir)
+                alignment_file = ssbio.sequence.utils.alignment.run_needle_alignment_on_files(id_a=base_gene_id,
+                                                                                              id_b=strain_id,
+                                                                                              faa_a=base_gene_seq_path,
+                                                                                              faa_b=strain_gene_seq_path,
+                                                                                              outdir=gene_dir)
 
                 # Save in strain gene annotation
                 strain_gene.annotation['sequence']['alignment_file'] = op.basename(alignment_file)
 
                 # Some stuff you can count
-                alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
+                alignment_df = ssbio.sequence.utils.alignment.get_alignment_df_from_file(alignment_file)
 
                 # TODO: also count: number of unique mutations (have to consider position, amino acid change)
                 # indels? (average length of insertion, deletion)
@@ -511,7 +521,7 @@ class ATLAS():
                 continue
 
             alignment_file = op.join(gene_dir, strain_gene.annotation['sequence']['alignment_file'])
-            alignment_df = ssbio.sequence.alignment.get_alignment_df(alignment_file)
+            alignment_df = ssbio.sequence.utils.alignment.get_alignment_df_from_file(alignment_file)
 
             num_mutations = len(alignment_df[alignment_df.type == 'mutation'])
 

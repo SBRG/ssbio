@@ -1,0 +1,57 @@
+ENTRY       b4384             CDS       T00007
+NAME        deoD
+DEFINITION  (RefSeq) purine-nucleoside phosphorylase
+ORTHOLOGY   K03784  purine-nucleoside phosphorylase [EC:2.4.2.1]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00230  Purine metabolism
+            eco00240  Pyrimidine metabolism
+            eco00760  Nicotinate and nicotinamide metabolism
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Nucleotide metabolism
+               00230 Purine metabolism
+                b4384 (deoD)
+               00240 Pyrimidine metabolism
+                b4384 (deoD)
+              Metabolism of cofactors and vitamins
+               00760 Nicotinate and nicotinamide metabolism
+                b4384 (deoD)
+            Enzymes [BR:eco01000]
+             2. Transferases
+              2.4  Glycosyltransferases
+               2.4.2  Pentosyltransferases
+                2.4.2.1  purine-nucleoside phosphorylase
+                 b4384 (deoD)
+POSITION    4620883..4621602
+MOTIF       Pfam: PNP_UDP_1 Transketolase_C Lipase_2
+DBLINKS     NCBI-ProteinID: NP_418801
+            NCBI-GeneID: 945654
+            Pasteur: deoD
+            RegulonDB: ECK120000216
+            EcoGene: EG10222
+            ECOCYC: EG10222
+            ASAP: ABE-0014379
+            UniProt: P0ABP8
+STRUCTURE   PDB: 4RJ2 4TS9 4TTJ 4TTI 3ONV 3UT6 4TTA 3OOE 1K9S 1ECP 1A69
+                 1OVG 4TS3 3OPV 1OV6 1OUM 1OU4 1OTY 1OTX 3OOH
+AASEQ       239
+            MATPHINAEMGDFADVVLMPGDPLRAKYIAETFLEDAREVNNVRGMLGFTGTYKGRKISV
+            MGHGMGIPSCSIYTKELITDFGVKKIIRVGSCGAVLPHVKLRDVVIGMGACTDSKVNRIR
+            FKDHDFAAIADFDMVRNAVDAAKALGIDARVGNLFSADLFYSPDGEMFDVMEKYGILGVE
+            MEAAGIYGVAAEFGAKALTICTVSDHIRTHEQTTAAERQTTFNDMIKIALESVLLGDKE
+NTSEQ       720
+            atggctaccccacacattaatgcagaaatgggcgatttcgctgacgtagttttgatgcca
+            ggcgacccgctgcgtgcgaagtatattgctgaaactttccttgaagatgcccgtgaagtg
+            aacaacgttcgcggtatgctgggcttcaccggtacttacaaaggccgcaaaatttccgta
+            atgggtcacggtatgggtatcccgtcctgctccatctacaccaaagaactgatcaccgat
+            ttcggcgtgaagaaaattatccgcgtgggttcctgtggcgcagttctgccgcacgtaaaa
+            ctgcgcgacgtcgttatcggtatgggtgcctgcaccgattccaaagttaaccgcatccgt
+            tttaaagaccatgactttgccgctatcgctgacttcgacatggtgcgtaacgcagtagat
+            gcagctaaagcactgggtattgatgctcgcgtgggtaacctgttctccgctgacctgttc
+            tactctccggacggcgaaatgttcgacgtgatggaaaaatacggcattctcggcgtggaa
+            atggaagcggctggtatctacggcgtcgctgcagaatttggcgcgaaagccctgaccatc
+            tgcaccgtatctgaccacatccgcactcacgagcagaccactgccgctgagcgtcagact
+            accttcaacgacatgatcaaaatcgcactggaatccgttctgctgggcgataaagagtaa
+///

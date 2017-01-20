@@ -1,0 +1,874 @@
+#!/usr/bin/perl
+use Math::Trig;
+
+########### setup  the environment and Working DIRectory ###
+$ENV{'PATH'}="/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/pgi/linux86/bin";
+$ENV{'LD_LIBRARY_PATH'}="/usr/local/lib:/usr/lib:/lib";
+
+##### report node -------->
+`hostname`=~/(\S+)/;
+$node=$1;
+printf "hostname: $node\n";
+$time=`date`;
+printf "starting time: $time";
+$pwd=`pwd`;
+printf "pwd: $pwd";
+#^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+%ts=(
+     'GLY'=>'G',
+     'ALA'=>'A',
+     'VAL'=>'V',
+     'LEU'=>'L',
+     'ILE'=>'I',
+     'SER'=>'S',
+     'THR'=>'T',
+     'CYS'=>'C',
+     'MET'=>'M',
+     'PRO'=>'P',
+     'ASP'=>'D',
+     'ASN'=>'N',
+     'GLU'=>'E',
+     'GLN'=>'Q',
+     'LYS'=>'K',
+     'ARG'=>'R',
+     'HIS'=>'H',
+     'PHE'=>'F',
+     'TYR'=>'Y',
+     'TRP'=>'W',
+
+     'ASX'=>'B',
+     'GLX'=>'Z',
+     'UNK'=>'X',
+
+     'G'=>'GLY',
+     'A'=>'ALA',
+     'V'=>'VAL',
+     'L'=>'LEU',
+     'I'=>'ILE',
+     'S'=>'SER',
+     'T'=>'THR',
+     'C'=>'CYS',
+     'M'=>'MET',
+     'P'=>'PRO',
+     'D'=>'ASP',
+     'N'=>'ASN',
+     'E'=>'GLU',
+     'Q'=>'GLN',
+     'K'=>'LYS',
+     'R'=>'ARG',
+     'H'=>'HIS',
+     'F'=>'PHE',
+     'Y'=>'TYR',
+     'W'=>'TRP',
+
+     'a'=>'CYS',
+     'b'=>'CYS',
+     'c'=>'CYS',
+     'd'=>'CYS',
+     'e'=>'CYS',
+     'f'=>'CYS',
+     'g'=>'CYS',
+     'h'=>'CYS',
+     'i'=>'CYS',
+     'j'=>'CYS',
+     'k'=>'CYS',
+     'l'=>'CYS',
+     'm'=>'CYS',
+     'n'=>'CYS',
+     'o'=>'CYS',
+     'p'=>'CYS',
+     'q'=>'CYS',
+     'r'=>'CYS',
+     's'=>'CYS',
+     't'=>'CYS',
+     'u'=>'CYS',
+     'v'=>'CYS',
+     'w'=>'CYS',
+     'x'=>'CYS',
+     'y'=>'CYS',
+     'z'=>'CYS',
+
+     'B'=>'ASX',
+     'Z'=>'GLX',
+     'X'=>'CYS',
+    );
+
+@AA=qw(
+       C
+       M
+       F
+       I
+       L
+       V
+       W
+       Y
+       A
+       G
+       T
+       S
+       Q
+       N
+       E
+       D
+       H
+       R
+       K
+       P
+       );
+
+################# directories #############################
+$data_dir="/global/project/projectdirs/m2009/nathan/GEM-PRO/iNJ661/P9WG73";  #for seq.txt and init.dat
+$pdb="P9WG73"; 
+$work_dir="/tmp/nmih/MUSTER_P9WG73";
+$pkgdir="/global/project/projectdirs/m2009/software/I-TASSER4.4";
+$libdir="/global/project/projectdirs/m2009/software/ITLIB";
+$libdir_local=$pkgdir;
+$blastdir="/global/project/projectdirs/m2009/software/I-TASSER4.4/blast/bin";
+$db="/global/project/projectdirs/m2009/software/ITLIB/nr/nr";
+$zalignbin="$libdir_local/bin/zalign";
+
+################ working directory ########################
+`mkdir -p $work_dir`;
+chdir "$work_dir";
+`rm -f $work_dir/*`;
+`cp $libdir_local/bin/align ./align`;
+`cp $libdir_local/bin/MUSTER/bin/construct_input_torsion.pl ./`;
+`cp $libdir_local/bin/MUSTER/bin/predict_psi.pl ./`;
+`cp $libdir_local/bin/MUSTER/bin/predict_phi.pl ./`;
+`cp $libdir_local/bin/MUSTER/bin/svm-predict ./`;
+`cp $libdir_local/bin/MUSTER/bin/exp.pl ./`;
+`cp $libdir_local/bin/MUSTER/bin/zal33 ./zalign`;
+
+if(-e "$data_dir/seq.dat")
+{
+    `cp $data_dir/seq.dat .`;
+}
+else
+{
+    `cp $data_dir/seq.fasta .`;
+    if(-s "seq.fasta")
+    {
+	`perl $pkgdir/PSSpred/mPSSpred.pl seq.fasta $pkgdir $libdir`;
+    }
+    elsif(-s "seq.txt")
+    {
+	`perl $pkgdir/PSSpred/mPSSpred.pl seq.txt $pkgdir $libdir`;
+    }
+}
+################ make fasta sequence file #################
+@seqtxts=`cat $data_dir/seq.txt`;
+$sequence="";
+foreach $seqtxt(@seqtxts)
+{
+    goto pos6 if($seqtxt=~/\>/);
+    $seqtxt=~s/\s//mg;
+    $seqtxt=~s/\n//mg;
+    $sequence=$sequence.$seqtxt;
+  pos6:;
+}
+$Lch=length $sequence;
+open(seq,">protein.seq");
+printf seq ">protein\n";
+for($i=1;$i<=$Lch;$i++)
+{
+    $a=substr($sequence,$i-1,1);
+    printf seq "$a";
+    $seqQ{$i}=$a;   #only for check
+    $seqQ3{$i}=$ts{$a};
+    $log{$i,$seqQ{$i}}++;
+    if($i==int($i/60)*60)
+    {
+	printf seq "\n";
+    }
+}
+printf seq "\n";
+close(seq);
+
+
+###############################################################
+#make 'exp.dat'
+###############################################################
+# input protein.seq, output exp.dat, need blastpgp, nr, solve, wgt.tar.bz2
+if(!-s "$data_dir/exp.dat")
+{
+    `./exp.pl $pkgdir $blastdir $db`;
+}
+else
+{
+    `cp $data_dir/exp.dat .`;
+}
+open(fl,"exp.dat");
+<fl>; #skip this line
+$in=0;
+while($line=<fl>)
+{
+    $line=~/\S+\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/;
+    for($pp=1;$pp<=17;$pp++)
+    {
+        if($$pp==0)
+        {
+            last;
+        }
+    }
+    $exp[$in]=($pp-1)/20;#exposed    
+    $in++;
+}
+close(fl);
+
+open(wfl,">seq.exp.sa");
+printf wfl "$in\n";
+for($i=0;$i<$in;$i++)
+{
+    printf wfl "%-4d %8.2f\n",$i+1,$exp[$i];
+}
+close(wfl);
+
+
+###############################################################
+#make '$pdb\_pssm.txt'
+###############################################################
+if(-s "$data_dir/blast.out" && -s "$data_dir/psitmp.chk" && -s "$data_dir/pssm.txt")
+{
+    `cp $data_dir/blast.out .`;
+    `cp $data_dir/psitmp.chk .`;
+    `cp $data_dir/pssm.txt ./$pdb\_pssm.txt`;
+}
+else
+{
+    printf "running Psi-blast .....\n";
+    `$blastdir/blastpgp  -b 1000 -j 3 -h 0.001 -d $db -i protein.seq -C psitmp.chk -Q $pdb\_pssm.txt > blast.out`;
+}
+
+#####generate seq.svr.psi and seq.svr.phi ######
+#input $pdb\_pssm.txt, exp.dat, seq.dat, output input_phi.dat input_psi.dat
+`./construct_input_torsion.pl 10 $pdb`;
+#input input_phi.dat input_psi.dat, output seq.svr.psi and seq.svr.phi
+`./predict_psi.pl $libdir`;
+`./predict_phi.pl $libdir`;
+
+###########close profile #########################
+########### extract 'pre.prf' ###################
+#seq.promals.aln does not exist. use blast.out
+open(blast,"blast.out");
+while($line=<blast>)
+{
+    if($line=~/Results from round\s+(\d+)/)
+    {
+	$ROUND=$1;
+    }
+}
+seek(blast,0,0);
+$it=0;
+while($line=<blast>)
+{
+    if($line=~/round\s+$ROUND/)
+    {
+	while($line=<blast>)
+	{
+	    if($line=~/Expect =\s*(\S+)/)
+	    {
+		$ev=$1;
+		<blast>=~/Identities =\s*\S+\s+\((\S+)\%/;
+		<blast>;
+		$id=$1;
+		if($ev<0.001 && $id < 98)
+		{
+		    $it++;
+		    $ev_dim{$it}=$ev;
+		    while($line=<blast>)
+		    {
+			if($line=~/Query\:\s*(\d+)\s+(\S+)\s+(\S+)/)
+			{
+			    $i1=$1;
+			    $seq1=$2;
+			    <blast>;
+			    <blast>=~/Sbjct\:\s*(\S+)\s+(\S+)\s+(\S+)/;
+			    $seq2=$2;
+			    <blast>;
+			    ###
+			    $L=length $seq1;
+			    $m1=$i1-1;
+			    for($i=1;$i<=$L;$i++)
+			    {
+				$q1=substr($seq1,$i-1,1);
+				$q2=substr($seq2,$i-1,1);
+				$m1++ if($q1 ne '-');
+				if($q1 ne '-' && $q2 ne '-')
+				{
+				    #$log{$m1,$q2}++;  #without henikoff
+				    $am{$it,$m1}=$q2;  #with henikoff
+				}
+			    }
+			    ###
+			}
+			else
+			{
+			    goto pos1;
+			}
+		    }
+		}
+	      pos1:;
+	    }
+	}
+    }
+}
+close(blast);
+
+##### with henikoff
+######## include query sequence ---------->
+$it++;
+for($i=1;$i<=$Lch;$i++)
+{
+    $am{$it,$i}=$seqQ{$i};
+}
+####### Henikoff weight $wei{i_seq} ----------->
+##### nA{A,i_pos}: number of times A appear at the position:
+undef %nA; 
+for($i=1;$i<=$Lch;$i++)
+{
+    for($j=1;$j<=$it;$j++)
+    {
+	$nA{$am{$j,$i},$i}+=transform($ev_dim{$j});
+    }
+}
+##### henikoff weight w(i)=sum of 1/rs:
+for($i=1;$i<=$it;$i++)
+{
+    for($j=1;$j<=$Lch;$j++)
+    {
+	####### r: number of different residues in j'th position:
+	$r=0;
+	foreach $A(@AA)
+	{
+	    $r++ if($nA{$A,$j}>0);
+	}
+	$A=$am{$i,$j};
+	$s2=$nA{$A,$j};
+	$w1=1.0/($r*$s2);
+	$w{$i}+=$w1;
+    }
+    $w_all+=$w{$i};
+}
+#### normalization of w(i):
+for($i=1;$i<=$it;$i++)
+{
+    $w{$i}/=$w_all;
+}
+#^^^^^ Henikoff weight finished ^^^^^^^^^^^^^^^^^
+
+########### weighted frequence #################
+undef %log;
+for($i=1;$i<=$it;$i++)
+{
+    for($j=1;$j<=$Lch;$j++)
+    {
+	$A=$am{$i,$j};
+	$log{$j,$A}+=$w{$i};
+    }
+}
+####record the close profile 
+for($i=1;$i<=$Lch;$i++)
+{
+    $norm=0;
+    foreach $A(@AA)
+    {
+        $norm+=$log{$i,$A};
+    }
+    foreach $A(@AA)
+    {
+        $close_log{$i,$A}=$log{$i,$A}/$norm;
+    }    
+}
+
+########### run psi-blast #######################
+printf "running Psi-blast .....\n";
+`$blastdir/blastpgp  -b 1000 -j 3 -h 1.0 -d $db -i protein.seq -C psitmp2.chk > blast2.out`;
+
+###############distant  profile  ##############
+undef %am,%nA,%w,%ev_dim;
+########### extract 'pre.prf' ###################
+open(blast,"blast2.out");
+while($line=<blast>)
+{
+    if($line=~/Results from round\s+(\d+)/)
+    {
+	$ROUND=$1;
+    }
+}
+seek(blast,0,0);
+$it=0;
+while($line=<blast>)
+{
+    if($line=~/round\s+$ROUND/)
+    {
+	while($line=<blast>)
+	{
+	    if($line=~/Expect =\s*(\S+)/)
+	    {
+		$ev=$1;
+		<blast>=~/Identities =\s*\S+\s+\((\S+)\%/;
+		<blast>;
+		$id=$1;
+		if($ev<1.0 && $id < 98)
+		{  #distant profile
+		    $it++;
+		    $ev_dim{$it}=$ev;
+		    while($line=<blast>)
+		    {
+			if($line=~/Query\:\s*(\d+)\s+(\S+)\s+(\S+)/)
+			{
+			    $i1=$1;
+			    $seq1=$2;
+			    <blast>;
+			    <blast>=~/Sbjct\:\s*(\S+)\s+(\S+)\s+(\S+)/;
+			    $seq2=$2;
+			    <blast>;
+			    ###
+			    $L=length $seq1;
+			    $m1=$i1-1;
+			    for($i=1;$i<=$L;$i++)
+			    {
+				$q1=substr($seq1,$i-1,1);
+				$q2=substr($seq2,$i-1,1);
+				$m1++ if($q1 ne '-');
+				if($q1 ne '-' && $q2 ne '-')
+				{
+				    #$log{$m1,$q2}++;  #without henikoff
+				    $am{$it,$m1}=$q2;  #with henikoff
+				}
+			    }
+			    ###
+			}
+			else
+			{
+			    goto pos1_;
+			}
+		    }
+		}
+	      pos1_:;
+	    }
+	}
+    }
+}
+close(blast);
+
+######## include query sequence ---------->
+$it++;
+for($i=1;$i<=$Lch;$i++)
+{
+    $am{$it,$i}=$seqQ{$i};
+}
+####### Henikoff weight $wei{i_seq} ----------->
+##### nA{A,i_pos}: number of times A appear at the position:
+undef %nA; 
+for($i=1;$i<=$Lch;$i++)
+{
+    for($j=1;$j<=$it;$j++)
+    {
+	$nA{$am{$j,$i},$i}+=transform($ev_dim{$j});
+    }
+}
+##### henikoff weight w(i)=sum of 1/rs:
+for($i=1;$i<=$it;$i++)
+{
+    for($j=1;$j<=$Lch;$j++)
+    {
+	####### r: number of different residues in j'th position:
+	$r=0;
+	foreach $A(@AA)
+	{
+	    $r++ if($nA{$A,$j}>0);
+	}
+	$A=$am{$i,$j};
+	$s2=$nA{$A,$j};
+	$w1=1.0/($r*$s2);
+	$w{$i}+=$w1;
+    }
+    $w_all+=$w{$i};
+}
+#### normalization of w(i):
+for($i=1;$i<=$it;$i++)
+{
+    $w{$i}/=$w_all;
+}
+#^^^^^ Henikoff weight finished ^^^^^^^^^^^^^^^^^
+
+########### weighted frequence #################
+undef %log;
+for($i=1;$i<=$it;$i++)
+{
+    for($j=1;$j<=$Lch;$j++)
+    {
+	$A=$am{$i,$j};
+	$log{$j,$A}+=$w{$i};
+    }
+}
+####record the distant profile 
+for($i=1;$i<=$Lch;$i++)
+{
+    $norm=0;
+    foreach $A(@AA)
+    {
+        $norm+=$log{$i,$A};
+    }
+    foreach $A(@AA)
+    {
+        $dist_log{$i,$A}=$log{$i,$A}/$norm;
+    }    
+}
+
+
+
+#^^^^^^^^^ Henikoff frequence finished ^^^^^^^^^^^^^
+open(freq,">protein.prf");
+printf freq "$Lch\n";
+for($i=1;$i<=$Lch;$i++)
+{
+    printf freq "%3d $seqQ{$i} %3d",$i,$i;    
+    foreach $A(@AA)
+    {
+        printf freq "%10.7f",$close_log{$i,$A}*0.5+$dist_log{$i,$A}*0.5;
+	#printf "$i $close_log{$i,$A} $dist_log{$i,$A}\n";
+    }
+    printf freq "\n";
+}
+close(freq);
+
+########### make .mtx ##############
+`echo psitmp.chk > psitmp.pn`;
+`echo protein.seq > psitmp.sn`;
+`$blastdir/makemat -P psitmp`;
+`mv psitmp.mtx protein.mtx`;
+
+########### run zalign #############
+open(in,">in.dd");
+printf in "seq.dat\n";
+#printf in "seq.spine.sa\n";
+printf in "seq.exp.sa\n";
+printf in "seq.svr.psi\n";
+printf in "seq.svr.phi\n";
+printf in "protein.seq\n";
+printf in "protein.mtx\n";
+printf in "protein.prf\n";
+printf in "\'$libdir/summary/AAA.seq\'\n";
+printf in "\'$libdir/summary/AAA.sec\'\n";
+printf in "\'$libdir/summary/AAA.sa3\'\n";
+printf in "\'$libdir/summary/AAA.psi\'\n";
+printf in "\'$libdir/summary/AAA.phi\'\n";
+printf in "\'$libdir/MTX/\'\n";
+printf in "\'$libdir/DEP/\'\n";
+printf in "1\n";
+close(in);
+
+printf "running zalign .....\n";
+printf `./zalign 7.01 0.55 0.66 1.6 -0.99 0.31 0.19 0 1.0 0.39 0.19`;
+printf "\n";
+################ calculate Z-score ######################
+open(out,"rst.dat");
+$i=0;
+while($line=<out>)
+{
+    if($line=~/(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/)
+    {
+	$i++;
+	$p{$i}=$2; #template name
+	$v1{$i}=$3; #raw score
+	$v2{$i}=$4; #reverse raw score
+	$sequence_id{$i}=$5; #seq id
+	$z1{$i}=$v1{$i}/$9; # full alignment
+	$z2{$i}=$v1{$i}/$10; # partial alignment
+	#$v3{$i}=($v1{$i}-$v2{$i});
+	#$v3_a+=$v3{$i}; 
+	#$v3_a2+=$v3{$i}**2;
+    }
+}
+close(out);
+$N_hit=$i;
+
+
+for($i=1;$i<=$N_hit;$i++)
+{
+    $z1_a+=$z1{$i}; 
+    $z1_a2+=$z1{$i}**2;
+    $z2_a+=$z2{$i}; 
+    $z2_a2+=$z2{$i}**2;
+}
+    
+    
+$z1_a/=$N_hit;
+$z1_a2/=$N_hit;
+$z1_sd=sqrt($z1_a2-$z1_a**2);
+for($i=1;$i<=$N_hit;$i++)
+{
+    $z1_zscore{$p{$i}}=($z1_a-$z1{$i})/$z1_sd;
+    $TT1{$p{$i}}=$i;
+}
+@z1_zscore_keys=sort{$z1_zscore{$b}<=>$z1_zscore{$a}} keys %z1_zscore;
+
+$z2_a/=$N_hit;
+$z2_a2/=$N_hit;
+$z2_sd=sqrt($z2_a2-$z2_a**2);
+for($i=1;$i<=$N_hit;$i++)
+{
+    $z2_zscore{$p{$i}}=($z2_a-$z2{$i})/$z2_sd;
+    $TT2{$p{$i}}=$i;
+}
+@z2_zscore_keys=sort{$z2_zscore{$b}<=>$z2_zscore{$a}} keys %z2_zscore;
+
+$index1=$z1_zscore_keys[0];
+$index2=$z2_zscore_keys[0];
+print "==>$index1 $index2 $z1_zscore{$index1} $z2_zscore{$index2}\n";
+print " $index1 $index2 $sequence_id{$TT1{$index1}} $sequence_id{$TT2{$index2}}\n"; 
+   
+   
+$score_flag=1; #always first scheme unless the following:
+
+if( ($sequence_id{$TT1{$index1}}+0.01) <= $sequence_id{$TT2{$index2}})
+{
+    $score_flag=2;
+}
+elsif(($sequence_id{$TT2{$index2}}+0.01) <= $sequence_id{$TT1{$index1}})
+{
+    $score_flag=1;
+}
+     
+printf "score_flag=$score_flag\n";
+
+
+###########################################################
+##### create template file 'init.dat' #####################
+###########################################################
+open(init,">init.dat");
+
+$i_t=0;
+for($i=1;$i<=$N_hit;$i++)
+{
+
+    if($score_flag == 0)
+    {
+	$template_name=$zscore_keys[$i-1];
+    }
+    elsif($score_flag == 1)
+    {
+	$template_name=$z1_zscore_keys[$i-1];
+    }
+    else
+    {
+	$template_name=$z2_zscore_keys[$i-1];
+    }
+    $template_name=~s/\./\\\./mg;  #useful for match
+    if($score_flag == 0)
+    {
+	$zscore_value=$zscore{$zscore_keys[$i-1]};
+    }
+    elsif($score_flag == 1)
+    {
+	$zscore_value=$z1_zscore{$z1_zscore_keys[$i-1]};
+    }
+    else
+    {
+	$zscore_value=$z2_zscore{$z2_zscore_keys[$i-1]};
+    }
+    ######## read the alignment -------->
+    open(align,"align.dat");
+    while($line=<align>)
+    {
+	if($line=~/structureX:$template_name\s*\:/)
+	{
+	    $sequenceT="";         #template sequence
+	    while($line1=<align>)
+	    {
+		goto pos5 if($line1=~/\>P1/);
+		$line1=~/(\S+)/;
+		$sequenceT=$sequenceT.$1;
+	    }
+	  pos5:;
+	    <align>;
+	    $sequenceQ="";         #query sequence
+	    while($line1=<align>)
+	    {
+		if($line1=~/(\S+)/)
+		{
+		    $sequenceQ=$sequenceQ.$1;
+		}
+		else
+		{
+		    goto pos1p;
+		}
+	    }
+	}
+    }
+  pos1p:;
+    close(align);
+    $sequenceT=~s/\*//mg;
+    $sequenceQ=~s/\*//mg;
+    ####### get sequence identity of the alignment ------>
+    $L=length $sequenceQ;
+    $L_eq=0;  #number of identical residues
+    $L_ali=0; #number of aligned residues
+    for($j=1;$j<=$L;$j++)
+    {
+	$sQ=substr($sequenceQ,$j-1,1);
+	$sT=substr($sequenceT,$j-1,1);
+	if($sQ ne "-" && $sT ne "-")
+	{
+	    $L_ali++;
+	    if($sQ eq $sT)
+	    {
+		$L_eq++;
+	    }
+	}
+    }
+    $seq_id=$L_eq/($L_ali+.0000001); #seq idendity betwen target & template
+    
+    ####### read template conformation #################
+    `cp $libdir/PDB/$template_name\.pdb ./temp.pdb`;
+    $idcut0=1;
+    if($idcut0<0.999)
+    {
+	$align_rst=`./align protein.seq temp.pdb 2`;
+	if($align_rst=~/Identical length\:\s+(\d+)/)
+	{
+	    $id=$1/$Lch;
+	    goto pos2p if($id>=$idcut0);
+	}
+    }
+    $i_t++;
+
+    open(temppdb,"temp.pdb");
+    $n=0;
+    while($line=<temppdb>)
+    {
+	$ATOM=substr($line,0,4);
+	$atom=substr($line,12,4);
+	$atom=~s/\s//mg;
+	if( $ATOM eq "ATOM" && $atom eq "CA")
+	{
+	    $n++;
+	    $seqT{$n}=$ts{substr($line,17,3)}; #only for check
+	      $numT{$n}=substr($line,22,4);
+	    $x{$n}=substr($line,30,8);
+	    $y{$n}=substr($line,38,8);
+	    $z{$n}=substr($line,46,8);
+	}
+    }
+    close(temppdb);
+
+    ########## write alignment to 'init.dat' ------------------>
+    $a=substr($template_name,0,4);
+    if(length $template_name == 4)
+    {
+	$b="_";
+    }
+    else
+    {
+	$b=substr($template_name,4,1);
+	$b=~tr/a-z/A-Z/;
+    }
+    $temp_name="$a$b";
+    $template_name=~s/\\\./\./mg;
+    printf init "%5d %8.3f %5d   %6s %8.3f %8.3f(=$L_ali/$Lch) (L_ali,Z,i,pdb,id,cov)\n",
+    $L_ali,$zscore_value,$i_t,$template_name,$seq_id,$L_ali/$Lch;
+    $iQ=0;
+    $iT=0;
+    for($j=1;$j<=$L;$j++)
+    {
+	$sQ=substr($sequenceQ,$j-1,1);
+	$sT=substr($sequenceT,$j-1,1);
+	if($sQ eq "-")
+	{
+	    $iT++;
+	}
+	if($sT eq "-")
+	{
+	    $iQ++;
+	}
+	if($sQ ne "-" && $sT ne "-")
+	{
+	    $iQ++;
+	    $iT++;
+	    printf init "ATOM  %5s  CA  %3s  %4d    %8.3f%8.3f%8.3f%5s %3s\n",
+	    $iQ+$i_t*1000,$ts{$sQ},$iQ,$x{$iT},$y{$iT},$z{$iT},$numT{$iT},$ts{$sT};
+	    if($sQ ne $seqQ{$iQ} || $sT ne $seqT{$iT})
+	    {
+		print "$temp_name : $iQ - $sQ = $seqQ{$iQ} <> $iT - $sT = $seqT{$iT}\n";
+	    }
+	}
+    }
+    printf init "TER\n";
+    goto pos3p if($i_t >= 20);
+  pos2p:;
+}
+ pos3p:;
+$time=`date`;
+close(init);
+
+open(init1,">init1.dat");
+printf init1 "%5d %5d (N_temp, Lch)\n",$i_t,$Lch;
+close(init1);
+`cat init.dat >> init1.dat`;
+
+`cp init1.dat      $data_dir/init.MUSTER`;
+
+################# endding procedure ######################
+$time=`date`;
+printf "ending time: $time";
+`sync`;
+`sync`;
+sleep(1);
+`rm -fr $work_dir`;
+exit();
+
+
+sub transform
+{
+    my($x)=@_;
+    if($x<1e-10)
+    {
+	$y=1.0;
+    }
+    elsif($x<1e-9)
+    {
+	$y=0.95; #0.95;
+    }
+    elsif($x<1e-8)
+    {
+	$y=0.90; #0.92;
+    }
+    elsif($x<1e-7)
+    {
+	$y=0.85; #0.90;
+    }
+    elsif($x<1e-6)
+    {
+	$y=0.8; #0.87;
+    }
+    elsif($x<1e-5)
+    {
+	$y=0.75 #0.85;
+    }
+    elsif($x<1e-4)
+    {
+	$y=0.70;
+    }
+    elsif($x<1e-3)
+    {
+	$y=0.65;
+    }
+    elsif($x<1e-2)
+    {
+	$y=0.60;
+    }
+    elsif($x<1e-1)
+    {
+	$y=0.55;
+    }
+    elsif($x<1)
+    {
+	$y=0.50;
+    }
+    return ($y);
+}
+
+

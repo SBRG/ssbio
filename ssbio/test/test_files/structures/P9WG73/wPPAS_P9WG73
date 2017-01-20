@@ -1,0 +1,489 @@
+#!/usr/bin/perl
+use Math::Trig;
+
+########### setup  the environment and Working DIRectory ###
+$ENV{'PATH'}="/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/pgi/linux86/bin";
+$ENV{'LD_LIBRARY_PATH'}="/usr/local/lib:/usr/lib:/lib";
+
+############### NNNd ############################
+# 1, Blast setting is inside NNNdmod
+#    use '/library/yzhang/nr/nr'
+# 2, To change template, one should modify
+#    /library/yzhang/MTX and summary
+################################################
+
+##### report node -------->
+`hostname`=~/(\S+)/;
+$node=$1;
+printf "hostname: $node\n";
+$time=`date`;
+printf "starting time: $time";
+$pwd=`pwd`;
+printf "pwd: $pwd";
+#^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+%ts=(
+     'GLY'=>'G',
+     'ALA'=>'A',
+     'VAL'=>'V',
+     'LEU'=>'L',
+     'ILE'=>'I',
+     'SER'=>'S',
+     'THR'=>'T',
+     'CYS'=>'C',
+     'MET'=>'M',
+     'PRO'=>'P',
+     'ASP'=>'D',
+     'ASN'=>'N',
+     'GLU'=>'E',
+     'GLN'=>'Q',
+     'LYS'=>'K',
+     'ARG'=>'R',
+     'HIS'=>'H',
+     'PHE'=>'F',
+     'TYR'=>'Y',
+     'TRP'=>'W',
+
+     'ASX'=>'B',
+     'GLX'=>'Z',
+     'UNK'=>'X',
+
+     'G'=>'GLY',
+     'A'=>'ALA',
+     'V'=>'VAL',
+     'L'=>'LEU',
+     'I'=>'ILE',
+     'S'=>'SER',
+     'T'=>'THR',
+     'C'=>'CYS',
+     'M'=>'MET',
+     'P'=>'PRO',
+     'D'=>'ASP',
+     'N'=>'ASN',
+     'E'=>'GLU',
+     'Q'=>'GLN',
+     'K'=>'LYS',
+     'R'=>'ARG',
+     'H'=>'HIS',
+     'F'=>'PHE',
+     'Y'=>'TYR',
+     'W'=>'TRP',
+
+     'a'=>'CYS',
+     'b'=>'CYS',
+     'c'=>'CYS',
+     'd'=>'CYS',
+     'e'=>'CYS',
+     'f'=>'CYS',
+     'g'=>'CYS',
+     'h'=>'CYS',
+     'i'=>'CYS',
+     'j'=>'CYS',
+     'k'=>'CYS',
+     'l'=>'CYS',
+     'm'=>'CYS',
+     'n'=>'CYS',
+     'o'=>'CYS',
+     'p'=>'CYS',
+     'q'=>'CYS',
+     'r'=>'CYS',
+     's'=>'CYS',
+     't'=>'CYS',
+     'u'=>'CYS',
+     'v'=>'CYS',
+     'w'=>'CYS',
+     'x'=>'CYS',
+     'y'=>'CYS',
+     'z'=>'CYS',
+
+     'B'=>'ASX',
+     'Z'=>'GLX',
+     'X'=>'CYS',
+    );
+
+@AA=qw(
+       C
+       M
+       F
+       I
+       L
+       V
+       W
+       Y
+       A
+       G
+       T
+       S
+       Q
+       N
+       E
+       D
+       H
+       R
+       K
+       P
+       );
+
+################# directories #############################
+$data_dir="/global/project/projectdirs/m2009/nathan/GEM-PRO/iNJ661/P9WG73";  #for seq.txt and init.dat
+$work_dir="/tmp/nmih/wPPAS_P9WG73";
+$pkgdir="/global/project/projectdirs/m2009/software/I-TASSER4.4";
+$libdir="/global/project/projectdirs/m2009/software/ITLIB";
+$blastdir="$pkgdir/blast/bin";
+$db="$libdir/nr/nr";
+$zalignbin="$pkgdir/bin/zalign";
+$java_exe="/usr/lib64/jvm/java";
+
+################ working directory ########################
+`mkdir -p $work_dir`;
+chdir "$work_dir";
+`rm -f $work_dir/*`;
+`cp $pkgdir/bin/align ./align`;
+`cp $pkgdir/bin/zalign/zal2 ./zalign`;
+
+################ make fasta sequence file #################
+@seqtxts=`cat $data_dir/seq.txt`;
+$sequence="";
+foreach $seqtxt(@seqtxts){
+    goto pos6 if($seqtxt=~/\>/);
+    $seqtxt=~s/\s//mg;
+    $seqtxt=~s/\n//mg;
+    $sequence=$sequence.$seqtxt;
+  pos6:;
+}
+$Lch=length $sequence;
+open(seq,">protein.seq");
+printf seq ">protein\n";
+for($i=1;$i<=$Lch;$i++){
+    $a=substr($sequence,$i-1,1);
+    printf seq "$a";
+    $seqQ{$i}=$a;   #only for check
+    $log{$i,$seqQ{$i}}++;
+    if($i==int($i/60)*60){
+	printf seq "\n";
+    }
+}
+printf seq "\n";
+close(seq);
+
+########### run psi-blast #######################
+printf "running Psi-blast .....\n";
+if(-s "$data_dir/blast.out" && -s "$data_dir/psitmp.chk")
+{
+    `cp $data_dir/blast.out .`;
+    `cp $data_dir/psitmp.chk .`;
+}
+else
+{
+    printf "running Psi-blast .....\n";
+    `$blastdir/blastpgp  -b 1000 -j 3 -h 0.001 -d $db -i protein.seq -C psitmp.chk > blast.out`;
+}
+#	`$blastdir/blastpgp  -b 1000 -j 3 -h 0.001 -d $db -i protein.seq -C psitmp.chk > blast.out`;
+
+########### extract 'pre.prf' ###################
+#### record multiple sequence alignment $am{i_seq,i_pos} -------->
+open(blast,"blast.out");
+while($line=<blast>){
+    if($line=~/Results from round\s+(\d+)/){
+        $ROUND=$1;
+    }
+}
+seek(blast,0,0);
+$it=0;
+while($line=<blast>){
+    if($line=~/round\s+$ROUND/){
+        while($line=<blast>){
+            if($line=~/Expect =\s*(\S+)/){
+                $ev=$1;
+                <blast>=~/Identities =\s*\S+\s+\((\S+)\%/;
+                <blast>;
+                $id=$1;
+                if($ev<0.001 && $id < 98){
+		    $it++; #number of aligned sequences
+                    while($line=<blast>){
+                        if($line=~/Query\:\s*(\d+)\s+(\S+)\s+(\S+)/){
+                            $i1=$1;
+                            $seq1=$2;
+                            <blast>;
+                            <blast>=~/Sbjct\:\s*(\S+)\s+(\S+)\s+(\S+)/;
+                            $seq2=$2;
+                            <blast>;
+                            ###
+                            $L=length $seq1;
+                            $m1=$i1-1;
+                            for($i=1;$i<=$L;$i++){
+                                $q1=substr($seq1,$i-1,1);
+                                $q2=substr($seq2,$i-1,1);
+                                $m1++ if($q1 ne '-');
+                                if($q1 ne '-' && $q2 ne '-'){
+				    $am{$it,$m1}=$q2;
+                                    #$log{$m1,$q2}++;
+                                }
+                            }
+                            ###
+                        }else{
+                            goto pos1;
+                        }
+                    }
+                }
+              pos1:;
+            }
+        }
+    }
+}
+close(blast);
+######## include query sequence ---------->
+$it++;
+for($i=1;$i<=$Lch;$i++){
+    $am{$it,$i}=$seqQ{$i};
+}
+####### Henikoff weight $wei{i_seq} ----------->
+##### nA{A,i_pos}: number of times A appear at the position:
+undef %nA; 
+for($i=1;$i<=$Lch;$i++){
+    for($j=1;$j<=$it;$j++){
+	$nA{$am{$j,$i},$i}++;
+    }
+}
+##### henikoff weight w(i)=sum of 1/rs:
+for($i=1;$i<=$it;$i++){
+    for($j=1;$j<=$Lch;$j++){
+	####### r: number of different residues in j'th position:
+	$r=0;
+	foreach $A(@AA){
+	    $r++ if($nA{$A,$j}>0);
+	}
+	$A=$am{$i,$j};
+	$s2=$nA{$A,$j};
+	$w1=1.0/($r*$s2);
+	$w{$i}+=$w1;
+    }
+    $w_all+=$w{$i};
+}
+#### normalization of w(i):
+for($i=1;$i<=$it;$i++){
+    $w{$i}/=$w_all;
+}
+#^^^^^ Henikoff weight finished ^^^^^^^^^^^^^^^^^
+
+########### weighted frequence #################
+undef %log;
+for($i=1;$i<=$it;$i++){
+    for($j=1;$j<=$Lch;$j++){
+	$A=$am{$i,$j};
+	$log{$j,$A}+=$w{$i};
+    }
+}
+#^^^^^^^^^ Henikoff frequence finished ^^^^^^^^^^^^^
+
+open(freq,">protein.prf");
+printf freq "$Lch\n";
+for($i=1;$i<=$Lch;$i++){
+    printf freq "%3d $seqQ{$i} %3d",$i,$i;
+    $norm=0;
+    foreach $A(@AA){
+        $norm+=$log{$i,$A};
+    }
+    foreach $A(@AA){
+        printf freq "%10.7f",$log{$i,$A}/$norm;
+    }
+    printf freq "\n";
+}
+close(freq);
+
+########### make .mtx ##############
+`echo psitmp.chk > psitmp.pn`;
+`echo protein.seq > psitmp.sn`;
+`$blastdir/makemat -P psitmp`;
+`mv psitmp.mtx protein.mtx`;
+
+########### run zalign #############
+`cp protein.seq seq.txt`;
+`cp $pkgdir/bin/v4.pl .`;
+`perl v4.pl $pkgdir $libdir`;
+
+open(in,">in.dd");
+printf in "seq.dat\n";
+printf in "protein.seq\n";
+printf in "protein.prf\n";
+printf in "\'$libdir/summary/AAA.seq\'\n";
+printf in "\'$libdir/summary/AAA.sec\'\n";
+printf in "\'$libdir/MTX/\'\n";
+printf in "profile.txt\n";
+printf in "$libdir/dotProfiles\n";
+close(in);
+`cp $data_dir/seq.dat .`;
+
+`cp $pkgdir/bin/zalign/fNNNd.jar  .`;
+
+if(!-e "$java_exe/bin/java"){
+        print "JAVA_HOME setting is not correct\n";
+        exit(1);
+}else{
+	`$java_exe/bin/java  -Xms2512m -Xmx2512m -jar fNNNd.jar > rst.dat`;
+}
+
+################ calculate Z-score ######################
+open(out,"rst.dat");
+$i=0;
+while($line=<out>){
+    if($line=~/(\d+)\s+(\S+)\s+(\S+)/){
+	$i++;
+	$p{$i}=$2;
+	$v3{$i}=$3;
+	$v3_a+=$v3{$i};
+	$v3_a2+=$v3{$i}**2;
+    }
+}
+close(out);
+$N_hit=$i;
+$v3_a/=$N_hit;
+$v3_a2/=$N_hit;
+$sd=sqrt($v3_a2-$v3_a**2);
+for($i=1;$i<=$N_hit;$i++){
+    $zscore{$p{$i}}=($v3_a-$v3{$i})/$sd;
+}
+@zscore_keys=sort{$zscore{$b}<=>$zscore{$a}} keys %zscore;
+
+###########################################################
+##### create template file 'init.dat' #####################
+###########################################################
+open(init,">init.dat");
+$i_t=0;
+open(TOPA,">NNNd_top_alignments.txt")||die "can not open NNNd_top_alignments.txt for writing";
+for($i=1;$i<=$N_hit;$i++){
+    $template_name=$zscore_keys[$i-1];
+    $template_name=~s/\./\\\./mg;  #useful for match
+    $zscore_value=$zscore{$zscore_keys[$i-1]};
+    ######## read the alignment -------->
+    open(align,"align.dat");
+    while($line=<align>){
+	if($line=~/structureX:$template_name\s*\:/){
+	    $sequenceT="";         #template sequence
+	    while($line1=<align>){
+		goto pos5 if($line1=~/\>P1/);
+		$line1=~/(\S+)/;
+		$sequenceT=$sequenceT.$1;
+	    }
+	  pos5:;
+	    <align>;
+	    $sequenceQ="";         #query sequence
+	    while($line1=<align>){
+		if($line1=~/(\S+)/){
+		    $sequenceQ=$sequenceQ.$1;
+		}else{
+		    goto pos1;
+		}
+	    }
+	}
+    }
+  pos1:;
+    close(align);
+    $sequenceT=~s/\*//mg;
+    $sequenceQ=~s/\*//mg;
+    ####### get sequence identity of the alignment ------>
+    $L=length $sequenceQ;
+    $L_eq=0;  #number of identical residues
+    $L_ali=0; #number of aligned residues
+    for($j=1;$j<=$L;$j++){
+	$sQ=substr($sequenceQ,$j-1,1);
+	$sT=substr($sequenceT,$j-1,1);
+	if($sQ ne "-" && $sT ne "-"){
+	    $L_ali++;
+	    if($sQ eq $sT){
+		$L_eq++;
+	    }
+	}
+    }
+    $seq_id=$L_eq/($L_ali+.0000001); #seq idendity betwen target & template
+    
+    ####### read template conformation #################
+    `cp $libdir/PDB/$template_name\.pdb ./temp.pdb`;
+    $idcut0=1;
+    if($idcut0<0.999){
+	$align_rst=`./align protein.seq temp.pdb 2`;
+	if($align_rst=~/Identical length\:\s+(\d+)/){
+	    $id=$1/$Lch;
+	    goto pos2 if($id>=$idcut0);
+	    print TOPA "QUERY:$sequenceQ\n";
+	    print TOPA "TEMPL:$sequenceT\t$zscore{$zscore_keys[$i-1]}\n";
+
+	}
+    }
+    $i_t++;
+
+    open(temppdb,"temp.pdb");
+    $n=0;
+    while($line=<temppdb>){
+	$ATOM=substr($line,0,4);
+	$atom=substr($line,12,4);
+	$atom=~s/\s//mg;
+	if( $ATOM eq "ATOM" && $atom eq "CA"){
+	    $n++;
+	    $seqT{$n}=$ts{substr($line,17,3)}; #only for check
+	      $numT{$n}=substr($line,22,4);
+	    $x{$n}=substr($line,30,8);
+	    $y{$n}=substr($line,38,8);
+	    $z{$n}=substr($line,46,8);
+	}
+    }
+    close(temppdb);
+
+    ########## write alignment to 'init.dat' ------------------>
+    $a=substr($template_name,0,4);
+    if(length $template_name == 4){
+	$b="_";
+    }else{
+	$b=substr($template_name,4,1);
+	$b=~tr/a-z/A-Z/;
+    }
+    $temp_name="$a$b";
+    $template_name=~s/\\\./\./mg;
+    printf init "%5d %8.3f %5d   %6s %8.3f %8.3f(=$L_ali/$Lch) (L_ali,Z,i,pdb,id,cov)\n",
+    $L_ali,$zscore_value,$i_t,$template_name,$seq_id,$L_ali/$Lch;
+    $iQ=0;
+    $iT=0;
+    for($j=1;$j<=$L;$j++){
+	$sQ=substr($sequenceQ,$j-1,1);
+	$sT=substr($sequenceT,$j-1,1);
+	if($sQ eq "-"){
+	    $iT++;
+	}
+	if($sT eq "-"){
+	    $iQ++;
+	}
+	if($sQ ne "-" && $sT ne "-"){
+	    $iQ++;
+	    $iT++;
+	    printf init "ATOM  %5s  CA  %3s  %4d    %8.3f%8.3f%8.3f%5s %3s\n",
+	    $iQ+$i_t*1000,$ts{$sQ},$iQ,$x{$iT},$y{$iT},$z{$iT},$numT{$iT},$ts{$sT};
+	    if($sQ ne $seqQ{$iQ} || $sT ne $seqT{$iT}){
+		print "$temp_name: $iQ - $sQ = $seqQ{$iQ} <> $iT - $sT = $seqT{$iT}\n";
+	    }
+	}
+    }
+    printf init "TER\n";
+    goto pos3 if($i_t >= 20);
+  pos2:;
+}
+
+ pos3:;
+$time=`date`;
+close(init);
+close TOPA;  ### CLOSE recording top alignments file
+open(init1,">init1.dat");
+printf init1 "%5d %5d (N_temp, Lch)\n",$i_t,$Lch;
+close(init1);
+`cat init.dat >> init1.dat`;
+`cp init1.dat            $data_dir/init.wPPAS`;
+
+################# endding procedure ######################
+$time=`date`;
+printf "ending time: $time";
+`sync`;
+`sync`;
+sleep(1);
+`rm -fr $work_dir`;
+exit();
+
+

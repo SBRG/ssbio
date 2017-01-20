@@ -1,54 +1,135 @@
-from ssbio.structure.pdbioext import PDBIOExt
-from Bio import PDB
+from Bio.SeqRecord import SeqRecord
+from Bio.Seq import Seq
+from Bio.Alphabet import IUPAC
 from Bio.PDB import Polypeptide
-import ssbio.utils
-import numpy as np
-# import cachetools
-
-from Bio.PDB import Polypeptide
-from ssbio.structure.pdbioext import PDBIOExt
-from Bio import PDB
-# from Bio import Struct
-from Bio.PDB.HSExposure import HSExposureCA, HSExposureCB, ExposureCN
-
-# TODO: network representation of structure ("neighborhood" stuff)?
+from Bio.PDB.HSExposure import ExposureCN, HSExposureCA, HSExposureCB
+from ssbio.structure.utils.pdbioext import PDBIOExt
+import ssbio.sequence.utils
+from copy import deepcopy
+from collections import defaultdict
+import logging
+log = logging.getLogger(__name__)
 
 
-# TODO: half sphere exposure
-def hse_output(pdb_file, file_type):
+def search_ss_bonds(model, threshold=3.0):
+    """ Searches S-S bonds based on distances
+        between atoms in the structure (first model only).
+        Average distance is 2.05A. Threshold is 3A default.
+        Returns iterator with tuples of residues.
+
+        # ADAPTED FROM JOAO RODRIGUES BIOPYTHON GSOC PROJECT
     """
-    The solvent exposure of an amino acid residue is important for analyzing,
-    understanding and predicting aspects of protein structure and function [73].
-    A residue's solvent exposure can be classified as four categories: exposed, partly exposed,
-    buried and deeply buried residues. Hamelryck  et al. [73] established a new 2D measure that provides a
-    different view of solvent exposure, i.e. half-sphere exposure (HSE). By conceptually dividing the sphere
-    of a residue into two halves- HSE-up and HSE-down, HSE provides a more detailed description of an amino
-    acid residue's spatial neighborhood. HSE is calculated by the hsexpo module implemented in the BioPython
-    package [74] from a PDB file.
 
-    http://onlinelibrary.wiley.com/doi/10.1002/prot.20379/abstract
+    # Taken from http://docs.python.org/library/itertools.html
+    # Python 2.4 does not include itertools.combinations
+
+    def combinations(iterable, r):
+        # combinations('ABCD', 2) --> AB AC AD BC BD CD
+        # combinations(range(4), 3) --> 012 013 023 123
+        pool = tuple(iterable)
+        n = len(pool)
+        if r > n:
+            return
+        indices = list(range(r))
+        yield tuple(pool[i] for i in indices)
+        while True:
+            for i in reversed(range(r)):
+                if indices[i] != i + n - r:
+                    break
+            else:
+                return
+            indices[i] += 1
+            for j in range(i + 1, r):
+                indices[j] = indices[j - 1] + 1
+            yield tuple(pool[i] for i in indices)
+
+    cysteines = [r for r in model.get_residues() if r.get_resname() == 'CYS']
+
+    pairs = combinations(cysteines, 2)  # Iterator with pairs
+
+    bridges = []
+    for cys_pair in pairs:
+        if cys_pair[0]['SG'] - cys_pair[1]['SG'] < threshold:
+            bridges.append(cys_pair)
+
+    infodict = {}
+    if bridges:
+        infodict = defaultdict(list)
+
+        for disulfide_bridge in bridges:
+            residue1 = disulfide_bridge[0]
+            residue2 = disulfide_bridge[1]
+            chain = residue1.get_parent().id
+            infodict[chain].append((residue1.get_full_id()[3], residue2.get_full_id()[3]))
+
+    return infodict
+
+
+def get_structure_seqrecords(model):
+    """Get a dictionary of a PDB file's sequences.
+
+    Special cases include:
+        - Insertion codes. In the case of residue numbers like "15A", "15B", both residues are written out. Example: 9LPR
+        - HETATMs. Currently written as an "X", or unknown amino acid.
 
     Args:
-        pdb_file:
+        model: Biopython Model object of a Structure
 
     Returns:
+        list: List of SeqRecords
 
     """
-    # Get the first model
-    my_structure = PDBIOExt(pdb_file, file_type=file_type)
-    model = my_structure.first_model
 
-    # Calculate HSEalpha
-    exp_ca = HSExposureCA(model)
-    # Calculate HSEbeta
-    exp_cb = HSExposureCB(model)
-    # Calculate classical coordination number
-    exp_fs = ExposureCN(model)
+    structure_seq_records = []
 
-    return
+    # Loop over each chain of the PDB
+    for chain in model:
+        tracker = 0
+        chain_seq = ''
+        chain_resnums = []
+
+        # Loop over the residues
+        for res in chain.get_residues():
+            # NOTE: you can get the residue number too
+            res_id = res.id
+            res_num = res_id[1]
+            res_icode = res_id[2]
+
+            # Double check if the residue name is a standard residue
+            # If it is not a standard residue (ie. selenomethionine),
+            # it will be filled in with an X on the next iteration)
+            if Polypeptide.is_aa(res, standard=True):
+                end_tracker = res_num
+                res_aa_one = Polypeptide.three_to_one(res.get_resname())
+
+                # Tracker to fill in X's
+                if end_tracker != (tracker + 1):
+                    if res_icode != ' ':
+                        chain_seq += res_aa_one
+                        chain_resnums.append(res_id)
+                        tracker = end_tracker + 1
+                        continue
+                    else:
+                        multiplier = (end_tracker - tracker - 1)
+                        chain_seq += 'X' * multiplier
+                        # Residue numbers for unresolved or nonstandard residues are Infinite
+                        chain_resnums.extend([(' ', float("Inf"), ' ')] * multiplier)
+
+                chain_seq += res_aa_one
+                chain_resnums.append(res_id)
+                tracker = end_tracker
+
+            else:
+                continue
+
+        chain_seq_record = SeqRecord(Seq(chain_seq, IUPAC.protein), id=chain.get_id())
+        chain_seq_record.letter_annotations['structure_resnums'] = chain_resnums
+        structure_seq_records.append(chain_seq_record)
+
+    return structure_seq_records
 
 
-def get_pdb_seqs(pdb_file, file_type):
+def get_structure_seqs(pdb_file, file_type):
     """Get a dictionary of a PDB file's sequences.
 
     Special cases include:
@@ -63,6 +144,10 @@ def get_pdb_seqs(pdb_file, file_type):
         {chain_id: sequence}
 
     """
+
+    # TODO: Please check out capitalization of chain IDs in mmcif files. example: 5afi - chain "l" is present but
+    # it seems like biopython capitalizes it to chain L
+
     # Get the first model
     my_structure = PDBIOExt(pdb_file, file_type=file_type)
     model = my_structure.first_model
@@ -108,28 +193,75 @@ def get_pdb_seqs(pdb_file, file_type):
     return structure_seqs
 
 
-# @cachetools.func.ttl_cache(maxsize=1000)
-def get_pdb_res_starts(pdb_file, file_type):
-    """Return a dictionary of the first residue number in each chain of a PDB file
+def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X'):
+    """Correct a sequence to match inserted X's in a structure sequence
+
+    This is useful for mapping a sequence obtained from structural tools like MSMS or DSSP
+        to the sequence obtained by the get_structure_seqs method.
+
+    Examples:
+        >>> structure_seq = 'XXXABCDEF'
+        >>> prop_list = [4, 5, 6, 7, 8, 9]
+        >>> match_structure_sequence(structure_seq, prop_list)
+        ['X', 'X', 'X', 4, 5, 6, 7, 8, 9]
+
+        >>> match_structure_sequence(structure_seq, prop_list, fill_with=float('Inf'))
+        [inf, inf, inf, 4, 5, 6, 7, 8, 9]
+
+        >>> structure_seq = '---ABCDEF---'
+        >>> prop_list = ('H','H','H','C','C','C')
+        >>> match_structure_sequence(structure_seq, prop_list, match='-', fill_with='-')
+        ('-', '-', '-', 'H', 'H', 'H', 'C', 'C', 'C', '-', '-', '-')
+
+        >>> structure_seq = 'ABCDEF---'
+        >>> prop_list = 'HHHCCC'
+        >>> match_structure_sequence(structure_seq, prop_list, match='-', fill_with='-')
+        'HHHCCC---'
+
+        >>> structure_seq = 'AXBXCXDXEXF'
+        >>> prop_list = ['H', 'H', 'H', 'C', 'C', 'C']
+        >>> match_structure_sequence(structure_seq, prop_list, match='X', fill_with='X')
+        ['H', 'X', 'H', 'X', 'H', 'X', 'C', 'X', 'C', 'X', 'C']
 
     Args:
-        pdb_file: path to PDB file
+        orig_seq (str, Seq, SeqRecord): Sequence to match to
+        new_seq (str, tuple, list): Sequence to fill in
+        match (str): What to match
+        fill_with: What to fill in when matches are found
 
     Returns:
-        start_residues: dictionary of {chainID: firstResNum, ...}
+        str, tuple, list: new_seq which will match the length of orig_seq
 
     """
-    my_structure = PDBIOExt(pdb_file, file_type=file_type)
-    model = my_structure.first_model
+    if len(orig_seq) == len(new_seq):
+        log.debug('Lengths already equal, nothing to fill in')
+        return new_seq
 
-    start_residues = {}
-    for chain in model:
-        residues = chain.get_residues()
-        start_residues[chain.get_id()] = next(residues).get_id()[1]
+    if len(orig_seq) < len(new_seq):
+        raise ValueError('Original sequence has a length less than the sequence provided to match to')
 
-    return start_residues
+    if not isinstance(new_seq, str) and not isinstance(new_seq, tuple) and not isinstance(new_seq, list):
+        raise ValueError('Invalid sequence provided, must be string, tuple, or list')
 
-def site_centroid(residues, pdb_file):
+    orig_seq = ssbio.sequence.utils.cast_to_str(orig_seq)
+    new_thing = deepcopy(new_seq)
+    if isinstance(new_seq, tuple):
+        new_thing = list(new_thing)
+
+    for i, s in enumerate(orig_seq):
+        if s == match:
+            if isinstance(new_thing, str):
+                new_thing = new_thing[:i] + fill_with + new_thing[i:]
+            if isinstance(new_thing, list):
+                new_thing.insert(i, fill_with)
+
+    if isinstance(new_seq, tuple):
+        new_thing = tuple(new_thing)
+
+    return new_thing
+
+
+def site_centroid(residues, model):
     """Get the XYZ coordinate of the center of a list of residues.
 
     Args:
@@ -142,7 +274,8 @@ def site_centroid(residues, pdb_file):
     """
     pass
 
-def distance_to_site(residue_of_interest, residues, pdb_file):
+
+def distance_to_site(residue_of_interest, residues, model):
     """Calculate the distance between an amino acid and a group of amino acids.
 
     Args:
@@ -153,11 +286,42 @@ def distance_to_site(residue_of_interest, residues, pdb_file):
         float: Distance (in Angstroms) to the group of residues
 
     """
-    centroid = site_centroid(residues, pdb_file)
+    centroid = site_centroid(residues, residue_of_interest)
     pass
 
 
-    #
+# TODO: half sphere exposure
+def hse_output(pdb_file, file_type):
+    """
+    The solvent exposure of an amino acid residue is important for analyzing,
+    understanding and predicting aspects of protein structure and function [73].
+    A residue's solvent exposure can be classified as four categories: exposed, partly exposed,
+    buried and deeply buried residues. Hamelryck  et al. [73] established a new 2D measure that provides a
+    different view of solvent exposure, i.e. half-sphere exposure (HSE). By conceptually dividing the sphere
+    of a residue into two halves- HSE-up and HSE-down, HSE provides a more detailed description of an amino
+    acid residue's spatial neighborhood. HSE is calculated by the hsexpo module implemented in the BioPython
+    package [74] from a PDB file.
+
+    http://onlinelibrary.wiley.com/doi/10.1002/prot.20379/abstract
+
+    Args:
+        pdb_file:
+
+    Returns:
+
+    """
+    # Get the first model
+    my_structure = PDBIOExt(pdb_file, file_type=file_type)
+    model = my_structure.first_model
+
+    # Calculate HSEalpha
+    exp_ca = HSExposureCA(model)
+    # Calculate HSEbeta
+    exp_cb = HSExposureCB(model)
+    # Calculate classical coordination number
+    exp_fs = ExposureCN(model)
+
+    return
 # def magni(a, b, c):
 #     """Calculate the magnitude of distance vector
 #     """
@@ -207,17 +371,3 @@ def distance_to_site(residue_of_interest, residues, pdb_file):
 #     except UnboundLocalError:
 #         log.error("Unknown interaction")
 #         return None
-
-# def count_ss_bond(filename, threshold_new=5):
-#     """
-#     Counts the number of sulfide bridges (S-S bonds formed by
-#     cysteines in close proximity)
-#     Input: PDB or mmCIF file (will be parsed into a Struct object)
-#     Output: Int of number of SS bonds
-#     """
-#     s = Struct.read(filename)
-#     my_structure = s.as_protein()
-#     ss = my_structure.search_ss_bonds(threshold=threshold_new)
-#
-#     return len(list(ss))
-#     return len(list(ss))

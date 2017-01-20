@@ -1,77 +1,78 @@
-from Bio import PDB
+import ssbio.utils
 import pandas as pd
-# import prody as pr
-
-from Bio.PDB.DSSP import *
+from Bio import PDB
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
-from ssbio.structure.pdbioext import PDBIOExt
-# import cachetools
+from Bio.PDB.DSSP import residue_max_acc
+from ssbio.structure.utils.pdbioext import PDBIOExt
+import logging
+log = logging.getLogger(__name__)
 
-AAdict = {'CYS': 'polar',
-          'ILE': 'nonpolar',
-          'GLY': 'nonpolar',
-          'SER': 'polar',
-          'GLN': 'polar',
-          'LYS': 'positive',
-          'ASN': 'polar',
-          'PRO': 'nonpolar',
-          'ASP': 'negative',
-          'THR': 'polar',
-          'PHE': 'nonpolar',
-          'ALA': 'nonpolar',
-          'MET': 'nonpolar',
-          'HIS': 'positive',
-          'LEU': 'nonpolar',
-          'ARG': 'positive',
-          'TRP': 'nonpolar',
-          'VAL': 'nonpolar',
-          'GLU': 'negative',
-          'TYR': 'polar',
-          'MSE': 'polar',
-          'SEC': 'polar'}
 
-# @cachetools.func.ttl_cache(maxsize=300)
-def dssp_dataframe(filename, file_type):
-    """Calculation of various properties utilizing the DSSP program.
+def get_dssp_df(model, pdb_file, outfile=None, outdir=None, outext='_dssp.df', force_rerun=False):
+    # Create the output file name
+    outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
 
-    DSSP must be installed for biopython to properly call it.
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        try:
+            dssp = PDB.DSSP(model, pdb_file)
+        except KeyError:
+            return pd.DataFrame()
 
-    Install on Ubuntu using:
-    > sudo apt-get install dssp
+        if len(dssp.property_list) == 0:
+            return pd.DataFrame()
 
-    Or from source at: http://swift.cmbi.ru.nl/gv/dssp/
+        # Reorganize the results into a csv file
+        appender = []
+        for k in dssp.property_keys:
+            to_append = []
+            x = dssp.property_dict[k]
+            chain = k[0]
+            residue = k[1]
+            het = residue[0]
+            resnum = residue[1]
+            icode = residue[2]
+            to_append.extend([chain, resnum, icode])
+            to_append.extend(x)
+            appender.append(to_append)
 
-    Args:
-        filename: PDB or mmCIF structure file
+        cols = ['chain', 'resnum', 'icode',
+                'dssp_index', 'aa', 'ss', 'exposure_rsa', 'phi', 'psi',
+                'NH_O_1_relidx', 'NH_O_1_energy', 'O_NH_1_relidx',
+                'O_NH_1_energy', 'NH_O_2_relidx', 'NH_O_2_energy',
+                'O_NH_2_relidx', 'O_NH_2_energy']
 
-    Returns:
-        dict: Dictionary of properties
+        df = pd.DataFrame.from_records(appender, columns=cols)
+
+        # Adding additional columns
+        df = df[df['aa'].isin(list(aa1))]
+        df['aa_three'] = df['aa'].apply(one_to_three)
+        df['max_acc'] = df['aa_three'].map(residue_max_acc['Sander'].get)
+        df[['exposure_rsa', 'max_acc']] = df[['exposure_rsa', 'max_acc']].astype(float)
+        df['exposure_asa'] = df['exposure_rsa'] * df['max_acc']
+
+        df.to_csv(outfile)
+    else:
+        log.debug('{}: already ran DSSP and force_rerun={}, loading results'.format(outfile, force_rerun))
+        df = pd.read_csv(outfile, index_col=0)
+
+    return df
+
+
+def get_dssp_df_on_file(pdb_file, outfile=None, outdir=None, outext='_dssp.df', force_rerun=False):
+    """Run DSSP
     """
+    # Create the output file name
+    outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
 
-    my_structure = PDBIOExt(filename, file_type='pdb')
-    model = my_structure.first_model
-    try:
-        dssp = PDB.DSSP(model, filename)
-    except:
-        return pd.DataFrame()
-    akeys = list(dssp)
-
-    if len(akeys) == 0:
-        akeys = [0] * 14
-
-    df = pd.DataFrame(akeys)
-    df.columns = ['dssp_index', 'aa', 'ss', 'relative_expo', 'phi', 'psi',
-                  'NH_O_1_relidx', 'NH_O_1_energy', 'O_NH_1_relidx',
-                  'O_NH_1_energy', 'NH_O_2_relidx', 'NH_O_2_energy',
-                  'O_NH_2_relidx', 'O_NH_2_energy']
-
-    df = df[df['aa'].isin(list(aa1))]
-    df['aa_three'] = df['aa'].apply(one_to_three)
-    df['max_acc'] = df['aa_three'].map(MAX_ACC.get)
-    df[['relative_expo', 'max_acc']] = df[
-        ['relative_expo', 'max_acc']].astype(float)
-    df['exposure_area'] = df['relative_expo'] * df['max_acc']
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        # Load the structure
+        my_structure = PDBIOExt(pdb_file)
+        model = my_structure.first_model
+        df = get_dssp_df(model, pdb_file, outfile=outfile, outdir=outdir, outext=outext, force_rerun=force_rerun)
+    else:
+        log.debug('{}: already ran MSMS and force_rerun={}, loading results'.format(outfile, force_rerun))
+        df = pd.read_csv(outfile, index_col=0)
 
     return df
 
@@ -88,8 +89,8 @@ def calc_sasa(dssp_df):
     Output: SASA (integer) of structure
     """
 
-    infodict = {'ssb_sasa': dssp_df.exposure_area.sum(),
-                'ssb_mean_rel_exposed': dssp_df.relative_expo.mean(),
+    infodict = {'ssb_sasa': dssp_df.exposure_asa.sum(),
+                'ssb_mean_rel_exposed': dssp_df.exposure_rsa.mean(),
                 'ssb_size': len(dssp_df)}
 
     return infodict
@@ -169,14 +170,14 @@ def calc_surface_buried(dssp_df):
 
     sbinfo = {}
 
-    df_min = dssp_df[['aa_three', 'exposure_area']]
+    df_min = dssp_df[['aa_three', 'exposure_asa']]
 
     if len(df_min) == 0:
         return sbinfo
     else:
         for i, r in df_min.iterrows():
             res = r.aa_three
-            area = r.exposure_area
+            area = r.exposure_asa
             if res in AAdict:
                 if AAdict[res] == 'nonpolar' and area > 3:
                     SNP = SNP + 1
@@ -244,44 +245,6 @@ def all_dssp_props(filename, file_type):
 
     return sasa
 
-if __name__ == '__main__':
-    import glob
-    files = glob.glob('../test_files/structures/*')
-    # print(files)
-    for f in files:
-        print(f)
-        # print(all_dssp_props(f))
-
-
-# TODO: convert these functions to use biopython?
-# def get_dssp_ss_content_multiplechains(prody_ag, chain):
-#     """Get secondary structure across chain
-#
-#     Args:
-#         prody_ag: ProDy atomgroup object (parsed PDB file)
-#         chain (str): chain ID
-#
-#     Returns:
-#
-#     """
-#     a = prody_ag.getData('resnum')
-#     b = prody_ag.getData('name')
-#     c = prody_ag.getData('secondary')
-#     d = prody_ag.getData('chain')
-#     resid = []
-#     SSstr = []
-#     idx = [i for i, x in enumerate(d) if x == chain]
-#     for i in idx:
-#         if b[i] == 'CA':
-#             resid.append(i)
-#             SSstr.append(c[i])
-#
-#     N = float(len(SSstr))
-#     helix_alpha = SSstr.count('H') / N
-#     helix_3_10 = SSstr.count('G') / N
-#     extended = SSstr.count('E') / N
-#     return helix_alpha, helix_3_10, extended
-
 
 def get_ss_class(pdb_file, dssp_file, chain):
     """Define the secondary structure class of a PDB file at the specific chain
@@ -310,3 +273,12 @@ def get_ss_class(pdb_file, dssp_file, chain):
         classification = 'mixed'
 
     return classification
+
+
+if __name__ == '__main__':
+    import glob
+    files = glob.glob('../test_files/structures/*')
+    # print(files)
+    for f in files:
+        print(f)
+        # print(all_dssp_props(f))

@@ -1,32 +1,26 @@
 import os
-import copy
 import os.path as op
-import numpy as np
 import shutil
+import numpy as np
 import pandas as pd
-from collections import OrderedDict
-
-from bioservices.uniprot import UniProt
-from bioservices import KEGG
-
 from Bio import SeqIO
-import requests
-from ssbio import utils
+from bioservices import KEGG
+from bioservices import UniProt
+from cobra.core import DictList
+from cobra.core import Gene
+from slugify import slugify
 import ssbio.cobra.utils
 import ssbio.databases.kegg
-import ssbio.databases.uniprot
 import ssbio.databases.pdb
-import ssbio.sequence.fasta
-from ssbio.itasser.itasserparse import ITASSERParse
-import ssbio.structure.properties.residues
-import ssbio.structure.properties.quality
-from ssbio.structure.cleanpdb import CleanPDB
-from ssbio.structure.pdbioext import PDBIOExt
+import ssbio.databases.uniprot
 import ssbio.sequence.properties.residues
+import ssbio.sequence.utils.fasta
 import ssbio.structure.properties.msms
-
-from cobra.core import Gene
-from cobra.core import DictList
+import ssbio.structure.properties.quality
+import ssbio.structure.properties.residues
+from ssbio import utils
+from ssbio.sequence.seqprop import SeqProp
+from ssbio.structure.homology.itasser.itasserprep import ITASSERPrep
 
 if utils.is_ipynb():
     from tqdm import tqdm_notebook as tqdm
@@ -36,8 +30,8 @@ else:
 import sys
 import logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logging.getLogger("requests").setLevel(logging.WARNING)
-logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.ERROR)
+logging.getLogger("urllib3").setLevel(logging.ERROR)
 log = logging.getLogger(__name__)
 
 date = utils.Date()
@@ -45,102 +39,16 @@ bs_unip = UniProt()
 bs_kegg = KEGG()
 
 
-class RepresentativeSequence(object):
-    pass
-
-
-class RepresentativeStructure(object):
-    pass
-
-
-# TODO using these classes in the annotation field will work
-class StructureProp(object):
-    def __init__(self, homology=None, pdb=None, representative=None):
-        if not homology:
-            homology = {}
-        if not pdb:
-            pdb = OrderedDict()
-        if not representative:
-            representative = {'pdb_id'             : None,
-                              'resolution'         : float('inf'),
-                              'original_pdb_file'  : None,
-                              'original_mmcif_file': None,
-                              'clean_pdb_file'     : None,
-                              'properties': {}}
-        self.homology = homology
-        self.pdb = pdb
-        self.representative = representative
-
-
-class SequenceProp(object):
-    def __init__(self, kegg_id=None, kegg_sequence_file=None, kegg_metadata_file=None,
-                 uniprot_ids=None, representative=None):
-
-        self.kegg = KEGGProp(kegg_id, kegg_sequence_file, kegg_metadata_file)
-
-        if not uniprot_ids:
-            uniprot_ids = []
-        uniprots = {}
-        for x in uniprot_ids:
-            uniprots[x] = UniProtProp(uniprot_acc=x)
-        self.uniprot = uniprots
-
-
-class SeqProp(object):
-    def __init__(self, ident=None, sequence_file=None, metadata_file=None):
-        if not ident:
-            ident = ''
-        if not sequence_file:
-            sequence_file = ''
-        if not metadata_file:
-            metadata_file = ''
-
-        self.ident = ident
-        self.kegg = None
-        self.refseq = None
-        self.uniprot = None
-        self.pdbs = []
-        self.seq_len = 0
-        self.seq_file = op.basename(sequence_file)
-        self.seq_path = sequence_file
-        self.metadata_file = op.basename(metadata_file)
-
-        if sequence_file:
-            self.seq_len = len(SeqIO.read(open(sequence_file), "fasta"))
-
-    def get_seq_str(self):
-        return str(self.get_seq.seq)
-
-    def get_seq(self):
-        return SeqIO.read(open(self.seq_path), "fasta")
-
-
-class UniProtProp(SeqProp):
-    def __init__(self, uniprot_acc=None, sequence_file=None, metadata_file=None):
-
-        SeqProp.__init__(self, sequence_file=sequence_file, metadata_file=metadata_file)
-
-        if uniprot_acc:
-            self.uniprot = uniprot_acc
-
-        if metadata_file:
-            metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
-
-            # TODO: populate SeqProp fields with parsed metadata
-
-
-class KEGGProp(SeqProp):
-    def __init__(self, kegg_id=None, sequence_file=None, metadata_file=None):
-
-        SeqProp.__init__(self, sequence_file=sequence_file, metadata_file=metadata_file)
-
-        if kegg_id:
-            self.kegg = kegg_id
-
-        # TODO: populate SeqProp fields with parsed metadata
-
-    def get_dict(self):
-        return self.__dict__.copy()
+# Casting Gene objects into GenePro objects
+# This replaces any new instance of Genes with GenePros. Even when you load a model later using COBRApy methods
+# Use with caution!
+# See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
+from ssbio.core.genepro import GenePro
+def __new__(cls, *args, **kwargs):
+    if cls == Gene:
+        return object.__new__(GenePro)
+    return object.__new__(cls)
+Gene.__new__ = staticmethod(__new__)
 
 
 class GEMPRO(object):
@@ -157,58 +65,58 @@ class GEMPRO(object):
     3. Mapping of representative sequence --> structures
         a. With UniProt --> ranking of PDB structures
         b. BLAST representative sequence --> PDB database
-    3. QC/QA
     4. Homology modeling
-    5. Representative structures
+        a. Mapping to existing models
+        b. Preparation for running I-TASSER
+        c. Parsing I-TASSER runs
+    5. Running QC/QA on structures and setting a representative structure
 
-    Each step may generate a report and also allow input of manual mappings if applicable.
+    Each step may generate reports as a Pandas DataFrame and various logging messages.
+
     """
 
-    def __init__(self, gem_name, root_dir, gem_file_path=None, gem_file_type=None, genes_list=None, genes_and_sequences=None):
+    def __init__(self, gem_name, root_dir=None, gem_file_path=None, gem_file_type=None, genes_list=None, genes_and_sequences=None):
         """Initialize the GEM-PRO project with a GEM or a list of genes.
 
         Specify the name of your project, along with the root directory where a folder with that name will be created.
 
         Args:
-            gem_name:
-            root_dir:
-            gem_file_path:
-            gem_file_type:
-            genes:
+            gem_name (str): The name of your GEM or just your project in general.
+                This will be the name of the main folder.
+            root_dir (str): Path to where the folder named gem_name will be created.
+                Default is current working directory.
+            gem_file_path (str): Path to GEM file
+            gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' format
+            genes_list (list): List of gene IDs that you want to map
+            genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
+
         """
 
+        # Create directory paths
+        if not root_dir:
+            root_dir = os.getcwd()
         self.root_dir = root_dir
         self.base_dir = op.join(root_dir, gem_name)
-
-        # model_dir - directory where original gems and gem-related files are stored
+        # model_dir - directory where original GEMs and GEM-related files are stored
         self.model_dir = op.join(self.base_dir, 'model')
-
-        # data_dir - directory where all data (dataframes, etc) will be stored
+        # data_dir - directory where all data (dataframes and more) will be stored
         self.data_dir = op.join(self.base_dir, 'data')
-
-        # notebooks_dir - directory where ipython notebooks_dir will be stored for manual analyses
-        self.notebooks_dir = op.join(self.base_dir, 'notebooks')
-
-        # # figure_dir - directory where all figure_dir will be stored
+        # figure_dir - directory where any figures will be stored
         self.figure_dir = op.join(self.base_dir, 'figures')
-
+        # sequence_dir - sequence related files are stored here
+        self.sequence_dir = op.join(self.base_dir, 'sequences')
         # structure_dir - directory where structure related files will be downloaded/are located
         self.structure_dir = op.join(self.base_dir, 'structures')
         self.structure_single_chain_dir = op.join(self.structure_dir, 'by_gene')
 
-        # sequence_dir - sequence related files are stored here
-        self.sequence_dir = op.join(self.base_dir, 'sequences')
-
+        # Make the directories
         list_of_dirs = [self.base_dir,
                         self.model_dir,
                         self.data_dir,
-                        self.notebooks_dir,
                         self.figure_dir,
                         self.structure_dir,
                         self.structure_single_chain_dir,
                         self.sequence_dir]
-
-        # Create directory tree
         for directory in list_of_dirs:
             if not op.exists(directory):
                 os.makedirs(directory)
@@ -220,6 +128,7 @@ class GEMPRO(object):
         if gem_file_path and gem_file_type:
             self.model = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type)
             log.info('Loaded model: {}'.format(gem_file_path))
+            log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
 
             # Place a copy of the current used model in model_dir
             if not op.exists(op.join(self.model_dir, op.basename(gem_file_path))):
@@ -232,26 +141,38 @@ class GEMPRO(object):
 
             # Log information on the number of things
             log.info('Number of reactions: {}'.format(len(self.model.reactions)))
-            log.info(
-                'Number of reactions linked to a gene: {}'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
-            log.info(
-                'Number of genes (excluding spontaneous): {}'.format(ssbio.cobra.utils.true_num_genes(self.model)))
+            log.info('Number of reactions linked to a gene: {}'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
+            log.info('Number of genes (excluding spontaneous): {}'.format(ssbio.cobra.utils.true_num_genes(self.model)))
             log.info('Number of metabolites: {}'.format(len(self.model.metabolites)))
 
         # Or, load a list of gene IDs
         elif genes_list:
             self.genes = genes_list
-            log.info('Number of genes: {}'.format(len(self._genes)))
+            log.info('Number of genes: {}'.format(len(self.genes)))
 
         # Or, load a dictionary of genes and their sequences
         elif genes_and_sequences:
             self.genes = list(genes_and_sequences.keys())
             self.manual_seq_mapping(genes_and_sequences)
+            log.info('Number of genes: {}'.format(len(self.genes)))
 
         # If neither a model or genes are input, you can still add_genes_by_id later
         else:
             self.genes = []
             log.warning('No model or genes input')
+
+        # Other attributes and dataframes
+        self.df_kegg_metadata = pd.DataFrame()
+        self.df_uniprot_metadata = pd.DataFrame()
+        self.df_sequence_properties = pd.DataFrame()
+
+        self.df_itasser = pd.DataFrame()
+        self.df_pdb_ranking = pd.DataFrame()
+        self.df_pdb_blast = pd.DataFrame()
+        self.df_pdb_metadata = pd.DataFrame()
+
+        self.genes_with_a_structure = None
+        self.genes_without_a_structure = None
 
     @property
     def genes(self):
@@ -259,9 +180,9 @@ class GEMPRO(object):
 
     @genes.setter
     def genes(self, genes_list):
-        """Set the genes attribute to be a DictList of COBRApy Gene objects.
+        """Set the genes attribute to be a DictList of GenePro objects.
 
-        Extra "annotation" fields will be added to the objects.
+        A "protein" attribute will be added to the Genes.
 
         Args:
             genes_list: DictList of COBRApy Gene objects, or list of gene IDs
@@ -272,62 +193,10 @@ class GEMPRO(object):
             tmp_list = []
             for x in list(set(genes_list)):
                 x = str(x)
-                new_gene = Gene(id=x)
-
-                # TODO: if we don't define dictionaries like this we risk pointing to the same object for some reason
-                # is there a better way to do this?
-                if 'sequence' not in new_gene.annotation.keys():
-                    new_gene.annotation['sequence'] = {'kegg'          : {'uniprot'  : None,
-                                                                          'kegg'      : None,
-                                                                          'seq_len'      : 0,
-                                                                          'pdbs'         : [],
-                                                                          'seq_file'     : None,
-                                                                          'metadata_file': None},
-                                                       'uniprot'       : {},
-                                                       'representative': {'uniprot'  : None,
-                                                                          'kegg'      : None,
-                                                                          'seq_len'      : 0,
-                                                                          'pdbs'         : [],
-                                                                          'properties'   : {},
-                                                                          'seq_file'     : None,
-                                                                          'metadata_file': None}}
-                if 'structure' not in new_gene.annotation.keys():
-                    new_gene.annotation['structure'] = {'homology'      : {},
-                                                        'pdb'           : OrderedDict(),
-                                                        'representative': {'structure_id'     : None,
-                                                                           'seq_coverage'     : 0,
-                                                                           'is_experimental'  : False,
-                                                                           'original_pdb_file': None,
-                                                                           'clean_pdb_file'   : None,
-                                                                           'properties': {}}}
+                new_gene = GenePro(id=x)
                 tmp_list.append(new_gene)
             self._genes = DictList(tmp_list)
         else:
-            for x in genes_list:
-                if 'sequence' not in x.annotation.keys():
-                    x.annotation['sequence'] = {'kegg'          : {'uniprot'  : None,
-                                                                   'kegg'      : None,
-                                                                   'seq_len'      : 0,
-                                                                   'pdbs'         : [],
-                                                                   'seq_file'     : None,
-                                                                   'metadata_file': None},
-                                                'uniprot'       : {},
-                                                'representative': {'uniprot'  : None,
-                                                                   'kegg'      : None,
-                                                                   'seq_len'      : 0,
-                                                                   'pdbs'         : [],
-                                                                   'properties'   : {},
-                                                                   'seq_file'     : None,
-                                                                   'metadata_file': None}}
-                if 'structure' not in x.annotation.keys():
-                    x.annotation['structure'] = {'homology'      : {},
-                                                 'pdb'           : OrderedDict(),
-                                                 'representative': {'structure_id'     : None,
-                                                                    'seq_coverage'     : 0,
-                                                                    'is_experimental'  : False,
-                                                                    'original_pdb_file': None,
-                                                                    'clean_pdb_file'   : None,
-                                                                    'properties': {}}}
             self._genes = genes_list
 
     def add_genes_by_id(self, genes_list):
@@ -340,29 +209,7 @@ class GEMPRO(object):
 
         new_genes = []
         for x in list(set(genes_list)):
-            new_gene = Gene(id=x)
-            new_gene.annotation['sequence'] = {'kegg'          : {'uniprot'  : None,
-                                                                  'kegg'      : None,
-                                                                  'seq_len'      : 0,
-                                                                  'pdbs'         : [],
-                                                                  'seq_file'     : None,
-                                                                  'metadata_file': None},
-                                               'uniprot'       : {},
-                                               'representative': {'uniprot'  : None,
-                                                                  'kegg'      : None,
-                                                                  'seq_len'      : 0,
-                                                                  'pdbs'         : [],
-                                                                  'properties'   : {},
-                                                                  'seq_file'     : None,
-                                                                  'metadata_file': None}}
-            new_gene.annotation['structure'] = {'homology'      : {},
-                                                'pdb'           : OrderedDict(),
-                                                'representative': {'structure_id'     : None,
-                                                                   'seq_coverage'     : 0,
-                                                                   'is_experimental'  : False,
-                                                                   'original_pdb_file': None,
-                                                                   'clean_pdb_file'   : None,
-                                                                   'properties': {}}}
+            new_gene = GenePro(id=x)
             new_genes.append(new_gene)
 
         # Add unique genes only
@@ -370,12 +217,14 @@ class GEMPRO(object):
         # TODO: report union length?
         # log.info('Added {} genes to the list of genes'.format(len(new_genes)))
 
+    ####################################################################################################################
+    ### SEQUENCE RELATED METHODS ###
     def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the KEGG service.
 
         This function does these things:
             1. Download all metadata and sequence files in the sequences directory
-            2. Saves KEGG metadata in each Gene object under the "sequence" key
+            2. Creates a KEGGProp object in the protein.sequences attribute
             3. Returns a Pandas DataFrame of mapping results
 
         Args:
@@ -387,88 +236,63 @@ class GEMPRO(object):
 
         """
 
-        # all data_dir will be stored in a dataframe
+        # all data will be stored in a dataframe
         kegg_pre_df = []
+        # TODO: update dataframe columns (there might be more now)
+        df_cols = ['gene', 'kegg', 'refseq', 'uniprot', 'pdbs', 'sequence_len', 'sequence_file', 'metadata_file']
 
-        # first map all of the organism's kegg genes to UniProt
+        # First map all of the organism's KEGG genes to UniProt
         kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
 
-        for g in tqdm(self.genes):
-            gene_id = str(g.id)
-            if custom_gene_mapping:
-                kegg_g = custom_gene_mapping[gene_id]
-            else:
-                kegg_g = gene_id
+        counter = 0
+        kegg_missing = []
 
-            # TODO: why always make it? i think it should only be made if data is found
+        for g in tqdm(self.genes):
+            if custom_gene_mapping:
+                kegg_g = custom_gene_mapping[g.id]
+            else:
+                kegg_g = g.id
+
             # Always make the gene specific folder under the sequence_files directory
-            gene_folder = op.join(self.sequence_dir, gene_id)
+            gene_folder = op.join(self.sequence_dir, g.id)
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            # Download kegg metadata
-            metadata_file = ssbio.databases.kegg.download_kegg_gene_metadata(organism_code=kegg_organism_code,
-                                                                             gene_id=kegg_g,
-                                                                             outdir=gene_folder,
-                                                                             force_rerun=force_rerun)
-
-            # Download kegg sequence
-            sequence_file = ssbio.databases.kegg.download_kegg_aa_seq(organism_code=kegg_organism_code,
-                                                                      gene_id=kegg_g,
-                                                                      outdir=gene_folder,
-                                                                      force_rerun=force_rerun)
-            kegg_prop = KEGGProp(kegg_id=kegg_organism_code + ':' + kegg_g,
-                                 sequence_file=sequence_file,
-                                 metadata_file=metadata_file)
-            kegg_dict = kegg_prop.get_dict()
+            kegg_prop = g.protein.load_kegg(kegg_id=g.id, kegg_organism_code=kegg_organism_code,
+                                            download=True, outdir=gene_folder, force_rerun=force_rerun)
 
             # Update potentially old UniProt ID
             if kegg_g in kegg_to_uniprot.keys():
                 kegg_prop.uniprot = kegg_to_uniprot[kegg_g]
+                if g.protein.representative_sequence:
+                    if g.protein.representative_sequence.kegg == kegg_prop.kegg:
+                        g.protein.representative_sequence.uniprot = kegg_to_uniprot[kegg_g]
 
-            # Save in Gene
-            g.annotation['sequence']['kegg'] = kegg_dict
+            # Keep track of missing mappings - missing means no sequence is available
+            if not kegg_prop.sequence_file:
+                kegg_missing.append(g.id)
+            else:
+                counter += 1
 
-            if sequence_file:
-                # Also check if KEGG sequence matches a potentially set representative sequence
-                # Do not add any info if a UniProt ID was already mapped though, we want to use that
-                if g.annotation['sequence']['representative']['seq_len'] > 0 and not g.annotation['sequence']['representative']['uniprot']:
-                    ### Check if sequences are the same
-
-                    # Load already set representative sequence
-                    rep_seq_file = g.annotation['sequence']['representative']['seq_file']
-                    rep_seq_path = op.join(self.sequence_dir, gene_id, rep_seq_file)
-                    rep_seq = SeqIO.read(open(rep_seq_path), 'fasta')
-
-                    # Load kegg sequence
-                    kegg_seq = SeqIO.read(open(sequence_file), 'fasta')
-
-                    # Test equality
-                    if str(rep_seq.seq) == str(kegg_seq.seq):
-                        # If equal, fill in representative sequence fields with kegg metadata but still use
-                        # the already set sequence file
-                        your_keys = ['kegg', 'uniprot', 'pdbs', 'metadata_file']
-                        for_saving = {your_key: kegg_dict[your_key] for your_key in your_keys if
-                                      your_key in kegg_dict}
-                        g.annotation['sequence']['representative'].update(for_saving)
-                    else:
-                        log.warning('{}: manually added sequence does not match mapped KEGG sequence.'.format(gene_id))
+            # Get a (deep)copy of the KEGG properties
+            kegg_dict = kegg_prop.get_dict(df_format=True, only_keys=df_cols)
 
             # Save in dataframe
-            kegg_dict['gene'] = gene_id
+            kegg_dict['gene'] = g.id
             kegg_pre_df.append(kegg_dict)
 
-            log.debug('{}: Loaded KEGG information for gene'.format(gene_id))
+            log.debug('{}: loaded KEGG information for gene'.format(g.id))
+
+        log.info('{} genes mapped to KEGG'.format(counter))
 
         # Save a dataframe of the file mapping info
-        cols = ['gene', 'uniprot', 'kegg', 'seq_len', 'pdbs', 'seq_file', 'metadata_file']
-        self.df_kegg_metadata = pd.DataFrame.from_records(kegg_pre_df, columns=cols)
+        self.df_kegg_metadata = pd.DataFrame.from_records(kegg_pre_df, columns=df_cols)
+        self.df_kegg_metadata.fillna(value=np.nan, inplace=True)
         log.info('Created KEGG metadata dataframe. See the "df_kegg_metadata" attribute.')
 
-        # TODO: standardize missing fields in DFs. should missing seqs have a Nan in seq_len, or be 0?
         # Info on genes that could not be mapped
-        self.missing_kegg_mapping = self.df_kegg_metadata[self.df_kegg_metadata.seq_len == 0].gene.unique().tolist()
-        if len(self.missing_kegg_mapping) > 0:
+        if len(kegg_missing) > 0:
+            self.missing_kegg_mapping = list(set(kegg_missing))
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_kegg_mapping" attribute.'.format(len(self.missing_kegg_mapping)))
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, force_rerun=False):
@@ -497,6 +321,11 @@ class GEMPRO(object):
         genes_to_uniprots = bs_unip.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
 
         uniprot_pre_df = []
+        df_cols = ['gene', 'uniprot', 'reviewed', 'gene_name', 'kegg', 'refseq', 'pdbs', 'ec_number', 'pfam',
+                   'sequence_len', 'description', 'entry_version', 'seq_version', 'sequence_file', 'metadata_file']
+
+        counter = 0
+        uniprot_missing = []
         for g in tqdm(self.genes):
             gene_id = str(g.id)
             if custom_gene_mapping and gene_id in custom_gene_mapping.keys():
@@ -509,85 +338,44 @@ class GEMPRO(object):
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            uniprot_dict = {}
-
             if uniprot_gene not in list(genes_to_uniprots.keys()):
                 # Append empty information for a gene that cannot be mapped
+                uniprot_prop = SeqProp(ident=gene_id)
+                uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
                 uniprot_dict['gene'] = gene_id
                 uniprot_pre_df.append(uniprot_dict)
-                log.debug('{}: Unable to map to UniProt'.format(gene_id))
+                uniprot_missing.append(gene_id)
+                log.debug('{}: unable to map to UniProt'.format(gene_id))
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
+                    uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True,
+                                                          outdir=gene_folder, force_rerun=force_rerun)
 
-                    uniprot_dict['uniprot'] = str(mapped_uniprot)
+                    # Keep track of missing ones
+                    if not uniprot_prop.sequence_file:
+                        uniprot_missing.append(gene_id)
+                    else:
+                        counter += 1
 
-                    # Download uniprot metadata
-                    metadata_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot,
-                                                                                  filetype='txt',
-                                                                                  outdir=gene_folder,
-                                                                                  force_rerun=force_rerun)
-
-                    # Download uniprot sequence
-                    sequence_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=mapped_uniprot,
-                                                                                  filetype='fasta',
-                                                                                  outdir=gene_folder,
-                                                                                  force_rerun=force_rerun)
-
-                    uniprot_dict['seq_file'] = op.basename(sequence_file)
-                    uniprot_dict['metadata_file'] = op.basename(metadata_file)
-
-                    # Adding additional uniprot metadata
-                    metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
-                    uniprot_dict.update(metadata)
-
-                    # Save in Gene
-                    # TODO: fix default representation for pdbs
-                    if 'pdbs' not in uniprot_dict:
-                        uniprot_dict['pdbs'] = []
-                    g.annotation['sequence']['uniprot'][str(mapped_uniprot)] = uniprot_dict
-
-                    # Also check if UniProt sequence matches a potentially set representative sequence
-                    if g.annotation['sequence']['representative']['seq_len'] > 0:
-                        ### Check if sequences are the same
-
-                        # Load already set representative sequence
-                        rep_seq_file = g.annotation['sequence']['representative']['seq_file']
-                        rep_seq_path = op.join(self.sequence_dir, gene_id, rep_seq_file)
-                        rep_seq = SeqIO.read(open(rep_seq_path), 'fasta')
-
-                        # Load uniprot sequence
-                        unip_seq = SeqIO.read(open(sequence_file), 'fasta')
-
-                        # Test equality
-                        if str(rep_seq.seq) == str(unip_seq.seq):
-                            # If equal, fill in representative sequence fields with uniprot metadata but still use
-                            # the already set sequence file
-                            your_keys = ['kegg', 'uniprot', 'pdbs', 'metadata_file']
-                            for_saving = {your_key: uniprot_dict[your_key] for your_key in your_keys if
-                                          your_key in uniprot_dict}
-                            g.annotation['sequence']['representative'].update(for_saving)
-                        else:
-                            log.warning('{}: manually added sequence does not match mapped UniProt sequence.'.format(gene_id))
+                    uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
 
                     # Add info to dataframe
-                    # TODO: empty pdb lists should be NaN in the dataframe
                     uniprot_dict['gene'] = gene_id
                     uniprot_pre_df.append(uniprot_dict)
 
         # Save a dataframe of the UniProt metadata
-        if hasattr(self, 'df_uniprot_metadata'):
-            self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).reset_index(drop=True)
+        if not self.df_uniprot_metadata.empty:
+            self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
+            self.df_uniprot_metadata.fillna(value=np.nan, inplace=True)
             log.info('Updated existing UniProt dataframe.')
         else:
-            cols = ['gene', 'uniprot', 'seq_len', 'seq_file', 'pdbs', 'gene_name', 'reviewed', 'kegg', 'refseq',
-                    'ec_number', 'pfam', 'description', 'entry_version', 'seq_version', 'metadata_file']
-            self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
+            self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=df_cols)
+            self.df_uniprot_metadata.fillna(value=np.nan, inplace=True)
             log.info('Created UniProt metadata dataframe. See the "df_uniprot_metadata" attribute.')
 
-        # TODO: standardize missing fields in DFs. should missing seqs have a Nan in seq_len, or be 0?
-        self.missing_uniprot_mapping = self.df_uniprot_metadata[pd.isnull(self.df_uniprot_metadata.metadata_file)].gene.unique().tolist()
         # Info on genes that could not be mapped
-        if len(self.missing_uniprot_mapping) > 0:
+        if len(uniprot_missing) > 0:
+            self.missing_uniprot_mapping = list(set(uniprot_missing))
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_uniprot_mapping" attribute.'.format(
                     len(self.missing_uniprot_mapping)))
 
@@ -603,50 +391,31 @@ class GEMPRO(object):
                 ...
         """
         uniprot_pre_df = []
+        df_cols = ['gene', 'uniprot', 'sequence_len', 'sequence_file', 'pdbs', 'gene_name', 'reviewed',
+                    'kegg', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
+                    'metadata_file']
 
         for g,u in gene_to_uniprot_dict.items():
             gene = self.genes.get_by_id(g)
-
-            uniprot_dict = {}
-            uniprot_dict['uniprot'] = u
 
             # Make the gene folder
             gene_folder = op.join(self.sequence_dir, g)
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            # Download uniprot metadata
-            metadata_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=u, filetype='txt',
-                                                                          outdir=gene_folder)
+            uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
+                                                     outdir=gene_folder, download=True,
+                                                     set_as_representative=True)
 
-            # Download uniprot sequence
-            sequence_file = ssbio.databases.uniprot.download_uniprot_file(uniprot_id=u,
-                                                                          filetype='fasta',
-                                                                          outdir=gene_folder)
-
-            uniprot_dict['seq_file'] = op.basename(sequence_file)
-            uniprot_dict['metadata_file'] = op.basename(metadata_file)
-
-            # Adding additional uniprot metadata
-            metadata = ssbio.databases.uniprot.parse_uniprot_txt_file(metadata_file)
-            uniprot_dict.update(metadata)
-
-            # Add info to Gene
-            # TODO: Setting as representative for now, but should also save in uniprot key
-            if 'pdbs' not in uniprot_dict:
-                uniprot_dict['pdbs'] = []
-            your_keys = ['kegg', 'uniprot', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
-            for_saving = {your_key: uniprot_dict[your_key] for your_key in your_keys if your_key in uniprot_dict}
-            gene.annotation['sequence']['representative'].update(for_saving)
+            uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
 
             # Add info to dataframe
-            # TODO: empty pdb lists should be NaN in the dataframe
             uniprot_dict['gene'] = g
             uniprot_pre_df.append(uniprot_dict)
 
             # Remove the entry from the missing genes list and also the DF
             # If it is in the DF but not marked as missing, we do not remove the information already mapped
-            if hasattr(self, 'df_uniprot_metadata'):
+            if not self.df_uniprot_metadata.empty:
                 if g in self.missing_uniprot_mapping:
                     self.missing_uniprot_mapping.remove(g)
                 if g in self.df_uniprot_metadata.gene.tolist():
@@ -656,14 +425,11 @@ class GEMPRO(object):
 
         # Save a dataframe of the UniProt metadata
         # Add all new entries to the df_uniprot_metadata
-        if hasattr(self, 'df_uniprot_metadata'):
+        if not self.df_uniprot_metadata.empty:
             self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).reset_index(drop=True)
             log.info('Updated existing UniProt dataframe.')
         else:
-            cols = ['gene', 'uniprot', 'seq_len', 'seq_file', 'pdbs', 'gene_name', 'reviewed',
-                    'kegg', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
-                    'metadata_file']
-            self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=cols)
+            self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=df_cols)
             log.info('Created UniProt metadata dataframe.')
 
     # TODO: should also have a seq --> uniprot id function (has to be 100% match) (what about organism?)
@@ -684,16 +450,12 @@ class GEMPRO(object):
             g = str(g)
             gene = self.genes.get_by_id(g)
 
-            gene.annotation['sequence']['representative']['seq_len'] = len(s)
-
             gene_folder = op.join(self.sequence_dir, g)
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            seq_file = ssbio.sequence.fasta.write_fasta_file(indict={g:s}, outname=g, outdir=gene_folder)
-            gene.annotation['sequence']['representative']['seq_file'] = op.basename(seq_file)
-
-            log.debug('{}: Loaded manually defined sequence information'.format(g))
+            manual_info = gene.protein.load_manual_sequence_str(ident=g, seq_str=s, outdir=gene_folder, set_as_representative=True)
+            log.debug('{}: loaded manually defined sequence information'.format(g))
 
         log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
 
@@ -704,135 +466,75 @@ class GEMPRO(object):
         UniProt mappings override KEGG mappings except when KEGG mappings have PDBs associated with them and UniProt doesn't.
 
         """
-        # TODO: clean up this code!
         seq_mapping_pre_df = []
+        df_cols = ['gene', 'uniprot', 'kegg', 'pdbs', 'sequence_len', 'sequence_file', 'metadata_file']
 
+        sequence_missing = []
+        counter = 0
         for gene in self.genes:
             g = gene.id
+            repseq = gene.protein.set_representative_sequence()
 
-            genedict = {'pdbs': []}
-
-            seq_prop = gene.annotation['sequence']
-
-            # If a representative sequence has already been set, nothing needs to be done
-            if seq_prop['representative']['seq_len'] > 0:
-                genedict['metadata_file'] = seq_prop['representative']['metadata_file']
-                genedict['pdbs'] = seq_prop['representative']['pdbs']
-                genedict['uniprot'] = seq_prop['representative']['uniprot']
-                if isinstance(seq_prop['representative']['kegg'], list):
-                    genedict['kegg'] = ';'.join(seq_prop['representative']['kegg'])
-                else:
-                    genedict['kegg'] = seq_prop['representative']['kegg']
-                genedict['seq_len'] = seq_prop['representative']['seq_len']
-                genedict['seq_file'] = seq_prop['representative']['seq_file']
-                log.debug('Representative sequence already set for {}'.format(g))
-
-            # If there is a KEGG annotation and no UniProt annotations, set KEGG as representative
-            elif seq_prop['kegg']['seq_len'] > 0 and len(seq_prop['uniprot']) == 0:
-                kegg_prop = seq_prop['kegg']
-                seq_prop['representative'].update(kegg_prop)
-                genedict.update(kegg_prop)
-                log.debug('{}: Representative sequence set from KEGG'.format(g))
-
-            # If there are UniProt annotations and no KEGG annotations, set UniProt as representative
-            elif seq_prop['kegg']['seq_len'] == 0 and len(seq_prop['uniprot']) > 0:
-
-                # If there are multiple uniprots rank them by the sum of reviewed (bool) + num_pdbs
-                # This way, UniProts with PDBs get ranked to the top, or if no PDBs, reviewed entries
-                uniprots = seq_prop['uniprot'].keys()
-                u_ranker = []
-                for u in uniprots:
-                    u_ranker.append((u, seq_prop['uniprot'][u]['reviewed'] + len(seq_prop['uniprot'][u]['pdbs'])))
-                sorted_by_second = sorted(u_ranker, key=lambda tup: tup[1], reverse=True)
-                best_u = sorted_by_second[0][0]
-
-                uni_prop = seq_prop['uniprot'][best_u]
-                your_keys = ['kegg', 'uniprot', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
-                for_saving = { your_key: uni_prop[your_key] for your_key in your_keys if your_key in uni_prop}
-                seq_prop['representative'].update(for_saving)
-                genedict.update(for_saving)
-                if 'kegg' in genedict:
-                    genedict['kegg'] = ';'.join(genedict['kegg'])
-                log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
-
-            # If there are both UniProt and KEGG annotations...
-            elif seq_prop['kegg']['seq_len'] > 0 and len(seq_prop['uniprot']) > 0:
-                # Use KEGG if the mapped UniProt is unique, and it has PDBs
-                kegg_prop = seq_prop['kegg']
-                if len(kegg_prop['pdbs']) > 0 and kegg_prop['uniprot'] not in seq_prop['uniprot'].keys():
-                    seq_prop['representative'].update(kegg_prop)
-                    genedict.update(kegg_prop)
-                    log.debug('{}: Representative sequence set from KEGG'.format(g))
-                else:
-                    # If there are multiple uniprots rank them by the sum of reviewed (bool) + num_pdbs
-                    uniprots = seq_prop['uniprot'].keys()
-                    u_ranker = []
-                    for u in uniprots:
-                        u_ranker.append((u, seq_prop['uniprot'][u]['reviewed'] + len(seq_prop['uniprot'][u]['pdbs'])))
-                    sorted_by_second = sorted(u_ranker, key=lambda tup: tup[1], reverse=True)
-                    best_u = sorted_by_second[0][0]
-
-                    uni_prop = seq_prop['uniprot'][best_u]
-                    your_keys = ['kegg', 'uniprot', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
-                    for_saving = {your_key: uni_prop[your_key] for your_key in your_keys if your_key in uni_prop}
-                    seq_prop['representative'].update(for_saving)
-                    genedict.update(for_saving)
-
-                    # For saving in dataframe, save as string
-                    if 'kegg' in genedict:
-                        genedict['kegg'] = ';'.join(genedict['kegg'])
-
-                    log.debug('{}: Representative sequence set from UniProt using {}'.format(g, best_u))
-
-            # For saving in dataframe, save as string
-            if genedict['pdbs']:
-                genedict['pdbs'] = ';'.join(genedict['pdbs'])
+            if not repseq:
+                sequence_missing.append(g)
+            elif not repseq.sequence_path:
+                sequence_missing.append(g)
             else:
-                genedict['pdbs'] = None
-            genedict['gene'] = g
-            seq_mapping_pre_df.append(genedict)
+                counter += 1
 
-        cols = ['gene', 'uniprot', 'kegg', 'pdbs', 'seq_len', 'seq_file', 'metadata_file']
-        tmp = pd.DataFrame.from_records(seq_mapping_pre_df, columns=cols)
+            # For saving the dataframe
+            gene_dict = gene.protein.representative_sequence.get_dict(df_format=True, only_keys=df_cols)
+            gene_dict['gene'] = g
+            seq_mapping_pre_df.append(gene_dict)
+
+        tmp = pd.DataFrame.from_records(seq_mapping_pre_df, columns=df_cols)
 
         # TODO: info on genes that could be mapped!
 
         # Info on genes that could not be mapped
-        self.missing_mapping = tmp[pd.isnull(tmp.seq_file)].gene.unique().tolist()
-        if len(self.missing_mapping) > 0:
-            log.warning('{} gene(s) could not be mapped. Inspect the "missing_mapping" attribute.'.format(
-                    len(self.missing_mapping)))
+        if len(sequence_missing) > 0:
+            self.missing_repseq = list(set(sequence_missing))
+            log.warning('{} gene(s) could not be mapped. Inspect the "missing_repseq" attribute.'.format(
+                    len(self.missing_repseq)))
 
-        self.df_sequence_mapping = tmp[pd.notnull(tmp.seq_file)].reset_index(drop=True)
-        self.df_sequence_mapping.fillna(value=np.nan, inplace=True)
-        # mapping_df_outfile = op.join(self.data_dir, 'df_sequence_mapping.csv')
-        # self.df_sequence_mapping.to_csv(mapping_df_outfile)
-        log.info('Created sequence mapping dataframe. See the "df_sequence_mapping" attribute.')
+        self.df_representative_sequences = tmp[pd.notnull(tmp.sequence_file)].reset_index(drop=True)
+        self.df_representative_sequences.fillna(value=np.nan, inplace=True)
+        log.info('Created sequence mapping dataframe. See the "df_representative_sequences" attribute.')
 
-    def write_representative_sequences_file(self, outname, outdir=None):
+    def write_representative_sequences_file(self, outname, outdir=None, use_original_ids=False):
         """Write all the model's sequences as a single FASTA file
 
         Args:
             outname: Name of FASTA file without the extension
             outdir: Path to output file
+            use_original_ids: If the original sequence IDs in the FASTA file should be used, or the model IDs
 
         """
         if not outdir:
             outdir = self.sequence_dir
 
-        tmp = {}
-        for x in self.genes:
-            seq_file = x.annotation['sequence']['representative']['seq_file']
-            if seq_file:
-                # Load the sequence fasta
-                seq_record = ssbio.sequence.fasta.load_fasta_file(op.join(self.sequence_dir, x.id, seq_file))[0]
-                # Save the ID as the model's ID
-                tmp[x.id] = str(seq_record.seq)
+        # TODO: not sure if i like this outname / outdir / outext thing
+        outfile = op.join(outdir, outname + '.faa')
 
-        outfile = ssbio.sequence.fasta.write_fasta_file(indict=tmp, outname=outname, outdir=outdir)
+        tmp = []
+        for x in self.genes:
+            repseq = x.protein.representative_sequence.get_seq_record()
+            if repseq:
+                if use_original_ids:
+                    tmp.append(repseq)
+                else:
+                    repseq.id = x.id
+                    tmp.append(repseq)
+
+        SeqIO.write(tmp, outfile, "fasta")
 
         log.info('{}: wrote all representative sequences to file'.format(outfile))
+        return outfile
+    ### END SEQUENCE RELATED METHODS ###
+    ####################################################################################################################
 
+    ####################################################################################################################
+    ### STRUCTURE RELATED METHODS ###
     def map_uniprot_to_pdb(self, seq_ident_cutoff=0, force_rerun=False):
         """Map UniProt IDs to a ranked list of PDB structures available.
 
@@ -841,109 +543,101 @@ class GEMPRO(object):
         """
         best_structures_pre_df = []
 
+        # First get all UniProt IDs and check if they have PDBs
+        all_representative_uniprots = []
+        for g in self.genes:
+            uniprot_id = g.protein.representative_sequence.uniprot
+            if uniprot_id:
+                all_representative_uniprots.append(uniprot_id)
+        uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
+
+        genes_with_a_structure = []
+        genes_without_a_structure = []
         for g in tqdm(self.genes):
             gene_id = str(g.id)
-            uniprot_id = g.annotation['sequence']['representative']['uniprot']
+            uniprot_id = g.protein.representative_sequence.uniprot
 
             if not uniprot_id:
                 # Check if a representative sequence was set
-                log.warning('{}: No representative UniProt ID set, cannot use best structures API'.format(gene_id))
+                log.warning('{}: no representative UniProt ID set, cannot use best structures API'.format(gene_id))
                 continue
             else:
-                best_structures = ssbio.databases.pdb.best_structures(uniprot_id,
-                                                                      outname='{}_best_structures.json'.format(uniprot_id),
-                                                                      outdir=op.join(self.sequence_dir, gene_id),
-                                                                      seq_ident_cutoff=seq_ident_cutoff,
-                                                                      force_rerun=force_rerun)
+                if uniprot_id in uniprots_to_pdbs:
+                    best_structures = ssbio.databases.pdb.best_structures(uniprot_id,
+                                                                          outname='{}_best_structures'.format(slugify(uniprot_id)),
+                                                                          outdir=op.join(self.sequence_dir, gene_id),
+                                                                          seq_ident_cutoff=seq_ident_cutoff,
+                                                                          force_rerun=force_rerun)
 
-                if best_structures:
-                    rank = 1
-                    to_add_to_annotation = OrderedDict()
+                    if best_structures:
+                        rank = 1
+                        for best_structure in best_structures:
+                            currpdb = str(best_structure['pdb_id'].lower())
+                            currchain = str(best_structure['chain_id'])
 
-                    for best_structure in best_structures:
-                        currpdb = str(best_structure['pdb_id'].lower())
-                        currchain = str(best_structure['chain_id'])
+                            # load_pdb will append this protein to the list
+                            new_pdb = g.protein.load_pdb(pdb_id=currpdb, mapped_chains=currchain)
+                            # Also add this chain to the chains attribute so we can save the info we get from best_structures
+                            new_pdb.add_chain_ids(currchain)
 
-                        # TODO: fix caching
-                        # pdb_rel = ssbio.databases.pdb.get_release_date(currpdb)
+                            pdb_specific_keys = ['experimental_method','resolution','tax_id']
+                            chain_specific_keys = ['coverage','start','end','unp_start','unp_end']
 
-                        best_structure_dict = {}
-                        best_structure_dict['pdb_id'] = currpdb
-                        best_structure_dict['pdb_chain_id'] = currchain
-                        best_structure_dict['uniprot'] = uniprot_id
-                        best_structure_dict['experimental_method'] = best_structure['experimental_method']
-                        best_structure_dict['resolution'] = best_structure['resolution']
-                        best_structure_dict['seq_coverage'] = best_structure['coverage']
-                        # best_structure_dict['release_date'] = pdb_rel
-                        best_structure_dict['taxonomy_id'] = best_structure['tax_id']
-                        best_structure_dict['pdb_start'] = best_structure['start']
-                        best_structure_dict['pdb_end'] = best_structure['end']
-                        best_structure_dict['unp_start'] = best_structure['unp_start']
-                        best_structure_dict['unp_end'] = best_structure['unp_end']
-                        best_structure_dict['rank'] = rank
+                            new_pdb.update(best_structure, only_keys=pdb_specific_keys)
+                            new_chain = new_pdb.chains.get_by_id(currchain)
+                            new_chain.update(best_structure, only_keys=chain_specific_keys)
 
-                        # For saving in the Gene annotation
-                        to_add_to_annotation[str(currpdb) + ';' + str(currchain)] = best_structure_dict.copy()
+                            # For saving in the summary dataframe
+                            pdb_dict = new_pdb.get_dict_with_chain(chain=currchain, df_format=True,
+                                                                   chain_keys=chain_specific_keys)
+                            pdb_dict['gene'] = gene_id
+                            pdb_dict['uniprot'] = uniprot_id
+                            pdb_dict['pdb_id'] = currpdb
+                            pdb_dict['pdb_chain_id'] = currchain
+                            pdb_dict['rank'] = rank
+                            best_structures_pre_df.append(pdb_dict)
 
-                        # For saving in the summary dataframe
-                        best_structure_dict['gene'] = gene_id
-                        best_structures_pre_df.append(best_structure_dict)
+                            rank += 1
 
-                        rank += 1
-
-                    # If structure annotation exists already, remove existing
-                    # (pdb,chain) keys and use the best_structure annotation instead
-                    # NOTE: sometimes, the (pdb,chain) key is not unique - some chains have a fused protein with
-                    # perhaps another organism's protein fused. Currently not considering these as unique, but
-                    # TODO: when cleaning, these should be removed
-                    if g.annotation['structure']['pdb']:
-                        current_annotation = g.annotation['structure']['pdb']
-                        temp_annotation = OrderedDict([k, v] for k, v in current_annotation.items() if k not in to_add_to_annotation)
-                        to_add_to_annotation.update(temp_annotation)
-
-                    g.annotation['structure']['pdb'] = to_add_to_annotation
-
-                    log.debug('{}: {} PDB/chain pairs mapped'.format(gene_id, len(to_add_to_annotation)))
+                        log.debug('{}, {}: {} PDB/chain pairs mapped'.format(gene_id, uniprot_id, len(best_structures)))
+                        genes_with_a_structure.append(gene_id)
+                    else:
+                        log.debug('{}, {}: no PDB/chain pairs mapped'.format(gene_id, uniprot_id))
+                        genes_without_a_structure.append(gene_id)
                 else:
-                    log.debug('{}: No PDB/chain pairs mapped'.format(gene_id))
+                    log.debug('{}, {}: no PDBs available'.format(gene_id, uniprot_id))
+                    genes_without_a_structure.append(gene_id)
 
-        cols = ['gene', 'uniprot', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'seq_coverage',
-                'taxonomy_id', 'pdb_start', 'pdb_end', 'unp_start', 'unp_end', 'rank'] #'release_date',
+        cols = ['gene', 'uniprot', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'coverage',
+                'tax_id', 'start', 'end', 'unp_start', 'unp_end', 'rank']
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
 
-        # TODO: also report genes with no PDB?
-
         log.info('Completed UniProt -> best PDB mapping. See the "df_pdb_ranking" attribute.')
+        # TODO: also make these into properties
+        log.info('{}: number of genes with at least one structure'.format(len(genes_with_a_structure)))
+        log.info('{}: number of genes with no structures'.format(len(genes_without_a_structure)))
 
     def blast_seqs_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, all_genes=False, force_rerun=False, display_link=False):
-        """BLAST each gene sequence to the PDB. Raw BLAST results (XML files) are saved per gene in the "structures" folder.
-
-        Returns:
-
+        """BLAST each gene sequence to the PDB. Raw BLAST results (XML files) are saved per gene in the "structures" folder
         """
         blast_results_pre_df = []
 
         for g in tqdm(self.genes):
             gene_id = str(g.id)
-            seq_file = g.annotation['sequence']['representative']['seq_file']
+            seq_name = g.protein.representative_sequence.id
+            seq_str = g.protein.representative_sequence.get_seq_str()
 
             # Check if a representative sequence was set
-            if not seq_file:
-                log.warning('{}: No sequence set'.format(gene_id))
+            if not seq_str:
+                log.warning('{}: no representative sequence set, cannot BLAST'.format(gene_id))
                 continue
-
-            seq_dir, seq_name, seq_ext = utils.split_folder_and_path(seq_file)
 
             # If all_genes=False, BLAST only genes without a uniprot->pdb mapping
-            already_has_pdbs = g.annotation['structure']['pdb']
-            if already_has_pdbs and not all_genes:
-                log.debug('Skipping BLAST for {}, structures already mapped and all_genes flag is False'.format(gene_id))
-                continue
 
-            # Read the sequence
-            seq_file_path = op.join(self.sequence_dir, gene_id, seq_file)
-            seq_record = SeqIO.read(open(seq_file_path), "fasta")
-            seq_str = str(seq_record.seq)
+            if g.protein.num_structures > 0 and not all_genes:
+                log.debug('{}: skipping BLAST, {} structures already mapped and all_genes flag is False'.format(g.protein.num_structures,
+                                                                                                                gene_id))
+                continue
 
             # Make the gene specific folder under the structure_files directory
             gene_folder = op.join(self.structure_single_chain_dir, gene_id)
@@ -952,7 +646,7 @@ class GEMPRO(object):
 
             # BLAST the sequence to the PDB
             blast_results = ssbio.databases.pdb.blast_pdb(seq_str,
-                                                          outfile='{}_blast_pdb.xml'.format(seq_name),
+                                                          outfile='{}_blast_pdb.xml'.format(slugify(seq_name)),
                                                           outdir=op.join(self.sequence_dir, gene_id),
                                                           force_rerun=force_rerun,
                                                           evalue=evalue,
@@ -960,51 +654,41 @@ class GEMPRO(object):
                                                           link=display_link)
 
             if blast_results:
-                to_add_to_annotation = OrderedDict()
+                # Filter for new BLASTed PDBs
+                pdbs = [x['hit_pdb'].lower() for x in blast_results]
+                new_pdbs = [y for y in pdbs if not g.protein.structures.has_id(y)]
+                if new_pdbs:
+                    log.info('{}: Adding {} PDBs from BLAST results.'.format(gene_id, len(new_pdbs)))
+                blast_results = [z for z in blast_results if z['hit_pdb'].lower() in new_pdbs]
 
                 for blast_result in blast_results:
-                    pdb = str(blast_result['hit_pdb'].lower())
+                    pdb = blast_result['hit_pdb'].lower()
                     chains = blast_result['hit_pdb_chains']
 
+                    # TODO: fix caching
                     # pdb_rez = ssbio.databases.pdb.get_resolution(pdb)
                     # pdb_rel = ssbio.databases.pdb.get_release_date(pdb)
 
                     for chain in chains:
-                        chain = str(chain)
-                        blast_dict = {}
-                        blast_dict['pdb_id'] = pdb
-                        blast_dict['pdb_chain_id'] = chain
-                        # blast_dict['resolution'] = pdb_rez
-                        # blast_dict['release_date'] = pdb_rel
-                        blast_dict['blast_score'] = blast_result['hit_score']
-                        blast_dict['blast_evalue'] = blast_result['hit_evalue']
-                        blast_dict['seq_coverage'] = blast_result['hit_percent_ident']
-                        blast_dict['seq_similar'] = blast_result['hit_percent_similar']
-                        blast_dict['seq_num_coverage'] = blast_result['hit_num_ident']
-                        blast_dict['seq_num_similar'] = blast_result['hit_num_similar']
-
-                        # For saving in Gene annotation
-                        to_add_to_annotation[pdb + ';' + chain] = blast_dict.copy()
-
-                        # For saving in summary dataframe
-                        blast_dict['gene'] = gene_id
-
-                        blast_results_pre_df.append(blast_dict)
-
-                # If structure annotation exists already, remove existing
-                # (pdb,chain) keys from BLAST results and append rest to the end
-                if g.annotation['structure']['pdb']:
-                    to_add_to_annotation = OrderedDict([k, v] for k, v in to_add_to_annotation.items() if k not in g.annotation['structure']['pdb'])
-                if to_add_to_annotation:
-                    log.info('{}: Adding {} PDBs from BLAST results.'.format(gene_id, len(to_add_to_annotation)))
-                g.annotation['structure']['pdb'].update(to_add_to_annotation)
+                        # load_pdb will append this protein to the list
+                        new_pdb = g.protein.load_pdb(pdb_id=pdb, mapped_chains=chain)
+                        new_pdb.add_chain_ids(chain)
+                        new_chain = new_pdb.chains.get_by_id(chain)
+                        new_chain.update(blast_result, only_keys=['hit_score', 'hit_evalue', 'hit_percent_similar',
+                                                                  'hit_percent_ident', 'hit_num_ident', 'hit_num_similar'])
+                        # For saving in the summary dataframe
+                        pdb_dict = new_pdb.get_dict_with_chain(chain=chain, df_format=True)
+                        pdb_dict['gene'] = gene_id
+                        pdb_dict['pdb_id'] = pdb
+                        pdb_dict['pdb_chain_id'] = chain
+                        blast_results_pre_df.append(pdb_dict)
 
                 log.debug('{}: {} PDBs BLASTed'.format(gene_id, len(blast_results)))
             else:
-                log.debug('No BLAST results for {}'.format(gene_id))
+                log.debug('{}: no BLAST results'.format(gene_id))
 
-        cols = ['gene', 'pdb_id', 'pdb_chain_id', 'blast_score', 'blast_evalue', # 'resolution', 'release_date',
-                'seq_coverage', 'seq_similar', 'seq_num_coverage', 'seq_num_similar']
+        cols = ['gene', 'pdb_id', 'pdb_chain_id', 'hit_score', 'hit_evalue', 'hit_percent_similar',
+                'hit_percent_ident', 'hit_num_ident', 'hit_num_similar']
         self.df_pdb_blast = pd.DataFrame.from_records(blast_results_pre_df, columns=cols)
 
         log.info('Completed sequence --> PDB BLAST. See the "df_pdb_blast" attribute.')
@@ -1043,42 +727,15 @@ class GEMPRO(object):
                 if not op.exists(op.join(dest_gene_dir, op.basename(hdict['model_file']))):
                     shutil.copy2(hdict['model_file'], dest_gene_dir)
 
-                g.annotation['structure']['homology'][hid] = hdict
+                new_homology = g.protein.load_homology_model(hid, hdict['model_file'])
+                new_homology.update(hdict)
+
                 log.debug('{}: updated homology model information and copied model file.'.format(gene_id))
             counter += 1
 
+        # TODO: dataframe for this stuff
+
         log.info('Updated homology model information for {} genes.'.format(counter))
-
-    # TODO: code to prep homology modeling
-    def prep_itasser_models(self, outdir, itasser_installation, itlib_location, runtype, print_exec=False, **kwargs):
-        pass
-        # import ssbio.itasser.itasserprep as ip
-        # # if running on ssb1-3
-        # runtype = 'torque'
-        # itasser_loc = '~/software/I-TASSER4.4'
-        # itlib_loc = '~/software/ITLIB'
-        # local_dir = '/home/nathan/projects_unsynced/thermatoga_me/structure_files/homology_models'
-        # run_from_dir = '~/projects/thermatoga_me/structure_files/homology_models'
-        #
-        # for ident, seq in genes_and_sequences:
-        #     ip.ITASSERPrep(ident, seq, local_dir,
-        #                    itasser_loc=itasser_loc, itlib_loc=itlib_loc,
-        #                    runtype=runtype, print_exec=True, data_dir=run_from_dir)
-
-        # # if running on NERSC
-        # runtype = 'slurm'
-        # itasser_loc = '~/projects/software/I-TASSER4.4'
-        # itlib_loc = '~/projects/software/ITLIB'
-        # email = 'nmih@ucsd.edu'
-        # username = 'nmih'
-        # project = 'm1244'
-        # data_dir = '~/projects/thermatoga_me/structure_files/homology_models'
-        #
-        # for ident, seq in genes_and_sequences:
-        #     ip.ITASSERPrep(ident, seq, '/home/nathan/projects_unsynced/thermatoga_me/structure_files/homology_models',
-        #                    itasser_loc=itasser_loc, itlib_loc=itlib_loc,
-        #                    runtype=runtype, print_exec=True, data_dir=data_dir, project_id=project,
-        #                    slurm_email=email, slurm_username=username)
 
     def get_itasser_models(self, homology_raw_dir, custom_itasser_name_mapping=None, force_rerun=False):
         """Copy generated homology models from a directory to the GEM-PRO directory.
@@ -1090,9 +747,25 @@ class GEMPRO(object):
 
         """
         itasser_pre_df = []
+        counter = 0
+
+        df_cols = ['gene', 'model_file', 'model_date', 'difficulty',
+                   'top_template_pdb', 'top_template_chain', 'c_score',
+                   'tm_score', 'tm_score_err', 'rmsd', 'rmsd_err',
+                   'top_bsite_site_num', 'top_bsite_c_score', 'top_bsite_cluster_size', 'top_bsite_algorithm',
+                   'top_bsite_pdb_template_id', 'top_bsite_pdb_template_chain', 'top_bsite_pdb_ligand',
+                   'top_bsite_binding_location_coords', 'top_bsite_c_score_method', 'top_bsite_binding_residues',
+                   'top_bsite_ligand_cluster_counts',
+                   'top_ec_pdb_template_id', 'top_ec_pdb_template_chain', 'top_ec_tm_score', 'top_ec_rmsd',
+                   'top_ec_seq_ident', 'top_ec_seq_coverage', 'top_ec_c_score', 'top_ec_ec_number',
+                   'top_ec_binding_residues',
+                   'top_go_mf_go_id', 'top_go_mf_go_term', 'top_go_mf_c_score', 'top_go_bp_go_id', 'top_go_bp_go_term',
+                   'top_go_bp_c_score', 'top_go_cc_go_id', 'top_go_cc_go_term', 'top_go_cc_c_score']
 
         for g in tqdm(self.genes):
             gene_id = g.id
+
+            # The name of the actual pdb file will be $GENEID_model1.pdb
             itasser_name = gene_id + '_model1'
 
             if custom_itasser_name_mapping and gene_id in custom_itasser_name_mapping:
@@ -1101,9 +774,15 @@ class GEMPRO(object):
                 hom_id = gene_id
             orig_itasser_dir = op.join(homology_raw_dir, hom_id)
 
-            itasser_parse = ITASSERParse(original_results_path=orig_itasser_dir, create_dfs=True)
+            try:
+                itasser_prop = g.protein.load_itasser_folder(ident=hom_id, itasser_folder=orig_itasser_dir, create_dfs=True)
+            except OSError:
+                log.debug('{}: no homology model available.'.format(gene_id))
+                continue
 
-            if itasser_parse.modeling_results:
+            if itasser_prop.model_file:
+                counter += 1
+
                 # Make the destination structure folder and other results folder
                 dest_gene_dir = op.join(self.structure_single_chain_dir, gene_id)
                 if not op.exists(dest_gene_dir):
@@ -1113,44 +792,35 @@ class GEMPRO(object):
                 if not op.exists(dest_itasser_extra_dir):
                     os.mkdir(dest_itasser_extra_dir)
 
-                try:
-                    itasser_parse.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
-                except Exception as e:
-                    print(e)
-                    print(g, orig_itasser_dir)
-                    break
-                itasser_parse.save_dataframes(outdir=dest_itasser_extra_dir)
+                itasser_prop.copy_results(copy_to_dir=dest_gene_dir, rename_model_to=itasser_name, force_rerun=force_rerun)
+                itasser_prop.save_dataframes(outdir=dest_itasser_extra_dir)
 
-                # Always set sequence coverage to 100% for an ITASSER model
-                # TODO: should probably just do the alignment to make sure (representative sequences can change)
-                copied = copy.deepcopy(itasser_parse.modeling_results)
-                copied['seq_coverage'] = 1
-                g.annotation['structure']['homology'][gene_id] = copied
+                new_homology_dict = itasser_prop.get_dict(df_format=True, only_keys=df_cols)
 
-                copied['gene'] = gene_id
-                itasser_pre_df.append(copied)
+                # TODO: should do the alignment to make calc seq_coverage (representative sequences can change)
+                # copied['seq_coverage'] = 1
+
+                new_homology_dict['gene'] = gene_id
+                itasser_pre_df.append(new_homology_dict)
             else:
-                log.debug('{}: No homology model available.'.format(gene_id))
+                log.debug('{}: homology modeling unfinished'.format(gene_id))
 
-        cols = ['gene', 'model_file', 'model_date', 'difficulty',
-                'top_template_pdb', 'top_template_chain', 'c_score',
-                'tm_score', 'tm_score_err', 'rmsd', 'rmsd_err',
-                'top_bsite_site_num', 'top_bsite_c_score', 'top_bsite_cluster_size', 'top_bsite_algorithm',
-                'top_bsite_pdb_template_id', 'top_bsite_pdb_template_chain', 'top_bsite_pdb_ligand',
-                'top_bsite_binding_location_coords', 'top_bsite_c_score_method', 'top_bsite_binding_residues',
-                'top_bsite_ligand_cluster_counts',
-                'top_ec_pdb_template_id', 'top_ec_pdb_template_chain', 'top_ec_tm_score', 'top_ec_rmsd',
-                'top_ec_seq_ident', 'top_ec_seq_coverage', 'top_ec_c_score', 'top_ec_ec_number',
-                'top_ec_binding_residues',
-                'top_go_mf_go_id', 'top_go_mf_go_term', 'top_go_mf_c_score', 'top_go_bp_go_id', 'top_go_bp_go_term',
-                'top_go_bp_c_score', 'top_go_cc_go_id', 'top_go_cc_go_term', 'top_go_cc_c_score']
-        self.df_itasser = pd.DataFrame.from_records(itasser_pre_df, columns=cols)
+        # TODO: write a "dataframe_update" method to 1) create a new df if empty, 2) or append to an existing one but
+        # checks for existing gene IDs (has to be an empty row value tho?)
+        if not self.df_itasser.empty:
+            self.df_itasser = self.df_itasser.append(itasser_pre_df, ignore_index=True).reset_index(drop=True)
+            log.info('Updated existing I-TASSER dataframe.')
+        else:
+            self.df_itasser = pd.DataFrame.from_records(itasser_pre_df, columns=df_cols)
+        # Drop columns that don't have anything in them
         self.df_itasser.dropna(axis=1, how='all', inplace=True)
 
-        log.info('Completed copying of {} I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.'.format(len(self.df_itasser)))
+        log.info('Completed copying of {} I-TASSER models to GEM-PRO directory'.format(counter))
+        log.info('{} I-TASSER models total'.format(len(self.df_itasser)))
+        log.info('See the "df_itasser" attribute for a summary dataframe')
 
-    def set_representative_structure(self, always_use_homology=True, sort_homology_by='seq_coverage',
-                                     allow_missing_on_termini=0.1, allow_mutants=True, allow_deletions=False,
+    def set_representative_structure(self, seq_ident_cutoff=0.5, always_use_homology=False,
+                                     allow_missing_on_termini=0.2, allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True, force_rerun=False):
         """Set the representative structure for a gene.
 
@@ -1166,166 +836,83 @@ class GEMPRO(object):
             - tm_score
 
         """
+        df_cols = ['gene', 'id', 'is_experimental', 'reference_seq', 'reference_seq_top_coverage',
+                   'structure_file']
+
+        rep_struct_pre_df = []
+        structure_missing = []
 
         for g in tqdm(self.genes):
             gene_id = str(g.id)
 
-            has_homology = False
-            has_pdb = False
-            use_homology = False
-            use_pdb = False
-
-            if len(g.annotation['structure']['homology']) > 0:
-                has_homology = True
-            if len(g.annotation['structure']['pdb']) > 0:
-                has_pdb = True
-
-            # If there are no structures at all, move on
-            if not has_pdb and not has_homology:
-                log.debug('{}: No structures available - no representative structure will be set.'.format(gene_id))
-                continue
-
-            # If we mark to always use homology, use it if it exists
-            if always_use_homology:
-                if has_homology:
-                    use_homology = True
-                elif has_pdb:
-                    use_pdb = True
-            # If we don't always want to use homology, use PDB if it exists
-            else:
-                if has_homology and has_pdb:
-                    use_pdb = True
-                elif has_homology and not has_pdb:
-                    use_homology = True
-                elif has_pdb and not has_homology:
-                    use_pdb = True
-
-            structure_set = False
             gene_seq_dir = op.join(self.sequence_dir, gene_id)
             gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
 
-            # Make the destination structure folder
-            if not op.exists(gene_struct_dir):
-                os.mkdir(gene_struct_dir)
+            repstruct = g.protein.set_representative_structure(seq_outdir=gene_seq_dir,
+                                                               struct_outdir=gene_struct_dir,
+                                                               seq_ident_cutoff=seq_ident_cutoff,
+                                                               always_use_homology=always_use_homology,
+                                                               allow_missing_on_termini=allow_missing_on_termini,
+                                                               allow_mutants=allow_mutants,
+                                                               allow_deletions=allow_deletions,
+                                                               allow_insertions=allow_insertions,
+                                                               allow_unresolved=allow_unresolved,
+                                                               force_rerun=force_rerun)
 
-            if use_pdb:
-                try:
-                    # Get the representative sequence
-                    seq_file = g.annotation['sequence']['representative']['seq_file']
-                    seq_file_path = op.join(gene_seq_dir, seq_file)
-                    seq_record = SeqIO.read(open(seq_file_path), "fasta")
-                    ref_seq = str(seq_record.seq)
+            if not repstruct:
+                structure_missing.append(gene_id)
+                continue
 
-                    # Put PDBs through QC/QA
-                    all_pdbs_and_chains = list(g.annotation['structure']['pdb'].keys())
-                    convert_to_dict = utils.DefaultOrderedDict(list)
-                    for x in all_pdbs_and_chains:
-                        convert_to_dict[x.split(';')[0]].append(x.split(';')[1])
+            repdict = repstruct.get_dict(df_format=True)
+            repdict['gene'] = gene_id
+            rep_struct_pre_df.append(repdict)
 
-                    for pdb, chains in convert_to_dict.items():
-                        # Download the PDB
-                        try:
-                            file_type = 'pdb'
-                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type=file_type, header=False,
-                                                                              outdir=gene_struct_dir,
-                                                                              force_rerun=force_rerun)
+        # Info on genes that could not be mapped
+        if len(structure_missing) > 0:
+            self.missing_repstruct = list(set(structure_missing))
+            log.warning('{} gene(s) could not be mapped. Inspect the "missing_repstruct" attribute.'.format(
+                    len(self.missing_repstruct)))
 
-                            log.debug('{}: downloaded PDB file'.format(pdb))
-                            break
-                        except requests.exceptions.HTTPError:
-                            file_type = 'cif'
-                            pdb_file = ssbio.databases.pdb.download_structure(pdb_id=pdb, file_type=file_type, header=False,
-                                                                              outdir=gene_struct_dir,
-                                                                              force_rerun=force_rerun)
-                            log.debug('{}: download mmCIF file'.format(pdb))
-                        except:
-                            log.warning('{}: PDB file not available'.format(pdb))
-                            continue
+        self.df_representative_structures = pd.DataFrame.from_records(rep_struct_pre_df, columns=df_cols)
+        self.df_representative_structures.fillna(value=np.nan, inplace=True)
+        log.info('Created representative structures dataframe. See the "df_representative_structures" attribute.')
 
-                        # Get the sequences of the chains
-                        chain_to_seq = ssbio.structure.properties.residues.get_pdb_seqs(pdb_file, file_type=file_type)
+    def prep_itasser_models(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
+                            execute_from_dir=None, all_genes=False, print_exec=False, **kwargs):
+        # TODO: kwargs for slurm options
 
-                        for chain in chains:
-                            if chain not in chain_to_seq:
-                                log.warning('{}: chain {} not found in structure!'.format(pdb, chain))
-                                continue
-                            chain_seq = chain_to_seq[chain]
+        if not create_in_dir:
+            self.structure_homology_models = op.join(self.structure_dir, 'homology_models')
+        else:
+            self.structure_homology_models = create_in_dir
+        if not op.exists(self.structure_homology_models):
+            os.makedirs(self.structure_homology_models)
+            log.info('Created directory: {}'.format(self.structure_homology_models))
 
-                            # Compare representative sequence to structure sequence
-                            found_good_pdb = ssbio.structure.properties.quality.sequence_checker(reference_id=gene_id,
-                                                                                                 reference_sequence=ref_seq,
-                                                                                                 structure_id=pdb+'_'+chain,
-                                                                                                 structure_sequence=chain_seq,
-                                                                                                 allow_missing_on_termini=allow_missing_on_termini,
-                                                                                                 allow_mutants=allow_mutants,
-                                                                                                 allow_deletions=allow_deletions,
-                                                                                                 allow_insertions=allow_insertions,
-                                                                                                 allow_unresolved=allow_unresolved,
-                                                                                                 outfile='{}_{}.needle'.format(gene_id, pdb+'_'+chain),
-                                                                                                 outdir=gene_seq_dir,
-                                                                                                 force_rerun=force_rerun)
+        if not execute_from_dir:
+            execute_from_dir = self.structure_homology_models
 
-                            # If found_good_pdb = True, set as representative
-                            # If not, move on to the next potential PDB
-                            if found_good_pdb:
-                                orig_pdb_data = g.annotation['structure']['pdb'][str(pdb) + ';' + str(chain)]
-                                g.annotation['structure']['representative']['is_experimental'] = True
-                                g.annotation['structure']['representative']['structure_id'] = str(pdb) + ';' + str(chain)
-                                g.annotation['structure']['representative']['seq_coverage'] = orig_pdb_data['seq_coverage']
-                                g.annotation['structure']['representative']['original_pdb_file'] = op.basename(pdb_file)
+        counter = 0
+        for g in self.genes:
+            gene_id = g.id
 
-                                # Clean it
-                                custom_clean = CleanPDB(keep_chains=chain)
-                                my_pdb = PDBIOExt(pdb_file, file_type=file_type)
-                                default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
-                                                                       out_suffix='_{}_clean'.format(chain),
-                                                                       out_dir=gene_struct_dir)
-                                default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
+            repseq = g.protein.representative_sequence
+            if not repseq:
+                log.warning('{}: No representative sequence available'.format(gene_id))
+                continue
 
-                                g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
+            # Skip homology modeling if there is a structure set
+            repstruct = g.protein.representative_structure
+            if repstruct and not all_genes:
+                log.debug('{}: Representative structure available, skipping homology modeling'.format(gene_id))
+                continue
 
-                                # TODO: download SIFTS file
-                                # TODO: mutate it based on the alignment
-                                # TODO: run xleap commands too?
+            ITASSERPrep(ident=gene_id, seq_str=repseq.get_seq_str(), root_dir=self.structure_homology_models,
+                        itasser_path=itasser_installation, itlib_path=itlib_folder,
+                        runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir, walltime=kwargs['walltime'])
+            counter += 1
 
-                                structure_set = True
-                                raise StopIteration
-                except StopIteration:
-                    log.debug('{}: Found representative PDB ({}, {})'.format(gene_id, pdb, chain))
-                    continue
-                else:
-                    if has_homology:
-                        use_homology = True
-
-            # If we are to use homology, save its information in the representative structure field
-            if use_homology and not structure_set:
-                hm = g.annotation['structure']['homology']
-                # Sort the available homology models by the specified field
-                sorted_homology_ids = sorted(hm, key=lambda x: hm[x][sort_homology_by], reverse=True)
-
-                top_homology = sorted_homology_ids[0]
-                original_pdb_file = g.annotation['structure']['homology'][top_homology]['model_file']
-                seq_coverage = g.annotation['structure']['homology'][top_homology]['seq_coverage']
-
-                g.annotation['structure']['representative']['structure_id'] = top_homology
-                g.annotation['structure']['representative']['seq_coverage'] = seq_coverage
-                g.annotation['structure']['representative']['original_pdb_file'] = op.basename(original_pdb_file)
-
-                # Clean it
-                custom_clean = CleanPDB()
-                my_pdb = PDBIOExt(op.join(gene_struct_dir, original_pdb_file), file_type='pdb')
-                default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean,
-                                                       out_suffix='_clean',
-                                                       out_dir=gene_struct_dir)
-                default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
-
-                g.annotation['structure']['representative']['clean_pdb_file'] = default_cleaned_pdb_basename
-
-                structure_set = True
-            else:
-                log.debug('{}: No representative PDB'.format(gene_id))
-
-        # TODO: summary of results
+        log.info('Prepared I-TASSER modeling folders for {} genes'.format(counter))
 
     def pdb_downloader_and_metadata(self, force_rerun=False):
         """Download ALL structures which have been mapped to our genes. Gets PDB file and mmCIF header and
@@ -1346,36 +933,21 @@ class GEMPRO(object):
                 os.mkdir(gene_struct_dir)
 
             # Check if we have any PDBs
-            if len(g.annotation['structure']['pdb']) == 0:
+            if g.protein.num_structures_experimental == 0:
                 log.debug('{}: No structures available - no structures will be downloaded'.format(gene_id))
                 continue
 
             # Download the PDBs
-            for k, v in g.annotation['structure']['pdb'].items():
-                p = v['pdb_id']
+            for s in g.protein.get_experimental_structures():
 
-                log.debug('{}: Downloading PDB and mmCIF'.format(p))
-                pdb_file = ssbio.databases.pdb.download_structure(pdb_id=p, file_type='pdb', header=False, outdir=gene_struct_dir, force_rerun=force_rerun)
-                cif_file = ssbio.databases.pdb.download_structure(pdb_id=p, file_type='cif', header=True, outdir=gene_struct_dir, force_rerun=force_rerun)
+                log.debug('{}: Downloading PDB or mmCIF file'.format(s.id))
+                s.download_structure_file(outdir=gene_struct_dir, force_rerun=force_rerun, parse=False)
+                s.download_cif_header_file(outdir=gene_struct_dir, force_rerun=force_rerun)
 
-                # Parse the mmCIF header
-                cif_dict = ssbio.databases.pdb.parse_mmcif_header(cif_file)
-
-                # Save annotation info
-                cif_dict['pdb_file'] = op.basename(pdb_file)
-                cif_dict['mmcif_header'] = op.basename(cif_file)
-                g.annotation['structure']['pdb'][k].update(cif_dict)
-
-                adder = g.annotation['structure']['pdb'][k].copy()
-                adder['chemicals'] = ';'.join(adder['chemicals'])
-                # TODO: error when taxonomy name does not exist for some PDBs
-                # if isinstance(adder['taxonomy_name'], list):
-                #     adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
-                adder['gene'] = gene_id
-                pdb_pre_df.append(adder)
+                # pdb_pre_df.append(adder)
 
         # Save a dataframe of the PDB metadata
-        if hasattr(self, 'df_pdb_metadata'):
+        if not self.df_pdb_metadata.empty:
             self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
             log.info('Updated existing PDB dataframe.')
         else:
@@ -1386,138 +958,133 @@ class GEMPRO(object):
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
             log.info('Created PDB metadata dataframe.')
 
-    # TODO: prepare genes for homology modeling
-    def homology_modeling_prep(self):
-        pass
+    # def calculate_sequence_properties(self, force_rerun=False):
+    #     """Run EMBOSS pepstats and biopython ProteinAnalysis on all representative sequences
+    #
+    #     """
+    #     seq_prop_pre_df = []
+    #     for g in tqdm(self.genes):
+    #         gene_id = str(g.id)
+    #         gene_folder = op.join(self.sequence_dir, gene_id)
+    #         repseq = g.protein.representative_sequence
+    #
+    #         if not repseq:
+    #             log.warning('{}: No representative sequence available'.format(gene_id))
+    #             continue
+    #         else:
+    #             pepstats_file = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=repseq.sequence_path,
+    #                                                                                         outdir=gene_folder,
+    #                                                                                         force_rerun=force_rerun)
+    #             pepstats_parsed = ssbio.sequence.properties.residues.emboss_pepstats_parser(pepstats_file)
+    #
+    #             # TODO: also run biopython ProteinAnalysis
+    #             g.annotation['sequence']['representative']['properties'].update(    pepstats_parsed.copy())
+    #
+    #             pepstats_parsed['gene'] = gene_id
+    #             seq_prop_pre_df.append(pepstats_parsed)
+    #
+    #     cols = ['gene', 'percent_acidic', 'percent_aliphatic', 'percent_aromatic', 'percent_basic', 'percent_charged',
+    #             'percent_non-polar', 'percent_polar', 'percent_small', 'percent_tiny']
+    #
+    #     self.df_sequence_properties = pd.DataFrame.from_records(seq_prop_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
+    #     log.info('Created sequence property dataframe. See the "df_sequence_properties" attribute.')
+    #
+    # def calculate_residue_depth(self, force_rerun=False):
+    #     """Run MSMS on all representative structures, save a json file per structure that contains
+    #         the average residue depth per residue, and the alpha-carbon depth. Units are in Angstroms.
+    #
+    #     Args:
+    #         force_rerun (bool): If you want to overwrite any existing files
+    #
+    #     """
+    #     self.missing_msms = {}
+    #
+    #     for g in tqdm(self.genes):
+    #         gene_id = g.id
+    #         gene_structure_dir = op.join(self.structure_single_chain_dir, gene_id)
+    #         clean_pdb = g.annotation['structure']['representative']['clean_pdb_file']
+    #
+    #         if not clean_pdb:
+    #             log.warning('{}: No representative structure available'.format(gene_id))
+    #             continue
+    #         else:
+    #             infile = op.join(gene_structure_dir, clean_pdb)
+    #
+    #             try:
+    #                 outfile = ssbio.structure.properties.msms.get_msms_df_on_file(pdb_file=infile,
+    #                                                                               outdir=gene_structure_dir,
+    #                                                                               force_rerun=force_rerun)
+    #             # Log if MSMS was not run on a file
+    #             except AssertionError:
+    #                 self.missing_msms[gene_id] = infile
+    #                 log.warning('{}: MSMS failed to run on {}'.format(gene_id, clean_pdb))
+    #                 continue
+    #
+    #             g.annotation['structure']['representative']['properties']['msms_file'] = op.basename(outfile)
+    #
+    #     if len(self.missing_msms) > 0:
+    #         log.warning('{} gene(s) failed calculation. Inspect the "missing_msms" attribute.'.format(len(self.missing_msms)))
+    #
+    #     log.info('Completed calculations of residue depth')
 
-    def calculate_sequence_properties(self, force_rerun=False):
-        """Run EMBOSS pepstats and biopython ProteinAnalysis on all representative sequences
-
-        """
-        seq_prop_pre_df = []
-        for g in tqdm(self.genes):
-            gene_id = str(g.id)
-            gene_folder = op.join(self.sequence_dir, gene_id)
-            repseq = g.annotation['sequence']['representative']['seq_file']
-
-            if not repseq:
-                log.warning('{}: No representative sequence available'.format(gene_id))
-                continue
-            else:
-                repseq_path = op.join(gene_folder, repseq)
-                pepstats_file = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=repseq_path,
-                                                                                            outdir=gene_folder,
-                                                                                            force_rerun=force_rerun)
-                pepstats_parsed = ssbio.sequence.properties.residues.emboss_pepstats_parser(pepstats_file)
-
-                # TODO: also run biopython ProteinAnalysis
-                g.annotation['sequence']['representative']['properties'].update(pepstats_parsed.copy())
-
-                pepstats_parsed['gene'] = gene_id
-                seq_prop_pre_df.append(pepstats_parsed)
-
-        cols = ['gene', 'percent_acidic', 'percent_aliphatic', 'percent_aromatic', 'percent_basic', 'percent_charged',
-                'percent_non-polar', 'percent_polar', 'percent_small', 'percent_tiny']
-
-        self.df_sequence_properties = pd.DataFrame.from_records(seq_prop_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
-        log.info('Created sequence property dataframe. See the "df_sequence_properties" attribute.')
-
-    def calculate_residue_depth(self, force_rerun=False):
-        """Run MSMS on all representative structures, save a json file per structure that contains
-            the average residue depth per residue, and the alpha-carbon depth. Units are in Angstroms.
-
-        Args:
-            force_rerun (bool): If you want to overwrite any existing files
-
-        """
-        self.missing_msms = {}
-
-        for g in tqdm(self.genes):
-            gene_id = g.id
-            gene_structure_dir = op.join(self.structure_single_chain_dir, gene_id)
-            clean_pdb = g.annotation['structure']['representative']['clean_pdb_file']
-
-            if not clean_pdb:
-                log.warning('{}: No representative structure available'.format(gene_id))
-                continue
-            else:
-                infile = op.join(gene_structure_dir, clean_pdb)
-
-                try:
-                    outfile = ssbio.structure.properties.msms.run_msms(pdb_file=infile,
-                                                                       outdir=gene_structure_dir,
-                                                                       force_rerun=force_rerun)
-                # Log if MSMS was not run on a file
-                except AssertionError:
-                    self.missing_msms[gene_id] = infile
-                    log.warning('{}: MSMS failed to run on {}'.format(gene_id, clean_pdb))
-                    continue
-
-                g.annotation['structure']['representative']['properties']['msms_file'] = op.basename(outfile)
-
-        if len(self.missing_msms) > 0:
-            log.warning('{} gene(s) failed calculation. Inspect the "missing_msms" attribute.'.format(len(self.missing_msms)))
-
-        log.info('Completed calculations of residue depth')
-
-    def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
-        """Run the entire GEM-PRO pipeline.
-
-        Options include:
-        ...
-
-        Returns:
-
-        """
-        current_sequence_mapping_engines = ['kegg', 'uniprot', 'all']
-        if sequence_mapping_engine not in current_sequence_mapping_engines:
-            raise ValueError('Sequence mapping engine not available')
-
-        if sequence_mapping_engine == 'kegg' or sequence_mapping_engine == 'all':
-            if 'kegg_organism_code' not in kwargs:
-                raise TypeError('kegg_organism_code needed')
-
-        if sequence_mapping_engine == 'uniprot' or sequence_mapping_engine == 'all':
-            if 'model_gene_source' not in kwargs:
-                raise TypeError('UniProt model_gene_source needed')
-
-        print('Running KEGG mapping...')
-        # TODO: better way of passing optional arguments to these things - yaml? There are too many if statements to check for things
-        if 'custom_gene_mapping' in kwargs:
-            self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'], custom_gene_mapping=kwargs['custom_gene_mapping'])
-        else:
-            self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
-
-        print('Running UniProt mapping...')
-        self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
-
-        print('Setting representative sequences...')
-        self.set_representative_sequence()
-
-        current_structure_mapping_engines = ['uniprot', 'itasser', 'all', 'none'] # 'blast', 'manual_homology'
-        if structure_mapping_engine not in current_structure_mapping_engines:
-            raise ValueError('Structure mapping engine not available')
-
-        if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
-            if 'homology_raw_dir' not in kwargs:
-                raise TypeError('Path to homology models needed as homology_raw_dir')
-
-        if not structure_mapping_engine == 'none':
-            if 'always_use_homology' not in kwargs:
-                raise TypeError('Flag always_use_homology needed')
-
-        if structure_mapping_engine == 'uniprot' or structure_mapping_engine == 'all':
-            print('Mapping UniProt IDs to the PDB...')
-            self.map_uniprot_to_pdb()
-
-        if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
-            print('Copying I-TASSER models...')
-            self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
-                                    custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
-
-        if not structure_mapping_engine == 'none':
-            print('Setting representative structures...')
-            self.set_representative_structure(always_use_homology=kwargs['always_use_homology'])
+    # def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
+    #     """Run the entire GEM-PRO pipeline.
+    #
+    #     Options include:
+    #     ...
+    #
+    #     Returns:
+    #
+    #     """
+    #     current_sequence_mapping_engines = ['kegg', 'uniprot', 'all']
+    #     if sequence_mapping_engine not in current_sequence_mapping_engines:
+    #         raise ValueError('Sequence mapping engine not available')
+    #
+    #     if sequence_mapping_engine == 'kegg' or sequence_mapping_engine == 'all':
+    #         if 'kegg_organism_code' not in kwargs:
+    #             raise TypeError('kegg_organism_code needed')
+    #
+    #     if sequence_mapping_engine == 'uniprot' or sequence_mapping_engine == 'all':
+    #         if 'model_gene_source' not in kwargs:
+    #             raise TypeError('UniProt model_gene_source needed')
+    #
+    #     print('Running KEGG mapping...')
+    #     # TODO: better way of passing optional arguments to these things - yaml? There are too many if statements to check for things
+    #     if 'custom_gene_mapping' in kwargs:
+    #         self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'], custom_gene_mapping=kwargs['custom_gene_mapping'])
+    #     else:
+    #         self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
+    #
+    #     print('Running UniProt mapping...')
+    #     self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
+    #
+    #     print('Setting representative sequences...')
+    #     self.set_representative_sequence()
+    #
+    #     current_structure_mapping_engines = ['uniprot', 'itasser', 'all', 'none'] # 'blast', 'manual_homology'
+    #     if structure_mapping_engine not in current_structure_mapping_engines:
+    #         raise ValueError('Structure mapping engine not available')
+    #
+    #     if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
+    #         if 'homology_raw_dir' not in kwargs:
+    #             raise TypeError('Path to homology models needed as homology_raw_dir')
+    #
+    #     if not structure_mapping_engine == 'none':
+    #         if 'always_use_homology' not in kwargs:
+    #             raise TypeError('Flag always_use_homology needed')
+    #
+    #     if structure_mapping_engine == 'uniprot' or structure_mapping_engine == 'all':
+    #         print('Mapping UniProt IDs to the PDB...')
+    #         self.map_uniprot_to_pdb()
+    #
+    #     if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
+    #         print('Copying I-TASSER models...')
+    #         self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
+    #                                 custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
+    #
+    #     if not structure_mapping_engine == 'none':
+    #         print('Setting representative structures...')
+    #         self.set_representative_structure(always_use_homology=kwargs['always_use_homology'])
 
 
 if __name__ == '__main__':

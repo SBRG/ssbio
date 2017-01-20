@@ -1,0 +1,272 @@
+ID   DEOD_ECOLI              Reviewed;         239 AA.
+AC   P0ABP8; P09743; Q2M5T3;
+DT   08-NOV-2005, integrated into UniProtKB/Swiss-Prot.
+DT   23-JAN-2007, sequence version 2.
+DT   02-NOV-2016, entry version 100.
+DE   RecName: Full=Purine nucleoside phosphorylase DeoD-type;
+DE            Short=PNP;
+DE            EC=2.4.2.1 {ECO:0000305|PubMed:11786017};
+DE   AltName: Full=Inosine phosphorylase;
+GN   Name=deoD; Synonyms=pup; OrderedLocusNames=b4384, JW4347;
+OS   Escherichia coli (strain K12).
+OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;
+OC   Enterobacteriaceae; Escherichia.
+OX   NCBI_TaxID=83333;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RC   STRAIN=K12;
+RX   PubMed=1714590; DOI=10.1073/pnas.88.16.7185;
+RA   Hershfield M.S., Chaffee S., Koro-Johnson L., Mary A., Smith A.A.,
+RA   Short S.A.;
+RT   "Use of site-directed mutagenesis to enhance the epitope-shielding
+RT   effect of covalent modification of proteins with polyethylene
+RT   glycol.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 88:7185-7189(1991).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=7610040; DOI=10.1093/nar/23.12.2105;
+RA   Burland V.D., Plunkett G. III, Sofia H.J., Daniels D.L.,
+RA   Blattner F.R.;
+RT   "Analysis of the Escherichia coli genome VI: DNA sequence of the
+RT   region from 92.8 through 100 minutes.";
+RL   Nucleic Acids Res. 23:2105-2119(1995).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / MG1655 / ATCC 47076;
+RX   PubMed=9278503; DOI=10.1126/science.277.5331.1453;
+RA   Blattner F.R., Plunkett G. III, Bloch C.A., Perna N.T., Burland V.,
+RA   Riley M., Collado-Vides J., Glasner J.D., Rode C.K., Mayhew G.F.,
+RA   Gregor J., Davis N.W., Kirkpatrick H.A., Goeden M.A., Rose D.J.,
+RA   Mau B., Shao Y.;
+RT   "The complete genome sequence of Escherichia coli K-12.";
+RL   Science 277:1453-1462(1997).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=K12 / W3110 / ATCC 27325 / DSM 5911;
+RX   PubMed=16738553; DOI=10.1038/msb4100049;
+RA   Hayashi K., Morooka N., Yamamoto Y., Fujita K., Isono K., Choi S.,
+RA   Ohtsubo E., Baba T., Wanner B.L., Mori H., Horiuchi T.;
+RT   "Highly accurate genome sequences of Escherichia coli K-12 strains
+RT   MG1655 and W3110.";
+RL   Mol. Syst. Biol. 2:E1-E5(2006).
+RN   [5]
+RP   PROTEIN SEQUENCE OF 2-21.
+RX   PubMed=8506346; DOI=10.1073/pnas.90.11.5011;
+RA   Henzel W.J., Billeci T.M., Stults J.T., Wong S.C., Grimley C.,
+RA   Watanabe C.;
+RT   "Identifying proteins from two-dimensional gels by molecular mass
+RT   searching of peptide fragments in protein sequence databases.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 90:5011-5015(1993).
+RN   [6]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 225-239.
+RC   STRAIN=K12;
+RX   PubMed=3299264; DOI=10.1093/nar/15.13.5125;
+RA   Larsen J.E.L., Albrechtsen B., Valentin-Hansen P.;
+RT   "Analysis of the terminator region after the deoCABD operon of
+RT   Escherichia coli K-12 using a new class of single copy number operon-
+RT   fusion vectors.";
+RL   Nucleic Acids Res. 15:5125-5140(1987).
+RN   [7]
+RP   ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-27, AND IDENTIFICATION BY
+RP   MASS SPECTROMETRY.
+RC   STRAIN=K12 / JW1106, and K12 / MG1655 / ATCC 47076;
+RX   PubMed=18723842; DOI=10.1074/mcp.M800187-MCP200;
+RA   Zhang J., Sprung R., Pei J., Tan X., Kim S., Zhu H., Liu C.F.,
+RA   Grishin N.V., Zhao Y.;
+RT   "Lysine acetylation is a highly abundant and evolutionarily conserved
+RT   modification in Escherichia coli.";
+RL   Mol. Cell. Proteomics 8:215-225(2009).
+RN   [8]
+RP   X-RAY CRYSTALLOGRAPHY (2.0 ANGSTROMS).
+RX   PubMed=9351810; DOI=10.1016/S0969-2126(97)00287-6;
+RA   Mao C., Cook W.J., Zhou M., Koszalka G.W., Krenitsky T.A.,
+RA   Ealick S.E.;
+RT   "The crystal structure of Escherichia coli purine nucleoside
+RT   phosphorylase: a comparison with the human enzyme reveals a conserved
+RT   topology.";
+RL   Structure 5:1373-1383(1997).
+RN   [9]
+RP   X-RAY CRYSTALLOGRAPHY (2.1 ANGSTROMS), AND SUBUNIT.
+RX   PubMed=9653038; DOI=10.1006/jmbi.1998.1799;
+RA   Koellner G., Luic M., Shugar D., Saenger W., Bzowska A.;
+RT   "Crystal structure of the ternary complex of E. coli purine nucleoside
+RT   phosphorylase with formycin B, a structural analogue of the substrate
+RT   inosine, and phosphate (sulphate) at 2.1-A resolution.";
+RL   J. Mol. Biol. 280:153-166(1998).
+RN   [10] {ECO:0000244|PDB:1K9S}
+RP   X-RAY CRYSTALLOGRAPHY (2.00 ANGSTROMS) OF 2-238 IN COMPLEX WITH
+RP   N(7)-METHYLFORMYCIN AND PHOSPHATE, FUNCTION, CATALYTIC ACTIVITY, AND
+RP   SUBUNIT.
+RX   PubMed=11786017; DOI=10.1006/jmbi.2001.5211;
+RA   Koellner G., Bzowska A., Wielgus-Kutrowska B., Luic M., Steiner T.,
+RA   Saenger W., Stepinski J.;
+RT   "Open and closed conformation of the E. coli purine nucleoside
+RT   phosphorylase active center and implications for the catalytic
+RT   mechanism.";
+RL   J. Mol. Biol. 315:351-371(2002).
+CC   -!- FUNCTION: Cleavage of guanosine or inosine to respective bases and
+CC       sugar-1-phosphate molecules. {ECO:0000269|PubMed:11786017}.
+CC   -!- CATALYTIC ACTIVITY: Purine nucleoside + phosphate = purine +
+CC       alpha-D-ribose 1-phosphate. {ECO:0000305|PubMed:11786017}.
+CC   -!- CATALYTIC ACTIVITY: Purine deoxynucleoside + phosphate = purine +
+CC       2'-deoxy-alpha-D-ribose 1-phosphate.
+CC       {ECO:0000305|PubMed:11786017}.
+CC   -!- SUBUNIT: Homohexamer. {ECO:0000269|PubMed:11786017,
+CC       ECO:0000269|PubMed:9653038}.
+CC   -!- INTERACTION:
+CC       Self; NbExp=7; IntAct=EBI-907568, EBI-907568;
+CC   -!- SIMILARITY: Belongs to the PNP/UDP phosphorylase family.
+CC       {ECO:0000305}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; M60917; AAA24401.1; -; Genomic_DNA.
+DR   EMBL; U14003; AAA97280.1; -; Genomic_DNA.
+DR   EMBL; U00096; AAC77337.1; -; Genomic_DNA.
+DR   EMBL; AP009048; BAE78373.1; -; Genomic_DNA.
+DR   EMBL; X05629; CAA29114.1; -; Genomic_DNA.
+DR   PIR; A41143; A27854.
+DR   RefSeq; NP_418801.1; NC_000913.3.
+DR   RefSeq; WP_000224877.1; NZ_LN832404.1.
+DR   PDB; 1A69; X-ray; 2.10 A; A/B/C=2-239.
+DR   PDB; 1ECP; X-ray; 2.00 A; A/B/C/D/E/F=2-239.
+DR   PDB; 1K9S; X-ray; 2.00 A; A/B/C/D/E/F=2-238.
+DR   PDB; 1OTX; X-ray; 2.70 A; A/B/C=2-239.
+DR   PDB; 1OTY; X-ray; 2.50 A; A/B/C=2-239.
+DR   PDB; 1OU4; X-ray; 2.50 A; A/B/C=2-239.
+DR   PDB; 1OUM; X-ray; 2.40 A; A/B/C=2-239.
+DR   PDB; 1OV6; X-ray; 2.40 A; A/B/C=2-239.
+DR   PDB; 1OVG; X-ray; 2.20 A; A/B/C=2-239.
+DR   PDB; 3ONV; X-ray; 1.89 A; A/B/C=2-238.
+DR   PDB; 3OOE; X-ray; 2.00 A; A/B/C/D/E/F=2-238.
+DR   PDB; 3OOH; X-ray; 2.90 A; A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R=2-238.
+DR   PDB; 3OPV; X-ray; 2.40 A; A/B/C/D/E/F/G/H/I/J/K/L=2-238.
+DR   PDB; 3UT6; X-ray; 1.90 A; A/B/C=2-238.
+DR   PDB; 4TS3; X-ray; 2.30 A; A/B/C/D/E/F=2-238.
+DR   PDB; 4TS9; X-ray; 1.77 A; A/B/C=2-238.
+DR   PDB; 4TTA; X-ray; 2.00 A; A/B/C/D/E/F=2-238.
+DR   PDB; 4TTI; X-ray; 1.89 A; A/B/C/D/E/F=2-238.
+DR   PDB; 4TTJ; X-ray; 1.87 A; A/B/D=2-238.
+DR   PDBsum; 1A69; -.
+DR   PDBsum; 1ECP; -.
+DR   PDBsum; 1K9S; -.
+DR   PDBsum; 1OTX; -.
+DR   PDBsum; 1OTY; -.
+DR   PDBsum; 1OU4; -.
+DR   PDBsum; 1OUM; -.
+DR   PDBsum; 1OV6; -.
+DR   PDBsum; 1OVG; -.
+DR   PDBsum; 3ONV; -.
+DR   PDBsum; 3OOE; -.
+DR   PDBsum; 3OOH; -.
+DR   PDBsum; 3OPV; -.
+DR   PDBsum; 3UT6; -.
+DR   PDBsum; 4TS3; -.
+DR   PDBsum; 4TS9; -.
+DR   PDBsum; 4TTA; -.
+DR   PDBsum; 4TTI; -.
+DR   PDBsum; 4TTJ; -.
+DR   ProteinModelPortal; P0ABP8; -.
+DR   SMR; P0ABP8; -.
+DR   BioGrid; 4263006; 3.
+DR   DIP; DIP-36195N; -.
+DR   IntAct; P0ABP8; 2.
+DR   MINT; MINT-8328110; -.
+DR   STRING; 511145.b4384; -.
+DR   SWISS-2DPAGE; P0ABP8; -.
+DR   EPD; P0ABP8; -.
+DR   PaxDb; P0ABP8; -.
+DR   PRIDE; P0ABP8; -.
+DR   EnsemblBacteria; AAC77337; AAC77337; b4384.
+DR   EnsemblBacteria; BAE78373; BAE78373; BAE78373.
+DR   GeneID; 945654; -.
+DR   KEGG; ecj:JW4347; -.
+DR   KEGG; eco:b4384; -.
+DR   PATRIC; 32124384; VBIEscCol129921_4532.
+DR   EchoBASE; EB0218; -.
+DR   EcoGene; EG10222; deoD.
+DR   eggNOG; ENOG4105D3A; Bacteria.
+DR   eggNOG; COG0813; LUCA.
+DR   HOGENOM; HOG000274896; -.
+DR   InParanoid; P0ABP8; -.
+DR   KO; K03784; -.
+DR   OMA; KDHDFSA; -.
+DR   PhylomeDB; P0ABP8; -.
+DR   BioCyc; EcoCyc:DEOD-MONOMER; -.
+DR   BioCyc; ECOL316407:JW4347-MONOMER; -.
+DR   BioCyc; MetaCyc:DEOD-MONOMER; -.
+DR   BRENDA; 2.4.2.1; 2026.
+DR   EvolutionaryTrace; P0ABP8; -.
+DR   PRO; PR:P0ABP8; -.
+DR   Proteomes; UP000000318; Chromosome.
+DR   Proteomes; UP000000625; Chromosome.
+DR   GO; GO:0005829; C:cytosol; IDA:UniProtKB.
+DR   GO; GO:0016020; C:membrane; IDA:UniProtKB.
+DR   GO; GO:0042802; F:identical protein binding; IPI:IntAct.
+DR   GO; GO:0004731; F:purine-nucleoside phosphorylase activity; IDA:EcoCyc.
+DR   GO; GO:0006974; P:cellular response to DNA damage stimulus; IEP:EcoliWiki.
+DR   GO; GO:0006152; P:purine nucleoside catabolic process; IMP:EcoCyc.
+DR   GO; GO:0019686; P:purine nucleoside interconversion; IDA:EcoCyc.
+DR   Gene3D; 3.40.50.1580; -; 1.
+DR   HAMAP; MF_01627; Pur_nucleosid_phosp; 1.
+DR   InterPro; IPR004402; DeoD-type.
+DR   InterPro; IPR018017; Nucleoside_phosphorylase.
+DR   InterPro; IPR018016; Nucleoside_phosphorylase_CS.
+DR   InterPro; IPR000845; Nucleoside_phosphorylase_d.
+DR   PANTHER; PTHR21234; PTHR21234; 1.
+DR   Pfam; PF01048; PNP_UDP_1; 1.
+DR   SUPFAM; SSF53167; SSF53167; 1.
+DR   TIGRFAMs; TIGR00107; deoD; 1.
+DR   PROSITE; PS01232; PNP_UDP_1; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; Acetylation; Complete proteome;
+KW   Direct protein sequencing; Glycosyltransferase; Reference proteome;
+KW   Transferase.
+FT   INIT_MET      1      1       Removed. {ECO:0000269|PubMed:8506346}.
+FT   CHAIN         2    239       Purine nucleoside phosphorylase DeoD-
+FT                                type.
+FT                                /FTId=PRO_0000063130.
+FT   REGION       88     91       Phosphate binding.
+FT                                {ECO:0000269|PubMed:11786017}.
+FT   REGION      180    182       Purine nucleoside binding.
+FT                                {ECO:0000250|UniProtKB:P50389}.
+FT   REGION      204    205       Purine nucleoside binding.
+FT                                {ECO:0000250|UniProtKB:P50389}.
+FT   BINDING       5      5       Purine nucleoside; shared with dimeric
+FT                                partner. {ECO:0000250|UniProtKB:P50389}.
+FT   BINDING      21     21       Phosphate; via amide nitrogen.
+FT                                {ECO:0000269|PubMed:11786017}.
+FT   BINDING      25     25       Phosphate. {ECO:0000269|PubMed:11786017}.
+FT   BINDING      44     44       Phosphate; shared with dimeric partner.
+FT                                {ECO:0000269|PubMed:11786017}.
+FT   MOD_RES      27     27       N6-acetyllysine.
+FT                                {ECO:0000269|PubMed:18723842}.
+FT   STRAND       15     19       {ECO:0000244|PDB:4TS9}.
+FT   HELIX        23     33       {ECO:0000244|PDB:4TS9}.
+FT   STRAND       35     41       {ECO:0000244|PDB:4TS9}.
+FT   HELIX        43     45       {ECO:0000244|PDB:4TS9}.
+FT   STRAND       48     53       {ECO:0000244|PDB:4TS9}.
+FT   STRAND       56     61       {ECO:0000244|PDB:4TS9}.
+FT   HELIX        67     80       {ECO:0000244|PDB:4TS9}.
+FT   STRAND       85     94       {ECO:0000244|PDB:4TS9}.
+FT   STRAND       96     99       {ECO:0000244|PDB:3OOH}.
+FT   STRAND      104    113       {ECO:0000244|PDB:4TS9}.
+FT   HELIX       116    120       {ECO:0000244|PDB:4TS9}.
+FT   TURN        121    123       {ECO:0000244|PDB:4TS9}.
+FT   HELIX       132    145       {ECO:0000244|PDB:4TS9}.
+FT   STRAND      149    156       {ECO:0000244|PDB:4TS9}.
+FT   HELIX       167    173       {ECO:0000244|PDB:4TS9}.
+FT   STRAND      178    182       {ECO:0000244|PDB:4TS9}.
+FT   HELIX       183    193       {ECO:0000244|PDB:4TS9}.
+FT   STRAND      196    206       {ECO:0000244|PDB:4TS9}.
+FT   TURN        207    209       {ECO:0000244|PDB:4TS9}.
+FT   HELIX       215    220       {ECO:0000244|PDB:4TS9}.
+FT   HELIX       223    237       {ECO:0000244|PDB:4TS9}.
+SQ   SEQUENCE   239 AA;  25950 MW;  71D3DFAA5A176970 CRC64;
+     MATPHINAEM GDFADVVLMP GDPLRAKYIA ETFLEDAREV NNVRGMLGFT GTYKGRKISV
+     MGHGMGIPSC SIYTKELITD FGVKKIIRVG SCGAVLPHVK LRDVVIGMGA CTDSKVNRIR
+     FKDHDFAAIA DFDMVRNAVD AAKALGIDAR VGNLFSADLF YSPDGEMFDV MEKYGILGVE
+     MEAAGIYGVA AEFGAKALTI CTVSDHIRTH EQTTAAERQT TFNDMIKIAL ESVLLGDKE
+//

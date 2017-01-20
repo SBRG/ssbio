@@ -99,7 +99,7 @@
         <span class="c1"># model_files - directory where original gems and gem-related files are stored</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_files</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="s1">&#39;model_files&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GEMPRO.prep_folders"><a class="viewcode-back" href="../../../python_api.html#ssbio.gempro.pipeline.GEMPRO.prep_folders">[docs]</a>    <span class="k">def</span> <span class="nf">prep_folders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GEMPRO.prep_folder"><a class="viewcode-back" href="../../../python_api.html#ssbio.gempro.pipeline.GEMPRO.prep_folder">[docs]</a>    <span class="k">def</span> <span class="nf">prep_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Prepare all folders for a GEM-PRO project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># data - directory where all data will be stored</span>
@@ -561,7 +561,7 @@
 <span class="sd">        Returns:</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prep_folders</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep_folder</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>
         <span class="c1"># map gene IDs</span>
         <span class="c1"># check for missing maps, request manual mapping file?</span>

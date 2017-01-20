@@ -1,8 +1,9 @@
-import os.path as op
-import ssbio.utils
-import ssbio.sequence.fasta
-
 import logging
+import os.path as op
+
+import ssbio.sequence.utils.fasta
+import ssbio.utils
+
 log = logging.getLogger(__name__)
 
 
@@ -24,10 +25,10 @@ class SCRATCH():
         self.project_name = project_name
         self.seq_file = seq_file
         if seq_str:
-            self.seq_file = ssbio.sequence.fasta.load_seq_str_as_temp_file(seq_str)
+            self.seq_file = ssbio.sequence.utils.fasta.load_seq_str_as_temp_file(seq_str)
 
     def run_scratch(self, path_to_scratch, num_cores=1, outname=None, outdir=None, force_rerun=False):
-        """Run SCRATCH on the seq_file that was loaded into the class.
+        """Run SCRATCH on the sequence_file that was loaded into the class.
 
         Args:
             path_to_scratch: Path to the SCRATCH executable, run_SCRATCH-1D_predictors.sh
@@ -55,6 +56,18 @@ class SCRATCH():
                                    outfile='{}.ss'.format(outname),
                                    force_rerun_flag=force_rerun)
 
+    def sspro_results(self):
+        """Parse the SSpro output file and return a dict of secondary structure compositions.
+
+        Returns:
+            dict: Keys are sequence IDs, values are the lists of secondary structure predictions.
+                H: helix
+                E: strand
+                C: the rest
+
+        """
+        return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_sspro)
+
     def sspro_summary(self):
         """Parse the SSpro output file and return a summary of secondary structure composition.
 
@@ -70,7 +83,7 @@ class SCRATCH():
         """
         summary = {}
 
-        records = ssbio.sequence.fasta.load_fasta_file(self.out_sspro)
+        records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_sspro)
         for r in records:
             seq_summary = {}
             seq_summary['H'] = r.seq.count('H')/float(len(r))
@@ -80,6 +93,11 @@ class SCRATCH():
             summary[r.id] = seq_summary
 
         return summary
+
+    def sspro8_results(self):
+        """Parse the SSpro8 output file and return a dict of secondary structure compositions.
+        """
+        return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_sspro8)
 
     def sspro8_summary(self):
         """Parse the SSpro8 output file and return a summary of secondary structure composition.
@@ -101,7 +119,7 @@ class SCRATCH():
         """
         summary = {}
 
-        records = ssbio.sequence.fasta.load_fasta_file(self.out_sspro8)
+        records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_sspro8)
         for r in records:
             seq_summary = {}
             seq_summary['H'] = r.seq.count('H') / float(len(r))
@@ -117,6 +135,11 @@ class SCRATCH():
 
         return summary
 
+    def accpro_results(self):
+        """Parse the ACCpro output file and return a dict of secondary structure compositions.
+        """
+        return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_accpro)
+
     def accpro_summary(self):
         """Parse the ACCpro output file and return a summary of percent exposed/buried residues.
 
@@ -129,7 +152,7 @@ class SCRATCH():
         """
         summary = {}
 
-        records = ssbio.sequence.fasta.load_fasta_file(self.out_accpro)
+        records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_accpro)
         for r in records:
             seq_summary = {}
             seq_summary['exposed'] = r.seq.count('e') / float(len(r))
@@ -139,8 +162,17 @@ class SCRATCH():
 
         return summary
 
+    def accpro20_results(self):
+        """Parse the ACCpro output file and return a dict of secondary structure compositions.
+        """
+        return read_accpro20(self.out_accpro20)
+        # return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_accpro20)
+
     def accpro20_summary(self, cutoff):
         """Parse the ACCpro output file and return a summary of percent exposed/buried residues based on a cutoff.
+
+        Below the cutoff = buried
+        Equal to or greater than cutoff = exposed
 
         The output file is just a FASTA formatted file, so you can get residue level
             information by parsing it like a normal sequence file.
@@ -162,18 +194,16 @@ class SCRATCH():
         for k,v in records.items():
             seq_summary = {}
 
-            seq_acc = [int(x) for x in v.split(' ')]
-
             exposed = 0
             buried = 0
-            for s in seq_acc:
+            for s in v:
                 if s > cutoff:
                     exposed += 1
                 else:
                     buried += 1
 
-            seq_summary['exposed'] = exposed / float(len(seq_acc))
-            seq_summary['buried'] = buried / float(len(seq_acc))
+            seq_summary['exposed'] = exposed / float(len(v))
+            seq_summary['buried'] = buried / float(len(v))
 
             summary[k] = seq_summary
 
@@ -198,6 +228,8 @@ def read_accpro20(infile):
     accpro20_dict = {}
     for i, r in enumerate(records):
         if i % 2 == 0:
-            accpro20_dict[records[i][1:]] = records[i + 1]
+            # TODO: Double check how to parse FASTA IDs (can they have a space because that is what i split by)
+            # Key was originally records[i][1:]
+            accpro20_dict[records[i].split(' ')[0][1:]] = [int(x) for x in records[i + 1].split(' ')]
 
     return accpro20_dict

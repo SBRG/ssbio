@@ -1,10 +1,14 @@
+import shutil
 import os.path as op
 import unittest
-import tempfile
 import cobra
 import pandas as pd
+import six
 from ssbio.pipeline.gempro import GEMPRO
+from ssbio.core.genepro import GenePro
 from ssbio.utils import Date
+from ssbio.databases.kegg import KEGGProp
+from ssbio.databases.uniprot import UniProtProp
 
 date = Date()
 
@@ -15,14 +19,13 @@ class TestGEMPRO(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.GEM_NAME = 'ecoli_test'
-        self.tempdir = tempfile.TemporaryDirectory()
-        self.ROOT_DIR = self.tempdir.name
-        # self.ROOT_DIR = 'C:\\Users\\nathan\\Dropbox (UCSD SBRG)\\Desktop\\'
-        gem_file = 'test_files/Ec_core_flux1.xml'
+        self.ROOT_DIR = op.join('test_files', 'out')
+        gem_file = op.join('test_files', 'Ec_core_flux1.xml')
 
         self.my_gempro = GEMPRO(self.GEM_NAME, self.ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
+        self.base_dir = self.my_gempro.base_dir
 
-        # remove some genes from this model so testing doesn't take too long
+        # Remove some genes from this model so testing doesn't take too long
         remove_these = ['b0118', 'b4025', 'b4153', 'b2925', 'b3919', 'b3738', 'b3732', 'b0726', 'b1602', 'b1101',
                         'b3236', 'b0728', 'b1603', 'b2926', 'b0432', 'b3735', 'b0474', 'b4090', 'b3731', 'b0767',
                         'b3737', 'b0724', 'b0008', 'b3403', 'b1779', 'b0727', 'b3956', 'b1676', 'b2935', 'b4232',
@@ -36,23 +39,28 @@ class TestGEMPRO(unittest.TestCase):
         for x in remove_these:
             self.my_gempro.genes.remove(self.my_gempro.genes.get_by_id(x))
 
-        # test the manual adding of any gene ID
+        # Test the manual adding of any gene ID
         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
         self.my_gempro.add_genes_by_id(add_these)
 
         self.kegg_will_not_map = ['b1417', 'b2092']
         self.uniprot_will_not_map = ['b1417', 'b2092']
 
+    def test_add_genes_by_id(self):
+        add_these = ['b0002', 'b0003', 'b0004', 'b2092']
+        for x in add_these:
+            self.assertTrue(self.my_gempro.genes.has_id(x))
+
     def test_gene_content(self):
-        # Test that genes were correctly removed from self.genes (not the model, but the GEM-PRO genes list)
+        # Test that genes were correctly removed from self.genes
         remaining = ['b2296', 'b3734', 'b3733', 'b3736', 'b0431', 'b2779', 'b4151', 'b4154', 'b1611',  'b2416',
                      'b0002', 'b0003', 'b0004', 'b1417', 'b2092']
-        self.assertCountEqual([x.id for x in self.my_gempro.genes], remaining)
+        six.assertCountEqual(self, [x.id for x in self.my_gempro.genes], remaining)
 
     def test_prep_folders(self):
         # Test if folders were made
         self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME)))
-        folders = ['data', 'notebooks', 'figures', 'structures', 'structures/by_gene', 'sequences']
+        folders = ['data', 'figures', 'structures', 'sequences']
         for f in folders:
             self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME, f)))
 
@@ -67,10 +75,10 @@ class TestGEMPRO(unittest.TestCase):
         self.assertEqual(len(self.my_gempro.model.genes), 15)
 
     def test_gene_info(self):
-        # Test that self.genes is a DictList and contains Gene objects
+        # Test that self.genes is a DictList and contains GenePro objects
         self.assertIsInstance(self.my_gempro.genes, cobra.DictList)
         for g in self.my_gempro.genes:
-            self.assertIsInstance(g, cobra.Gene)
+            self.assertIsInstance(g, GenePro)
 
     def test_kegg_mapping_and_metadata(self):
         """Test that KEGG mapping did these things:
@@ -80,7 +88,7 @@ class TestGEMPRO(unittest.TestCase):
         """
         kegg_organism_code = 'eco'
         self.my_gempro.kegg_mapping_and_metadata(kegg_organism_code=kegg_organism_code)
-        print(self.my_gempro.df_kegg_metadata)
+        # print(self.my_gempro.df_kegg_metadata)
 
         # 1.
         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
@@ -108,8 +116,9 @@ class TestGEMPRO(unittest.TestCase):
                 self.assertTrue(op.exists(op.join(gene_structure_folder, '{}-{}.kegg'.format(kegg_organism_code, g))))
                 # 3.
                 # Test that the sequence_properties attribute has KEGG information in it
-                self.assertTrue(gene.annotation['sequence']['kegg']['seq_len'] > 0)
-
+                keggs = gene.protein.filter_sequences(KEGGProp)
+                for k in keggs:
+                    self.assertTrue(k.sequence_len > 0)
 
     def test_uniprot_mapping_and_metadata(self):
         """Test that UniProt mapping did these things:
@@ -118,7 +127,7 @@ class TestGEMPRO(unittest.TestCase):
         3. Save UniProt related info into each GeneInfo object
         """
         self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
-        print(self.my_gempro.df_uniprot_metadata)
+        # print(self.my_gempro.df_uniprot_metadata)
 
         # 1.
         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
@@ -149,14 +158,33 @@ class TestGEMPRO(unittest.TestCase):
                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))
                     # 3.
                     # Test that the.annotation['sequence'] attribute has UniProt information in it
-                    self.assertTrue(gene.annotation['sequence']['uniprot'][u]['seq_len'] > 0)
+                    u_prop = gene.protein.sequences.get_by_id(u)
+                    self.assertTrue(u_prop.sequence_len > 0)
 
-    def test_manual_seq_mapping(self):
-        pass
+    def test_x_map_uniprot_to_pdb(self):
+        self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
+        self.my_gempro.set_representative_sequence()
+        self.my_gempro.map_uniprot_to_pdb(seq_ident_cutoff=.9)
 
-    def test_consolidate_mappings(self):
-        pass
+        look_at_this_gene = self.my_gempro.genes.get_by_id('b3734').protein
+        self.assertTrue(look_at_this_gene.structures.has_id('3oaa'))
+        look_at_this_structure = look_at_this_gene.structures.get_by_id('3oaa')
+        self.assertEqual(536056, look_at_this_structure.tax_id)
+        look_at_this_chain = look_at_this_structure.chains.get_by_id('A')
+        self.assertEqual(513, look_at_this_chain.unp_end)
+        self.assertEqual(1, look_at_this_chain.coverage)
+
+    def test_x_blast_pdb(self):
+        self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
+        self.my_gempro.set_representative_sequence()
+        self.my_gempro.blast_seqs_to_pdb(seq_ident_cutoff=.8, all_genes=True)
+
+        look_at_this_gene = self.my_gempro.genes.get_by_id('b2296').protein
+        self.assertTrue(look_at_this_gene.structures.has_id('3slc'))
+        look_at_this_structure = look_at_this_gene.structures.get_by_id('3slc')
+        look_at_this_chain = look_at_this_structure.chains.get_by_id('A')
+        self.assertEqual(0.9425, look_at_this_chain.hit_percent_ident)
 
     @classmethod
     def tearDownClass(self):
-        self.tempdir.cleanup()
+        shutil.rmtree(self.base_dir)

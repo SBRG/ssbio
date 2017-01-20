@@ -1,10 +1,44 @@
 import unittest
+import six
 
 import ssbio.databases.uniprot
+from ssbio.databases.uniprot import UniProtProp
 
 class TestUniProt(unittest.TestCase):
     """Unit tests for UniProt
     """
+
+    def test_uniprotprop(self):
+        up = UniProtProp(uniprot_acc='P0ABP8',
+                         sequence_file='test_files/sequences/P0ABP8.fasta',
+                         metadata_file='test_files/sequences/P0ABP8.txt')
+
+        up_keys = ['bigg','description','ec_number','entry_version','gene_name','id','kegg',
+                   'metadata_file','metadata_path','pdbs','pfam','refseq','reviewed','sequence_file','sequence_len',
+                   'sequence_path','seq_version','uniprot']
+
+        for k in up_keys:
+            # print(k)
+            self.assertTrue(hasattr(up, k))
+
+        self.assertEqual(up.bigg, None)
+        self.assertEqual(up.description, ['Inosine phosphorylase', 'PNP', 'Purine nucleoside phosphorylase DeoD-type'])
+        self.assertEqual(up.ec_number, ['2.4.2.1'])
+        self.assertEqual(up.entry_version, '2016-11-02')
+        self.assertEqual(up.gene_name, 'deoD')
+        self.assertEqual(up.id, 'P0ABP8')
+        six.assertCountEqual(self, up.kegg, ['ecj:JW4347', 'eco:b4384'])
+        self.assertEqual(up.metadata_file, 'P0ABP8.txt')
+        six.assertCountEqual(self, up.pdbs,
+                        ['1OUM', '4TTA', '4TS3', '1OTY', '1K9S', '3OOE', '1OVG', '3ONV', '3UT6', '1OV6', '4TTJ', '1OTX',
+                         '1OU4', '3OOH', '4TS9', '1A69', '3OPV', '1ECP', '4TTI'])
+        self.assertEqual(up.pfam, ['PF01048'])
+        six.assertCountEqual(self, up.refseq, ['NP_418801.1', 'NC_000913.3', 'WP_000224877.1', 'NZ_LN832404.1'])
+        self.assertEqual(up.reviewed, True)
+        self.assertEqual(up.sequence_file, 'P0ABP8.fasta')
+        self.assertEqual(up.sequence_len, 239)
+        self.assertEqual(up.seq_version, '2007-01-23')
+        self.assertEqual(up.uniprot, 'P0ABP8')
 
     def test_uniprot_valid_id(self):
         valid_ids = ['P20020',
@@ -19,25 +53,14 @@ class TestUniProt(unittest.TestCase):
                      'P48426']
         invalid_ids = ['1AAG', '1AN3', '1A8X', '8CEL', 'ASDASDASD##']
 
-        # test if the non-theoretical pdbs return False when checked to be in the theoretical list
-        for pdb in invalid_ids:
-            self.assertFalse(ssbio.databases.uniprot.is_valid_uniprot_id(pdb))
+        for u in valid_ids:
+            self.assertTrue(ssbio.databases.uniprot.is_valid_uniprot_id(u))
 
-        # test if the theoretical pdbs return True when checked to be in the theoretical list
-        for pdb in valid_ids:
-            self.assertTrue(ssbio.databases.uniprot.is_valid_uniprot_id(pdb))
+        for u in invalid_ids:
+            self.assertFalse(ssbio.databases.uniprot.is_valid_uniprot_id(u))
 
     def test_uniprot_reviewed_checker(self):
         status = {'I1Z9G4': False,
-                  'I3L3I9': False,
-                  'J3KN10': False,
-                  'J3KQV8': False,
-                  'J3KRC4': False,
-                  'O00408': True,
-                  'O00757': True,
-                  'O00764': True,
-                  'O14494': True,
-                  'O14495': True,
                   'O14735': True}
 
         for f,v in status.items():

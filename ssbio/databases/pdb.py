@@ -1,21 +1,15 @@
-import json
 import io
-import requests
-import pandas as pd
+import json
+import logging
 import os.path as op
 from io import BytesIO
-# import cachetools
-# from repoze.lru import lru_cache
-import gzip
-import ssbio.utils
-
-from Bio.PDB import PDBList
+from ssbio.structure.structprop import StructProp
+import pandas as pd
+import requests
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
-from ssbio.structure.cleanpdb import CleanPDB
-from ssbio.structure.pdbioext import PDBIOExt
+import ssbio.utils
 
-import logging
 log = logging.getLogger(__name__)
 
 try:
@@ -32,16 +26,59 @@ import gzip
 
 SEVEN_DAYS = 60 * 60 * 24 * 7
 
+class PDBProp(StructProp):
+    """Class to parse through PDB properties
+    """
 
-def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, force_rerun=False):
+    def __init__(self, ident, chains=None, structure_file=None, file_type=None, reference_seq=None,
+                 parse=False):
+        StructProp.__init__(self, ident, chains=chains, structure_file=structure_file, file_type=file_type,
+                            is_experimental=True, reference_seq=reference_seq,
+                            parse=parse)
+        self.experimental_method = None
+        self.resolution = None
+        self.date = None
+        self.tax_id = None
+        self.release_date = None
+
+    # TODO: test using cif or mmtf file formats -- this is the global flag here (which is a dumb place to be)
+    def download_structure_file(self, outdir, file_type='cif', force_rerun=False, parse=False):
+        pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False,
+                                      outdir=outdir,
+                                      force_rerun=force_rerun)
+        log.debug('{}: downloaded {} file'.format(self.id, file_type))
+        self.load_structure_file(pdb_file, file_type, parse)
+
+    def download_cif_header_file(self, outdir, force_rerun=False):
+        file_type = 'cif'
+        cif_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=True,
+                                      outdir=outdir,
+                                      force_rerun=force_rerun)
+        log.debug('{}: downloaded mmCIF file header'.format(self.id))
+
+        cif_dict = parse_mmcif_header(cif_file)
+
+        # # Save annotation info
+        # cif_dict['pdb_file'] = op.basename(pdb_file)
+        # cif_dict['mmcif_header'] = op.basename(cif_file)
+        # g.annotation['structure']['pdb'][k].update(cif_dict)
+        #
+        # adder = g.annotation['structure']['pdb'][k].copy()
+        # adder['chemicals'] = ';'.join(adder['chemicals'])
+        # # TODO: error when taxonomy name does not exist for some PDBs
+        # # if isinstance(adder['taxonomy_name'], list):
+        # #     adder['taxonomy_name'] = ';'.join(adder['taxonomy_name'])
+        # adder['gene'] = gene_id
+
+def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
     """Download a structure from the RCSB PDB by ID. Specify the file type desired.
 
     Args:
         pdb_id: PDB ID
-        file_type: pdb, pdb.gz, cif, cif.gz, xml.gz
+        file_type: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz
         outdir: Optional output directory
         outfile: Optional output name
-        header: If only the header file should be downloaded
+        only_header: If only the header file should be downloaded
         force_rerun: If the file should be downloaded again even if it exists
 
     Returns:
@@ -50,11 +87,17 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
     """
     pdb_id = pdb_id.lower()
     file_type = file_type.lower()
-    file_types = ['pdb', 'pdb.gz', 'cif', 'cif.gz', 'xml.gz']
+    file_types = ['pdb', 'pdb.gz', 'cif', 'cif.gz', 'xml.gz', 'mmtf', 'mmtf.gz']
     if file_type not in file_types:
-        raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz')
+        raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz')
 
-    if header:
+    if file_type == 'mmtf':
+        final_file_type = 'mmtf'
+        file_type = 'mmtf.gz'
+    else:
+        final_file_type = file_type
+
+    if only_header:
         folder = 'header'
         if outfile:
             outfile = op.join(outdir, outfile)
@@ -68,15 +111,26 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', header=False, f
             outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
-        req = requests.get(download_link)
+        if file_type == 'mmtf.gz':
+            mmtf_api = '1.0'
+            download_link = 'http://mmtf.rcsb.org/v{}/full/{}.mmtf.gz'.format(mmtf_api, pdb_id)
+            urllib2.urlretrieve(download_link, outfile)
 
-        # Raise error if request fails
-        # TODO: will fail if PDB is not available for something like a large structure. example: 5iqr and file_type=pdb
-        req.raise_for_status()
+            if final_file_type == 'mmtf':
+                outfile = ssbio.utils.gunzip_file(infile=outfile,
+                                                  outfile=outfile.strip('.gz'),
+                                                  delete_original=True,
+                                                  force_rerun_flag=force_rerun)
+        else:
+            download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
+            req = requests.get(download_link)
 
-        with open(outfile, 'w') as f:
-            f.write(req.text)
+            # Raise error if request fails
+            # TODO: will fail if PDB is not available for something like a large structure. example: 5iqr and file_type=pdb
+            req.raise_for_status()
+
+            with open(outfile, 'w') as f:
+                f.write(req.text)
 
         log.debug('{}: Saved structure file'.format(outfile))
     else:
@@ -163,37 +217,6 @@ def parse_mmcif_header(infile):
 #     # TODO: currently saves as .ent file
 #     file_loc = pdbl.retrieve_pdb_file(pdb_id, pdir=output_dir)
 #     return file_loc
-
-
-# def download_and_clean_pdb(pdb_id, chain_id, output_dir, file_type='pdb', output_name=''):
-#     """Download the original PDB ID as well as a "cleaned" version of it including only the chain of interest.
-#
-#     Args:
-#         pdb_id:
-#         chain_id:
-#         output_dir:
-#         file_type:
-#
-#     Returns:
-#
-#     """
-#     my_pdb_file = download_and_load_pdb(pdb_id, output_dir=output_dir)
-#     my_pdb = PDBIOExt(my_pdb_file)
-#
-#     # clean pdb and save a file with only these chains of interest
-#     # suffix appended with chains (1fat_A_B_cleaned.pdb)
-#     print('Cleaning PDB structure {} and keeping chain {}...'.format(pdb_id, chain_id))
-#     my_cleaner = CleanPDB(keep_chains=[chain_id])
-#
-#     if output_name:
-#         my_new_pdb_id = output_name
-#     else:
-#         my_new_pdb_id = '{}_{}_cleaned'.format(pdb_id, chain_id)
-#
-#     my_clean_pdb = my_pdb.write_pdb(custom_name=my_new_pdb_id, out_suffix='',
-#                                     out_dir=output_dir, custom_selection=my_cleaner)
-#
-#     return my_clean_pdb
 
 
 # TODO: check this for python 2
@@ -285,6 +308,7 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
 # @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
 # @lru_cache(maxsize=1)
 def _theoretical_pdbs():
+    # TODO: biopython has these
     """Get the list of theoretical PDBs directly from the wwPDB.
 
     Caches this list for up to seven days for quick access.
@@ -498,6 +522,7 @@ def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0, f
 
     # Otherwise run the web request
     else:
+        # TODO: add a checker for a cached file of uniprot -> PDBs - can be generated within gempro pipeline and stored
         response = requests.get('https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/{}'.format(uniprot_id),
                                 data={'key': 'value'})
         if response.status_code == 404:
@@ -768,40 +793,3 @@ def SIFTS():
 
 def sifts_pdb_chain_to_uniprot(pdb, chain):
     return _sifts_mapping().ix[(pdb.lower(), chain.upper())]['SP_PRIMARY'].unique().tolist()
-
-
-# class Structure():
-#     """
-#     Class for defining Structure within an SBML model.
-#     A structure is mainly:
-#     1. a pointer to the file of the protein structure cartesian coordinates
-#     2. a representation of a gene or genes within a GEM
-#     """
-#
-#     def __init__(self, id=None, filename=None, seqs=None, current=None):
-#         """
-#         An object for defining protein structures and how they represent a
-#         gene or genes within a SBML model.
-#         """
-#         self.id = id
-#         self.filename = filename
-#         self.current = self.pdb_current_checker(self.id)
-#
-#         # all genes which are transcribed to make up the protein structure
-#         self.genes = set()
-#
-#         # all metabolites/ligands within the structure
-#         self.chemicals = set()
-#
-#         # all reactions which utilize this protein
-#         self.reactions = set()
-#
-#         # dictionary of chain IDs and their sequences as strings
-#         self.sequences = seqs
-
-
-if __name__ == '__main__':
-    seq = 'VLSPADKTNVKAAWGVKALSPADKTNVKAALTAVAHVDDMPNAL'
-    print(blast_pdb(seq, evalue=1))
-    print(len(blast_pdb(seq, evalue=1)))
-    print(len(blast_pdb(seq, evalue=1, seq_ident_cutoff=.83)))

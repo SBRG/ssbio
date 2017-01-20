@@ -12,68 +12,56 @@ from ssbio.utils import percentage_to_float
 log = logging.getLogger(__name__)
 
 
-def sequence_checker(reference_id, reference_sequence, structure_id, structure_sequence, gapopen=10, gapextend=0.5,
-                     allow_missing_on_termini=0, allow_mutants=False, allow_deletions=False,
-                     allow_insertions=False, allow_unresolved=False,
-                     outdir='', outfile='', force_rerun=False):
+def sequence_checker(reference_seq_aln, structure_seq_aln, seq_ident_cutoff=0.5,
+                     allow_missing_on_termini=0.2, allow_mutants=False, allow_deletions=False,
+                     allow_insertions=False, allow_unresolved=False):
     """Report if a structure's sequence meets coverage checks to a reference sequence.
 
     First aligns a sequence from a chain of a PDB structure to "reference" sequence.
     Then creates a DataFrame of results and check for everything.
 
     Args:
-        reference_id: ID of reference sequence
-        reference_sequence: String representation of reference sequence
-        structure_id: ID of sequence to be aligned
-        structure_sequence: String representation of sequence to be aligned
-        gapopen: Gap open penalty is the score taken away when a gap is created
-        gapextend: Gap extension penalty is added to the standard gap penalty for each base or residue in the gap
-        allow_missing_on_termini (float): Percentage of the length of the reference sequence which will be ignored
+        reference_seq_aln: String representation of reference sequence alignment
+        structure_seq_aln: String representation of structure sequence alignment
+        seq_ident_cutoff: Percent sequence identity cutoff
+        allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
             when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
-            10 to 90 will be checked for modifications.
+            5 to 95 will be checked for modifications.
         allow_mutants (bool): If mutations should be allowed or checked for
         allow_deletions (bool): If deletions should be allowed or checked for
         allow_insertions (bool): If insertions should be allowed or checked for
         allow_unresolved (bool): If unresolved residues should be allowed or checked for
-        outdir (str, optional): Path to output directory. Default is the current directory.
-        outfile (str, optional): Name of output file. If not set, is {id_a}_{id_b}_align.txt
-        force_rerun (bool): Default False, set to True if you want to rerun the alignment if outfile exists.
 
     Returns:
         bool: If the structure's sequence meets the quality checks.
 
     """
+    if len(reference_seq_aln) != len(structure_seq_aln):
+        raise ValueError('Sequence lengths not equal - was an alignment run?')
 
-    # Run the needle (global) alignment
-    outpath = ssbio.sequence.utils.alignment.run_needle_alignment_on_str(id_a=reference_id,
-                                                                         seq_a=reference_sequence,
-                                                                         id_b=structure_id,
-                                                                         seq_b=structure_sequence,
-                                                                         gapopen=gapopen,
-                                                                         gapextend=gapextend,
-                                                                         outdir=outdir,
-                                                                         outfile=outfile,
-                                                                         force_rerun=force_rerun)
+    reference_seq_aln = ssbio.sequence.utils.cast_to_str(reference_seq_aln)
+    structure_seq_aln = ssbio.sequence.utils.cast_to_str(structure_seq_aln)
 
-    # TODO: why are there cases where the alignment fails?
-    try:
-        assert op.exists(outpath)
-    except AssertionError:
-        log.debug('{}: needle alignment file does not exist'.format(outpath))
+    # Check percent identity cutoff
+    stats_percent_ident = ssbio.sequence.utils.alignment.get_percent_identity(reference_seq_aln, structure_seq_aln)
+    log.debug('{}: percent identity'.format(stats_percent_ident))
+    if stats_percent_ident < seq_ident_cutoff:
+        log.debug('Alignment does not meet percent identity cutoff')
         return False
-
-    stats = ssbio.sequence.utils.alignment.needle_statistics(outpath)
+    else:
+        log.debug('Alignment meets percent identity cutoff')
 
     # Parse the alignment results
-    summary_df = ssbio.sequence.utils.alignment.get_alignment_summary_df(outpath)
+    aln_df = ssbio.sequence.utils.alignment.get_alignment_df(a_aln_seq=reference_seq_aln,
+                                                             b_aln_seq=structure_seq_aln)
 
     # Get cutoff stuff ready
-    ref_seq_len = len(reference_sequence)
-    # TODO: should allow_missing_on_termini be a total percentage of missing?
+    ref_seq_len = len(reference_seq_aln.replace('-', ''))
+    allow_missing_on_termini /= 2
     # If any differences appear before start, they are ignored
-    start = ref_seq_len - ref_seq_len * (1 - allow_missing_on_termini)
+    start = ref_seq_len - (ref_seq_len * (1 - allow_missing_on_termini))
     # If any differences appear before end, they are ignored
-    end = ref_seq_len - ref_seq_len * allow_missing_on_termini
+    end = ref_seq_len - (ref_seq_len * allow_missing_on_termini)
 
     no_deletions_in_pdb = False
     no_insertions_in_pdb = False
@@ -83,80 +71,86 @@ def sequence_checker(reference_id, reference_sequence, structure_id, structure_s
     # Check everything
     if not allow_deletions:
         # Get indices of the deletions
-        deletion_indices = summary_df[summary_df['type'] == 'deletion'].index
+        deletions = ssbio.sequence.utils.alignment.get_deletions(aln_df)
         # If there are no deletions, that's great
-        if len(deletion_indices) == 0:
+        if len(deletions) == 0:
             log.debug('No deletion regions')
             no_deletions_in_pdb = True
         else:
-            log.debug('{} deletion region(s)'.format(len(deletion_indices)))
+            log.debug('{} deletion region(s)'.format(len(deletions)))
             # If the deletion appears before or after the cutoff, that's also great
-            for deletion_index in deletion_indices:
-                if summary_df.ix[deletion_index, 'id_a_stop'] < start or summary_df.ix[deletion_index, 'id_a_start'] > end:
+            for deletion in deletions:
+                if deletion[0][1] < start or deletion[0][0] > end:
                     no_deletions_in_pdb = True
+                    log.debug('Deletion region(s) are not within structure core')
                 else:
                     no_deletions_in_pdb = False
-                    log.debug('{} vs {}: PDB has deletions within structure'.format(reference_id, structure_id))
+                    log.debug('Deletions within structure')
+                    log.debug('{} < {} or {} > {}'.format(deletion[0][1], start, deletion[0][0], end))
                     break
     else:
         no_deletions_in_pdb = True
 
     if not allow_insertions:
         # Get indices of the insertions
-        insertion_indices = summary_df[summary_df['type'] == 'insertion'].index
+        insertions = ssbio.sequence.utils.alignment.get_insertions(aln_df)
         # If there are no insertions, that's great
-        if len(insertion_indices) == 0:
+        if len(insertions) == 0:
             log.debug('No insertion regions')
             no_insertions_in_pdb = True
         else:
-            log.debug('{} insertion region(s)'.format(len(insertion_indices)))
+            log.debug('{} insertion region(s)'.format(len(insertions)))
             # If the insertion appears before or after the cutoff, that's also great
-            for insertion_index in insertion_indices:
-                if summary_df.ix[insertion_index, 'id_a_stop'] < start or summary_df.ix[insertion_index, 'id_a_start'] > end:
+            for insertion in insertions:
+                if insertion[0][1] < start or insertion[0][0] > end:
                     no_insertions_in_pdb = True
+                    log.debug('Insertion region(s) are not within structure core')
                 else:
                     no_insertions_in_pdb = False
-                    log.debug('{} vs {}: PDB has insertions within structure'.format(reference_id, structure_id))
+                    log.debug('Insertion regions within structure')
                     break
     else:
         no_insertions_in_pdb = True
 
     if not allow_mutants:
         # Get indices of the mutants
-        mutant_indices = summary_df[summary_df['type'] == 'mutation'].index
+        mutations_full = ssbio.sequence.utils.alignment.get_mutations(aln_df)
+        mutations = [x[1] for x in mutations_full]
         # If there are no mutants, that's great
-        if len(mutant_indices) == 0:
+        if len(mutations) == 0:
             log.debug('No point mutations')
             no_mutants_in_pdb = True
         else:
-            log.debug('{} point mutation(s)'.format(len(mutant_indices)))
+            log.debug('{} point mutation(s)'.format(len(mutations)))
             # If the mutant appears before or after the cutoff, that's also great
-            for mutant_index in mutant_indices:
-                if summary_df.ix[mutant_index, 'id_a_stop'] < start or summary_df.ix[mutant_index, 'id_a_start'] > end:
+            for mutation in mutations:
+                if mutation < start or mutation > end:
                     no_mutants_in_pdb = True
+                    log.debug('Mutation region(s) are not within structure core')
                 else:
                     no_mutants_in_pdb = False
-                    log.debug('{} vs {}: PDB has mutants within structure'.format(reference_id, structure_id))
+                    log.debug('Mutantion regions within structure')
                     break
     else:
         no_mutants_in_pdb = True
 
     if not allow_unresolved:
         # Get indices of the unresolved residues
-        unresolved_indices = summary_df[summary_df['type'] == 'unresolved'].index
+        unresolved = ssbio.sequence.utils.alignment.get_unresolved(aln_df)
         # If there are no unresolved, that's great
-        if len(unresolved_indices) == 0:
+        if len(unresolved) == 0:
             log.debug('No unresolved mutations')
             no_unresolved_in_pdb = True
         else:
-            log.debug('{} unresolved residue(s)'.format(len(unresolved_indices)))
+            log.debug('{} unresolved residue(s)'.format(len(unresolved)))
             # If the unresolved residue appears before or after the cutoff, that's also great
-            for unresolved_index in unresolved_indices:
-                if summary_df.ix[unresolved_index, 'id_a_stop'] < start or summary_df.ix[unresolved_index, 'id_a_start'] > end:
+            for unr in unresolved:
+                if unr < start or unr > end:
                     no_unresolved_in_pdb = True
+                    log.debug('Unresolved region(s) are not within structure core')
                 else:
                     no_unresolved_in_pdb = False
-                    log.debug('{} vs {}: PDB has unresolved within structure'.format(reference_id, structure_id))
+                    log.debug('Unresolved residues within structure')
                     break
     else:
         no_unresolved_in_pdb = True

@@ -1,0 +1,45 @@
+ENTRY       Rv0417            CDS       T00015
+NAME        thiG
+DEFINITION  (RefSeq) thiazole synthase
+ORTHOLOGY   K03149  thiazole synthase [EC:2.8.1.10]
+ORGANISM    mtu  Mycobacterium tuberculosis H37Rv
+PATHWAY     mtu00730  Thiamine metabolism
+            mtu01100  Metabolic pathways
+BRITE       KEGG Orthology (KO) [BR:mtu00001]
+             Metabolism
+              Metabolism of cofactors and vitamins
+               00730 Thiamine metabolism
+                Rv0417 (thiG)
+            Enzymes [BR:mtu01000]
+             2. Transferases
+              2.8  Transferring sulfur-containing groups
+               2.8.1  Sulfurtransferases
+                2.8.1.10  thiazole synthase
+                 Rv0417 (thiG)
+POSITION    502366..503124
+MOTIF       Pfam: ThiG FMN_dh His_biosynth NanE HPP IMPDH
+DBLINKS     NCBI-ProteinID: NP_214931
+            NCBI-GeneID: 886396
+            TubercuList: Rv0417
+            UniProt: P9WG73 I6Y3Q4
+AASEQ       252
+            MAESKLVIGDRSFASRLIMGTGGATNLAVLEQALIASGTELTTVAIRRVDADGGTGLLDL
+            LNRLGITPLPNTAGSRSAAEAVLTAQLAREALNTNWVKLEVIADERTLWPDAVELVRAAE
+            QLVDDGFVVLPYTTDDPVLARRLEDTGCAAVMPLGSPIGTGLGIANPHNIEMIVAGARVP
+            VVLDAGIGTASDAALAMELGCDAVLLASAVTRAADPPAMAAAMAAAVTAGYLARCAGRIP
+            KRFWAQASSPAR
+NTSEQ       759
+            gtggctgagtccaagttggttatcggtgaccgcagcttcgcctcgcggctcatcatgggt
+            actgggggtgcgaccaatctggcggtgctagagcaggctctgatcgcctcaggtaccgag
+            ctgaccaccgtcgcgatacgccgggtcgacgccgacgggggaaccggcctgctcgacctg
+            ctcaaccggctcggcatcacaccgctacccaacaccgcggggtcccgcagcgccgcggaa
+            gcggtcctgacagcgcagttggcccgtgaggcgctgaacaccaactgggtcaagctcgag
+            gtgattgccgacgaacgcaccctgtggcctgatgcggtcgaattagtccgggctgcagaa
+            caattggtggacgacggatttgtggtcctaccgtacacaaccgacgacccggtgctggcc
+            cgccggctagaagataccggttgcgcagcggtgatgccgctgggttcgccgatcggcacc
+            ggccttggtatcgccaacccgcacaatatcgagatgatcgtcgccggtgcccgcgttccc
+            gtggtgctggacgcgggcatcggtaccgccagcgatgccgcgttggcgatggagttgggt
+            tgcgatgccgtgttgttggccagtgcggtgacccgggccgccgacccgccggcgatggcc
+            gcggcgatggccgccgcggtgaccgccggatatctggcgcgttgcgcggggcggatcccg
+            aaacgcttctgggctcaggcttccagcccggcacgataa
+///

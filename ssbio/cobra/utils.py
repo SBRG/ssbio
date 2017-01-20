@@ -10,7 +10,7 @@ def model_loader(gem_file_path, gem_file_type):
 
     Args:
         gem_file_path (str): Path to model file
-        gem_file_type (str): if your model is in "sbml" (or "xml"), "mat", or 'json" format
+        gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' format
 
     Returns:
         COBRApy Model object.

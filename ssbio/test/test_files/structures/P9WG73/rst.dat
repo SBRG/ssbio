@@ -1,0 +1,92 @@
+ Target: protein   
+ Modeling Length:          252
+ Native Length:            0
+ Number of clusters:            3
+ Total number of structures=       13106
+ Number of structure in use=       13106
+
+
+ ------------ summary of clusers -------------------
+ i Size R_cut density R_cl_co   <E>    E_model  #str Trajectory    
+ B--------------------------------------------------
+ 1 13069  3.50  3734.  0.51 -11060.6 -10413.3     1 rep1.tra4A   
+ 2   169  3.50    48.  0.90 -10620.2 -10652.1     5 rep1.tra4M   
+ 3   132  3.50    38.  0.83 -10560.8 -10496.0     3 rep7.tra4A   
+
+  include used structure  exclude used structre
+   ---------------------  ---------------------
+ i  N_in  <R_in> <Rc_in>   N_ex  <R_ex> <Rc_ex>
+ C---------------------------------------------
+ 1 13069   2.96   0.94   13069   2.96   0.94
+ 2   169   2.39   1.77      36   1.80   2.14
+ 3   132   2.42   1.69       1   0.00   1.76
+
+ RMSD_cut_initial=   8.000000    
+ RMSD_cut_min=   3.500000    
+ RMSD_cut_max=   12.00000    
+ ratio_min=  0.7000000    
+ ratio_max=  0.1500000    
+
+ trajectories used:          62
+ rep1.tra10M                                                             
+ rep1.tra1A                                                              
+ rep1.tra1M                                                              
+ rep1.tra2A                                                              
+ rep1.tra2M                                                              
+ rep1.tra3A                                                              
+ rep1.tra3M                                                              
+ rep1.tra4A                                                              
+ rep1.tra4M                                                              
+ rep1.tra5M                                                              
+ rep1.tra6M                                                              
+ rep1.tra7M                                                              
+ rep1.tra8M                                                              
+ rep1.tra9M                                                              
+ rep2.tra10M                                                             
+ rep2.tra1A                                                              
+ rep2.tra1M                                                              
+ rep2.tra2A                                                              
+ rep2.tra2M                                                              
+ rep2.tra3A                                                              
+ rep2.tra3M                                                              
+ rep2.tra4A                                                              
+ rep2.tra4M                                                              
+ rep2.tra5M                                                              
+ rep2.tra6M                                                              
+ rep2.tra7M                                                              
+ rep2.tra8M                                                              
+ rep2.tra9M                                                              
+ rep3.tra10M                                                             
+ rep3.tra1A                                                              
+ rep3.tra1M                                                              
+ rep3.tra2A                                                              
+ rep3.tra2M                                                              
+ rep3.tra3A                                                              
+ rep3.tra3M                                                              
+ rep3.tra4A                                                              
+ rep3.tra4M                                                              
+ rep3.tra5M                                                              
+ rep3.tra6M                                                              
+ rep3.tra7M                                                              
+ rep3.tra8M                                                              
+ rep3.tra9M                                                              
+ rep4.tra1A                                                              
+ rep4.tra2A                                                              
+ rep4.tra3A                                                              
+ rep4.tra4A                                                              
+ rep5.tra1A                                                              
+ rep5.tra2A                                                              
+ rep5.tra3A                                                              
+ rep5.tra4A                                                              
+ rep6.tra1A                                                              
+ rep6.tra2A                                                              
+ rep6.tra3A                                                              
+ rep6.tra4A                                                              
+ rep7.tra1A                                                              
+ rep7.tra2A                                                              
+ rep7.tra3A                                                              
+ rep7.tra4A                                                              
+ rep8.tra1A                                                              
+ rep8.tra2A                                                              
+ rep8.tra3A                                                              
+ rep8.tra4A                                                              
