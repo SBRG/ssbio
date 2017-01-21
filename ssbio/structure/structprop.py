@@ -446,6 +446,8 @@ class StructProp(Object):
         elif isinstance(mutations, dict):
             unique_mutations = list(mutations.keys())
 
+        # TODO: add color by letter_annotations!
+
         colors = sns.color_palette("hls", len(unique_mutations)).as_hex()
 
         for i, x in enumerate(unique_mutations):

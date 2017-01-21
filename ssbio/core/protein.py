@@ -643,5 +643,6 @@ class Protein(object):
             view = self.representative_structure.view_structure_with_mutations(fingerprint_map_to_structure,
                                                                                color=color, unique_colors=unique_colors,
                                                                                opacity_range=opacity_range,
-                                                                               scale_range=scale_range)
+                                                                               scale_range=scale_range,
+                                                                               gui=gui)
             return view
