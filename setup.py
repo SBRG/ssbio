@@ -20,7 +20,7 @@ setup(
                  'ssbio/structure/properties/msms.py'],
         long_description=open('README.md').read(),
         install_requires=['cobra',
-                          'biopython',
+                          'biopython>=1.68',
                           'numpy',
                           'tqdm',
                           'pandas',
@@ -31,5 +31,7 @@ setup(
                           'mmtf-python',
                           'ujson',
                           'awesome-slugify',
-                          'seaborn']
+                          'seaborn',
+                          'nglview',
+                          'ipywidgets']
 )
