@@ -944,19 +944,20 @@ class GEMPRO(object):
                 s.download_structure_file(outdir=gene_struct_dir, force_rerun=force_rerun, parse=False)
                 s.download_cif_header_file(outdir=gene_struct_dir, force_rerun=force_rerun)
 
-                # TODO: parse header file and store in pdb_pre_df
-                # pdb_pre_df.append(adder)
+                infodict = s.get_dict(df_format=True)
+                infodict['gene'] = gene_id
+                infodict['pdb_id'] = s.id
+                pdb_pre_df.append(infodict)
 
         # Save a dataframe of the PDB metadata
         if not self.df_pdb_metadata.empty:
             self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
             log.info('Updated existing PDB dataframe.')
         else:
-            cols = ['gene', 'pdb_id', 'pdb_chain_id', 'experimental_method',
-                    'resolution', 'seq_coverage', 'chemicals', 'rank', 'release_date', 'blast_evalue', 'blast_score',
-                    'seq_similar', 'seq_num_coverage', 'seq_num_similar',
-                    'pdb_file', 'mmcif_header'] # taxonomy_name
-            self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
+            cols = ['gene', 'pdb_id', 'pdb_title','description', 'experimental_method',
+                    'resolution', 'chemicals', 'date', 'taxonomy_name',
+                    'structure_file']
+            self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
             log.info('Created PDB metadata dataframe.')
 
     # def calculate_sequence_properties(self, force_rerun=False):

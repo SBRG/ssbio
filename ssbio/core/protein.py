@@ -446,6 +446,10 @@ class Protein(object):
             log.error('{}: no representative sequence to compare structures to'.format(self.id))
             return None
 
+        if self.representative_structure and not force_rerun:
+            log.debug('{}: representative structure already set'.format(self.id))
+            return self.representative_structure
+
         has_homology = False
         has_pdb = False
         use_homology = False
@@ -512,32 +516,32 @@ class Protein(object):
 
             # TODO: homology models are not ordered in any other way other than how they are loaded,
             # rethink this for multiple homology models
-            top_homology = all_models[0]
-            if not top_homology.structure_path:
-                log.debug('{}: no representative structure found'.format(self.id))
-                return None
+            for homology in all_models:
+                if not homology.structure_path:
+                    log.debug('{}: no homology structure file'.format(self.id))
+                    continue
 
-            top_homology.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False,
+                homology.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False,
                                                               force_rerun=force_rerun)
-            best_chain = top_homology.sequence_quality_checker(seq_ident_cutoff=seq_ident_cutoff,
+                best_chain = homology.sequence_quality_checker(seq_ident_cutoff=seq_ident_cutoff,
                                                                allow_missing_on_termini=allow_missing_on_termini,
                                                                allow_mutants=allow_mutants,
                                                                allow_deletions=allow_deletions,
                                                                allow_insertions=allow_insertions,
                                                                allow_unresolved=allow_unresolved)
 
-            if best_chain:
-                self._representative_structure_setter(struct_prop=top_homology,
-                                                      new_id='{}-{}'.format(top_homology.id, best_chain.id),
-                                                      clean=True,
-                                                      out_suffix='-{}_clean'.format(best_chain.id),
-                                                      keep_chain=best_chain.id,
-                                                      outdir=struct_outdir)
-                log.debug('{}-{}: set as representative structure'.format(top_homology.id, best_chain.id))
-                return self.representative_structure
+                if best_chain:
+                    self._representative_structure_setter(struct_prop=homology,
+                                                          new_id='{}-{}'.format(homology.id, best_chain.id),
+                                                          clean=True,
+                                                          out_suffix='-{}_clean'.format(best_chain.id),
+                                                          keep_chain=best_chain.id,
+                                                          outdir=struct_outdir)
+                    log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain.id))
+                    return self.representative_structure
 
         else:
-            log.debug('{}: no representative structure found'.format(self.id))
+            log.warning('{}: no representative structure found'.format(self.id))
             return None
 
     def map_repseq_resnums_to_repchain_index(self, resnums):

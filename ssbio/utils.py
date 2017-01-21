@@ -683,24 +683,15 @@ def remap( x, oMin, oMax, nMin, nMax ):
     """Map to a 0 to 1 scale
         http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
 
-    Args:
-        x:
-        oMin:
-        oMax:
-        nMin:
-        nMax:
-
-    Returns:
-
     """
 
     #range check
     if oMin == oMax:
-        # print("Warning: Zero input range")
+        log.warning("Zero input range, unable to rescale")
         return x
 
     if nMin == nMax:
-        # print("Warning: Zero output range")
+        log.warning("Zero output range, unable to rescale")
         return x
 
     #check reversed input range

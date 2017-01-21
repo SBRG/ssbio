@@ -245,7 +245,7 @@ class StructProp(Object):
                 log.debug('{}: chain {} set as representative'.format(self.id, chain_id))
                 return self.representative_chain
         else:
-            log.warning('{}: no chains meet quality checks'.format(self.id))
+            log.debug('{}: no chains meet quality checks'.format(self.id))
             return None
 
     def get_dict_with_chain(self, chain, only_keys=None, chain_keys=None, exclude_attributes=None, df_format=False):
@@ -377,6 +377,7 @@ class StructProp(Object):
             return
 
         chains = dssp_results.chain.unique()
+        dssp_summary = ssbio.structure.properties.dssp.secondary_structure_summary(dssp_results)
 
         for chain in chains:
             ss = dssp_results[dssp_results.chain == chain].ss.tolist()
@@ -390,8 +391,8 @@ class StructProp(Object):
 
             # Making sure the X's are filled in
             ss = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                   new_seq=ss,
-                                                                   fill_with='-')
+                                                                              new_seq=ss,
+                                                                              fill_with='-')
             exposure_rsa = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
                                                                              new_seq=exposure_rsa,
                                                                              fill_with=float('Inf'))
@@ -404,6 +405,8 @@ class StructProp(Object):
             psi = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
                                                                     new_seq=psi,
                                                                     fill_with=float('Inf'))
+
+            chain_prop.seq_record.annotations.update(dssp_summary[chain])
 
             chain_prop.seq_record.letter_annotations['SS-dssp'] = ss
             chain_prop.seq_record.letter_annotations['RSA-dssp'] = exposure_rsa

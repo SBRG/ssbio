@@ -1,5 +1,6 @@
 import ssbio.utils
 import pandas as pd
+from collections import defaultdict
 from Bio import PDB
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
@@ -96,60 +97,52 @@ def calc_sasa(dssp_df):
     return infodict
 
 
-def calc_sec_struct_composition(dssp_df):
-    '''Calculates the percent of residues that are in a certain
-    secondary structure. Returns a dictionary of this.
-    '''
-    expoinfo = {}
-    Hn = 0
-    Bn = 0
-    En = 0
-    Gn = 0
-    In = 0
-    Tn = 0
-    Sn = 0
-    Nn = 0
-    Total = 0
-    abh = dssp_df.ss.tolist()
-    if len(abh) == 0:
-        expoinfo = {}
-    else:
-        for i in abh:
-            if i == '-':
-                Nn = Nn + 1
-            elif i == 'H':
-                Hn = Hn + 1
-            elif i == 'B':
-                Bn = Bn + 1
-            elif i == 'E':
-                En = En + 1
-            elif i == 'G':
-                Gn = Gn + 1
-            elif i == 'I':
-                In = In + 1
-            elif i == 'T':
-                Tn = Tn + 1
-            elif i == 'S':
-                Sn = Sn + 1
-            Total = Total + 1
-        Nnp = float(Nn) / float(Total)
-        Hnp = float(Hn) / float(Total)
-        Bnp = float(Bn) / float(Total)
-        Enp = float(En) / float(Total)
-        Gnp = float(Gn) / float(Total)
-        Inp = float(In) / float(Total)
-        Tnp = float(Tn) / float(Total)
-        Snp = float(Sn) / float(Total)
-        expoinfo['ssb_per_irr'] = Nnp
-        expoinfo['ssb_per_alpha'] = Hnp
-        expoinfo['ssb_per_beta_bridge'] = Bnp
-        expoinfo['ssb_per_ext_beta'] = Enp
-        expoinfo['ssb_per_310_helix'] = Gnp
-        expoinfo['ssb_per_5_helix'] = Inp
-        expoinfo['ssb_per_hbond_turn'] = Tnp
-        expoinfo['ssb_per_bent'] = Snp
+def secondary_structure_summary(dssp_df):
+    """Summarize the secondary structure content of the DSSP dataframe for each chain.
 
-    return expoinfo
+    Args:
+        dssp_df: Pandas DataFrame of parsed DSSP results
+
+    Returns:
+        dict: Chain to secondary structure summary dictionary
+
+    """
+    chains = dssp_df.chain.unique()
+
+    infodict = {}
+    for chain in chains:
+        expoinfo = defaultdict(int)
+        chain_df = dssp_df[dssp_df.chain == chain]
+        counts = chain_df.ss.value_counts()
+        total = float(len(chain_df))
+
+        for ss, count in counts.items():
+            if ss == '-':
+                expoinfo['percent_irregular'] = count/total
+            if ss == 'H':
+                expoinfo['percent_alpha_helix'] = count/total
+            if ss == 'B':
+                expoinfo['percent_beta_sheet'] = count/total
+            if ss == 'E':
+                expoinfo['percent_ext_beta'] = count/total
+            if ss == 'G':
+                expoinfo['percent_310_helix'] = count/total
+            if ss == 'I':
+                expoinfo['percent_5_helix'] = count/total
+            if ss == 'T':
+                expoinfo['percent_hbond_turn'] = count/total
+            if ss == 'S':
+                expoinfo['percent_bent'] = count/total
+
+        # Filling in 0 percenters
+        for per in ['percent_irregular','percent_alpha_helix','percent_beta_sheet','percent_ext_beta',
+                    'percent_310_helix','percent_5_helix','percent_hbond_turn','percent_bent']:
+            if per not in expoinfo:
+                expoinfo[per] = 0.0
+
+        infodict[chain] = dict(expoinfo)
+
+    return infodict
 
 
 def calc_surface_buried(dssp_df):
@@ -237,7 +230,7 @@ def all_dssp_props(filename, file_type):
     t = dssp_dataframe(filename, file_type)
     # print(t)
     sasa = calc_sasa(t)
-    sstr = calc_sec_struct_composition(t)
+    sstr = secondary_structure_summary(t)
     subu = calc_surface_buried(t)
 
     sasa.update(sstr)
