@@ -38,7 +38,8 @@ $ git pull
 ```
 
 Uninstalling
-```pip uninstall ssbio
+```bash
+pip uninstall ssbio
 ```
 
 ## Dependencies
