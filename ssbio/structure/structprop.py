@@ -16,7 +16,7 @@ class StructProp(Object):
     """Class for protein structural properties"""
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_file=None, file_type=None,
-                 reference_seq=None, representative_chain=None, is_experimental=False, parse=False, ):
+                 reference_seq=None, representative_chain=None, is_experimental=False, parse=False):
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
@@ -38,10 +38,15 @@ class StructProp(Object):
         self.mapped_chains = ssbio.utils.force_list(mapped_chains)
 
         self.file_type = file_type
-        self.structure_file = None
         self.structure_path = structure_file
         if structure_file:
             self.load_structure_file(structure_file, file_type, parse)
+
+    @property
+    def structure_file(self):
+        if not self.structure_path:
+            return None
+        return op.basename(self.structure_path)
 
     def load_structure_file(self, structure_file, file_type, parse=False):
         """Load a structure file and provide pointers to its location
@@ -54,7 +59,6 @@ class StructProp(Object):
 
         """
         self.file_type = file_type
-        self.structure_file = op.basename(structure_file)
         self.structure_path = structure_file
 
         if parse:
@@ -183,7 +187,7 @@ class StructProp(Object):
                 raise ValueError('{}: chain sequence not parsed ')
             chain_seq_record = chain_prop.seq_record
 
-            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.reference_seq.get_seq_str(),
+            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.reference_seq.seq_str,
                                                                              a_seq_id=self.reference_seq.id,
                                                                              b_seq=chain_seq_record,
                                                                              b_seq_id=structure_id,
@@ -320,7 +324,7 @@ class StructProp(Object):
         if not self.structure:
             parsed = self.parse_structure()
             if not parsed:
-                log.error('{}: unable to run MSMS'.format(self.id))
+                log.error('{}: unable to open structure to run MSMS'.format(self.id))
                 return
 
         log.debug('{}: running MSMS'.format(self.id))
@@ -364,13 +368,14 @@ class StructProp(Object):
         if not self.structure:
             parsed = self.parse_structure()
             if not parsed:
-                log.error('{}: unable to run DSSP'.format(self.id))
+                log.error('{}: unable to open structure to run DSSP'.format(self.id))
                 return
 
         log.debug('{}: running DSSP'.format(self.id))
         dssp_results = ssbio.structure.properties.dssp.get_dssp_df(model=self.structure.first_model,
-                                                        pdb_file=self.structure_path,
-                                                        outdir=outdir, force_rerun=force_rerun)
+                                                                   pdb_file=self.structure_path,
+                                                                   outdir=outdir,
+                                                                   force_rerun=force_rerun)
 
         if dssp_results.empty:
             log.error('{}: unable to run DSSP'.format(self.id))
@@ -415,7 +420,7 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
-    def view_structure(self, opacity=1, gui=False):
+    def view_structure(self, opacity=1.0, gui=False):
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
         view = nv.show_structure_file(self.structure_path, gui=gui)
@@ -467,3 +472,4 @@ class StructProp(Object):
                                         color=color, opacity=opacity_dict[x], scale=scale_dict[x])
 
         return view
+

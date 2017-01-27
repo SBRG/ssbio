@@ -54,7 +54,7 @@ class TestProtein(unittest.TestCase):
     def test_set_representative_sequence(self):
         self.prot.set_representative_sequence()
         self.assertEqual(self.prot.representative_sequence.id, 'P0ABP8')
-        self.assertTrue(self.prot.representative_sequence.num_pdbs() > 0)
+        self.assertTrue(self.prot.representative_sequence.num_pdbs > 0)
 
     def test_align_sequences_to_representative(self):
         # TODO: unittests for this method

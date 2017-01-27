@@ -79,7 +79,7 @@ class UniProtProp(SeqProp):
             int: Scoring for this ID
 
         """
-        return self.reviewed + self.num_pdbs()
+        return self.reviewed + self.num_pdbs
 
 
 def is_valid_uniprot_id(instring):
@@ -309,7 +309,7 @@ def parse_uniprot_txt_file(infile):
     metadata = old_parse_uniprot_txt_file(infile)
     metadata_key = list(metadata.keys())[0]
 
-    uniprot_metadata_dict['sequence_len'] = len(str(metadata[metadata_key]['sequence']))
+    uniprot_metadata_dict['seq_len'] = len(str(metadata[metadata_key]['sequence']))
     uniprot_metadata_dict['reviewed'] = metadata[metadata_key]['is_reviewed']
     uniprot_metadata_dict['seq_version'] = metadata[metadata_key]['sequence_version']
     uniprot_metadata_dict['entry_version'] = metadata[metadata_key]['entry_version']

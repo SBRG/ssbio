@@ -60,7 +60,7 @@ class TestGEMPRO(unittest.TestCase):
     def test_prep_folders(self):
         # Test if folders were made
         self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME)))
-        folders = ['data', 'figures', 'structures', 'sequences']
+        folders = ['data', 'structures', 'sequences']
         for f in folders:
             self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME, f)))
 

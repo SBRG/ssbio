@@ -62,7 +62,7 @@ def biopython_protein_analysis(inseq):
     # info_dict['secondary_structure_fraction'] = analysed_seq.secondary_structure_fraction()
     info_dict['percent_helix_naive'] = analysed_seq.secondary_structure_fraction()[0]
     info_dict['percent_turn_naive'] = analysed_seq.secondary_structure_fraction()[1]
-    info_dict['percent_sheet_naive'] = analysed_seq.secondary_structure_fraction()[2]
+    info_dict['percent_strand_naive'] = analysed_seq.secondary_structure_fraction()[2]
 
     return info_dict
 

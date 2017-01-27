@@ -14,7 +14,7 @@ class TestUniProt(unittest.TestCase):
                          metadata_file='test_files/sequences/P0ABP8.txt')
 
         up_keys = ['bigg','description','ec_number','entry_version','gene_name','id','kegg',
-                   'metadata_file','metadata_path','pdbs','pfam','refseq','reviewed','sequence_file','sequence_len',
+                   'metadata_file','metadata_path','pdbs','pfam','refseq','reviewed','sequence_file','seq_len',
                    'sequence_path','seq_version','uniprot']
 
         for k in up_keys:
@@ -36,7 +36,7 @@ class TestUniProt(unittest.TestCase):
         six.assertCountEqual(self, up.refseq, ['NP_418801.1', 'NC_000913.3', 'WP_000224877.1', 'NZ_LN832404.1'])
         self.assertEqual(up.reviewed, True)
         self.assertEqual(up.sequence_file, 'P0ABP8.fasta')
-        self.assertEqual(up.sequence_len, 239)
+        self.assertEqual(up.seq_len, 239)
         self.assertEqual(up.seq_version, '2007-01-23')
         self.assertEqual(up.uniprot, 'P0ABP8')
 

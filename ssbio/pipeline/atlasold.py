@@ -26,6 +26,7 @@ import ssbio.sequence.utils.alignment
 
 date = utils.Date()
 from ssbio.pipeline.gempro import GEMPRO
+from cobra.core import Model
 import sys
 import logging
 import copy
@@ -52,6 +53,32 @@ Gene.__new__ = staticmethod(__new__)
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
 
+class AtlasModel(Model):
+    """Class to represent a model within the ATLAS analysis. Just adding some fields to the annotation attributes.
+    """
+
+    def __init__(self, model, genome_file_name):
+        Model.__init__(self, model)
+        self.annotation['genome_file'] = op.basename(genome_file_name)
+
+        for g in model.genes:
+            g.annotation['sequence'] = {'seq_len'       : 0,
+                                        'sequence_file'      : None,
+                                        'alignment_file': None,
+                                        'properties'    : {}
+                                        }
+            g.annotation['structure'] = {'base_structure': g.annotation['structure']['representative']}
+
+    def get_genome_file_path(self, genome_file_dir):
+        return op.join(genome_file_dir, self.annotation['genome_file'])
+
+    def get_gene_sequence_path(self, gene_id, gene_dir):
+        g = self.genes.get_by_id(gene_id)
+        if not g.annotation['sequence']['sequence_file']:
+            raise IOError('{}: Sequence does not exist'.format(gene_id))
+        g_seq_path = op.join(gene_dir, g.annotation['sequence']['sequence_file'])
+        return g_seq_path
+
 
 class ATLAS():
     """Class to represent an ATLAS workflow to carry out multi-strain comparisons
@@ -66,18 +93,22 @@ class ATLAS():
     """
 
     def __init__(self,
-                 base_gempro,
+                 base_gempro_name,
                  base_dir,
+                 base_gempro_file,
                  base_genome_id,
                  list_of_ncbi_ids=None,
                  email_for_ncbi='',
                  list_of_patric_ids=None,
                  dict_of_genomes=None,
                  seq_type='protein'):
-        """Prepare for ATLAS analysis"""
+        """Prepare for ATLAS analysis.
+
+        """
 
         # Load the GEM-PRO
-        self.base_strain_gempro = base_gempro
+        self.base_strain_gempro = GEMPRO(gem_name=base_gempro_name, root_dir=base_dir,
+                                         gem_file_path=base_gempro_file, gem_file_type='json')
 
         # Prepare ATLAS directories
         list_of_dirs = []
@@ -88,10 +119,12 @@ class ATLAS():
         self.atlas_model_files = op.join(self.atlas_dir, 'models')
         # atlas_data_dir - directory where all data will be stored
         self.atlas_data_dir = op.join(self.atlas_dir, 'data')
+        # figure_dir - directory where all figure_dir will be stored
+        self.atlas_figure_dir = op.join(self.atlas_dir, 'figures')
         # sequence_dir - sequence related files are stored here
         self.atlas_sequence_dir = op.join(self.atlas_dir, 'sequences')
 
-        list_of_dirs.extend([self.atlas_dir, self.atlas_data_dir,
+        list_of_dirs.extend([self.atlas_dir, self.atlas_data_dir, self.atlas_figure_dir,
                              self.atlas_model_files, self.atlas_sequence_dir])
 
         # Check to see what analysis we'll be doing
@@ -141,7 +174,7 @@ class ATLAS():
 
         # Create initial strain models that are just copies of the base strain with a resetted annotation
         self.strain_ids = []
-        self.strain_models = DictList()
+        self.strain_models = DictList([])
         log.info('Creating initial strain specific models based on the base model...')
         for strain_id, strain_fasta in tqdm(strains_to_fasta_file.items()):
             self.strain_ids.append(strain_id)

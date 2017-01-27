@@ -41,7 +41,7 @@ class PDBProp(StructProp):
         self.taxonomy_name = None
 
     # TODO: test using cif or mmtf file formats -- this is the global flag here (which is a dumb place to be)
-    def download_structure_file(self, outdir, file_type='cif', force_rerun=False, parse=False):
+    def download_structure_file(self, outdir, file_type='pdb', force_rerun=False, parse=False):
         pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False,
                                       outdir=outdir,
                                       force_rerun=force_rerun)

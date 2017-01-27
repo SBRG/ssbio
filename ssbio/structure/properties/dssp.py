@@ -5,17 +5,33 @@ from Bio import PDB
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
 from Bio.PDB.DSSP import residue_max_acc
+from Bio.PDB.DSSP import dssp_dict_from_pdb_file
 from ssbio.structure.utils.pdbioext import PDBIOExt
 import logging
 log = logging.getLogger(__name__)
 
 
 def get_dssp_df(model, pdb_file, outfile=None, outdir=None, outext='_dssp.df', force_rerun=False):
+    """
+
+    Args:
+        model:
+        pdb_file:
+        outfile:
+        outdir:
+        outext:
+        force_rerun:
+
+    Returns:
+
+    """
     # Create the output file name
     outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         try:
+            # TODO: errors with non-standard residues, ie. MSE in 4Q6U or 1nfr
+            # TODO: write command line executor for DSSP and parser for raw DSSP results
             dssp = PDB.DSSP(model, pdb_file)
         except KeyError:
             return pd.DataFrame()
@@ -61,41 +77,68 @@ def get_dssp_df(model, pdb_file, outfile=None, outdir=None, outext='_dssp.df', f
 
 
 def get_dssp_df_on_file(pdb_file, outfile=None, outdir=None, outext='_dssp.df', force_rerun=False):
-    """Run DSSP
+    """Run DSSP directly on a structure file with the Biopython method Bio.PDB.DSSP.dssp_dict_from_pdb_file
+
+    Avoids errors like: PDBException: Structure/DSSP mismatch at <Residue MSE het=  resseq=19 icode= >
+        by not matching information to the structure file (DSSP fills in the ID "X" for unknown residues)
+
+    Args:
+        pdb_file: Path to PDB file
+        outfile: Name of output file
+        outdir: Path to output directory
+        outext: Extension of output file
+        force_rerun: If DSSP should be rerun if the outfile exists
+
+    Returns:
+        Pandas DataFrame: DSSP results, summarized
+
     """
+    # TODO: function unfinished
     # Create the output file name
     outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        # Load the structure
-        my_structure = PDBIOExt(pdb_file)
-        model = my_structure.first_model
-        df = get_dssp_df(model, pdb_file, outfile=outfile, outdir=outdir, outext=outext, force_rerun=force_rerun)
+        try:
+            d = dssp_dict_from_pdb_file(pdb_file)
+        except Exception('DSSP failed to produce an output'):
+            log.error('{}: unable to run DSSP'.format(pdb_file))
+            return pd.DataFrame()
+
+        appender = []
+        # TODO: WARNING: d is slightly different than when using function get_dssp_df
+        for k in d[1]:
+            to_append = []
+            y = d[0][k]
+            chain = k[0]
+            residue = k[1]
+            het = residue[0]
+            resnum = residue[1]
+            icode = residue[2]
+            to_append.extend([chain, resnum, icode])
+            to_append.extend(y)
+            appender.append(to_append)
+
+        cols = ['chain', 'resnum', 'icode',
+                'dssp_index', 'aa', 'ss', 'exposure_rsa', 'phi', 'psi',
+                'NH_O_1_relidx', 'NH_O_1_energy', 'O_NH_1_relidx',
+                'O_NH_1_energy', 'NH_O_2_relidx', 'NH_O_2_energy',
+                'O_NH_2_relidx', 'O_NH_2_energy']
+
+        df = pd.DataFrame.from_records(appender, columns=cols)
+
+        # Adding additional columns
+        df = df[df['aa'].isin(list(aa1))]
+        df['aa_three'] = df['aa'].apply(one_to_three)
+        df['max_acc'] = df['aa_three'].map(residue_max_acc['Sander'].get)
+        df[['exposure_rsa', 'max_acc']] = df[['exposure_rsa', 'max_acc']].astype(float)
+        df['exposure_asa'] = df['exposure_rsa'] * df['max_acc']
+
+        df.to_csv(outfile)
     else:
-        log.debug('{}: already ran MSMS and force_rerun={}, loading results'.format(outfile, force_rerun))
+        log.debug('{}: already ran DSSP and force_rerun={}, loading results'.format(outfile, force_rerun))
         df = pd.read_csv(outfile, index_col=0)
 
     return df
-
-
-def calc_sasa(dssp_df):
-    """
-    Calculation of SASA utilizing the DSSP program.
-
-    DSSP must be installed for biopython to properly call it.
-    Install using apt-get on Ubuntu
-    or from: http://swift.cmbi.ru.nl/gv/dssp/
-
-    Input: PDB or CIF structure file
-    Output: SASA (integer) of structure
-    """
-
-    infodict = {'ssb_sasa': dssp_df.exposure_asa.sum(),
-                'ssb_mean_rel_exposed': dssp_df.exposure_rsa.mean(),
-                'ssb_size': len(dssp_df)}
-
-    return infodict
-
 
 def secondary_structure_summary(dssp_df):
     """Summarize the secondary structure content of the DSSP dataframe for each chain.
@@ -118,25 +161,25 @@ def secondary_structure_summary(dssp_df):
 
         for ss, count in counts.items():
             if ss == '-':
-                expoinfo['percent_irregular'] = count/total
+                expoinfo['percent_C-dssp'] = count/total
             if ss == 'H':
-                expoinfo['percent_alpha_helix'] = count/total
+                expoinfo['percent_H-dssp'] = count/total
             if ss == 'B':
-                expoinfo['percent_beta_sheet'] = count/total
+                expoinfo['percent_B-dssp'] = count/total
             if ss == 'E':
-                expoinfo['percent_ext_beta'] = count/total
+                expoinfo['percent_E-dssp'] = count/total
             if ss == 'G':
-                expoinfo['percent_310_helix'] = count/total
+                expoinfo['percent_G-dssp'] = count/total
             if ss == 'I':
-                expoinfo['percent_5_helix'] = count/total
+                expoinfo['percent_I-dssp'] = count/total
             if ss == 'T':
-                expoinfo['percent_hbond_turn'] = count/total
+                expoinfo['percent_T-dssp'] = count/total
             if ss == 'S':
-                expoinfo['percent_bent'] = count/total
+                expoinfo['percent_S-dssp'] = count/total
 
         # Filling in 0 percenters
-        for per in ['percent_irregular','percent_alpha_helix','percent_beta_sheet','percent_ext_beta',
-                    'percent_310_helix','percent_5_helix','percent_hbond_turn','percent_bent']:
+        for per in ['percent_C-dssp','percent_H-dssp','percent_B-dssp','percent_E-dssp',
+                    'percent_G-dssp','percent_I-dssp','percent_T-dssp','percent_S-dssp']:
             if per not in expoinfo:
                 expoinfo[per] = 0.0
 
@@ -145,6 +188,7 @@ def secondary_structure_summary(dssp_df):
     return infodict
 
 
+# TODO: below methods have not been fixed
 def calc_surface_buried(dssp_df):
     '''Calculates the percent of residues that are in the surface or buried,
     as well as if they are polar or nonpolar. Returns a dictionary of this.
@@ -219,6 +263,25 @@ def calc_surface_buried(dssp_df):
         sbinfo['ssb_per_B'] = pBN
 
         return sbinfo
+
+
+def calc_sasa(dssp_df):
+    """
+    Calculation of SASA utilizing the DSSP program.
+
+    DSSP must be installed for biopython to properly call it.
+    Install using apt-get on Ubuntu
+    or from: http://swift.cmbi.ru.nl/gv/dssp/
+
+    Input: PDB or CIF structure file
+    Output: SASA (integer) of structure
+    """
+
+    infodict = {'ssb_sasa': dssp_df.exposure_asa.sum(),
+                'ssb_mean_rel_exposed': dssp_df.exposure_rsa.mean(),
+                'ssb_size': len(dssp_df)}
+
+    return infodict
 
 
 def all_dssp_props(filename, file_type):

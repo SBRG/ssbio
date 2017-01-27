@@ -11,3 +11,6 @@ class ChainProp(Object):
 
         self.pdb_parent = pdb_parent
         self.seq_record = seq_record
+
+        if not self.description:
+            self.description = 'Chain {} from PDB parent {}'.format(self.id, self.pdb_parent)

@@ -25,7 +25,7 @@ class SCRATCH():
         self.project_name = project_name
         self.seq_file = seq_file
         if seq_str:
-            self.seq_file = ssbio.sequence.utils.fasta.load_seq_str_as_temp_file(seq_str)
+            self.seq_file = ssbio.sequence.utils.fasta.load_seq_str_as_tempfasta(seq_str)
 
     def run_scratch(self, path_to_scratch, num_cores=1, outname=None, outdir=None, force_rerun=False):
         """Run SCRATCH on the sequence_file that was loaded into the class.
@@ -86,9 +86,9 @@ class SCRATCH():
         records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_sspro)
         for r in records:
             seq_summary = {}
-            seq_summary['H'] = r.seq.count('H')/float(len(r))
-            seq_summary['E'] = r.seq.count('E')/float(len(r))
-            seq_summary['C'] = r.seq.count('C')/float(len(r))
+            seq_summary['percent_H-sspro'] = r.seq.count('H')/float(len(r))
+            seq_summary['percent_E-sspro'] = r.seq.count('E')/float(len(r))
+            seq_summary['percent_C-sspro'] = r.seq.count('C')/float(len(r))
 
             summary[r.id] = seq_summary
 
@@ -122,14 +122,14 @@ class SCRATCH():
         records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_sspro8)
         for r in records:
             seq_summary = {}
-            seq_summary['H'] = r.seq.count('H') / float(len(r))
-            seq_summary['G'] = r.seq.count('G') / float(len(r))
-            seq_summary['I'] = r.seq.count('I') / float(len(r))
-            seq_summary['E'] = r.seq.count('E') / float(len(r))
-            seq_summary['B'] = r.seq.count('B') / float(len(r))
-            seq_summary['T'] = r.seq.count('T') / float(len(r))
-            seq_summary['S'] = r.seq.count('S') / float(len(r))
-            seq_summary['C'] = r.seq.count('C') / float(len(r))
+            seq_summary['percent_H-sspro8'] = r.seq.count('H') / float(len(r))
+            seq_summary['percent_G-sspro8'] = r.seq.count('G') / float(len(r))
+            seq_summary['percent_I-sspro8'] = r.seq.count('I') / float(len(r))
+            seq_summary['percent_E-sspro8'] = r.seq.count('E') / float(len(r))
+            seq_summary['percent_B-sspro8'] = r.seq.count('B') / float(len(r))
+            seq_summary['percent_T-sspro8'] = r.seq.count('T') / float(len(r))
+            seq_summary['percent_S-sspro8'] = r.seq.count('S') / float(len(r))
+            seq_summary['percent_C-sspro8'] = r.seq.count('C') / float(len(r))
 
             summary[r.id] = seq_summary
 
@@ -155,16 +155,15 @@ class SCRATCH():
         records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_accpro)
         for r in records:
             seq_summary = {}
-            seq_summary['exposed'] = r.seq.count('e') / float(len(r))
-            seq_summary['buried'] = r.seq.count('-') / float(len(r))
+            seq_summary['percent_exposed-accpro'] = r.seq.count('e') / float(len(r))
+            seq_summary['percent_buried-accpro'] = r.seq.count('-') / float(len(r))
 
             summary[r.id] = seq_summary
 
         return summary
 
     def accpro20_results(self):
-        """Parse the ACCpro output file and return a dict of secondary structure compositions.
-        """
+        """Parse the ACCpro output file and return a dict of secondary structure compositions"""
         return read_accpro20(self.out_accpro20)
         # return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_accpro20)
 
@@ -173,6 +172,7 @@ class SCRATCH():
 
         Below the cutoff = buried
         Equal to or greater than cutoff = exposed
+        The default cutoff used in accpro is 25%.
 
         The output file is just a FASTA formatted file, so you can get residue level
             information by parsing it like a normal sequence file.
@@ -202,8 +202,8 @@ class SCRATCH():
                 else:
                     buried += 1
 
-            seq_summary['exposed'] = exposed / float(len(v))
-            seq_summary['buried'] = buried / float(len(v))
+            seq_summary['percent_exposed-accpro20'] = exposed / float(len(v))
+            seq_summary['percent_buried-accpro20'] = buried / float(len(v))
 
             summary[k] = seq_summary
 

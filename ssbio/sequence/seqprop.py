@@ -10,13 +10,37 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 from collections import defaultdict
 import logging
+
 log = logging.getLogger(__name__)
 
 
 class SeqProp(Object):
-    """Class for protein sequence properties"""
+    """Class for protein sequence properties.
 
-    def __init__(self, ident, description=None, sequence_file=None, metadata_file=None, seq_record=None, seq_str=None):
+    SeqProp provides:
+    1. Attributes for mapping to other database identifiers
+        - .bigg: BiGG Models ID
+        - .kegg: KEGG ID
+        - .uniprot: UniProt ACC/ID
+        - .gene_name: Human readable gene name
+        - .pdbs: Mapped PDB IDs
+
+    2. Basic sequence attributes
+        - .seq_len: Length of the amino acid sequence
+
+    3. Pointers to filepaths
+        - .sequence_file: Basename of sequence file in FASTA format
+        - .sequence_path: Full path to sequence file
+        - .metadata_file: Basename of metadata file in any format
+        - .metadata_path: Full path to metadata file
+
+    4. Pointers to
+
+
+    """
+
+    def __init__(self, ident, description=None, sequence_file=None, metadata_file=None, seq_record=None, seq_str=None,
+                 write_fasta_file=False, outname=None, outdir=None, force_rewrite=False):
         """Parses basic sequence properties like identifiers and sequence length.
         Provides paths to sequence and metadata files.
 
@@ -36,52 +60,58 @@ class SeqProp(Object):
         self.uniprot = None
         self.gene_name = None
         self.pdbs = None
+        self.seq_record = seq_record
 
-        self.sequence_len = 0
-        self.sequence_file = None
         self.sequence_path = sequence_file
+        self.metadata_path = metadata_file
+
+        if seq_str:
+            self.seq_record = ssbio.sequence.utils.fasta.load_seq_string_as_seqrecord(seq_str, self.id)
         if sequence_file:
             self.load_seq_file(sequence_file)
 
-        self.metadata_file = None
-        self.metadata_path = metadata_file
-        if metadata_file:
-            self.load_metadata_file(metadata_file)
-
-        self.seq_record = None
-        self.seq_str = None
-        if seq_record:
-            self.load_seq_record(seq_record)
-        if seq_str:
-            self.load_seq_str(seq_str)
+        if write_fasta_file:
+            self.write_fasta_file(outname=outname, outdir=outdir, force_rerun=force_rewrite)
 
         # Store AlignIO objects of this sequence to others in alignments
         self.sequence_alignments = DictList()
         self.structure_alignments = DictList()
 
-    def load_seq_record(self, seq_record):
-        """Load a SeqRecord
+    @property
+    def seq_str(self):
+        """Get the sequence formatted as a string"""
+        if not self.seq_record:
+            return None
+        return ssbio.sequence.utils.cast_to_str(self.seq_record)
 
-        Args:
-            seq_record: Sequence string
+    @property
+    def seq_len(self):
+        """Get the sequence length"""
+        if not self.seq_record:
+            return 0
+        return len(self.seq_record.seq)
 
-        """
-        seq_record.id = self.id
+    @property
+    def sequence_file(self):
+        """Get the name of the sequence file"""
+        if not self.sequence_path:
+            return None
+        return op.basename(self.sequence_path)
 
-        self.sequence_len = len(seq_record.seq)
-        self.seq_record = seq_record
-        self.seq_str = str(seq_record.seq)
+    @property
+    def metadata_file(self):
+        """Get the name of the metadata file"""
+        if not self.metadata_path:
+            return None
+        return op.basename(self.metadata_path)
 
-    def load_seq_str(self, seq_str):
-        """Load a sequence string
-
-        Args:
-            seq_str: Sequence string
-
-        """
-        self.sequence_len = len(seq_str)
-        self.seq_record = SeqRecord(Seq(seq_str, IUPAC.extended_protein), id=self.id)
-        self.seq_str = str(self.seq_record.seq)
+    @property
+    def num_pdbs(self):
+        """Report the number of PDB IDs mapped"""
+        if not self.pdbs:
+            return 0
+        else:
+            return len(self.pdbs)
 
     def load_seq_file(self, sequence_file):
         """Load a sequence file and provide pointers to its location
@@ -90,9 +120,8 @@ class SeqProp(Object):
             sequence_file: Path to sequence file
 
         """
-        self.sequence_len = len(SeqIO.read(open(sequence_file), "fasta"))
-        self.sequence_file = op.basename(sequence_file)
         self.sequence_path = sequence_file
+        self.seq_record = SeqIO.read(open(sequence_file), 'fasta')
 
     def load_metadata_file(self, metadata_file):
         """Load a metadata file and provide pointers to its location
@@ -101,43 +130,23 @@ class SeqProp(Object):
             metadata_file: Path to metadata file
 
         """
-        self.metadata_file = op.basename(metadata_file)
         self.metadata_path = metadata_file
 
-    def get_seq_str(self):
-        """Get the sequence formatted as a string
+    def write_fasta_file(self, outname=None, outdir=None, force_rerun=False):
+        """Write a FASTA file for the sequence
 
-        Returns:
-            str: Amino acid sequence in string format
-
-        """
-        if self.seq_str:
-            return self.seq_str
-        elif self.seq_record:
-            self.seq_str = str(self.seq_record.seq)
-            return self.seq_str
-        elif self.get_seq_record():
-            return self.seq_str
-        else:
-            log.debug('{}: no sequence loaded, cannot get sequence string'.format(self.id))
-            return None
-
-    def get_seq_record(self):
-        """Get the sequence as a SeqRecord object
-
-        Returns:
-            SeqRecord: Amino acid sequence as a SeqRecord object
+        Args:
+            outname: Name of the FASTA file (without extension)
+            outdir: Path to directory to output file to
+            force_rerun: If file should be overwritten if existing
 
         """
-        if self.seq_record:
-            return self.seq_record
-        elif self.sequence_path:
-            self.seq_record = SeqIO.read(open(self.sequence_path), "fasta")
-            self.seq_str = str(self.seq_record.seq)
-            return self.seq_record
-        else:
-            log.debug('{}: no sequence loaded, cannot get seqrecord'.format(self.id))
-            return None
+        if not outname:
+            outname = self.id
+        self.sequence_path = ssbio.sequence.utils.fasta.write_fasta_file(self.seq_record,
+                                                                         outname=outname,
+                                                                         outdir=outdir,
+                                                                         force_rerun=force_rerun)
 
     def equal_to(self, seq_prop):
         """Test if the sequence is equal to another SeqProp object's sequence
@@ -149,10 +158,7 @@ class SeqProp(Object):
             bool: If the sequences are the same
 
         """
-        if not self.sequence_path or not seq_prop.sequence_path:
-            log.error('Sequence file not available')
-            return False
-        return ssbio.sequence.utils.fasta.sequences_equal(self.sequence_path, seq_prop.sequence_path)
+        return self.seq_str == seq_prop.seq_str
 
     def equal_to_fasta(self, seq_file):
         """Test if this sequence is equal to another sequence file.
@@ -167,16 +173,7 @@ class SeqProp(Object):
         if not self.sequence_path:
             log.error('Sequence file not available')
             return False
-        return ssbio.sequence.utils.fasta.sequences_equal(self.sequence_path, seq_file)
-
-    def num_pdbs(self):
-        """Report the number of PDBs mapped
-        """
-
-        if not self.pdbs:
-            return 0
-        else:
-            return len(self.pdbs)
+        return ssbio.sequence.utils.fasta.fasta_files_equal(self.sequence_path, seq_file)
 
     def load_letter_annotations(self, annotation_name, letter_annotation):
         """Add per-residue annotations to the seq_record.letter_annotations attribute
@@ -195,7 +192,7 @@ class SeqProp(Object):
 
         Stores statistics in the seq_record.annotations attribute.
         """
-        pepstats = ssbio.sequence.properties.residues.biopython_protein_analysis(self.get_seq_str())
+        pepstats = ssbio.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
         self.seq_record.annotations.update(pepstats)
 
     def get_emboss_pepstats(self):
@@ -207,6 +204,14 @@ class SeqProp(Object):
         outfile = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
         pepstats = ssbio.sequence.properties.residues.emboss_pepstats_parser(outfile)
         self.seq_record.annotations.update(pepstats)
+
+    def summary(self, as_Df):
+        """Summarize this sequence.
+
+        Returns:
+            dict:
+
+        """
 
     def sequence_mutation_summary(self):
         """Summarize all mutations found in the sequence_alignments attribute.

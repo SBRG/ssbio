@@ -138,7 +138,8 @@ class ITASSERProp(StructProp):
                 my_pdb = PDBIOExt(self.structure_path, file_type='pdb')
                 new_model_path = my_pdb.write_pdb(custom_selection=custom_clean,
                                                   custom_name=rename_model_to,
-                                                  out_dir=copy_to_dir)
+                                                  out_dir=copy_to_dir,
+                                                  force_rerun=force_rerun)
             # Update the structure_path to be the copied, clean file
             self.load_structure_file(new_model_path, 'pdb', parse)
             self.model_file = op.basename(new_model_path)

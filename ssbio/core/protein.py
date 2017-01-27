@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 from cobra.core import DictList
+from collections import OrderedDict
+from ssbio.core.object import Object
 import ssbio.databases.kegg
 import ssbio.databases.uniprot
 from ssbio.sequence import SeqProp
@@ -20,16 +22,16 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class Protein(object):
+class Protein(Object):
     """Basic definition of a protein"""
 
-    _representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs', 'sequence_len',
-                                           'sequence_file', 'sequence_path', 'metadata_file', 'metadata_path']
+    _representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs',
+                                           'sequence_path', 'metadata_path']
     _representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
                                             'resolution','taxonomy_name']
 
-    def __init__(self, ident):
-        self.id = ident
+    def __init__(self, ident, description=None):
+        Object.__init__(self, id=ident, description=description)
         self.sequences = DictList()
         self.structures = DictList()
         self.representative_sequence = None
@@ -41,26 +43,29 @@ class Protein(object):
 
     @property
     def num_structures(self):
+        """Return the total number of structures"""
         return len(self.structures)
 
     @property
     def num_structures_experimental(self):
+        """Return the total number of experimental structures"""
         return len(self.get_experimental_structures())
 
     @property
     def num_structures_homology(self):
+        """Return the total number of homology models"""
         return len(self.get_homology_models())
 
     def get_experimental_structures(self):
-        # Return a DictList of all experimental structures in self.structures
+        """Return a DictList of all experimental structures in self.structures"""
         return DictList(x for x in self.structures if x.is_experimental)
 
     def get_homology_models(self):
-        # Return a DictList of all homology models in self.structures
+        """Return a DictList of all homology models in self.structures"""
         return DictList(x for x in self.structures if not x.is_experimental)
 
     def filter_sequences(self, seq_type):
-        """Get a DictList of only specified mappings in the sequences attribute.
+        """Get a DictList of only specified types in the sequences attribute.
 
         Args:
             seq_type: Object type
@@ -72,17 +77,19 @@ class Protein(object):
         return DictList(x for x in self.sequences if isinstance(x, seq_type))
 
     def load_kegg(self, kegg_id, kegg_organism_code=None, kegg_seq_file=None, kegg_metadata_file=None,
-                  set_as_representative=False,
-                  download=False, outdir=None, force_rerun=False):
-        """Load existing KEGG ID, sequence, and metadata files into the sequences attribute.
+                  set_as_representative=False, download=False, outdir=None, force_rerun=False):
+        """Load a KEGG ID, sequence, and metadata files into the sequences attribute.
 
         Args:
-            kegg_id:
-            kegg_organism_code: KEGG organism code to prepend to the kegg_id if not part of it already.
+            kegg_id (str): KEGG ID
+            kegg_organism_code (str): KEGG organism code to prepend to the kegg_id if not part of it already.
                 Example: "eco:b1244", eco is the organism code
-            kegg_seq_file:
-            kegg_metadata_file:
-            set_as_representative:
+            kegg_seq_file (str): Path to KEGG FASTA file
+            kegg_metadata_file (str): Path to KEGG metadata file (raw KEGG format)
+            set_as_representative (bool): If this KEGG ID should be set as the representative sequence
+            download (bool): If the KEGG sequence and metadata files should be downloaded if not provided
+            outdir (str): Where the sequence and metadata files should be downloaded to
+            force_rerun (bool): If ID should be reloaded and files redownloaded
 
         Returns:
             KEGGProp: object contained in the sequences attribute
@@ -91,8 +98,19 @@ class Protein(object):
         if kegg_organism_code:
             kegg_id = kegg_organism_code + ':' + kegg_id
 
-        # If KEGG ID has already been mapped, just return the KEGGProp object in sequences
-        if kegg_id not in self.sequences:
+        # If we have already loaded the KEGG ID
+        if self.sequences.has_id(kegg_id):
+            # Remove it if we want to force rerun things
+            if force_rerun:
+                existing = self.sequences.get_by_id(kegg_id)
+                self.sequences.remove(existing)
+            # Otherwise just get that KEGG object
+            else:
+                log.debug('{}: KEGG ID already present in list of sequences'.format(kegg_id))
+                kegg_prop = self.sequences.get_by_id(kegg_id)
+
+        # Check again (instead of else) in case we removed it if force rerun
+        if not self.sequences.has_id(kegg_id):
             kegg_prop = KEGGProp(kegg_id, kegg_seq_file, kegg_metadata_file)
             if download:
                 kegg_prop.download_seq_file(outdir, force_rerun)
@@ -110,25 +128,41 @@ class Protein(object):
                             # TODO: add option to use manual or kegg sequence if things do not match
                             log.warning('{}: representative sequence does not match mapped KEGG sequence.'.format(self.id))
 
-            if set_as_representative:
-                self._representative_sequence_setter(kegg_prop)
-
             self.sequences.append(kegg_prop)
+
+        if set_as_representative:
+            self._representative_sequence_setter(kegg_prop)
 
         return self.sequences.get_by_id(kegg_id)
 
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_metadata_file=None,
-                     set_as_representative=False,
-                     download=False, outdir=None, force_rerun=False):
+                     set_as_representative=False, download=False, outdir=None, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
 
         Args:
             uniprot_id:
             uniprot_seq_file:
             uniprot_metadata_file:
+            set_as_representative:
+            download:
+            outdir:
+            force_rerun:
+
+        Returns:
 
         """
-        if uniprot_id not in self.sequences:
+        # If we have already loaded the KEGG ID
+        if self.sequences.has_id(uniprot_id):
+            # Remove it if we want to force rerun things
+            if force_rerun:
+                existing = self.sequences.get_by_id(uniprot_id)
+                self.sequences.remove(existing)
+            # Otherwise just get that KEGG object
+            else:
+                log.debug('{}: KEGG ID already present in list of sequences'.format(uniprot_id))
+                uniprot_prop = self.sequences.get_by_id(uniprot_id)
+
+        if not self.sequences.has_id(uniprot_id):
             uniprot_prop = UniProtProp(uniprot_id, uniprot_seq_file, uniprot_metadata_file)
             if download:
                 uniprot_prop.download_seq_file(outdir, force_rerun)
@@ -143,11 +177,11 @@ class Protein(object):
                 else:
                     # TODO: add option to use manual or uniprot sequence if things do not match
                     log.warning('{}: representative sequence does not match mapped UniProt sequence'.format(self.id))
-
-            if set_as_representative:
-                self._representative_sequence_setter(uniprot_prop)
-
             self.sequences.append(uniprot_prop)
+
+        if set_as_representative:
+            self._representative_sequence_setter(uniprot_prop)
+
         return self.sequences.get_by_id(uniprot_id)
 
     def load_manual_sequence_file(self, ident, seq_file, set_as_representative=False):
@@ -168,10 +202,9 @@ class Protein(object):
 
         return self.sequences.get_by_id(ident)
 
-    def load_manual_sequence_str(self, ident, seq_str, outdir=None, set_as_representative=False):
+    def load_manual_sequence_str(self, ident, seq_str, outdir=None, set_as_representative=False, force_rerun=False):
         """Load a manual sequence given as a string and optionally set it as the representative sequence.
-
-        Also store it in the sequences attribute.
+            Also store it in the sequences attribute.
 
         Args:
             ident:
@@ -179,8 +212,8 @@ class Protein(object):
             set_as_representative:
 
         """
-        seq_file = ssbio.sequence.utils.fasta.write_fasta_file(indict={ident: seq_str}, outname=ident, outdir=outdir)
-        manual_sequence = SeqProp(ident=ident, sequence_file=seq_file)
+        manual_sequence = SeqProp(ident=ident, seq_str=seq_str,
+                                  write_fasta_file=True, outname=ident, outdir=outdir, force_rewrite=force_rerun)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -190,12 +223,11 @@ class Protein(object):
 
     def _representative_sequence_setter(self, seq_prop):
         """Make a copy of a SeqProp object and store it as the representative. Only keep certain attributes"""
-        self.representative_sequence = SeqProp(ident=seq_prop.id)
+        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_file=seq_prop.sequence_path)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self._representative_sequence_attributes)
 
     def set_representative_sequence(self):
-        """Consolidate sequences and set a single representative sequence.
-        """
+        """Consolidate sequence that were loaded and set a single representative sequence."""
 
         if len(self.sequences) == 0:
             log.error('{}: no sequences mapped'.format(self.id))
@@ -215,7 +247,6 @@ class Protein(object):
 
         # If there is a KEGG annotation and no UniProt annotations, set KEGG as representative
         elif len(kegg_mappings) > 0 and len(uniprot_mappings) == 0:
-            # TODO: double check if everything is set properly in seqprop
             self._representative_sequence_setter(kegg_to_use)
             log.debug('{}: representative sequence set from KEGG ID {}'.format(self.id, kegg_to_use.id))
 
@@ -236,7 +267,7 @@ class Protein(object):
         # If there are both UniProt and KEGG annotations...
         elif len(kegg_mappings) > 0 and len(uniprot_mappings) > 0:
             # Use KEGG if the mapped UniProt is unique, and it has PDBs
-            if kegg_to_use.num_pdbs() > 0 and not uniprot_mappings.has_id(kegg_to_use.uniprot):
+            if kegg_to_use.num_pdbs > 0 and not uniprot_mappings.has_id(kegg_to_use.uniprot):
                 self._representative_sequence_setter(kegg_to_use)
                 log.debug('{}: Representative sequence set from KEGG ID {}'.format(self.id, kegg_to_use.id))
             else:
@@ -276,9 +307,9 @@ class Protein(object):
                 log.debug('{}: alignment already completed'.format(seq.id))
                 continue
 
-            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.get_seq_str(),
+            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
                                                                              a_seq_id=self.id,
-                                                                             b_seq=seq.get_seq_str(),
+                                                                             b_seq=seq.seq_str,
                                                                              b_seq_id=seq.id,
                                                                              engine=engine,
                                                                              outdir=outdir,
@@ -298,7 +329,8 @@ class Protein(object):
 
             self.representative_sequence.sequence_alignments.append(aln)
 
-    def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, set_as_representative=False, parse=False):
+    def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, set_as_representative=False,
+                 parse=False, force_rerun=False):
         """Load a PDB ID into the structures attribute.
 
         Args:
@@ -316,14 +348,19 @@ class Protein(object):
         pdb_id = pdb_id.lower()
 
         if self.structures.has_id(pdb_id):
-            log.debug('{}: PDB ID already present in list of structures'.format(pdb_id))
-            pdb = self.structures.get_by_id(pdb_id)
+            if force_rerun:
+                existing = self.structures.get_by_id(pdb_id)
+                self.structures.remove(existing)
+            else:
+                log.debug('{}: PDB ID already present in list of structures'.format(pdb_id))
+                pdb = self.structures.get_by_id(pdb_id)
 
-            if mapped_chains:
-                pdb.add_mapped_chain_ids(mapped_chains)
-            if pdb_file:
-                pdb.load_structure_file(pdb_file, file_type, parse)
-        else:
+                if mapped_chains:
+                    pdb.add_mapped_chain_ids(mapped_chains)
+                if pdb_file:
+                    pdb.load_structure_file(pdb_file, file_type, parse)
+
+        if not self.structures.has_id(pdb_id):
             pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_file=pdb_file, file_type=file_type, parse=parse,
                           reference_seq=self.representative_sequence)
             if mapped_chains:
@@ -335,13 +372,34 @@ class Protein(object):
 
         return self.structures.get_by_id(pdb_id)
 
-    def load_itasser_folder(self, ident, itasser_folder, set_as_representative=False, create_dfs=False, parse=False):
-        itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs, parse=parse,
-                              reference_seq=self.representative_sequence)
-        if self.structures.has_id(itasser.id):
-            log.warning('{}: already present in list of structures'.format(itasser.id))
-            self.structures.get_by_id(ident)
-        else:
+    def load_itasser_folder(self, ident, itasser_folder, set_as_representative=False, create_dfs=False,
+                            parse=False, force_rerun=False):
+        """Load the results folder from I-TASSER, copy structure files over, and create summary dataframes.
+
+        Args:
+            ident: I-TASSER ID
+            itasser_folder: Path to results folder
+            set_as_representative: If this structure should be set as the representative structure
+            create_dfs: If summary dataframes should be created
+            parse: If the structure's 3D coordinates and chains should be parsed
+            force_rerun:
+
+        Returns:
+            ITASSERProp: StructProp object stored in the structures list.
+
+        """
+
+        if self.structures.has_id(ident):
+            if force_rerun:
+                existing = self.structures.get_by_id(ident)
+                self.structures.remove(existing)
+            else:
+                log.warning('{}: already present in list of structures'.format(ident))
+                itasser = self.structures.get_by_id(ident)
+
+        if not self.structures.has_id(ident):
+            itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs, parse=parse,
+                                  reference_seq=self.representative_sequence)
             self.structures.append(itasser)
 
         if set_as_representative:
@@ -424,8 +482,11 @@ class Protein(object):
         """Set a representative structure from the structures in self.structures
 
         Args:
+            seq_outdir:
+            struct_outdir:
+            engine:
+            seq_ident_cutoff:
             always_use_homology:
-            sort_homology_by:
             allow_missing_on_termini:
             allow_mutants:
             allow_deletions:
@@ -565,7 +626,7 @@ class Protein(object):
             ix = repchain_resnum_mapping[x - 1] - 1
 
             if np.isnan(ix):
-                log.debug('{}, {}: no equivalent residue found in structure'.format(self.id, x))
+                log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
             else:
                 to_repchain_index[x] = int(ix)
 
@@ -591,7 +652,7 @@ class Protein(object):
             rn = repchain_structure_mapping[v]
 
             if rn[1] == float('Inf'):
-                log.debug('{}, {}: structure file does not contain coordinates for this residue'.format(self.id, k))
+                log.warning('{}, {}: structure file does not contain coordinates for this residue'.format(self.id, k))
             else:
                 to_structure_resnums[k] = rn
 
@@ -619,6 +680,9 @@ class Protein(object):
         for k, v in single_lens.items():
             resnum = int(k[1])
             resnum_to_structure = self.map_repseq_resnums_to_structure_resnums(resnum)
+            if resnum not in resnum_to_structure:
+                log.warning('{}: residue is not available in structure {}'.format(resnum, self.representative_structure.id))
+                continue
             new_key = resnum_to_structure[resnum][1]
             single_map_to_structure[new_key] = v
 
@@ -646,3 +710,63 @@ class Protein(object):
                                                                                scale_range=scale_range,
                                                                                gui=gui)
             return view
+
+    def summarize_protein(self):
+        """Gather all possible attributes in the sequences and structures and summarize everything.
+
+        Returns:
+            dict:
+
+        """
+        d = OrderedDict()
+        repseq = self.representative_sequence
+        if not self.representative_structure:
+            repstruct = StructProp(self.id)
+            repchain = repstruct.representative_chain
+        else:
+            repstruct = self.representative_structure
+            repchain = self.representative_structure.representative_chain
+        single, fingerprint = g.protein.representative_sequence.sequence_mutation_summary()
+        numstrains = len(self.sequences) - 1
+
+        d['Gene ID'] = g.id
+        d['Number of sequences'] = len(self.sequences)
+        d['Number of structures (total)'] = self.num_structures
+        d['Number of structures (experimental)'] = self.num_structures_experimental
+        d['Number of structures (homology models)'] = self.num_structures_homology
+
+        # d['------REPRESENTATIVE SEQUENCE PROPERTIES------')
+        #     d['Sequence ID'] = repseq.id
+        d['Sequence length'] = repseq.sequence_len
+        d['Predicted number of transmembrane helices'] = repseq.seq_record.annotations['num_tm_helix-tmhmm']
+
+        # d['------REPRESENTATIVE STRUCTURE PROPERTIES------')
+        d['Structure ID'] = repstruct.id
+        #     d['Structure representative chain'] = format(repchain.id)))
+        d['Structure is experimental'] = repstruct.is_experimental
+        # d['Structure origin'] = repstruct.taxonomy_name))
+        # d['Structure description'] = repstruct.description))
+        d['Structure coverage of sequence'] = str(repstruct.reference_seq_top_coverage) + '%'
+
+        # d['------ALIGNMENTS SUMMARY------')
+        #     d['Number of sequence alignments'] = len(repseq.sequence_alignments)))
+        #     d['Number of structure alignments'] = len(repseq.structure_alignments)))
+
+        singles = []
+        for k, v in single.items():
+            k = [str(x) for x in k]
+            if len(v) / numstrains >= 0.01:
+                singles.append(''.join(k))  # len(v) is the number of strains
+        d['Mutations that show up in more than 10% of strains'] = ';'.join(singles)
+
+        allfingerprints = []
+        for k, v in fingerprint.items():
+            if len(v) / numstrains >= 0.01:
+                fingerprints = []
+                for m in k:
+                    y = [str(x) for x in m]
+                    fingerprints.append(''.join(y))
+                allfingerprints.append('-'.join(fingerprints))
+        d['Mutation groups that show up in more than 10% of strains'] = ';'.join(allfingerprints)
+
+        return d

@@ -98,10 +98,10 @@ class ITASSERPrep():
 
         tmp = {self.id: seq}
 
-        fasta.write_fasta_file(indict=tmp,
-                               outname='seq',
-                               outext='.fasta',
-                               outdir=itasser_dir)
+        fasta.write_fasta_file_from_dict(indict=tmp,
+                                         outname='seq',
+                                         outext='.fasta',
+                                         outdir=itasser_dir)
         return itasser_dir
 
     def prep_script_local(self, itasser_loc, itlib_loc, java_home='/usr/'):

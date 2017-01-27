@@ -16,6 +16,8 @@ from Bio.Emboss.Applications import NeedleCommandline
 import logging
 log = logging.getLogger(__name__)
 
+# quiet the SettingWithCopyWarning when converting dtypes in get_deletions/mutations methods
+pd.options.mode.chained_assignment = None
 
 from Bio.PDB.Polypeptide import one_to_three
 
@@ -349,8 +351,11 @@ def get_mutations(aln_df):
 
     """
     mutation_df = aln_df[aln_df['type'] == 'mutation']
-    subset = mutation_df[['id_a_aa', 'id_a_pos', 'id_b_aa']]
-    tuples = [tuple(x) for x in subset.values]
+    tuples = []
+    if not mutation_df.empty:
+        subset = mutation_df[['id_a_aa', 'id_a_pos', 'id_b_aa']]
+        subset['id_a_pos'] = subset['id_a_pos'].astype(int)
+        tuples = [tuple(x) for x in subset.values]
     return tuples
 
 
@@ -365,8 +370,11 @@ def get_unresolved(aln_df):
 
     """
     unresolved_df = aln_df[aln_df['type'] == 'unresolved']
-    unresolved = unresolved_df.id_a_pos
-    return list(unresolved)
+    unresolved = []
+    if not unresolved_df.empty:
+        unresolved_df['id_a_pos'] = unresolved_df['id_a_pos'].astype(int)
+        unresolved = unresolved_df.id_a_pos.tolist()
+    return unresolved
 
 
 def get_deletions(aln_df):
@@ -388,7 +396,8 @@ def get_deletions(aln_df):
     """
 
     deletion_df = aln_df[aln_df['type'] == 'deletion']
-
+    if not deletion_df.empty:
+        deletion_df['id_a_pos'] = deletion_df['id_a_pos'].astype(int)
     deletions = []
 
     for k, g in groupby(deletion_df.index, key=lambda n, c=count(): n - next(c)):
@@ -437,6 +446,8 @@ def get_insertions(aln_df):
     """
 
     insertion_df = aln_df[aln_df['type'] == 'insertion']
+    # if not insertion_df.empty: # don't need to do this for insertions
+    #     insertion_df['id_a_pos'] = insertion_df['id_a_pos'].astype(int)
 
     insertions = []
 

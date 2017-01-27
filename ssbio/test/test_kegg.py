@@ -14,7 +14,7 @@ class TestKEGG(unittest.TestCase):
                       metadata_file='test_files/sequences/mtu-Rv0417.kegg')
 
         kg_keys = ['bigg','gene_name','id','kegg','metadata_file','metadata_path','pdbs','refseq',
-                   'sequence_file','sequence_len','sequence_path','taxonomy','uniprot']
+                   'sequence_file','seq_len','sequence_path','taxonomy','uniprot']
 
         for k in kg_keys:
             self.assertTrue(hasattr(kg, k))
@@ -27,6 +27,6 @@ class TestKEGG(unittest.TestCase):
         self.assertEqual(kg.pdbs, None)
         self.assertEqual(kg.refseq, 'NP_214931')
         self.assertEqual(kg.sequence_file, 'mtu-Rv0417.faa')
-        self.assertEqual(kg.sequence_len, 252)
+        self.assertEqual(kg.seq_len, 252)
         self.assertEqual(kg.taxonomy, 'mtu  Mycobacterium tuberculosis H37Rv')
         six.assertCountEqual(self, kg.uniprot, ['P9WG73', 'I6Y3Q4'])

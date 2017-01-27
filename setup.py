@@ -33,5 +33,6 @@ setup(
                           'awesome-slugify',
                           'seaborn',
                           'nglview',
-                          'ipywidgets']
+                          'ipywidgets',
+                          'qgrid']
 )
