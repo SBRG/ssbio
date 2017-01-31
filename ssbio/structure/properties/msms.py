@@ -3,7 +3,7 @@ import pandas as pd
 from Bio import PDB
 from tqdm import tqdm
 import ssbio.utils
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 import logging
 log = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ def get_msms_df_on_file(pdb_file, outfile=None, outdir=None, outext='_msms.df', 
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         # Load the structure
-        my_structure = PDBIOExt(pdb_file)
+        my_structure = StructureIO(pdb_file)
         model = my_structure.first_model
         df = get_msms_df(model, pdb_file, outfile=outfile, outdir=outdir, outext=outext, force_rerun=force_rerun)
     else:

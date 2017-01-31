@@ -2,13 +2,14 @@ from ssbio.core.object import Object
 from ssbio.structure.chainprop import ChainProp
 import ssbio.sequence.utils.alignment
 import os.path as op
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 from cobra.core import DictList
 import ssbio.structure.properties
 import ssbio.utils
 import logging
 import nglview as nv
 import seaborn as sns
+import ssbio.structure.utils.cleanpdb
 log = logging.getLogger(__name__)
 
 
@@ -16,11 +17,10 @@ class StructProp(Object):
     """Class for protein structural properties"""
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_file=None, file_type=None,
-                 reference_seq=None, representative_chain=None, is_experimental=False, parse=False):
+                 reference_seq=None, representative_chain=None, is_experimental=False):
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
-        self.structure = None
 
         self.reference_seq = reference_seq
         self.reference_seq_top_coverage = 0
@@ -29,7 +29,6 @@ class StructProp(Object):
         self.chains = DictList()
         if chains:
             self.add_chain_ids(chains)
-
         # representative_chain is a pointer to the chain in self.chains that matches reference_seq
         self.representative_chain = None
         if representative_chain:
@@ -40,7 +39,7 @@ class StructProp(Object):
         self.file_type = file_type
         self.structure_path = structure_file
         if structure_file:
-            self.load_structure_file(structure_file, file_type, parse)
+            self.load_structure_file(structure_file, file_type)
 
     @property
     def structure_file(self):
@@ -48,55 +47,60 @@ class StructProp(Object):
             return None
         return op.basename(self.structure_path)
 
-    def load_structure_file(self, structure_file, file_type, parse=False):
+    def load_structure_file(self, structure_file, file_type):
         """Load a structure file and provide pointers to its location
 
         Args:
             structure_file: Path to structure file
             file_type: Type of structure file
-            parse (bool): If the 3D coordinates should be parsed using Biopython
-            get_chain_sequences (bool): If chain sequences should be parsed and stored in their corresponding ChainProp object
-
         """
         self.file_type = file_type
         self.structure_path = structure_file
 
-        if parse:
-            my_structure = self.parse_structure()
-            if not my_structure:
-                log.error('{}: unable to load structure file'.format(self.id))
-                return
-            log.debug('{}: parsed 3D coordinates into Biopython structure object'.format(self.id))
-
     def parse_structure(self):
-        """Read the 3D coordinates of a structure file and save it in the structure attribute.
+        """Read the 3D coordinates of a structure file and return it as a Biopython Structure object
 
         Also create ChainProp objects in the chains attribute
-
-        Args:
-            get_chain_sequences (bool): If chain sequences should be parsed and stored in their corresponding ChainProp object
 
         Returns:
             Structure: Biopython structure object
 
         """
         if not self.structure_path:
-            log.error('{}: no structure loaded, unable to parse'.format(self.id))
+            log.error('{}: no structure file, unable to parse'.format(self.id))
             return None
         else:
             # Add Biopython structure object
-            self.structure = PDBIOExt(self.structure_path, file_type=self.file_type)
+            structure = StructureIO(self.structure_path)
 
             # Add all chains to self.chains as ChainProp objects
-            structure_chains = [x.id for x in self.structure.first_model.child_list]
+            structure_chains = [x.id for x in structure.first_model.child_list]
             self.add_chain_ids(structure_chains)
-            self._get_structure_seqs()
+            self.get_structure_seqs(structure.first_model)
 
             # Also add all chains to self.mapped_chains ONLY if there are none specified
             if not self.mapped_chains:
                 self.add_mapped_chain_ids(structure_chains)
 
-        return self.structure
+            return structure
+
+    def clean_structure(self, out_suffix='_clean', outdir=None, force_rerun=False,
+                        remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
+                        remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
+
+        if not self.structure_path:
+            log.error('{}: no structure file, unable to clean'.format(self.id))
+            return None
+
+        self.structure_path = ssbio.structure.utils.cleanpdb.clean_pdb(self.structure_path, out_suffix=out_suffix,
+                                                                       outdir=outdir, force_rerun=force_rerun,
+                                                                       remove_atom_alt=remove_atom_alt,
+                                                                       remove_atom_hydrogen=remove_atom_hydrogen,
+                                                                       keep_atom_alt_id=keep_atom_alt_id,
+                                                                       add_atom_occ=add_atom_occ,
+                                                                       remove_res_hetero=remove_res_hetero,
+                                                                       add_chain_id_if_empty=add_chain_id_if_empty,
+                                                                       keep_chains=keep_chains)
 
     def add_mapped_chain_ids(self, mapped_chains):
         """Add chains by ID into the mapped_chains attribute
@@ -124,11 +128,6 @@ class StructProp(Object):
         chains = ssbio.utils.force_list(chains)
 
         for c in chains:
-            # Check if chain ID is not in the structure
-            if self.structure:
-                if c not in self.structure.first_model:
-                    raise ValueError('{}: specified chain not contained in model'.format(c))
-
             if self.chains.has_id(c):
                 log.debug('{}: chain already present'.format(c))
             else:
@@ -136,7 +135,7 @@ class StructProp(Object):
                 self.chains.append(chain_prop)
                 log.debug('{}: added to chains list'.format(c))
 
-    def _get_structure_seqs(self):
+    def get_structure_seqs(self, model):
         """Store chain sequences in the corresponding ChainProp objects in the chains attribute
 
         Returns:
@@ -145,7 +144,7 @@ class StructProp(Object):
         """
 
         # Returns the structures sequences with Xs added
-        structure_seqs = ssbio.structure.properties.residues.get_structure_seqrecords(self.structure.first_model)
+        structure_seqs = ssbio.structure.properties.residues.get_structure_seqrecords(model)
         log.debug('{}: gathered chain sequences'.format(self.id))
 
         # Associate with ChainProps
@@ -164,12 +163,8 @@ class StructProp(Object):
         if not self.reference_seq:
             raise ValueError('{}: reference sequence not set'.format(self.id))
 
-        # If no mapped chains have been specified and the structure hasn't been parsed, parse it and look at all chains
-        if not self.mapped_chains and not self.structure:
-            parsed = self.parse_structure()
-            if not parsed:
-                log.error('{}: unable to load structure file'.format(self.id))
-                return
+        # Parse the structure so chain sequences are stored
+        my_structure = self.parse_structure()
 
         for chain_id in self.mapped_chains:
             structure_id = '{}-{}'.format(self.id, chain_id)
@@ -183,9 +178,9 @@ class StructProp(Object):
             log.debug('{}: aligning to reference sequence {}'.format(structure_id, self.reference_seq.id))
 
             chain_prop = self.chains.get_by_id(chain_id)
-            if not chain_prop:
-                raise ValueError('{}: chain sequence not parsed ')
             chain_seq_record = chain_prop.seq_record
+            if not chain_seq_record:
+                raise ValueError('{}: chain sequence not parsed')
 
             aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.reference_seq.seq_str,
                                                                              a_seq_id=self.reference_seq.id,
@@ -302,13 +297,12 @@ class StructProp(Object):
     def get_disulfide_bridges(self, threshold=3.0):
         """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp.
         """
-        if not self.structure:
-            parsed = self.parse_structure()
-            if not parsed:
-                log.error('{}: unable to open structure to find S-S bridges'.format(self.id))
-                return
+        parsed = self.parse_structure()
+        if not parsed:
+            log.error('{}: unable to open structure to find S-S bridges'.format(self.id))
+            return
 
-        disulfide_bridges = ssbio.structure.properties.residues.search_ss_bonds(self.structure.first_model,
+        disulfide_bridges = ssbio.structure.properties.residues.search_ss_bonds(parsed.first_model,
                                                                                 threshold=threshold)
         if not disulfide_bridges:
             log.debug('{}: no disulfide bridges'.format(self.id))
@@ -321,14 +315,13 @@ class StructProp(Object):
     def get_residue_depths(self, outdir, force_rerun=False):
         """Run MSMS on this structure and store the residue depths/ca depths in the corresponding ChainProp SeqRecords
         """
-        if not self.structure:
-            parsed = self.parse_structure()
-            if not parsed:
-                log.error('{}: unable to open structure to run MSMS'.format(self.id))
-                return
+        parsed = self.parse_structure()
+        if not parsed:
+            log.error('{}: unable to open structure to run MSMS'.format(self.id))
+            return
 
         log.debug('{}: running MSMS'.format(self.id))
-        msms_results = ssbio.structure.properties.msms.get_msms_df(model=self.structure.first_model,
+        msms_results = ssbio.structure.properties.msms.get_msms_df(model=parsed.first_model,
                                                         pdb_file=self.structure_path,
                                                         outdir=outdir, force_rerun=force_rerun)
         if msms_results.empty:
@@ -365,14 +358,13 @@ class StructProp(Object):
             force_rerun (bool): If DSSP results should be recalculated
 
         """
-        if not self.structure:
-            parsed = self.parse_structure()
-            if not parsed:
-                log.error('{}: unable to open structure to run DSSP'.format(self.id))
-                return
+        parsed = self.parse_structure()
+        if not parsed:
+            log.error('{}: unable to open structure to run DSSP'.format(self.id))
+            return
 
         log.debug('{}: running DSSP'.format(self.id))
-        dssp_results = ssbio.structure.properties.dssp.get_dssp_df(model=self.structure.first_model,
+        dssp_results = ssbio.structure.properties.dssp.get_dssp_df(model=parsed.first_model,
                                                                    pdb_file=self.structure_path,
                                                                    outdir=outdir,
                                                                    force_rerun=force_rerun)

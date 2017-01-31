@@ -329,8 +329,7 @@ class Protein(Object):
 
             self.representative_sequence.sequence_alignments.append(aln)
 
-    def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, set_as_representative=False,
-                 parse=False, force_rerun=False):
+    def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, set_as_representative=False, force_rerun=False):
         """Load a PDB ID into the structures attribute.
 
         Args:
@@ -358,11 +357,10 @@ class Protein(Object):
                 if mapped_chains:
                     pdb.add_mapped_chain_ids(mapped_chains)
                 if pdb_file:
-                    pdb.load_structure_file(pdb_file, file_type, parse)
+                    pdb.load_structure_file(pdb_file, file_type)
 
         if not self.structures.has_id(pdb_id):
-            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_file=pdb_file, file_type=file_type, parse=parse,
-                          reference_seq=self.representative_sequence)
+            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_file=pdb_file, file_type=file_type, reference_seq=self.representative_sequence)
             if mapped_chains:
                 pdb.add_mapped_chain_ids(mapped_chains)
             self.structures.append(pdb)
@@ -372,8 +370,7 @@ class Protein(Object):
 
         return self.structures.get_by_id(pdb_id)
 
-    def load_itasser_folder(self, ident, itasser_folder, set_as_representative=False, create_dfs=False,
-                            parse=False, force_rerun=False):
+    def load_itasser_folder(self, ident, itasser_folder, set_as_representative=False, create_dfs=False, force_rerun=False):
         """Load the results folder from I-TASSER, copy structure files over, and create summary dataframes.
 
         Args:
@@ -398,8 +395,7 @@ class Protein(Object):
                 itasser = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs, parse=parse,
-                                  reference_seq=self.representative_sequence)
+            itasser = ITASSERProp(ident, itasser_folder, reference_seq=self.representative_sequence)
             self.structures.append(itasser)
 
         if set_as_representative:
@@ -407,13 +403,22 @@ class Protein(Object):
 
         return self.structures.get_by_id(ident)
 
-    def load_homology_model(self, ident, pdb_file=None, set_as_representative=False, parse=False):
-        pdb = StructProp(ident=ident, structure_file=pdb_file, is_experimental=False, parse=parse,
-                         reference_seq=self.representative_sequence)
-        self.structures.append(pdb)
+    def load_generic_structure(self, ident, structure_file=None, set_as_representative=False, force_rerun=False):
+        if self.structures.has_id(ident):
+            if force_rerun:
+                existing = self.structures.get_by_id(ident)
+                self.structures.remove(existing)
+            else:
+                log.warning('{}: already present in list of structures'.format(ident))
+                model = self.structures.get_by_id(ident)
+
+        if not self.structures.has_id(ident):
+            model = StructProp(ident=ident, structure_file=structure_file, reference_seq=self.representative_sequence,
+                               is_experimental=False)
+            self.structures.append(model)
 
         if set_as_representative:
-            self._representative_structure_setter(pdb)
+            self._representative_structure_setter(model)
 
         return self.structures.get_by_id(ident)
 
@@ -439,27 +444,16 @@ class Protein(Object):
         if not new_id:
             new_id = struct_prop.id
 
-        # Parse the structure if it hasn't already been, so chains will be added
-        if not struct_prop.structure:
-            parsed = struct_prop.parse_structure()
-            if not parsed:
-                log.error('{}: can\'t parse, unable to set as representative structure'.format(self.id))
-                return
-
         # If the structure is to be cleaned, and which chain to keep
         if clean:
-            custom_clean = CleanPDB(keep_chains=keep_chain)
-
-            final_pdb = struct_prop.structure.write_pdb(custom_selection=custom_clean,
-                                                        out_suffix=out_suffix,
-                                                        out_dir=outdir)
+            final_pdb = struct_prop.clean_structure(outdir=outdir, out_suffix=out_suffix)
         else:
             final_pdb = struct_prop.structure_path
 
-        self.representative_structure = StructProp(ident=new_id, structure_file=final_pdb,
+        self.representative_structure = StructProp(ident=new_id, chains=keep_chain, mapped_chains=keep_chain,
+                                                   structure_file=final_pdb, file_type='pdb',
                                                    reference_seq=self.representative_sequence,
-                                                   chains=keep_chain, representative_chain=keep_chain, mapped_chains=keep_chain,
-                                                   file_type='pdb', parse=True)
+                                                   representative_chain=keep_chain)
         # structure needs to be excluded when using get_dict because of too much recursion
         self.representative_structure.update(struct_prop.get_dict_with_chain(chain=keep_chain,
                                                                              exclude_attributes='structure'),
@@ -592,13 +586,17 @@ class Protein(Object):
                                                                allow_unresolved=allow_unresolved)
 
                 if best_chain:
+                    if not best_chain.id.strip():
+                        best_chain_suffix = 'X'
+                    else:
+                        best_chain_suffix = best_chain.id
                     self._representative_structure_setter(struct_prop=homology,
-                                                          new_id='{}-{}'.format(homology.id, best_chain.id),
+                                                          new_id='{}-{}'.format(homology.id, best_chain_suffix),
                                                           clean=True,
-                                                          out_suffix='-{}_clean'.format(best_chain.id),
+                                                          out_suffix='-{}_clean'.format(best_chain_suffix),
                                                           keep_chain=best_chain.id,
                                                           outdir=struct_outdir)
-                    log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain.id))
+                    log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain_suffix))
                     return self.representative_structure
 
         else:

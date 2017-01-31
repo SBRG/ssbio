@@ -30,23 +30,23 @@ class PDBProp(StructProp):
     """Class to parse through PDB properties
     """
 
-    def __init__(self, ident, chains=None, structure_file=None, file_type=None, reference_seq=None,
-                 parse=False):
-        StructProp.__init__(self, ident, chains=chains, structure_file=structure_file, file_type=file_type,
-                            is_experimental=True, reference_seq=reference_seq,
-                            parse=parse)
+    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_file=None, file_type=None,
+                 reference_seq=None, representative_chain=None):
+        StructProp.__init__(self, ident, description=description, chains=chains, mapped_chains=mapped_chains,
+                            structure_file=structure_file, file_type=file_type, reference_seq=reference_seq,
+                            representative_chain=representative_chain, is_experimental=True)
         self.experimental_method = None
         self.resolution = None
         self.date = None
         self.taxonomy_name = None
 
     # TODO: test using cif or mmtf file formats -- this is the global flag here (which is a dumb place to be)
-    def download_structure_file(self, outdir, file_type='pdb', force_rerun=False, parse=False):
+    def download_structure_file(self, outdir, file_type='cif', force_rerun=False, parse=False):
         pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False,
                                       outdir=outdir,
                                       force_rerun=force_rerun)
         log.debug('{}: downloaded {} file'.format(self.id, file_type))
-        self.load_structure_file(pdb_file, file_type, parse)
+        self.load_structure_file(pdb_file, file_type)
 
         if file_type=='cif':
             self.update(parse_mmcif_header(pdb_file))
@@ -217,7 +217,7 @@ def parse_mmcif_header(infile):
 #         output_dir: path to output directory
 #         file_type: pdb, xml, mmcif - TODO: add support
 #
-#     Returns: PDBIOExt object
+#     Returns: StructureIO object
 #
 #     """
 #     pdbl = PDBList()

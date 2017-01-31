@@ -8,7 +8,7 @@ from Bio import PDB
 from tqdm import tqdm
 
 import ssbio.utils
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 
 log = logging.getLogger(__name__)
 
@@ -88,6 +88,52 @@ class CleanPDB(PDB.Select):
                 atom.set_altloc(' ')
             return True
 
+def clean_pdb(pdb_file, out_suffix='_clean', outdir=None, force_rerun=False,
+              remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
+              remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
+    """Clean a PDB file.
+
+    Args:
+        pdb_file: Path to input PDB file
+        out_suffix: Suffix to append to original filename
+        outdir: Path to output directory
+        force_rerun: If structure should be re-cleaned if a clean file exists already
+        remove_atom_alt: Remove alternate positions
+        remove_atom_hydrogen: Remove hydrogen atoms
+        keep_atom_alt_id: If removing alternate positions, which alternate ID to keep
+        add_atom_occ: Add atom occupancy fields if not present
+        remove_res_hetero: Remove all HETATMs
+        add_chain_id_if_empty: Add a chain ID if not present
+        keep_chains: Keep only these chains
+
+    Returns:
+        str: Path to cleaned PDB file
+
+    """
+    outfile = ssbio.utils.outfile_maker(inname=pdb_file,
+                                        append_to_name=out_suffix,
+                                        outdir=outdir,
+                                        outext='.pdb')
+
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        my_pdb = StructureIO(pdb_file)
+        my_cleaner = CleanPDB(remove_atom_alt=remove_atom_alt,
+                              remove_atom_hydrogen=remove_atom_hydrogen,
+                              keep_atom_alt_id=keep_atom_alt_id,
+                              add_atom_occ=add_atom_occ,
+                              remove_res_hetero=remove_res_hetero,
+                              add_chain_id_if_empty=add_chain_id_if_empty,
+                              keep_chains=keep_chains)
+
+        my_clean_pdb = my_pdb.write_pdb(out_suffix=out_suffix,
+                                        out_dir=outdir,
+                                        custom_selection=my_cleaner,
+                                        force_rerun=force_rerun)
+
+        return my_clean_pdb
+    else:
+        return outfile
+
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -146,7 +192,7 @@ if __name__ == '__main__':
 
         if ssbio.utils.force_rerun(flag=args.force, outfile=outfile):
 
-            my_pdb = PDBIOExt(pdb, file_type='pdb')
+            my_pdb = StructureIO(pdb)
             my_cleaner = CleanPDB(remove_atom_alt=args.keepalt,
                                   remove_atom_hydrogen=args.keephydro,
                                   keep_atom_alt_id='A',

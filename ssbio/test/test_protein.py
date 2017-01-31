@@ -68,14 +68,9 @@ class TestProtein(unittest.TestCase):
                                              uniprot_metadata_file='test_files/sequences/P0ABP8.txt',
                                              set_as_representative=True)
 
-        newpdb = self.prot.load_pdb('1ecp', pdb_file='test_files/structures/1ecp.pdb', file_type='pdb', parse=True)
+        newpdb = self.prot.load_pdb('1ecp', pdb_file='test_files/structures/1ecp.pdb', file_type='pdb')
         self.assertTrue(self.prot.structures.has_id('1ecp'))
         self.assertTrue(isinstance(newpdb, PDBProp))
-
-        # Test that adding a chain ID as a ChainProp raises an error if the chain is not in the structure
-        test_chains = self.prot.structures.get_by_id('1ecp')
-        self.assertRaises(ValueError, test_chains.add_chain_ids, 'XX')
-        test_chains.add_chain_ids(['A', 'B', 'C', 'D', 'E', 'F'])
 
     def test_load_itasser_folder(self):
         self.assertRaises(OSError, self.prot.load_itasser_folder, 'sdfsdfsdf', itasser_folder='sdfsdfsdf/structures/P9WG73')
@@ -88,7 +83,7 @@ class TestProtein(unittest.TestCase):
         # newitasser.copy_results(copy_to_dir='test_files/structures/test_out/', rename_model_to='haha', force_rerun=True)
 
     def test_load_homology_model(self):
-        newprot = self.prot.load_homology_model('DEOD', pdb_file='test_files/structures/DEOD_ECOLI_model1.pdb')
+        newprot = self.prot.load_generic_structure('DEOD', structure_file='test_files/structures/DEOD_ECOLI_model1.pdb')
         self.assertTrue(self.prot.structures.has_id('DEOD'))
         self.assertTrue(isinstance(newprot, StructProp))
 

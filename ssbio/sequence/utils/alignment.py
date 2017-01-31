@@ -93,9 +93,12 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
         alignment[0].id = a_seq_id
         alignment[1].id = b_seq_id
 
-        # Add needle statistics as annotations in the alignement object
+        # Add needle statistics as annotations in the alignment object
         stats = needle_statistics(alignment_file)
-        needle_id = 'asis' + '_' + 'asis'
+        alignment_ids = list(stats.keys())
+        if len(alignment_ids) > 1:
+            raise ValueError('Needle alignment file contains more than one pairwise alignment')
+        needle_id = alignment_ids[0]
         alignment.annotations['percent_identity'] = stats[needle_id]['percent_identity']
         alignment.annotations['percent_similarity'] = stats[needle_id]['percent_similarity']
         alignment.annotations['percent_gaps'] = stats[needle_id]['percent_gaps']
@@ -226,9 +229,9 @@ def get_percent_identity(a_aln_seq, b_aln_seq):
     for n in range(0, len(a_aln_seq)):
         if a_aln_seq[n] == b_aln_seq[n]:
             if a_aln_seq[n] != "-":
-                count = count + 1
+                count += 1
             else:
-                gaps = gaps + 1
+                gaps += 1
 
     return count / float((len(a_aln_seq) - gaps))
 

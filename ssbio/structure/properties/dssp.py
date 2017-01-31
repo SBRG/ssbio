@@ -6,7 +6,7 @@ from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
 from Bio.PDB.DSSP import residue_max_acc
 from Bio.PDB.DSSP import dssp_dict_from_pdb_file
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 import logging
 log = logging.getLogger(__name__)
 

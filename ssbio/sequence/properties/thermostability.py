@@ -65,7 +65,7 @@ def calculate_oobatake_dH(seq, temp):
 
     """
     dH = 0
-    temp = temp + 273.15
+    temp += 273.15
     T0 = 298.15
     for aa in seq:
         H0 = oobatake_dictionary[aa]['dH'] * 1000
@@ -85,7 +85,7 @@ def calculate_oobatake_dS(seq, temp):
 
     """
     dS = 0
-    temp = temp + 273.15
+    temp += 273.15
     T0 = 298.15
     dCp_sum = sum_of_dCp(seq)
     for aa in seq:
@@ -128,7 +128,7 @@ def calculate_dill_dG(seq_len, temp):
     """
     Th = 373.5  # this quantity affects the up-and-down of the dG vs temperature curve (dG values)
     Ts = 385  # this quantity affects the left-and-right
-    temp = temp + 273.15
+    temp += 273.15
     dH = (4.0 * seq_len + 143) * 1000
     dS = 13.27 * seq_len + 448
     dCp = (0.049 * seq_len + 0.85) * 1000

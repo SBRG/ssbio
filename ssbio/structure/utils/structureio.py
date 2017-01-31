@@ -1,12 +1,10 @@
-import logging
-import warnings
-
-from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from Bio.PDB.PDBIO import PDBIO
 from Bio.PDB.PDBIO import Select
 from Bio.PDB.PDBParser import PDBParser
 from Bio.PDB.mmtf import MMTFParser
-
+from Bio.PDB.PDBExceptions import PDBConstructionWarning
+import logging
+import warnings
 import ssbio.utils
 from ssbio.biopython.bp_mmcifparser import MMCIFParserFix
 
@@ -29,38 +27,38 @@ def as_protein(structure, filter_residues=True):
     return Protein.from_structure(structure, filter_residues)
 
 
-class PDBIOExt(PDBIO):
-    """Extended class to load a PDB or mmCIF file into a Biopython PDBIO object.
+class StructureIO(PDBIO):
+    """Extended class to load any structure file into a Biopython Structure object
 
     Loads the first model when there are multiple available.
     Also adds some logging methods.
     """
 
-    def __init__(self, structure_file, file_type='pdb'):
+    def __init__(self, structure_file):
         PDBIO.__init__(self)
 
-        dirname, filename_without_extension, extension = ssbio.utils.split_folder_and_path(structure_file)
-        extension = extension.strip('.')
-
-        if extension != file_type:
-            file_type = extension
-
+        dirname, filename_without_extension, file_type = ssbio.utils.split_folder_and_path(structure_file)
         self.structure_file = structure_file
 
-        if file_type not in ['pdb', 'mmcif', 'cif', 'mmtf']:
-            raise ValueError('{}: unsupported file type'.format(file_type))
+        # Unzip the file if it is zipped
+        if file_type == '.gz':
+            unzipped = ssbio.utils.gunzip_file(structure_file, outdir=dirname)
+            dirname, filename_without_extension, file_type = ssbio.utils.split_folder_and_path(unzipped)
 
-        # Load the structure
-        if file_type.lower() == 'pdb':
-            structure = pdbp.get_structure(id='ssbio_pdb', file=structure_file)
-        if file_type.lower() == 'mmcif' or file_type.lower() == 'cif':
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', PDBConstructionWarning)
-                structure = cifp.get_structure(structure_id='ssbio_cif', filename=structure_file)
-        if file_type.lower() == 'mmtf':
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', PDBConstructionWarning)
-                structure = mmtfp.get_structure(file_path=structure_file)
+        if file_type in ['.pdb', '.ent', '.mmcif', '.cif', '.mmtf']:
+            # Load the structure
+            if file_type.lower() == '.pdb' or file_type.lower() == '.ent':
+                structure = pdbp.get_structure(id='ssbio_pdb', file=structure_file)
+            if file_type.lower() == '.mmcif' or file_type.lower() == '.cif':
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore', PDBConstructionWarning)
+                    structure = cifp.get_structure(structure_id='ssbio_cif', filename=structure_file)
+            if file_type.lower() == '.mmtf':
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore', PDBConstructionWarning)
+                    structure = mmtfp.get_structure(file_path=structure_file)
+        else:
+            raise ValueError('{}: unsupported file type'.format(file_type))
 
         # If there are multiple models (NMR), use the first model as the representative structure
         if len(structure) > 1:
@@ -84,6 +82,7 @@ class PDBIOExt(PDBIO):
             out_suffix: Optional string to append to new PDB file
             out_dir: Optional directory to output the file
             custom_selection: Optional custom selection class
+            force_rerun: If existing file should be overwritten
 
         Returns:
             out_file: filepath of new PDB file
@@ -113,7 +112,3 @@ class PDBIOExt(PDBIO):
             return None
 
         return outfile
-
-
-if __name__ == '__main__':
-    pass

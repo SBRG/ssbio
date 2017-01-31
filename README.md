@@ -12,8 +12,9 @@ of structural systems biology. The main goals of this package are to:
 
 - How can I determine the number of protein structures available for my list of genes?
 - What is the best, representative structure for my protein?
-- Where, in a network, do these proteins work?
+- Where, in a metabolic network, do these proteins work?
 - Where do popular mutations show up on a protein?
+- How can I compare the structural features of an entire proteome?
 - and more...
 
 ## Quick install

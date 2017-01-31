@@ -188,16 +188,50 @@ def grantham_score(ref_aa, mut_aa):
         return score, 'Conservative'
     else:
         if int(grantham[ref_aa][mut_aa]) != 0:
-            score = score + int(grantham[ref_aa][mut_aa])
+            score += int(grantham[ref_aa][mut_aa])
         else:
-            score = score + int(grantham[mut_aa][ref_aa])
+            score += int(grantham[mut_aa][ref_aa])
 
     if score > 150:
         return score, "Radical"
-    elif score <= 150 and score > 100:
+    elif 150 >= score > 100:
         return score, "Moderately Radical"
-    elif score <= 100 and score > 50:
+    elif 100 >= score > 50:
         return score, "Moderately Conservative"
     else:
         return score, "Conservative"
 
+
+def flexibility_index(aa_one):
+    """From Smith DK, Radivoja P, ObradovicZ, et al. Improved amino acid flexibility parameters, Protein Sci.2003, 12:1060
+
+    Author: Ke Chen
+
+    Args:
+        aa_one:
+
+    Returns:
+
+    """
+    aa_flexibility_index={}
+    aa_flexibility_index['A']=-0.605
+    aa_flexibility_index['C']=-0.692
+    aa_flexibility_index['D']=-0.279
+    aa_flexibility_index['E']=-0.160
+    aa_flexibility_index['F']=-0.719
+    aa_flexibility_index['G']=-0.537
+    aa_flexibility_index['H']=-0.662
+    aa_flexibility_index['I']=-0.682
+    aa_flexibility_index['K']=-0.043
+    aa_flexibility_index['L']=-0.631
+    aa_flexibility_index['M']=-0.626
+    aa_flexibility_index['N']=-0.381
+    aa_flexibility_index['P']=-0.271
+    aa_flexibility_index['Q']=-0.368
+    aa_flexibility_index['R']=-0.448
+    aa_flexibility_index['S']=-0.424
+    aa_flexibility_index['T']=-0.525
+    aa_flexibility_index['V']=-0.669
+    aa_flexibility_index['W']=-0.727
+    aa_flexibility_index['Y']=-0.721
+    return aa_flexibility_index[aa_one]

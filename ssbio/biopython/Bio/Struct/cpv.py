@@ -66,7 +66,7 @@ def random_displacement(v,radius):
     while 1:
         vect = r_vect()
         v_len = length(vect)
-        if (v_len<=0.5):
+        if v_len<=0.5:
             break;
     if v_len > 0.00000000001:
         v_len = random.random()*radius / v_len
@@ -257,8 +257,8 @@ def rotation_matrix(angle,axis):
 
     if abs(mag)<RSMALL4:
         return get_identity()
-    
-    x = x / mag
+
+    x /= mag
     y = y / mag
     z = z / mag
  

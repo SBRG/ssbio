@@ -1,18 +1,30 @@
 import os
 import os.path as op
-
 import cobra.flux_analysis
 import cobra.manipulation
 import numpy as np
 import pandas as pd
 import ssbio.sequence.utils.blast
 from Bio import SeqIO
-
 import ssbio.cobra.utils
 import ssbio.databases.ncbi
 import ssbio.databases.patric
 import ssbio.sequence.utils.fasta
-
+from ssbio import utils
+import ssbio.sequence.utils.alignment
+date = utils.Date()
+from ssbio.pipeline.gempro import GEMPRO
+import sys
+import logging
+import copy
+import shutil
+from cobra.core import DictList
+from cobra.core import Gene
+from ssbio.core.genepro import GenePro
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 try:
     from IPython.display import clear_output
     have_ipython = True
@@ -21,29 +33,16 @@ except ImportError:
     have_ipython = False
     from tqdm import tqdm
 
-from ssbio import utils
-import ssbio.sequence.utils.alignment
 
-date = utils.Date()
-from ssbio.pipeline.gempro import GEMPRO
-import sys
-import logging
-import copy
-import shutil
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
-from cobra.core import DictList
-from cobra.core import Gene
-# Casting Gene objects into GenePro objects
-# This replaces any new instance of Genes with GenePros. Even when you load a model later using COBRApy methods
-# Use with caution!
-# See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
-from ssbio.core.genepro import GenePro
 def __new__(cls, *args, **kwargs):
+    """Casting Gene objects into GenePro objects
+        This replaces any new instance of Genes with GenePros. Even when you load a model later
+        using COBRApy methods. Use with caution!
+    See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
+
+    Returns:
+        GenePro: a Gene object with a .protein attribute
+    """
     if cls == Gene:
         return object.__new__(GenePro)
     return object.__new__(cls)
@@ -65,15 +64,7 @@ class ATLAS():
     Each step may generate a report and also request additional files if something is missing
     """
 
-    def __init__(self,
-                 base_gempro,
-                 base_dir,
-                 base_genome_id,
-                 list_of_ncbi_ids=None,
-                 email_for_ncbi='',
-                 list_of_patric_ids=None,
-                 dict_of_genomes=None,
-                 seq_type='protein'):
+    def __init__(self, base_gempro, strain_ids=None):
         """Prepare for ATLAS analysis"""
 
         # Load the GEM-PRO
@@ -82,34 +73,28 @@ class ATLAS():
         # Prepare ATLAS directories
         list_of_dirs = []
         self.base_gempro_dir = self.base_strain_gempro.base_dir
+
         # atlas_dir - directory where all ATLAS analysis will be carried out
         self.atlas_dir = op.join(self.base_gempro_dir, 'atlas')
+        list_of_dirs.append(self.atlas_dir)
+
         # model_dir - directory where base strain GEM and new models will be stored
         self.atlas_model_files = op.join(self.atlas_dir, 'models')
+        list_of_dirs.append(self.atlas_model_files)
+
         # atlas_data_dir - directory where all data will be stored
         self.atlas_data_dir = op.join(self.atlas_dir, 'data')
+        list_of_dirs.append(self.atlas_data_dir)
+
         # sequence_dir - sequence related files are stored here
         self.atlas_sequence_dir = op.join(self.atlas_dir, 'sequences')
+        list_of_dirs.append(self.atlas_sequence_dir)
 
-        list_of_dirs.extend([self.atlas_dir, self.atlas_data_dir,
-                             self.atlas_model_files, self.atlas_sequence_dir])
-
-        # Check to see what analysis we'll be doing
-        self.seq_type = seq_type
-        if seq_type == 'dna':
-            self.seq_atlas_dir = op.join(self.atlas_sequence_dir, 'dna')
-            self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
-            self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
-            self.fasta_extension = 'fna'
-            self.blast_seq_type = 'nucl'
-        elif seq_type == 'protein':
-            self.seq_atlas_dir = op.join(self.atlas_sequence_dir, 'protein')
-            self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
-            self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
-            self.fasta_extension = 'faa'
-            self.blast_seq_type = 'prot'
-        else:
-            raise ValueError('seqtype must be "dna" or "protein"')
+        self.seq_atlas_dir = op.join(self.atlas_sequence_dir, 'protein')
+        self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
+        self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
+        self.fasta_extension = 'faa'
+        self.blast_seq_type = 'prot'
 
         # Make more dirs based on this analysis
         list_of_dirs.extend([self.seq_atlas_dir, self.seq_atlas_org_dir, self.seq_atlas_gene_dir])
@@ -121,23 +106,6 @@ class ATLAS():
                 log.info('Created directory: {}'.format(directory))
             else:
                 log.debug('Directory already exists: {}'.format(directory))
-
-        strains_to_fasta_file = {}
-        # Loading the strains
-        if list_of_ncbi_ids:
-            if not email_for_ncbi:
-                raise ValueError('Input an email if downloading from NCBI')
-            log.info('Downloading genomes from NCBI...')
-            strains_to_fasta_file.update(self.download_genome_cds_ncbi(list_of_patric_ids, email_for_ncbi))
-        if list_of_patric_ids:
-            log.info('Downloading genomes from PATRIC...')
-            strains_to_fasta_file.update(self.download_genome_cds_patric(list_of_patric_ids))
-        if dict_of_genomes:
-            log.info('Loading existing genomes to ATLAS sequence directory...')
-            strains_to_fasta_file.update(dict_of_genomes)
-            for v in dict_of_genomes.values():
-                if not op.exists(op.join(self.seq_atlas_org_dir, op.basename(v))):
-                    shutil.copy(v, self.seq_atlas_org_dir)
 
         # Create initial strain models that are just copies of the base strain with a resetted annotation
         self.strain_ids = []
@@ -217,8 +185,7 @@ class ATLAS():
         log.info('Set reference genome to ID {}'.format(reference_genome_id))
 
     def get_orthology_matrix(self):
-        """Run run_makeblastdb, run_bidirectional_blast, and calculate_bbh for both DNA and protein sequences.
-
+        """Run run_makeblastdb, run_bidirectional_blast, and calculate_bbh for protein sequences.
         """
         # TODO: probably best to split this function up to allow for force_rerunning of different parts
         # Get the path to the reference genome
@@ -403,8 +370,7 @@ class ATLAS():
 
             gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
 
-            info_dict = {}
-            info_dict['gene'] = base_gene_id
+            info_dict = {'gene': base_gene_id}
             mutation_count = 0
             num_strains_with_gene = 0
 

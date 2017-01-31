@@ -197,7 +197,7 @@ def outfile_maker(inname, outext='.out', outname='', outdir='', append_to_name='
 
     # Append additional stuff to the filename if specified
     if append_to_name:
-        outname = outname + append_to_name
+        outname += append_to_name
 
     # Join the output filename and output extension
     final_outfile = op.join(outdir, '{}{}'.format(outname, outext))
@@ -243,7 +243,23 @@ def force_rerun(flag, outfile):
         return False
 
 
-def gunzip_file(infile, outfile, outdir=None, delete_original=False, force_rerun_flag=False):
+def gunzip_file(infile, outfile=None, outdir=None, delete_original=False, force_rerun_flag=False):
+    """Decompress a gzip file and optionally set output values.
+
+    Args:
+        infile: Path to .gz file
+        outfile: Name of output file
+        outdir: Path to output directory
+        delete_original: If original .gz file should be deleted
+        force_rerun_flag: If file should be decompressed if outfile already exists
+
+    Returns:
+        str: Path to decompressed file
+
+    """
+    if not outfile:
+        outfile = infile.strip('.gz')
+
     if not outdir:
         outdir = ''
     outfile = op.join(outdir, outfile)

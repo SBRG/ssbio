@@ -50,16 +50,19 @@ def parse_tmhmm_long(tmhmm_results):
             gene = l.split(' Number')[0].strip('# ')
             infodict[gene]['num_tm_helices'] = int(l.split(': ')[1])
 
+        if 'WARNING' in l:
+            log.warning('{}: no TMHMM predictions'.format(l))
+            continue
+
         # Look for the lines with tab separations, these are the TM predicted regions
-        if '\t' in l:
-            stuff = l.split('\t')
+        if '#' not in l:
+            stuff = l.split()
             if stuff[1] == 'TMHMM2.0':
 
                 gene = stuff[0]
-                region = stuff[2:][0]
-                region_resnums = stuff[3].split()
-                region_start = region_resnums[0]
-                region_end = region_resnums[1]
+                region = stuff[2]
+                region_start = stuff[3]
+                region_end = stuff[4]
 
                 if 'sequence' in infodict[gene]:
                     tm_seq = infodict[gene]['sequence']
@@ -80,6 +83,5 @@ def parse_tmhmm_long(tmhmm_results):
                     tm_seq += info
 
                 infodict[gene]['sequence'] = tm_seq
-
 
     return infodict

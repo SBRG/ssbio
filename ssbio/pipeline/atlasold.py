@@ -425,8 +425,8 @@ class ATLAS():
         for base_gene in tqdm(self.base_strain_gempro.genes):
             # Get base strain gene fasta file path
             base_gene_id = base_gene.id
-            base_gene_seq_file = base_gene.annotation['sequence']['representative']['sequence_file']
-            base_gene_seq_len = base_gene.annotation['sequence']['representative']['seq_len']
+            base_gene_seq_file = base_gene.protein.representative_sequence.sequence_file
+            base_gene_seq_len = base_gene.protein.representative_sequence.seq_len
 
             if not base_gene_seq_file:
                 log.warning('{}: No representative sequence set in base strain'.format(base_gene_id))
@@ -436,8 +436,7 @@ class ATLAS():
 
             gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
 
-            info_dict = {}
-            info_dict['gene'] = base_gene_id
+            info_dict = {'gene': base_gene_id}
             mutation_count = 0
             num_strains_with_gene = 0
 

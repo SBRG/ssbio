@@ -8,7 +8,7 @@ import pandas as pd
 log = logging.getLogger(__name__)
 import time
 from ssbio.structure.structprop import StructProp
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 from ssbio.structure.utils.cleanpdb import CleanPDB
 import ssbio.utils
 
@@ -21,7 +21,7 @@ class ITASSERProp(StructProp):
     _coach_files_to_copy = ['Bsites.inf', 'EC.dat', 'GO_MF.dat', 'GO_BP.dat', 'GO_CC.dat']
 
     def __init__(self, ident, original_results_path, create_dfs=False,
-                 coach_results_folder='model1/coach', model_to_use='model1', parse=False, reference_seq=None):
+                 coach_results_folder='model1/coach', model_to_use='model1', reference_seq=None):
         """Initialize a class to collect I-TASSER modeling information and optionally copy results to a new directory.
 
         Args:
@@ -31,15 +31,13 @@ class ITASSERProp(StructProp):
             model_to_use: Which I-TASSER model to use. Default is "model1"
         """
         if not op.exists(original_results_path):
-           raise OSError('{}: folder does not exist'.format(original_results_path))
+            raise OSError('{}: folder does not exist'.format(original_results_path))
 
-        StructProp.__init__(self, ident, is_experimental=False, parse=parse, reference_seq=reference_seq)
+        StructProp.__init__(self, ident, is_experimental=False, reference_seq=reference_seq)
+
         self.results_path = original_results_path
         self.model_to_use = model_to_use
         self.create_dfs = create_dfs
-
-        # For summarizing main modeling results
-        # self = {}
 
         ### MODEL1.PDB THINGS
         old_model_path = op.join(original_results_path, '{}.pdb'.format(model_to_use))
@@ -48,7 +46,7 @@ class ITASSERProp(StructProp):
             self.model_date = None
             self.model_file = None
         else:
-            self.load_structure_file(old_model_path, 'pdb', parse)
+            self.load_structure_file(old_model_path, 'pdb')
             # Save model creation date
             self.model_date = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
             self.model_file = op.basename(self.structure_path)
@@ -114,7 +112,7 @@ class ITASSERProp(StructProp):
                     tmp = {'top_go_cc_' + k: v for k, v in parsed_go_cc[0].items()}
                     self.update(tmp)
 
-    def copy_results(self, copy_to_dir, rename_model_to=None, force_rerun=False, parse=False):
+    def copy_results(self, copy_to_dir, rename_model_to=None, force_rerun=False):
         """Copy the raw information from I-TASSER modeling to a new folder.
 
         Copies files in the variables _main_files_to_copy and _coach_files_to_copy.
@@ -135,13 +133,13 @@ class ITASSERProp(StructProp):
             if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_model_path):
                 # Clean and save it
                 custom_clean = CleanPDB()
-                my_pdb = PDBIOExt(self.structure_path, file_type='pdb')
+                my_pdb = StructureIO(self.structure_path)
                 new_model_path = my_pdb.write_pdb(custom_selection=custom_clean,
                                                   custom_name=rename_model_to,
                                                   out_dir=copy_to_dir,
                                                   force_rerun=force_rerun)
             # Update the structure_path to be the copied, clean file
-            self.load_structure_file(new_model_path, 'pdb', parse)
+            self.load_structure_file(new_model_path, 'pdb')
             self.model_file = op.basename(new_model_path)
 
             # Other modeling results - store in a new folder

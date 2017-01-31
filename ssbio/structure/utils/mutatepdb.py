@@ -7,7 +7,7 @@ from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import aa3
 from Bio.PDB.Polypeptide import one_to_three
 from ssbio.structure.utils.cleanpdb import CleanPDB
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 
 
 class MutatePDB(PDB.Select):
@@ -82,11 +82,11 @@ if __name__ == '__main__':
 
     mutations = parse_mutation_input(args.mutations)
 
-    my_pdb = PDBIOExt(args.infile, file_type='pdb')
+    my_pdb = StructureIO(args.infile)
     if args.clean:
         my_cleaner = CleanPDB(keep_chains=[x[0] for x in mutations])
         my_clean_pdb = my_pdb.write_pdb(out_suffix='_clean', out_dir=tempfile.gettempdir(), custom_selection=my_cleaner)
-        my_pdb = PDBIOExt(my_clean_pdb, file_type='pdb')
+        my_pdb = StructureIO(my_clean_pdb)
 
     my_mutation = MutatePDB(mutations)
     my_mutated_pdb = my_pdb.write_pdb(out_suffix=args.outsuffix, out_dir='mutated_pdbs', custom_selection=my_mutation)

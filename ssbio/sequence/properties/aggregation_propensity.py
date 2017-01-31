@@ -34,7 +34,7 @@ import requests
 
 # author: Ke Chen
 
-class AMYLPRED():
+class AMYLPRED:
     def __init__(self, email, password):
         self.email = email
         self.password = password
@@ -126,7 +126,7 @@ class AMYLPRED():
             # elif method == 'Beta-strand contiguity' and met == 'BSC':
             # output[met]=hits
             # elif method == 'Hexapeptide Conf. Energy' and met == 'CONFENERGY':
-        print("Time Spent: %d seconds" % (timeCounts))
+        print("Time Spent: %d seconds" % timeCounts)
         return output
 
     def get_method_hits(self, results_file, met):

@@ -702,17 +702,15 @@ class GEMPRO(object):
         log.info('Completed sequence --> PDB BLAST. See the "df_pdb_blast" attribute.')
         # TODO: log.info for counts - num pdbs with no blast hits, number with (instead of in the for loop)
 
-    def manual_homology_models(self, input_dict):
-        """Copy homology models and manually defined information per model to the GEM-PRO project.
+    def manual_homology_models(self, input_dict, clean=True, force_rerun=False):
+        """Copy homology models to the GEM-PRO project.
 
         Args:
             input_dict: Dictionary of dictionaries of gene names to homology model IDs and information. Input a dict of:
-                {model_gene: {homology_model_id1: {'model_file': '/path/to/homology/model',
-                                                  'other_info': 'other_info_here',
-                                                  ...},
-                              homology_model_id2: {'model_file': '/path/to/homology/model',
-                                                  'other_info': 'other_info_here',
-                                                  ...}}}
+                {model_gene: {homology_model_id1: {'model_file': '/path/to/homology/model'},
+                              homology_model_id2: {'model_file': '/path/to/homology/model'}
+                             },
+                }
 
         """
         counter = 0
@@ -731,11 +729,16 @@ class GEMPRO(object):
                 if not op.exists(dest_gene_dir):
                     os.mkdir(dest_gene_dir)
 
-                # Just copy the file to the structure directory and store the file name
-                if not op.exists(op.join(dest_gene_dir, op.basename(hdict['model_file']))):
-                    shutil.copy2(hdict['model_file'], dest_gene_dir)
+                new_homology = g.protein.load_generic_structure(hid, hdict['model_file'])
 
-                new_homology = g.protein.load_homology_model(hid, hdict['model_file'])
+                if clean:
+                    new_homology.clean_structure(outdir=dest_gene_dir, force_rerun=force_rerun)
+                else:
+                    if ssbio.utils.force_rerun(force_rerun, op.basename(hdict['model_file'])):
+                        # Just copy the file to the structure directory and store the file name
+                        shutil.copy2(hdict['model_file'], dest_gene_dir)
+
+                # TODO: how to handle other info?
                 new_homology.update(hdict)
 
                 log.debug('{}: updated homology model information and copied model file.'.format(gene_id))

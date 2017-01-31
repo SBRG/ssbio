@@ -3,7 +3,7 @@ import tempfile
 import unittest
 
 from ssbio.structure.utils.cleanpdb import CleanPDB
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 
 
 class TestCleanPDB(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestCleanPDB(unittest.TestCase):
             outfile_new = '{}{}.pdb'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
-            my_pdb = PDBIOExt(infile_path, file_type='pdb')
+            my_pdb = StructureIO(infile_path)
             default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix,
                                                    out_dir=tempfile.gettempdir(), force_rerun=True)
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
@@ -49,7 +49,7 @@ class TestCleanPDB(unittest.TestCase):
             outfile_new = '{}{}.pdb'.format(op.splitext(infile)[0], out_suffix)
             infile_path = op.join(working_dir, infile)
 
-            my_pdb = PDBIOExt(infile_path, file_type='pdb')
+            my_pdb = StructureIO(infile_path)
             default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix,
                                                    out_dir=tempfile.gettempdir(), force_rerun=True)
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)

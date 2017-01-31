@@ -3,7 +3,7 @@ from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 from Bio.PDB import Polypeptide
 from Bio.PDB.HSExposure import ExposureCN, HSExposureCA, HSExposureCB
-from ssbio.structure.utils.pdbioext import PDBIOExt
+from ssbio.structure.utils.structureio import StructureIO
 import ssbio.sequence.utils
 from copy import deepcopy
 from collections import defaultdict
@@ -149,7 +149,7 @@ def get_structure_seqs(pdb_file, file_type):
     # it seems like biopython capitalizes it to chain L
 
     # Get the first model
-    my_structure = PDBIOExt(pdb_file, file_type=file_type)
+    my_structure = StructureIO(pdb_file)
     model = my_structure.first_model
 
     structure_seqs = {}
@@ -311,7 +311,7 @@ def hse_output(pdb_file, file_type):
 
     """
     # Get the first model
-    my_structure = PDBIOExt(pdb_file, file_type=file_type)
+    my_structure = StructureIO(pdb_file)
     model = my_structure.first_model
 
     # Calculate HSEalpha
@@ -341,7 +341,7 @@ def hse_output(pdb_file, file_type):
 #
 #     """
 #
-#     my_structure = PDBIOExt(pdb_file)
+#     my_structure = StructureIO(pdb_file)
 #     model = my_structure.first_model
 #
 #     res_list = PDB.Selection.unfold_entities(model, 'R')
