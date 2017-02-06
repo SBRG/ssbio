@@ -8,6 +8,7 @@ from cobra.core import DictList
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
+from copy import deepcopy
 from collections import defaultdict
 import logging
 
@@ -113,6 +114,53 @@ class SeqProp(Object):
         else:
             return len(self.pdbs)
 
+    def get_dict(self, only_keys=None, exclude_attributes=None, df_format=False):
+        """Get a copy of all attributes as a dictionary, including object properties
+
+        Args:
+            only_keys:
+            exclude_attributes:
+            df_format:
+
+        Returns:
+
+        """
+        my_dict = Object.get_dict(self, only_keys=only_keys, exclude_attributes=exclude_attributes, df_format=df_format)
+
+        additional_keys = ['seq_str', 'seq_len', 'sequence_file', 'metadata_file', 'num_pdbs']
+        for k in additional_keys:
+            my_dict[k] = deepcopy(getattr(self, k))
+
+        # Choose attributes to return, return everything in the object if a list is not specified
+        if not only_keys:
+            keys = list(my_dict.keys())
+        else:
+            keys = ssbio.utils.force_list(only_keys)
+
+        # Remove keys you don't want returned
+        if exclude_attributes:
+            exclude_attributes = ssbio.utils.force_list(exclude_attributes)
+            for x in exclude_attributes:
+                if x in keys:
+                    keys.remove(x)
+
+        # Copy attributes into a new dictionary
+        for k, v in my_dict.items():
+            if k in keys:
+                if df_format:
+                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v, float) and not isinstance(v, bool):
+                        try:
+                            my_dict[k] = ssbio.utils.force_string(v)
+                        except TypeError:
+                            log.warning('{}: excluding attribute from dict, cannot transform into string'.format(k))
+                    else:
+                        my_dict[k] = v
+                else:
+                    my_dict[k] = v
+            else:
+                log.debug('{}: not copying attribute'.format(k))
+        return my_dict
+
     def load_seq_file(self, sequence_file):
         """Load a sequence file and provide pointers to its location
 
@@ -205,13 +253,14 @@ class SeqProp(Object):
         pepstats = ssbio.sequence.properties.residues.emboss_pepstats_parser(outfile)
         self.seq_record.annotations.update(pepstats)
 
-    def summary(self, as_Df):
+    def summary(self, as_df):
         """Summarize this sequence.
 
         Returns:
             dict:
 
         """
+        pass
 
     def sequence_mutation_summary(self):
         """Summarize all mutations found in the sequence_alignments attribute.

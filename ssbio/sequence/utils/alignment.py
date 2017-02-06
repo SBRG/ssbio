@@ -83,7 +83,7 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
     if engine == 'needle':
         alignment_file = run_needle_alignment(seq_a=a_seq, seq_b=b_seq,
                                               outdir=outdir, outfile=outfile, force_rerun=force_rerun, **kwargs)
-        log.debug('Wrote alignment to {}'.format(alignment_file))
+        log.debug('Needle alignment at {}'.format(alignment_file))
 
         # Use AlignIO to parse the needle alignment, alignments[0] is the first alignment (the only one in pairwise)
         alignments = list(AlignIO.parse(alignment_file, "emboss"))

@@ -31,6 +31,7 @@ def cast_to_seq_record(obj, alphabet=generic_protein, id="<unknown id>", name="<
     if isinstance(obj, Seq):
         return SeqRecord(obj, id, name, description, dbxrefs, features, annotations, letter_annotations)
     if isinstance(obj, str):
+        obj = obj.upper()
         return SeqRecord(Seq(obj, alphabet), id, name, description, dbxrefs, features, annotations, letter_annotations)
     else:
         raise ValueError('Must provide a string, Seq, or SeqRecord object.')

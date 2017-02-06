@@ -179,6 +179,20 @@ class GEMPRO(object):
         self.df_pdb_metadata = pd.DataFrame()
 
     @property
+    def genes_with_structures(self):
+        return DictList(x for x in self.genes if x.protein.num_structures > 0)
+
+    @property
+    def genes_with_experimental_structures(self):
+        """Return a DictList of all genes that have at least one experimental structure"""
+        return DictList(x for x in self.genes_with_structures if x.protein.num_structures_experimental > 0)
+
+    @property
+    def genes_with_homology_models(self):
+        """Return a DictList of all homology models in self.structures"""
+        return DictList(x for x in self.genes_with_structures if x.protein.num_structures_homology > 0)
+
+    @property
     def genes(self):
         return self._genes
 
@@ -243,7 +257,7 @@ class GEMPRO(object):
         # all data will be stored in a dataframe
         kegg_pre_df = []
         # TODO: update dataframe columns (there might be more now)
-        df_cols = ['gene', 'kegg', 'refseq', 'uniprot', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
+        df_cols = ['gene', 'kegg', 'refseq', 'uniprot', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
         # First map all of the organism's KEGG genes to UniProt
         kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
@@ -325,7 +339,7 @@ class GEMPRO(object):
         genes_to_uniprots = bs_unip.mapping(fr=model_gene_source, to='ACC', query=genes_to_map)
 
         uniprot_pre_df = []
-        df_cols = ['gene', 'uniprot', 'reviewed', 'gene_name', 'kegg', 'refseq', 'pdbs', 'ec_number', 'pfam',
+        df_cols = ['gene', 'uniprot', 'reviewed', 'gene_name', 'kegg', 'refseq', 'num_pdbs', 'pdbs', 'ec_number', 'pfam',
                    'seq_len', 'description', 'entry_version', 'seq_version', 'sequence_file', 'metadata_file']
 
         counter = 0
@@ -395,7 +409,7 @@ class GEMPRO(object):
                 ...
         """
         uniprot_pre_df = []
-        df_cols = ['gene', 'uniprot', 'seq_len', 'sequence_file', 'pdbs', 'gene_name', 'reviewed',
+        df_cols = ['gene', 'uniprot', 'seq_len', 'sequence_file', 'num_pdbs', 'pdbs', 'gene_name', 'reviewed',
                     'kegg', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
                     'metadata_file']
 
@@ -471,7 +485,7 @@ class GEMPRO(object):
 
         """
         seq_mapping_pre_df = []
-        df_cols = ['gene', 'uniprot', 'kegg', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
+        df_cols = ['gene', 'uniprot', 'kegg', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
         sequence_missing = []
         counter = 0
@@ -556,8 +570,6 @@ class GEMPRO(object):
                     all_representative_uniprots.append(uniprot_id)
         uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
 
-        genes_with_a_structure = []
-        genes_without_a_structure = []
         for g in tqdm(self.genes):
             if not g.protein.representative_sequence:
                 # Check if a representative sequence was set
@@ -587,7 +599,7 @@ class GEMPRO(object):
                             # Also add this chain to the chains attribute so we can save the info we get from best_structures
                             new_pdb.add_chain_ids(currchain)
 
-                            pdb_specific_keys = ['experimental_method','resolution','taxonomy_name']
+                            pdb_specific_keys = ['experimental_method','resolution']
                             chain_specific_keys = ['coverage','start','end','unp_start','unp_end']
 
                             new_pdb.update(best_structure, only_keys=pdb_specific_keys)
@@ -607,22 +619,18 @@ class GEMPRO(object):
                             rank += 1
 
                         log.debug('{}, {}: {} PDB/chain pairs mapped'.format(g.id, uniprot_id, len(best_structures)))
-                        genes_with_a_structure.append(g.id)
                     else:
                         log.debug('{}, {}: no PDB/chain pairs mapped'.format(g.id, uniprot_id))
-                        genes_without_a_structure.append(g.id)
                 else:
                     log.debug('{}, {}: no PDBs available'.format(g.id, uniprot_id))
-                    genes_without_a_structure.append(g.id)
 
         cols = ['gene', 'uniprot', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'coverage',
                 'taxonomy_name', 'start', 'end', 'unp_start', 'unp_end', 'rank']
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
 
         log.info('Completed UniProt -> best PDB mapping. See the "df_pdb_ranking" attribute.')
-        # TODO: also make these into properties
-        log.info('{}: number of genes with at least one structure'.format(len(genes_with_a_structure)))
-        log.info('{}: number of genes with no structures'.format(len(genes_without_a_structure)))
+        log.info('{}: number of genes with at least one structure'.format(len(self.genes_with_experimental_structures)))
+        log.info('{}: number of genes with no structures'.format(len(self.genes)-len(self.genes_with_experimental_structures)))
 
     def blast_seqs_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, all_genes=False, force_rerun=False, display_link=False):
         """BLAST each gene sequence to the PDB. Raw BLAST results (XML files) are saved per gene in the "structures" folder
@@ -859,6 +867,8 @@ class GEMPRO(object):
 
             gene_seq_dir = op.join(self.sequence_dir, gene_id)
             gene_struct_dir = op.join(self.structure_single_chain_dir, gene_id)
+            if not op.exists(gene_struct_dir):
+                os.mkdir(gene_struct_dir)
 
             repstruct = g.protein.set_representative_structure(seq_outdir=gene_seq_dir,
                                                                struct_outdir=gene_struct_dir,
@@ -972,75 +982,6 @@ class GEMPRO(object):
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
             log.info('Created PDB metadata dataframe.')
 
-    # def calculate_sequence_properties(self, force_rerun=False):
-    #     """Run EMBOSS pepstats and biopython ProteinAnalysis on all representative sequences
-    #
-    #     """
-    #     seq_prop_pre_df = []
-    #     for g in tqdm(self.genes):
-    #         gene_id = str(g.id)
-    #         gene_folder = op.join(self.sequence_dir, gene_id)
-    #         repseq = g.protein.representative_sequence
-    #
-    #         if not repseq:
-    #             log.warning('{}: No representative sequence available'.format(gene_id))
-    #             continue
-    #         else:
-    #             pepstats_file = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=repseq.sequence_path,
-    #                                                                                         outdir=gene_folder,
-    #                                                                                         force_rerun=force_rerun)
-    #             pepstats_parsed = ssbio.sequence.properties.residues.emboss_pepstats_parser(pepstats_file)
-    #
-    #             # TODO: also run biopython ProteinAnalysis
-    #             g.annotation['sequence']['representative']['properties'].update(    pepstats_parsed.copy())
-    #
-    #             pepstats_parsed['gene'] = gene_id
-    #             seq_prop_pre_df.append(pepstats_parsed)
-    #
-    #     cols = ['gene', 'percent_acidic', 'percent_aliphatic', 'percent_aromatic', 'percent_basic', 'percent_charged',
-    #             'percent_non-polar', 'percent_polar', 'percent_small', 'percent_tiny']
-    #
-    #     self.df_sequence_properties = pd.DataFrame.from_records(seq_prop_pre_df, columns=cols).drop_duplicates().reset_index(drop=True)
-    #     log.info('Created sequence property dataframe. See the "df_sequence_properties" attribute.')
-    #
-    # def calculate_residue_depth(self, force_rerun=False):
-    #     """Run MSMS on all representative structures, save a json file per structure that contains
-    #         the average residue depth per residue, and the alpha-carbon depth. Units are in Angstroms.
-    #
-    #     Args:
-    #         force_rerun (bool): If you want to overwrite any existing files
-    #
-    #     """
-    #     self.missing_msms = {}
-    #
-    #     for g in tqdm(self.genes):
-    #         gene_id = g.id
-    #         gene_structure_dir = op.join(self.structure_single_chain_dir, gene_id)
-    #         clean_pdb = g.annotation['structure']['representative']['clean_pdb_file']
-    #
-    #         if not clean_pdb:
-    #             log.warning('{}: No representative structure available'.format(gene_id))
-    #             continue
-    #         else:
-    #             infile = op.join(gene_structure_dir, clean_pdb)
-    #
-    #             try:
-    #                 outfile = ssbio.structure.properties.msms.get_msms_df_on_file(pdb_file=infile,
-    #                                                                               outdir=gene_structure_dir,
-    #                                                                               force_rerun=force_rerun)
-    #             # Log if MSMS was not run on a file
-    #             except AssertionError:
-    #                 self.missing_msms[gene_id] = infile
-    #                 log.warning('{}: MSMS failed to run on {}'.format(gene_id, clean_pdb))
-    #                 continue
-    #
-    #             g.annotation['structure']['representative']['properties']['msms_file'] = op.basename(outfile)
-    #
-    #     if len(self.missing_msms) > 0:
-    #         log.warning('{} gene(s) failed calculation. Inspect the "missing_msms" attribute.'.format(len(self.missing_msms)))
-    #
-    #     log.info('Completed calculations of residue depth')
-
     # def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
     #     """Run the entire GEM-PRO pipeline.
     #
@@ -1103,15 +1044,4 @@ class GEMPRO(object):
 
 if __name__ == '__main__':
     pass
-    # Run the GEM-PRO pipeline!
-
-    # Parse arguments
-#     p = argparse.ArgumentParser(description='Runs the GEM-PRO pipeline')
-#     p.add_argument('gemfile', help='Path to the GEM file')
-#     p.add_argument('gemname', help='Name you would like to use to refer to this GEM')
-#     p.add_argument('rootdir', help='Directory where GEM-PRO files should be stored')
-#
-#     args = p.parse_args()
-#
-#     my_gem_pro = GEMPRO(args.gemfile, args.gemname, args.rootdir)
-#     my_gem_pro.run_pipeline()
+    # TODO: Run the GEM-PRO pipeline!

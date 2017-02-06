@@ -307,6 +307,14 @@ class Protein(Object):
                 log.debug('{}: alignment already completed'.format(seq.id))
                 continue
 
+            if not seq.seq_str:
+                log.error('{}: no sequence stored, skipping alignment'.format(seq.id))
+                continue
+
+            # Don't need to compare sequence to itself
+            if seq.id == self.representative_sequence.id:
+                continue
+
             aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
                                                                              a_seq_id=self.id,
                                                                              b_seq=seq.seq_str,
@@ -437,7 +445,6 @@ class Protein(Object):
             StructProp: representative structure
 
         """
-        # TODO: which attributes to keep?
         if not outdir:
             outdir = os.getcwd()
 
@@ -540,7 +547,7 @@ class Protein(Object):
                 # Download the structure and parse it
                 # This will add all chains to the mapped_chains attribute if there are none
                 try:
-                    pdb.download_structure_file(outdir=struct_outdir, force_rerun=force_rerun, parse=True)
+                    pdb.download_structure_file(outdir=struct_outdir, force_rerun=force_rerun)
                     # TODO: add global flag of PDB file type and adjust for downloading the header here (and other places where pdb is downloaded)
                     # pdb.download_cif_header_file(outdir=struct_outdir)
                 except requests.exceptions.HTTPError:

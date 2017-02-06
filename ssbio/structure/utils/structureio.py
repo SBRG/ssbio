@@ -3,6 +3,7 @@ from Bio.PDB.PDBIO import Select
 from Bio.PDB.PDBParser import PDBParser
 from Bio.PDB.mmtf import MMTFParser
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
+import os.path as op
 import logging
 import warnings
 import ssbio.utils
@@ -57,6 +58,7 @@ class StructureIO(PDBIO):
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore', PDBConstructionWarning)
                     structure = mmtfp.get_structure(file_path=structure_file)
+            log.debug('{}: parsed 3D coordinates of structure'.format(op.basename(structure_file)))
         else:
             raise ValueError('{}: unsupported file type'.format(file_type))
 

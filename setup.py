@@ -32,7 +32,7 @@ setup(
                           'ujson',
                           'awesome-slugify',
                           'seaborn',
-                          'nglview',
+                          #'nglview',
                           'ipywidgets',
                           'qgrid']
 )

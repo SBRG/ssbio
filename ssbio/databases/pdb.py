@@ -41,7 +41,7 @@ class PDBProp(StructProp):
         self.taxonomy_name = None
 
     # TODO: test using cif or mmtf file formats -- this is the global flag here (which is a dumb place to be)
-    def download_structure_file(self, outdir, file_type='cif', force_rerun=False, parse=False):
+    def download_structure_file(self, outdir, file_type='cif', force_rerun=False):
         pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False,
                                       outdir=outdir,
                                       force_rerun=force_rerun)
@@ -60,6 +60,7 @@ class PDBProp(StructProp):
 
         cif_dict = parse_mmcif_header(cif_file)
         self.update(cif_dict)
+
 
 def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
     """Download a structure from the RCSB PDB by ID. Specify the file type desired.
@@ -180,14 +181,20 @@ def parse_mmcif_header(infile):
     else:
         log.debug('{}: no date field'),format(infile)
 
-
     if '_exptl.method' in mmdict:
         newdict['experimental_method'] = mmdict['_exptl.method']
     else:
         log.debug('{}: No experimental method field'.format(infile))
 
     if '_refine.ls_d_res_high' in mmdict:
-        newdict['resolution'] = float(mmdict['_refine.ls_d_res_high'])
+        try:
+            if isinstance(mmdict['_refine.ls_d_res_high'], list):
+                newdict['resolution'] = [float(x) for x in mmdict['_refine.ls_d_res_high']]
+            else:
+                newdict['resolution'] = float(mmdict['_refine.ls_d_res_high'])
+        except:
+            # TODO: double check EM structures, example is 5MDV
+            newdict['resolution'] = float(mmdict['_refine_ls_shell.d_res_high'])
     else:
         log.debug('{}: No resolution field'.format(infile))
 
@@ -725,29 +732,6 @@ def get_resolution(pdb_id):
             resolution = float('inf')
 
     return resolution
-
-
-# def get_taxonomy(pdb_id):
-#     """Quick way to get the taxonomy of a PDB ID using the table of results from the REST service
-#
-#     Returns None if the taxonomy is not available.
-# TODO: taxonomy adds chain ID in the table, need to deal with that
-#
-#     Returns:
-#         str: Organism of a PDB ID
-#
-#     """
-#
-#     pdb_id = pdb_id.upper()
-#     if pdb_id not in _property_table().index:
-#         raise ValueError('PDB ID not in property table')
-#     else:
-#         taxonomy = _property_table().ix[pdb_id, 'taxonomy']
-#         if pd.isnull(taxonomy):
-#             log.debug('{}: no taxonomy available')
-#             taxonomy = None
-#
-#     return taxonomy
 
 
 # @lru_cache(maxsize=500)

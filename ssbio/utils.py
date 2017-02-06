@@ -30,7 +30,16 @@ def is_ipynb():
     False
 
     """
-    return 'ipykernel' in sys.modules
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':  # Jupyter notebook or qtconsole?
+            return True
+        elif shell == 'TerminalInteractiveShell':  # Terminal running IPython?
+            return False
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False      # Probably standard Python interpreter
 
 
 class Date():

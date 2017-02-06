@@ -93,9 +93,7 @@ class ATLAS():
     """
 
     def __init__(self,
-                 base_gempro_name,
-                 base_dir,
-                 base_gempro_file,
+                 base_gempro,
                  base_genome_id,
                  list_of_ncbi_ids=None,
                  email_for_ncbi='',
@@ -107,8 +105,7 @@ class ATLAS():
         """
 
         # Load the GEM-PRO
-        self.base_strain_gempro = GEMPRO(gem_name=base_gempro_name, root_dir=base_dir,
-                                         gem_file_path=base_gempro_file, gem_file_type='json')
+        self.base_strain_gempro = base_gempro
 
         # Prepare ATLAS directories
         list_of_dirs = []
