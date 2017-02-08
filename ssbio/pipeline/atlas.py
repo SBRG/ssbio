@@ -64,40 +64,47 @@ class ATLAS():
     Each step may generate a report and also request additional files if something is missing
     """
 
-    def __init__(self, base_gempro, strain_ids=None):
-        """Prepare for ATLAS analysis"""
+    def __init__(self, base_gempro, base_genome_path=None):
+        """Prepare a GEM-PRO model for ATLAS analysis
 
-        # Load the GEM-PRO
+        Args:
+            base_gempro (GEMPRO): Completed GEM-PRO model
+            base_genome_path (str): Simple reference link to the genome FASTA file (CDS)
+        """
+
+        # Load the GEM-PRO (could be a model, could just be a list of genes)
         self.base_strain_gempro = base_gempro
 
-        # Prepare ATLAS directories
+        # Check if there is a genome file associated with this model - if not, write all sequences
+        if not base_genome_path and self.base_strain_gempro.genome_path:
+            self.base_strain_gempro.genome_path = self.base_strain_gempro.write_representative_sequences_file(outname='BASE_CDS')
+        else:
+            self.base_strain_gempro.genome_path = base_genome_path
+            # TODO: must check if base_genome gene IDs can be matched to the base model
+
+        ### Prepare ATLAS directories
         list_of_dirs = []
-        self.base_gempro_dir = self.base_strain_gempro.base_dir
+
+        # Everything will be stored where the GEM-PRO folder is
+        base_gempro_dir = self.base_strain_gempro.base_dir
 
         # atlas_dir - directory where all ATLAS analysis will be carried out
-        self.atlas_dir = op.join(self.base_gempro_dir, 'atlas')
+        self.atlas_dir = op.join(base_gempro_dir, 'atlas')
         list_of_dirs.append(self.atlas_dir)
 
-        # model_dir - directory where base strain GEM and new models will be stored
-        self.atlas_model_files = op.join(self.atlas_dir, 'models')
-        list_of_dirs.append(self.atlas_model_files)
+        # atlas_model_dir - directory where new strain specific models will be stored
+        self.atlas_model_dir = op.join(self.atlas_dir, 'models')
+        list_of_dirs.append(self.atlas_model_dir)
 
         # atlas_data_dir - directory where all data will be stored
         self.atlas_data_dir = op.join(self.atlas_dir, 'data')
         list_of_dirs.append(self.atlas_data_dir)
 
-        # sequence_dir - sequence related files are stored here
+        # atlas_sequence_dir - sequence related files are stored here
         self.atlas_sequence_dir = op.join(self.atlas_dir, 'sequences')
-        list_of_dirs.append(self.atlas_sequence_dir)
-
-        self.seq_atlas_dir = op.join(self.atlas_sequence_dir, 'protein')
-        self.seq_atlas_org_dir = op.join(self.seq_atlas_dir, 'by_organism')
-        self.seq_atlas_gene_dir = op.join(self.seq_atlas_dir, 'by_gene')
-        self.fasta_extension = 'faa'
-        self.blast_seq_type = 'prot'
-
-        # Make more dirs based on this analysis
-        list_of_dirs.extend([self.seq_atlas_dir, self.seq_atlas_org_dir, self.seq_atlas_gene_dir])
+        self.atlas_seq_genomes_dir = op.join(self.atlas_sequence_dir, 'by_organism')
+        self.atlas_seq_genes_dir = op.join(self.atlas_sequence_dir, 'by_gene')
+        list_of_dirs.extend([self.atlas_sequence_dir, self.atlas_seq_genomes_dir, self.atlas_seq_genes_dir])
 
         # Make the dirs
         for directory in list_of_dirs:
@@ -107,82 +114,56 @@ class ATLAS():
             else:
                 log.debug('Directory already exists: {}'.format(directory))
 
-        # Create initial strain models that are just copies of the base strain with a resetted annotation
-        self.strain_ids = []
-        self.strain_models = DictList()
-        log.info('Creating initial strain specific models based on the base model...')
-        for strain_id, strain_fasta in tqdm(strains_to_fasta_file.items()):
-            self.strain_ids.append(strain_id)
+        # Other initializations
+        self.atlas_strains = DictList()
 
-            if strain_id == base_genome_id:
-                log.debug('Not making strain specific model for the base model')
-                continue
+    def copy_base_model(self, new_id):
+        """Copy the base strain model or the genes list (excluding GEM-PRO information) into a new model with a specified ID.
 
-            base_strain_model_copy = copy.deepcopy(self.base_strain_gempro.model)
-            base_strain_model_copy.id = strain_id
-            self.strain_models.append(AtlasModel(model=base_strain_model_copy,
-                                                 genome_file_name=strain_fasta))
-
-        # Set the base, reference genome
-        self._reference_genome = base_genome_id
-        self.base_strain_gempro.model.annotation['genome_file'] = op.basename(strains_to_fasta_file[base_genome_id])
-        self.base_strain_gempro_genome_file = op.basename(strains_to_fasta_file[base_genome_id])
-        self.base_strain_gempro_genome_path = op.join(self.seq_atlas_org_dir, self.base_strain_gempro_genome_file)
-
-    def download_genome_cds_patric(self, ids, force_rerun=False):
-        """Download genome files from PATRIC
-
-        """
-        strains_to_fasta_file = {}
-
-        for x in tqdm(ids):
-            f = ssbio.databases.patric.download_genome_sequence(patric_id=x, seqtype=self.seq_type,
-                                                                outdir=self.seq_atlas_org_dir,
-                                                                force_rerun=force_rerun)
-            if f:
-                strains_to_fasta_file[x] = f
-                log.debug('{}: Downloaded sequence'.format(x))
-            else:
-                log.warning('{}: Unable to download sequence'.format(x))
-
-        if len(strains_to_fasta_file) > 0:
-            log.info('Downloaded sequences of coding genes.')
-
-        return strains_to_fasta_file
-
-    def download_genome_cds_ncbi(self, ids, email, force_rerun=False):
-        """Loads a list of NCBI GIs or RefSeq complete genome IDs and downloads the CDS FASTA files
+        Appends the model to the atlas_strains attribute.
 
         Args:
-            ids (list): List of strain_genome_ids
-            email (str): your email
+            new_id (str): New ID to be assigned to the copied model
 
         """
-        strains_to_fasta_file = {}
+        copied_model = self.base_strain_gempro.model.copy()
+        copied_model.id = new_id
+        self.atlas_strains.append(copied_model)
+        log.debug('{}: new model ID copied from base model'.format(new_id))
 
-        for x in tqdm(ids):
-            f = ssbio.databases.ncbi.download_genome_sequence(genome_accession_or_id=x, seqtype=self.seq_type,
-                                                              email=email,
-                                                              outdir=self.seq_atlas_org_dir, force_rerun=force_rerun)
-            strains_to_fasta_file[x] = f
-            log.debug('Downloaded sequence for {}'.format(x))
+    def load_patric_genomes(self, ids_to_genome_file):
+        """Load a dictionary of PATRIC IDs which point to the path of their respective genome files.
 
-        if len(strains_to_fasta_file) > 0:
-            log.info('Downloaded sequences of coding genes.')
+        Creates initial copies of the base strain model for each strain ID and stores them in self.atlas_strains
 
-        return strains_to_fasta_file
+        Args:
+            ids_to_genome_file (dict): Keys are PATRIC IDs (which will become your strain IDs) and
+                values are absolute paths to the FASTA file containing CDS regions
+        """
+        pass
+        # TODO: code to load IDs and link them to the genome files
 
-    @property
-    def reference_genome(self):
-        return self._reference_genome
-
-    @reference_genome.setter
-    def reference_genome(self, reference_genome_id):
-        if reference_genome_id in self.strain_ids:
-            self._reference_genome = reference_genome_id
-        else:
-            raise ValueError('Reference genome ID not in list of genomes.')
-        log.info('Set reference genome to ID {}'.format(reference_genome_id))
+    def download_genome_cds_patric(self, ids, force_rerun=False):
+        """Download genome files from PATRIC give a list of IDs"""
+        pass
+        # TODO: run the below, and then load_patric_genomes
+        # strains_to_fasta_file = {}
+        # ids = ssbio.utils.force_list(ids)
+        #
+        # for patric_id in tqdm(ids):
+        #     f = ssbio.databases.patric.download_genome_sequence(patric_id=patric_id, seqtype='protein',
+        #                                                         outdir=self.atlas_seq_genomes_dir,
+        #                                                         force_rerun=force_rerun)
+        #     if f:
+        #         strains_to_fasta_file[patric_id] = f
+        #         log.debug('{}: Downloaded sequence'.format(patric_id))
+        #     else:
+        #         log.warning('{}: Unable to download sequence'.format(patric_id))
+        #
+        # if len(strains_to_fasta_file) > 0:
+        #     log.info('Downloaded sequences of coding genes.')
+        #
+        # return strains_to_fasta_file
 
     def get_orthology_matrix(self):
         """Run run_makeblastdb, run_bidirectional_blast, and calculate_bbh for protein sequences.
@@ -194,29 +175,29 @@ class ATLAS():
 
         bbh_files = {}
 
-        for strain_model in tqdm(self.strain_models):
-            g_file = strain_model.get_genome_file_path(self.seq_atlas_org_dir)
+        for strain_model in tqdm(self.atlas_strains):
+            g_file = strain_model.get_genome_file_path(self.atlas_seq_genomes_dir)
             # TODO: replace usages of g_name with strain_model.id instead for consistency
             g_folder, g_name, g_ext = utils.split_folder_and_path(g_file)
 
             # Run bidirectional BLAST
             log.debug('{} vs {}: Running bidirectional BLAST'.format(r_name, g_name))
             r_vs_g, g_vs_r = ssbio.sequence.utils.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
-                                                                                dbtype=self.blast_seq_type,
-                                                                                outdir=self.seq_atlas_org_dir)
+                                                                                dbtype='prot',
+                                                                                outdir=self.atlas_seq_genomes_dir)
 
             # Using the BLAST files, find the BBH
             log.debug('{} vs {}: Finding BBHs'.format(r_name, g_name))
             bbh = ssbio.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
                                                            r_name=r_name, g_name=g_name,
-                                                           outdir=self.seq_atlas_org_dir)
+                                                           outdir=self.atlas_seq_genomes_dir)
             bbh_files[strain_model.id] = bbh
 
         # Make the orthologous genes matrix
         log.debug('Creating orthology matrix')
         ortho_matrix = ssbio.sequence.utils.blast.create_orthology_matrix(r_name=r_name,
                                                                           genome_to_bbh_files=bbh_files,
-                                                                          outname='{}_{}_orthology.csv'.format(r_name, self.blast_seq_type),
+                                                                          outname='{}_{}_orthology.csv'.format(r_name, 'prot'),
                                                                           outdir=self.atlas_data_dir)
 
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
@@ -224,7 +205,7 @@ class ATLAS():
 
         # Remove extraneous strains from our analysis
         to_remove = []
-        for i, strain_model in enumerate(self.strain_models):
+        for i, strain_model in enumerate(self.atlas_strains):
             strain_id = strain_model.id
 
             if strain_id not in self.df_orthology_matrix.columns:
@@ -240,7 +221,7 @@ class ATLAS():
         if to_remove:
             # Remove strains with no differences
             for x in to_remove:
-                self.strain_models.pop(x)
+                self.atlas_strains.pop(x)
             log.info('Removed {} strains from analysis'.format(len(to_remove)))
 
         # Also need to check for potential gene IDs that are in the model and not in the orthology matrix
@@ -257,7 +238,7 @@ class ATLAS():
         self.df_orthology_matrix_filtered = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
         log.info('Created base model specific "df_orthology_matrix_filtered" attribute.'.format(ortho_matrix))
 
-        log.info('{} strains to be analyzed'.format(len(self.strain_models)))
+        log.info('{} strains to be analyzed'.format(len(self.atlas_strains)))
 
     def pare_down_model(self, model_to_be_modified, genes_to_remove):
         """Remove genes from a model. Directly modifies the model.
@@ -304,51 +285,11 @@ class ATLAS():
             self.pare_down_model(model_to_be_modified=strain_model, genes_to_remove=not_in_strain)
 
             # Save the strain specific file
-            outfile = op.join(self.atlas_model_files, '{}.json'.format(strain_id))
+            outfile = op.join(self.atlas_model_dir, '{}.json'.format(strain_id))
             cobra.io.save_json_model(strain_model, outfile)
             log.debug('{}: saved model at {}'.format(strain_id, outfile))
 
         log.info('Created {} new strain-specific models'.format(len(self.strain_models)))
-
-    def write_orthologous_gene_sequences(self):
-        """For each organism, write their orthologous gene files named like <STRAIN>_<BASESTRAIN_GENE>.faa
-
-        """
-        if len(self.df_orthology_matrix_filtered) == 0:
-            raise RuntimeError('Empty orthology matrix')
-
-        for strain_model in tqdm(self.strain_models):
-            strain_id = strain_model.id
-
-            # Load the strain genome file
-            strain_fasta = strain_model.get_genome_file_path(self.seq_atlas_org_dir)
-            strain_sequences = SeqIO.index(strain_fasta, 'fasta')
-            log.debug('Loaded {}'.format(strain_fasta))
-
-            # Get the list of orthologous genes, ignoring genes outside our context of the base model
-            base_to_strain = self.df_orthology_matrix_filtered[pd.notnull(self.df_orthology_matrix_filtered[strain_id])][strain_id].to_dict()
-            for base_g_id, strain_g_id in base_to_strain.items():
-
-                # Make the gene directory
-                gene_dir = op.join(self.seq_atlas_gene_dir, base_g_id)
-                if not op.exists(gene_dir):
-                    os.mkdir(gene_dir)
-
-                # Get and write the strain sequence
-                strain_seq_record = strain_sequences[strain_g_id]
-                outfile = '{}_{}.{}'.format(base_g_id, strain_id, self.fasta_extension)
-
-                # Save the filename in the strain model's gene annotation
-                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['sequence_file'] = outfile
-                strain_model.genes.get_by_id(base_g_id).annotation['sequence']['seq_len'] = len(strain_seq_record.seq)
-
-                if not op.exists(op.join(gene_dir, outfile)):
-                    with open(op.join(gene_dir, outfile), 'w') as f:
-                        SeqIO.write(strain_seq_record, f, "fasta")
-
-            log.debug('Wrote all sequences for strain {}'.format(strain_id))
-
-        log.info('Wrote all individual orthologous gene sequences for all strains.')
 
     def align_orthologous_genes_pairwise(self):
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it.
@@ -368,7 +309,7 @@ class ATLAS():
 
             base_gene_seq_path = op.join(self.base_strain_gempro.sequence_dir, base_gene_id, base_gene_seq_file)
 
-            gene_dir = op.join(self.seq_atlas_gene_dir, base_gene_id)
+            gene_dir = op.join(self.atlas_seq_genes_dir, base_gene_id)
 
             info_dict = {'gene': base_gene_id}
             mutation_count = 0
@@ -423,14 +364,6 @@ class ATLAS():
         self.df_alignment_stats = pd.DataFrame.from_records(info_pre_df, columns=cols)
         log.info('Created alignment statistics dataframe. See the "df_alignment_stats" attribute.')
 
-    def align_orthologous_genes_multiple(self):
-        """For each gene in the base strain, run a multiple alignment to all orthologous strain genes
-
-        Returns:
-
-        """
-        pass
-
     def per_gene_total_num_mutations(self, gene_id):
         """Simply return the total number of mutations for a gene, summed over all strains.
 
@@ -440,7 +373,7 @@ class ATLAS():
         """
         total_num_mutations = 0
 
-        gene_dir = op.join(self.seq_atlas_gene_dir, gene_id)
+        gene_dir = op.join(self.atlas_seq_genes_dir, gene_id)
 
         if not op.exists(gene_dir):
             raise ValueError('{}: Gene does not exist'.format(gene_id))
@@ -461,26 +394,3 @@ class ATLAS():
             total_num_mutations += num_mutations
 
         return total_num_mutations
-
-
-    def predict_auxotrophies(self):
-        """Find what nutrients must be added to allow them to grow in minimal media
-
-        """
-        pass
-        # for strain_id, strain_model in self.genome_id_to_strain_model.items():
-        #     model = ssbio.cobra.utils.model_loader(gem_file_path=strain_model, gem_file_type='json')
-        #
-        #     # Optimize the strain model for growth
-        #     model.optimize()
-        #
-        #     if model.solution.f < 0.00001:
-        #         log.info('Gap filling {}'.format(strain_id))
-        #         # Run GrowMatch with only exchange reactions
-        #         solution = cobra.flux_analysis.growMatch(model, dm_rxns=False, ex_rxns=True, iterations=1)
-        #
-        #         # Open the exchange reactions determined using GrowMatch
-        #         for rxn in solution[0]:
-        #             rxn = rxn.id.replace('_reverse', '')
-        #             model.reactions[model.reactions.index(rxn)].lower_bound = -1
-

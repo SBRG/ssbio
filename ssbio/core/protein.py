@@ -284,7 +284,7 @@ class Protein(Object):
 
         return self.representative_sequence
 
-    def align_sequences_to_representative(self, outdir=None, engine='needle', parse=False, force_rerun=False, **kwargs):
+    def align_sequences_to_representative(self, outdir=None, engine='needle', parse=True, force_rerun=False, **kwargs):
         """Align all sequences in the sequences attribute to the representative sequence.
 
         Stores the alignments the representative_sequence.sequence_alignments DictList
@@ -430,8 +430,11 @@ class Protein(Object):
 
         return self.structures.get_by_id(ident)
 
-    def _representative_structure_setter(self, struct_prop, keep_chain, new_id=None, clean=True, out_suffix='_clean', outdir=None):
-        """Set the representative structure by cleaning it and copying over attributes of the original structure.
+    def _representative_structure_setter(self, struct_prop, keep_chain, new_id=None, clean=True,
+                                         out_suffix='_clean', outdir=None):
+        """Set the representative structure by 1) cleaning it and 2) copying over attributes of the original structure.
+
+        The structure is copied because the chains stored may change, and cleaning it makes a new PDB file.
 
         Args:
             struct_prop (StructProp): StructProp object to set as representative
@@ -461,9 +464,8 @@ class Protein(Object):
                                                    structure_file=final_pdb, file_type='pdb',
                                                    reference_seq=self.representative_sequence,
                                                    representative_chain=keep_chain)
-        # structure needs to be excluded when using get_dict because of too much recursion
-        self.representative_structure.update(struct_prop.get_dict_with_chain(chain=keep_chain,
-                                                                             exclude_attributes='structure'),
+
+        self.representative_structure.update(struct_prop.get_dict_with_chain(chain=keep_chain),
                                              only_keys=self._representative_structure_attributes,
                                              overwrite=True)
 
@@ -476,11 +478,15 @@ class Protein(Object):
         repchain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
         self.representative_sequence.seq_record.letter_annotations['repchain_resnums'] = repchain_resnums
 
+        # Also need to parse the clean structure and save its sequence..
+        parsed = self.representative_structure.parse_structure()
+        self.representative_structure.get_structure_seqs(parsed.first_model)
+
     def set_representative_structure(self, seq_outdir, struct_outdir, engine='needle', seq_ident_cutoff=0.5,
                                      always_use_homology=False,
                                      allow_missing_on_termini=0.2, allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True, force_rerun=False):
-        """Set a representative structure from the structures in self.structures
+        """Set a representative structure from a structure in self.structures
 
         Args:
             seq_outdir:
@@ -610,59 +616,6 @@ class Protein(Object):
             log.warning('{}: no representative structure found'.format(self.id))
             return None
 
-    def map_repseq_resnums_to_repchain_index(self, resnums):
-        """Map a residue number in the representative_sequence to an index in the representative_chain
-
-        Use this to get the indices of the repchain to get structural properties at a specific residue number.
-
-        Args:
-            resnums (int, list): Residue numbers in the representative sequence
-
-        Returns:
-            dict: Mapping of resnums to indices
-
-        """
-        resnums = ssbio.utils.force_list(resnums)
-
-        repchain_resnum_mapping = self.representative_sequence.seq_record.letter_annotations['repchain_resnums']
-
-        to_repchain_index = {}
-        for x in resnums:
-            ix = repchain_resnum_mapping[x - 1] - 1
-
-            if np.isnan(ix):
-                log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
-            else:
-                to_repchain_index[x] = int(ix)
-
-        return to_repchain_index
-
-    def map_repseq_resnums_to_structure_resnums(self, resnums):
-        """Map a residue number in the representative_sequence to the actual structure file's residue number
-
-        Args:
-            resnums (int, list): Residue numbers in the representative sequence
-
-        Returns:
-            dict: Mapping of resnums to structure residue IDs
-
-        """
-        resnums = ssbio.utils.force_list(resnums)
-
-        mapping_to_repchain_index = self.map_repseq_resnums_to_repchain_index(resnums)
-        repchain_structure_mapping = self.representative_structure.representative_chain.seq_record.letter_annotations['structure_resnums']
-
-        to_structure_resnums = {}
-        for k, v in mapping_to_repchain_index.items():
-            rn = repchain_structure_mapping[v]
-
-            if rn[1] == float('Inf'):
-                log.warning('{}, {}: structure file does not contain coordinates for this residue'.format(self.id, k))
-            else:
-                to_structure_resnums[k] = rn
-
-        return to_structure_resnums
-
     def view_all_mutations(self, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
                            opacity_range=(0.8,1), scale_range=(1,5), gui=False):
         """Map all sequence alignment mutations to the structure.
@@ -671,8 +624,10 @@ class Protein(Object):
             grouped (bool): If groups of mutations should be colored and sized together
             color (str): Color of the mutations (overridden if unique_colors=True)
             unique_colors (bool): If each mutation/mutation group should be colored uniquely
+            structure_opacity (float): Opacity of the protein structure cartoon representation
             opacity_range (tuple): Min/max opacity values (mutations that show up more will be opaque)
             scale_range (tuple): Min/max size values (mutations that show up more will be bigger)
+            gui (bool): If the NGLview GUI should show up
 
         Returns:
             NGLviewer object
@@ -684,7 +639,7 @@ class Protein(Object):
         single_map_to_structure = {}
         for k, v in single_lens.items():
             resnum = int(k[1])
-            resnum_to_structure = self.map_repseq_resnums_to_structure_resnums(resnum)
+            resnum_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(resnum)
             if resnum not in resnum_to_structure:
                 log.warning('{}: residue is not available in structure {}'.format(resnum, self.representative_structure.id))
                 continue
@@ -692,12 +647,12 @@ class Protein(Object):
             single_map_to_structure[new_key] = v
 
         if not grouped:
-            view = self.representative_structure.view_structure_with_mutations(single_map_to_structure,
-                                                                               color=color, unique_colors=unique_colors,
-                                                                               structure_opacity=structure_opacity,
-                                                                               opacity_range=opacity_range,
-                                                                               scale_range=scale_range,
-                                                                               gui=gui)
+            view = self.representative_structure.view_structure_and_highlight_residues(single_map_to_structure,
+                                                                                       color=color, unique_colors=unique_colors,
+                                                                                       structure_opacity=structure_opacity,
+                                                                                       opacity_range=opacity_range,
+                                                                                       scale_range=scale_range,
+                                                                                       gui=gui)
             return view
 
         else:
@@ -705,15 +660,15 @@ class Protein(Object):
             fingerprint_map_to_structure = {}
             for k, v in fingerprint_lens.items():
                 k_list = [int(x[1]) for x in k]
-                resnums_to_structure = self.map_repseq_resnums_to_structure_resnums(k_list)
+                resnums_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(k_list)
                 new_key = tuple(y[1] for y in resnums_to_structure.values())
                 fingerprint_map_to_structure[new_key] = v
 
-            view = self.representative_structure.view_structure_with_mutations(fingerprint_map_to_structure,
-                                                                               color=color, unique_colors=unique_colors,
-                                                                               opacity_range=opacity_range,
-                                                                               scale_range=scale_range,
-                                                                               gui=gui)
+            view = self.representative_structure.view_structure_and_highlight_residues(fingerprint_map_to_structure,
+                                                                                       color=color, unique_colors=unique_colors,
+                                                                                       opacity_range=opacity_range,
+                                                                                       scale_range=scale_range,
+                                                                                       gui=gui)
             return view
 
     def summarize_protein(self):

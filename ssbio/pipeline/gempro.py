@@ -79,7 +79,7 @@ class GEMPRO(object):
     """
 
     def __init__(self, gem_name, root_dir=None, gem_file_path=None, gem_file_type=None,
-                 genes_list=None, genes_and_sequences=None):
+                 genes_list=None, genes_and_sequences=None, genome_path=None):
         """Initialize the GEM-PRO project with a GEM (genome-scale model) or a list of genes.
 
         Specify the name of your project, along with the root directory where a folder with that name will be created.
@@ -93,6 +93,7 @@ class GEMPRO(object):
             gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' format
             genes_list (list): List of gene IDs that you want to map
             genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
+            genome_path (str): Simple reference link to the genome FASTA file (CDS)
 
         """
 
@@ -169,6 +170,7 @@ class GEMPRO(object):
             log.warning('No model or genes input')
 
         # Other attributes and dataframes
+        self.genome_path = genome_path
         self.df_kegg_metadata = pd.DataFrame()
         self.df_uniprot_metadata = pd.DataFrame()
         self.df_sequence_properties = pd.DataFrame()
@@ -519,7 +521,7 @@ class GEMPRO(object):
         self.df_representative_sequences.fillna(value=np.nan, inplace=True)
         log.info('Created sequence mapping dataframe. See the "df_representative_sequences" attribute.')
 
-    def write_representative_sequences_file(self, outname, outdir=None, use_original_ids=False):
+    def write_representative_sequences_file(self, outname, outdir=None):
         """Write all the model's sequences as a single FASTA file
 
         Args:
@@ -538,11 +540,8 @@ class GEMPRO(object):
         for x in self.genes:
             repseq = x.protein.representative_sequence.seq_record
             if repseq:
-                if use_original_ids:
-                    tmp.append(repseq)
-                else:
-                    repseq.id = x.id
-                    tmp.append(repseq)
+                repseq.id = x.id
+                tmp.append(repseq)
 
         SeqIO.write(tmp, outfile, "fasta")
 
@@ -740,7 +739,7 @@ class GEMPRO(object):
                 new_homology = g.protein.load_generic_structure(hid, hdict['model_file'])
 
                 if clean:
-                    new_homology.clean_structure(outdir=dest_gene_dir, force_rerun=force_rerun)
+                    new_homology.structure_path = new_homology.clean_structure(outdir=dest_gene_dir, force_rerun=force_rerun)
                 else:
                     if ssbio.utils.force_rerun(force_rerun, op.basename(hdict['model_file'])):
                         # Just copy the file to the structure directory and store the file name
@@ -963,7 +962,7 @@ class GEMPRO(object):
             for s in g.protein.get_experimental_structures():
 
                 log.debug('{}: Downloading PDB or mmCIF file'.format(s.id))
-                s.download_structure_file(outdir=gene_struct_dir, force_rerun=force_rerun, parse=False)
+                s.download_structure_file(outdir=gene_struct_dir, force_rerun=force_rerun)
                 s.download_cif_header_file(outdir=gene_struct_dir, force_rerun=force_rerun)
 
                 infodict = s.get_dict(df_format=True)
