@@ -7,6 +7,7 @@ from cobra.core import DictList
 import ssbio.structure.properties
 import ssbio.utils
 import logging
+import numpy as np
 import nglview as nv
 import seaborn as sns
 import ssbio.structure.utils.cleanpdb
@@ -87,20 +88,40 @@ class StructProp(Object):
     def clean_structure(self, out_suffix='_clean', outdir=None, force_rerun=False,
                         remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
                         remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
+        """Clean the structure file associated with this structure, and save it as a new file. Returns the file path.
+
+        Args:
+            out_suffix: Suffix to append to original filename
+            outdir: Path to output directory
+            force_rerun: If structure should be re-cleaned if a clean file exists already
+            remove_atom_alt: Remove alternate positions
+            remove_atom_hydrogen: Remove hydrogen atoms
+            keep_atom_alt_id: If removing alternate positions, which alternate ID to keep
+            add_atom_occ: Add atom occupancy fields if not present
+            remove_res_hetero: Remove all HETATMs
+            add_chain_id_if_empty: Add a chain ID if not present
+            keep_chains: Keep only these chains
+
+        Returns:
+            str: Path to cleaned PDB file
+
+        """
 
         if not self.structure_path:
             log.error('{}: no structure file, unable to clean'.format(self.id))
             return None
 
-        self.structure_path = ssbio.structure.utils.cleanpdb.clean_pdb(self.structure_path, out_suffix=out_suffix,
-                                                                       outdir=outdir, force_rerun=force_rerun,
-                                                                       remove_atom_alt=remove_atom_alt,
-                                                                       remove_atom_hydrogen=remove_atom_hydrogen,
-                                                                       keep_atom_alt_id=keep_atom_alt_id,
-                                                                       add_atom_occ=add_atom_occ,
-                                                                       remove_res_hetero=remove_res_hetero,
-                                                                       add_chain_id_if_empty=add_chain_id_if_empty,
-                                                                       keep_chains=keep_chains)
+        clean_pdb_file = ssbio.structure.utils.cleanpdb.clean_pdb(self.structure_path, out_suffix=out_suffix,
+                                                                  outdir=outdir, force_rerun=force_rerun,
+                                                                  remove_atom_alt=remove_atom_alt,
+                                                                  remove_atom_hydrogen=remove_atom_hydrogen,
+                                                                  keep_atom_alt_id=keep_atom_alt_id,
+                                                                  add_atom_occ=add_atom_occ,
+                                                                  remove_res_hetero=remove_res_hetero,
+                                                                  add_chain_id_if_empty=add_chain_id_if_empty,
+                                                                  keep_chains=keep_chains)
+
+        return clean_pdb_file
 
     def add_mapped_chain_ids(self, mapped_chains):
         """Add chains by ID into the mapped_chains attribute
@@ -153,13 +174,21 @@ class StructProp(Object):
             my_chain = self.chains.get_by_id(seq_record.id)
             my_chain.seq_record = seq_record
 
-    def align_reference_seq_to_mapped_chains(self, outdir=None, engine='needle', parse=False, force_rerun=False,
+    def align_reference_seq_to_mapped_chains(self, outdir=None, engine='needle', parse=True, force_rerun=False,
                                              **kwargs):
-        """Run and store alignments of the reference sequence to chains in mapped_chains
+        """Run and store alignments of the reference sequence to chains in mapped_chains.
 
         Alignments are stored in the reference_seq.structure_alignments attribute.
 
+        Args:
+            outdir (str): Directory to output sequence alignment files (only if running with needle)
+            engine (str): Which pairwise alignment tool to use ("needle" or "biopython")
+            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
+            force_rerun:
+            **kwargs: Other alignment options
         """
+        # TODO: **kwargs for alignment options
+
         if not self.reference_seq:
             raise ValueError('{}: reference sequence not set'.format(self.id))
 
@@ -412,7 +441,72 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
+    def map_repseq_resnums_to_repchain_index(self, resnums):
+        """Map a residue number in the reference_seq to an index in the representative_chain
+
+        Use this to get the indices of the repchain to get structural properties at a specific residue number.
+
+        Args:
+            resnums (int, list): Residue numbers in the representative sequence
+
+        Returns:
+            dict: Mapping of resnums to indices
+
+        """
+        resnums = ssbio.utils.force_list(resnums)
+
+        repchain_resnum_mapping = self.reference_seq.seq_record.letter_annotations['repchain_resnums']
+
+        to_repchain_index = {}
+        for x in resnums:
+            ix = repchain_resnum_mapping[x - 1] - 1
+
+            if np.isnan(ix):
+                log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
+            else:
+                to_repchain_index[x] = int(ix)
+
+        return to_repchain_index
+
+    def map_repseq_resnums_to_structure_resnums(self, resnums):
+        """Map a residue number in the reference_seq to the actual structure file's residue number
+
+        Args:
+            resnums (int, list): Residue numbers in the representative sequence
+
+        Returns:
+            dict: Mapping of resnums to structure residue IDs
+
+        """
+        resnums = ssbio.utils.force_list(resnums)
+
+        mapping_to_repchain_index = self.map_repseq_resnums_to_repchain_index(resnums)
+        repchain_structure_mapping = self.representative_chain.seq_record.letter_annotations['structure_resnums']
+
+        to_structure_resnums = {}
+        for k, v in mapping_to_repchain_index.items():
+            rn = repchain_structure_mapping[v]
+
+            if rn[1] == float('Inf'):
+                log.warning('{}, {}: structure file does not contain coordinates for this residue'.format(self.id, k))
+            else:
+                to_structure_resnums[k] = rn
+
+        return to_structure_resnums
+
     def view_structure(self, opacity=1.0, gui=False):
+        """Use NGLviewer to display a structure in a Jupyter notebook
+
+        Args:
+            opacity (float): Opacity of the structure
+            gui (bool): If the NGLview GUI should show up
+
+        Returns:
+            NGLviewer object
+
+        """
+        # TODO: test other ways we can manipulate the view object
+
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
         view = nv.show_structure_file(self.structure_path, gui=gui)
@@ -420,28 +514,37 @@ class StructProp(Object):
         view.add_cartoon(selection='protein', color='silver', opacity=opacity)
         return view
 
-    def view_structure_with_mutations(self, mutations, color='red', unique_colors=False, structure_opacity=0.5,
-                                      opacity_range=(0.5,1), scale_range=(.7, 10), gui=False):
-        """Input a list of residue numbers to view on the structure. Or input a dictionary of residue numbers to counts.
+    def view_structure_and_highlight_residues(self, structure_resnums, color='red', unique_colors=False,
+                                              structure_opacity=0.5, opacity_range=(0.5,1), scale_range=(.7, 10),
+                                              gui=False):
+        """Input a list of residue numbers to view on the structure. Or input a dictionary of residue numbers to counts
+            to scale residues by counts (useful to view mutations).
 
         Args:
-            mutations (int, list)
-            color:
-            opacity_range:
-            scale_range:
+            structure_resnums (int, list, dict): Residue number(s) to highlight, or
+                a dictionary of residue number to frequency count
+            color (str): Color to highlight with
+            unique_colors (bool): If each mutation should be colored uniquely (will override color argument)
+            structure_opacity (float): Opacity of the protein structure cartoon representation
+            opacity_range (tuple): Min/max opacity values (residues that have higher frequency counts will be opaque)
+            scale_range (tuple): Min/max size values (residues that have higher frequency counts will be bigger)
+            gui (bool): If the NGLview GUI should show up
 
         Returns:
+            NGLviewer object
 
         """
-        opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], mutations, rescale=opacity_range)
-        scale_dict = ssbio.utils.scale_calculator(scale_range[0], mutations, rescale=scale_range)
+        opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], structure_resnums, rescale=opacity_range)
+        scale_dict = ssbio.utils.scale_calculator(scale_range[0], structure_resnums, rescale=scale_range)
 
         view = self.view_structure(opacity=structure_opacity, gui=gui)
 
-        if isinstance(mutations, list):
-            unique_mutations = list(set(mutations))
-        elif isinstance(mutations, dict):
-            unique_mutations = list(mutations.keys())
+        if isinstance(structure_resnums, list):
+            unique_mutations = list(set(structure_resnums))
+        elif isinstance(structure_resnums, dict):
+            unique_mutations = list(structure_resnums.keys())
+        elif isinstance(structure_resnums, int):
+            unique_mutations = ssbio.utils.force_list(structure_resnums)
 
         # TODO: add color by letter_annotations!
 
