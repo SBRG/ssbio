@@ -163,6 +163,16 @@ class StructProp(Object):
             DictList: All chain sequences as a DictList of SeqRecords
 
         """
+        # Don't overwrite existing ChainProp objects
+        dont_overwrite = []
+        chains = list(model.get_chains())
+        for x in chains:
+            if self.chains.has_id(x.id):
+                if self.chains.get_by_id(x.id).seq_record:
+                    dont_overwrite.append(x.id)
+        if len(dont_overwrite) == len(chains):
+            log.debug('Not writing structure sequences, already stored')
+            return
 
         # Returns the structures sequences with Xs added
         structure_seqs = ssbio.structure.properties.residues.get_structure_seqrecords(model)
@@ -209,7 +219,7 @@ class StructProp(Object):
             chain_prop = self.chains.get_by_id(chain_id)
             chain_seq_record = chain_prop.seq_record
             if not chain_seq_record:
-                raise ValueError('{}: chain sequence not parsed')
+                raise ValueError('{}: chain sequence not parsed'.format(chain_id))
 
             aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.reference_seq.seq_str,
                                                                              a_seq_id=self.reference_seq.id,

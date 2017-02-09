@@ -855,8 +855,7 @@ class GEMPRO(object):
             - tm_score
 
         """
-        df_cols = ['gene', 'id', 'is_experimental', 'reference_seq', 'reference_seq_top_coverage',
-                   'structure_file']
+        df_cols = ['gene', 'id', 'is_experimental', 'reference_seq', 'reference_seq_top_coverage']
 
         rep_struct_pre_df = []
         structure_missing = []
