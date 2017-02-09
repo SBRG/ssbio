@@ -456,7 +456,7 @@ class Protein(Object):
 
         # If the structure is to be cleaned, and which chain to keep
         if clean:
-            final_pdb = struct_prop.clean_structure(outdir=outdir, out_suffix=out_suffix)
+            final_pdb = struct_prop.clean_structure(outdir=outdir, out_suffix=out_suffix, keep_chains=keep_chain)
         else:
             final_pdb = struct_prop.structure_path
 
@@ -479,8 +479,7 @@ class Protein(Object):
         self.representative_sequence.seq_record.letter_annotations['repchain_resnums'] = repchain_resnums
 
         # Also need to parse the clean structure and save its sequence..
-        parsed = self.representative_structure.parse_structure()
-        self.representative_structure.get_structure_seqs(parsed.first_model)
+        self.representative_structure.parse_structure()
 
     def set_representative_structure(self, seq_outdir, struct_outdir, engine='needle', seq_ident_cutoff=0.5,
                                      always_use_homology=False,
