@@ -403,7 +403,7 @@ class Protein(Object):
                 itasser = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            itasser = ITASSERProp(ident, itasser_folder, reference_seq=self.representative_sequence)
+            itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs, reference_seq=self.representative_sequence)
             self.structures.append(itasser)
 
         if set_as_representative:

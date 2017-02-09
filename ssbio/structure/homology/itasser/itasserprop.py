@@ -2,15 +2,15 @@ import logging
 import os
 import os.path as op
 import shutil
-
-import pandas as pd
-
-log = logging.getLogger(__name__)
 import time
+import pandas as pd
+import ssbio.utils
 from ssbio.structure.structprop import StructProp
 from ssbio.structure.utils.structureio import StructureIO
 from ssbio.structure.utils.cleanpdb import CleanPDB
-import ssbio.utils
+
+log = logging.getLogger(__name__)
+
 
 class ITASSERProp(StructProp):
     """Parse all available information for an I-TASSER modeling run.
