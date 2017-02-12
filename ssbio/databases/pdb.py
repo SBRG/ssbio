@@ -480,7 +480,7 @@ def update_pdb_list(pdb_ids):
     return list(set(new_pdb_ids))
 
 
-def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0, force_rerun=False):
+def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0.0, force_rerun=False):
     """Use the PDBe REST service to query for the best PDB structures for a UniProt ID.
 
         More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
@@ -500,19 +500,23 @@ def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0, f
 
         Args:
             uniprot_id (str): UniProt Accession ID
+            outname (str): Basename of the output file of JSON results
+            outdir (str): Path to output directory of JSON results
+            seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
+            force_rerun (bool): Obtain best structures mapping ignoring previously downloaded results
 
         Returns:
             list: Rank-ordered list of dictionaries representing chain-specific PDB entries. Keys are:
-            pdb_id: the PDB ID which maps to the UniProt ID
-            chain_id: the specific chain of the PDB which maps to the UniProt ID
-            coverage: the percent coverage of the entire UniProt sequence
-            resolution: the resolution of the structure
-            start: the structure residue number which maps to the start of the mapped sequence
-            end: the structure residue number which maps to the end of the mapped sequence
-            unp_start: the sequence residue number which maps to the structure start
-            unp_end: the sequence residue number which maps to the structure end
-            experimental_method: type of experiment used to determine structure
-            tax_id: taxonomic ID of the protein's original organism
+                pdb_id: the PDB ID which maps to the UniProt ID
+                chain_id: the specific chain of the PDB which maps to the UniProt ID
+                coverage: the percent coverage of the entire UniProt sequence
+                resolution: the resolution of the structure
+                start: the structure residue number which maps to the start of the mapped sequence
+                end: the structure residue number which maps to the end of the mapped sequence
+                unp_start: the sequence residue number which maps to the structure start
+                unp_end: the sequence residue number which maps to the structure end
+                experimental_method: type of experiment used to determine structure
+                tax_id: taxonomic ID of the protein's original organism
 
     """
     outfile = ''
