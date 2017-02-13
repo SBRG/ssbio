@@ -9,3 +9,6 @@ class GenePro(Gene):
     def __init__(self, id, name='', functional=True):
         Gene.__init__(self, id=id, name=name, functional=functional)
         self.protein = Protein(ident=id)
+
+    def reset_protein(self):
+        self.protein = Protein(self.id)
