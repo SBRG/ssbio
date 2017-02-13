@@ -252,14 +252,17 @@ class StructProp(Object):
         """Set the representative chain based on sequence quality checks to the reference sequence.
 
         Args:
-            seq_ident_cutoff:
-            allow_missing_on_termini:
-            allow_mutants:
-            allow_deletions:
-            allow_insertions:
-            allow_unresolved:
+            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
+            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
+                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
+                5 to 95 will be checked for modifications.
+            allow_mutants (bool): If mutations should be allowed or checked for
+            allow_deletions (bool): If deletions should be allowed or checked for
+            allow_insertions (bool): If insertions should be allowed or checked for
+            allow_unresolved (bool): If unresolved residues should be allowed or checked for
 
         Returns:
+            ChainProp: the best chain, if any
 
         """
         for alignment in self.reference_seq.structure_alignments:

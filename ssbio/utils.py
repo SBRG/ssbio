@@ -161,6 +161,9 @@ def outfile_maker(inname, outext='.out', outname='', outdir='', append_to_name='
         >>> outfile_maker(inname='P00001.fasta')
         'P00001.out'
 
+        >>> outfile_maker(inname='P00001')
+        'P00001.out'
+
         >>> outfile_maker(inname='P00001.fasta', append_to_name='_new')
         'P00001_new.out'
 

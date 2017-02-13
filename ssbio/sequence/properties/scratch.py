@@ -25,7 +25,7 @@ class SCRATCH():
         self.project_name = project_name
         self.seq_file = seq_file
         if seq_str:
-            self.seq_file = ssbio.sequence.utils.fasta.load_seq_str_as_tempfasta(seq_str)
+            self.seq_file = ssbio.sequence.utils.fasta.write_seq_as_temp_fasta(seq_str)
 
     def run_scratch(self, path_to_scratch, num_cores=1, outname=None, outdir=None, force_rerun=False):
         """Run SCRATCH on the sequence_file that was loaded into the class.

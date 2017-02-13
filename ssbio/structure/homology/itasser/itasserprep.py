@@ -10,8 +10,8 @@ class ITASSERPrep():
     """Prepare a sequence for I-TASSER runs
     """
 
-    def __init__(self, ident, seq_str,
-                 root_dir, itasser_path, itlib_path, execute_dir=None, light='true', runtype='local', print_exec=False,
+    def __init__(self, ident, seq_str, root_dir, itasser_path, itlib_path,
+                 execute_dir=None, light='true', runtype='local', print_exec=False,
                  binding_site_pred=False, ec_pred=False, go_pred=False, project_id=None,
                  slurm_email='', slurm_username='', walltime='48:00:00',
                  slurm_queue='shared'):
@@ -26,7 +26,7 @@ class ITASSERPrep():
             execute_dir: Optional path to execution directory - use this if you are copying the homology models to
                 another location such as a supercomputer for running
             light: If simulations should be limited to 5 runs
-            runtype: Where you will be running I-TASSER - local, slurm, or torque
+            runtype: How you will be running I-TASSER - local, slurm, or torque
             print_exec: If the execution script should be printed out
             binding_site_pred: If binding site predictions should be run
             ec_pred: If EC number predictions should be run

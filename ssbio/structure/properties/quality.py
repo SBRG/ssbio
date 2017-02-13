@@ -12,18 +12,19 @@ from ssbio.utils import percentage_to_float
 log = logging.getLogger(__name__)
 
 
-def sequence_checker(reference_seq_aln, structure_seq_aln, seq_ident_cutoff=0.5,
-                     allow_missing_on_termini=0.2, allow_mutants=False, allow_deletions=False,
+def sequence_checker(reference_seq_aln, structure_seq_aln,
+                     seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+                     allow_mutants=False, allow_deletions=False,
                      allow_insertions=False, allow_unresolved=False):
     """Report if a structure's sequence meets coverage checks to a reference sequence.
 
     First aligns a sequence from a chain of a PDB structure to "reference" sequence.
-    Then creates a DataFrame of results and check for everything.
+    Then creates a DataFrame of results to check for everything.
 
     Args:
-        reference_seq_aln: String representation of reference sequence alignment
-        structure_seq_aln: String representation of structure sequence alignment
-        seq_ident_cutoff: Percent sequence identity cutoff
+        reference_seq_aln (str, Seq, SeqRecord): Reference sequence, alignment form
+        structure_seq_aln (str, Seq, SeqRecord): Structure sequence, alignment form
+        seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
         allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
             when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
             5 to 95 will be checked for modifications.

@@ -21,7 +21,7 @@ class TestGEMPRO(unittest.TestCase):
         self.ROOT_DIR = op.join('test_files', 'out')
         gem_file = op.join('test_files', 'Ec_core_flux1.xml')
 
-        self.my_gempro = GEMPRO(self.GEM_NAME, self.ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
+        self.my_gempro = GEMPRO(gem_name=self.GEM_NAME, root_dir=self.ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
         self.base_dir = self.my_gempro.base_dir
 
         # Remove some genes from this model so testing doesn't take too long
