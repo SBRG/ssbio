@@ -202,18 +202,22 @@ class Protein(Object):
 
         return self.sequences.get_by_id(ident)
 
-    def load_manual_sequence_str(self, ident, seq_str, outdir=None, set_as_representative=False, force_rerun=False):
+    def load_manual_sequence(self, seq, ident=None, write_fasta_file=True, outname=None, outdir=None,
+                             set_as_representative=False, force_rewrite=False):
         """Load a manual sequence given as a string and optionally set it as the representative sequence.
             Also store it in the sequences attribute.
 
         Args:
-            ident:
-            seq_str:
+            seq (str, Seq, SeqRecord):
+            ident (str): Optional identifier for the sequence, required if seq is a string. Also will override existing
+                IDs in Seq or SeqRecord objects if set.
             set_as_representative:
 
         """
-        manual_sequence = SeqProp(ident=ident, seq_str=seq_str,
-                                  write_fasta_file=True, outname=ident, outdir=outdir, force_rewrite=force_rerun)
+        if not outname:
+            outname = ident
+
+        manual_sequence = SeqProp(ident=ident, seq_str=seq, write_fasta_file=write_fasta_file, outname=outname, outdir=outdir, force_rewrite=force_rewrite)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -481,26 +485,35 @@ class Protein(Object):
         # Also need to parse the clean structure and save its sequence..
         self.representative_structure.parse_structure()
 
-    def set_representative_structure(self, seq_outdir, struct_outdir, engine='needle', seq_ident_cutoff=0.5,
-                                     always_use_homology=False,
-                                     allow_missing_on_termini=0.2, allow_mutants=True, allow_deletions=False,
-                                     allow_insertions=False, allow_unresolved=True, force_rerun=False):
+    def set_representative_structure(self, seq_outdir, struct_outdir, pdb_file_type, engine='needle', always_use_homology=False,
+                                     seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+                                     allow_mutants=True, allow_deletions=False,
+                                     allow_insertions=False, allow_unresolved=True,
+                                     force_rerun=False):
         """Set a representative structure from a structure in self.structures
 
         Args:
-            seq_outdir:
-            struct_outdir:
-            engine:
-            seq_ident_cutoff:
-            always_use_homology:
-            allow_missing_on_termini:
-            allow_mutants:
-            allow_deletions:
-            allow_insertions:
-            allow_unresolved:
-            force_rerun:
+            seq_outdir (str): Path to output directory of sequence alignment files
+            struct_outdir (str): Path to output directory of structure files
+            pdb_file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - PDB structure file type that
+                should be downloaded
+            engine (str): "needle" or "biopython" - which pairwise sequence alignment engine should be used
+                needle is the standard EMBOSS tool to run pairwise alignments
+                biopython is Biopython's implementation of needle. Results can differ!
+            always_use_homology (bool): If homology models should always be set as the representative structure
+            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
+            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
+                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
+                5 to 95 will be checked for modifications.
+            allow_mutants (bool): If mutations should be allowed or checked for
+            allow_deletions (bool): If deletions should be allowed or checked for
+            allow_insertions (bool): If insertions should be allowed or checked for
+            allow_unresolved (bool): If unresolved residues should be allowed or checked for
+            force_rerun (bool): If sequence to structure alignment should be rerun
 
         Returns:
+            StructProp: Representative structure from the list of structures.
+                This is a not a map to the original structure, it is copied from its reference.
 
         """
         log.debug('{}: setting representative structure'.format(self.id))
@@ -552,9 +565,10 @@ class Protein(Object):
                 # Download the structure and parse it
                 # This will add all chains to the mapped_chains attribute if there are none
                 try:
-                    pdb.download_structure_file(outdir=struct_outdir, force_rerun=force_rerun)
-                    # TODO: add global flag of PDB file type and adjust for downloading the header here (and other places where pdb is downloaded)
-                    # pdb.download_cif_header_file(outdir=struct_outdir)
+                    pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun)
+                    # Download the mmCIF header file to get additional information
+                    if 'cif' not in pdb_file_type:
+                        pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
                 except requests.exceptions.HTTPError:
                     log.error('{}: structure file could not be downloaded'.format(pdb))
                     continue
