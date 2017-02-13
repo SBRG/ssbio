@@ -134,7 +134,7 @@ def run_needle_alignment(seq_a, seq_b, gapopen=10, gapextend=0.5,
     if not outdir:
         outdir = ''
 
-    # TODO: rewrite using utils functions
+    # TODO: rewrite using utils functions - does not report error if needle is not installed currently
     # TODO: rethink outdir/outfile, also if this should return the tempfile or just a file object or whatever
     if not outfile:
         outfile = op.join(tempfile.gettempdir(), 'temp_alignment.needle')

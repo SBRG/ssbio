@@ -120,7 +120,7 @@ def run_bidirectional_blast(reference, other_genome, dbtype, outdir=''):
     return r_vs_g, g_vs_r
 
 
-def calculate_bbh(blast_results_1, blast_results_2, r_name, g_name, outdir=''):
+def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, outdir=''):
     """Calculate the best bidirectional BLAST hits (BBH) and save a dataframe of results.
 
     Args:
@@ -137,6 +137,14 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name, g_name, outdir=''):
 
     cols = ['gene', 'subject', 'PID', 'alnLength', 'mismatchCount', 'gapOpenCount', 'queryStart', 'queryEnd',
             'subjectStart', 'subjectEnd', 'eVal', 'bitScore']
+
+    if not r_name and not g_name:
+        r_name = op.basename(blast_results_1).split('_vs_')[0]
+        g_name = op.basename(blast_results_1).split('_vs_')[1].strip('_blast.out')
+
+        r_name2 = op.basename(blast_results_2).split('_vs_')[1].strip('_blast.out')
+        if r_name != r_name2:
+            log.warning('{} != {}'.format(r_name, r_name2))
 
     bbh1 = pd.read_csv(blast_results_1, sep='\t', names=cols)
     bbh2 = pd.read_csv(blast_results_2, sep='\t', names=cols)
@@ -177,7 +185,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=80, bitscore
     Args:
         r_name (str): name of the reference genome
         genome_to_bbh_files (dict): mapping of genome names to the BBH files
-        pid_cutoff: Min percent identity between BLAST hits to filter for
+        pid_cutoff (int): Min percent identity between BLAST hits to filter for in the range (0,100)
         bitscore_cutoff: Min bitscore cutoff between BLAST hits to filter for
         outname: Name of output file of orthology matrix
         outdir: Path to output directory
