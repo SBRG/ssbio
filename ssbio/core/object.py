@@ -1,3 +1,7 @@
+import os
+import os.path as op
+import ssbio.utils
+import pickle
 from copy import deepcopy
 import pandas as pd
 import ssbio.utils
@@ -127,8 +131,8 @@ class Object(object):
                         df_dict[k] = deepcopy(v)
                 else:
                     df_dict[k] = deepcopy(v)
-            else:
-                log.debug('{}: not copying attribute'.format(k))
+            # else:
+            #     log.debug('{}: not copying attribute'.format(k))
         return df_dict
 
     def save_dataframes(self, outdir, prefix='df_'):
@@ -152,3 +156,25 @@ class Object(object):
             log.debug('{}: saved dataframe'.format(outpath))
 
         log.debug('Saved {} dataframes at {}'.format(len(dfs), outdir))
+
+    def save_pickle(self, outname, outext='.pckl', outdir=None):
+        """Save the object as a pickle file
+
+        Args:
+            outname (str): Basename of file
+            outext (str): Extension of file
+            outdir (str): Path to output directory
+
+        Returns:
+            str: Path to pickle file
+
+        """
+        if not outdir:
+            outdir = os.getcwd()
+
+        outfile = ssbio.utils.outfile_maker(inname=outname, outext=outext, outdir=outdir)
+
+        with open(outfile, 'wb') as f:
+            pickle.dump(self, f)
+
+        return outfile
