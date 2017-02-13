@@ -47,7 +47,7 @@ class TestProtein(unittest.TestCase):
         self.assertTrue(isinstance(new_manual, SeqProp))
 
     def test_load_manual_sequence_str(self):
-        new_manual = self.prot.load_manual_sequence_str('tester2', 'ALALALAL', outdir='test_files/out/')
+        new_manual = self.prot.load_manual_sequence(ident='tester2', seq='ALALALAL', outdir='test_files/out/')
         self.assertTrue(self.prot.sequences.has_id('tester'))
         self.assertTrue(isinstance(new_manual, SeqProp))
 
@@ -98,5 +98,7 @@ class TestProtein(unittest.TestCase):
 
     def test_set_representative_structure(self):
         prot_to_set = self.prot.structures.get_by_id('1ecp')
-        self.prot.set_representative_structure(seq_outdir=op.join('test_files','out'), struct_outdir=op.join('test_files','out'))
+        self.prot.set_representative_structure(seq_outdir=op.join('test_files','out'),
+                                               struct_outdir=op.join('test_files','out'),
+                                               pdb_file_type='cif')
         self.assertEqual('1ecp-A', self.prot.representative_structure.id)

@@ -1,7 +1,5 @@
 import os.path as op
-import tempfile
 import unittest
-
 from ssbio.structure.utils.cleanpdb import CleanPDB
 from ssbio.structure.utils.structureio import StructureIO
 
@@ -14,6 +12,7 @@ class TestCleanPDB(unittest.TestCase):
         files = [('1kf6.pdb', '1kf6_clean_tester.pdb'), ('PHOE_ECOLI_model1.pdb', 'PHOE_ECOLI_model1_clean_tester.pdb'),
                  ('E04142.pdb', 'E04142_clean_tester.pdb'), ('1cbn.pdb', '1cbn_clean_tester.pdb')]
 
+        outdir = op.join('test_files', 'out')
         working_dir = 'test_structures'
         out_suffix = '_clean'
         custom_clean = CleanPDB()
@@ -24,7 +23,7 @@ class TestCleanPDB(unittest.TestCase):
 
             my_pdb = StructureIO(infile_path)
             default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix,
-                                                   out_dir=tempfile.gettempdir(), force_rerun=True)
+                                                   out_dir=outdir, force_rerun=True)
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
             # test if the filename is correct
@@ -40,7 +39,7 @@ class TestCleanPDB(unittest.TestCase):
 
     def test_clean_pdb_and_get_chain(self):
         files = [('1kf6.pdb', '1kf6_clean_chainA_tester.pdb')]
-
+        outdir = op.join('test_files', 'out')
         working_dir = 'test_structures'
         out_suffix = '_clean_chainA'
         custom_clean = CleanPDB(keep_chains='A')
@@ -51,7 +50,7 @@ class TestCleanPDB(unittest.TestCase):
 
             my_pdb = StructureIO(infile_path)
             default_cleaned_pdb = my_pdb.write_pdb(custom_selection=custom_clean, out_suffix=out_suffix,
-                                                   out_dir=tempfile.gettempdir(), force_rerun=True)
+                                                   out_dir=outdir, force_rerun=True)
             default_cleaned_pdb_basename = op.basename(default_cleaned_pdb)
 
             # test if the filename is correct

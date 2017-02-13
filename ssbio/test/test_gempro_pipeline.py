@@ -8,7 +8,6 @@ from ssbio.pipeline.gempro import GEMPRO
 from ssbio.core.genepro import GenePro
 from ssbio.utils import Date
 from ssbio.databases.kegg import KEGGProp
-from ssbio.databases.uniprot import UniProtProp
 
 date = Date()
 

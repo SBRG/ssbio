@@ -1,40 +1,27 @@
 import os.path as op
 import unittest
-import tempfile
-from ssbio.pipeline.atlasold import ATLAS
+from ssbio.pipeline.gempro import GEMPRO
+from ssbio.pipeline.atlas import ATLAS
 
 
 class TestATLAS(unittest.TestCase):
-    """Unit tests for the ATLAS pipeline
-    """
+    """Unit tests for the ATLAS pipeline"""
 
-    # @classmethod
-    # def setUpClass(self):
-    #     self.tempdir = tempfile.TemporaryDirectory()
-    #     self.ROOT_DIR = self.tempdir.name
-    #     # self.ROOT_DIR = 'C:\\Users\\nathan\\Dropbox (UCSD SBRG)\\projects\\'
-    #
-    #     # Prepare your ATLAS analysis
-    #     self.atlas = ATLAS(base_strain_name='iJO1366', root_dir=self.ROOT_DIR,
-    #                        seq_type='prot',
-    #                        base_gem_file_path=op.join(self.ROOT_DIR, 'iJO1366', 'atlas\\model_dir\\iJO1366.xml'),
-    #                        base_gem_file_type='sbml',
-    #                        reference_genome='U00096')
-    #
-    #     # Input the list of strains you would like to compare
-    #     with open(op.join(self.ROOT_DIR, 'iJO1366\\atlas\\data_dir\\161016-55strains.in')) as f:
-    #         genomes = f.read().splitlines()
-    #     self.atlas.download_genome_cds(genomes, email='nmih@ucsd.edu')
-    #
-    #     # Using renamed sequence files for the base strain
-    #     self.atlas.genome_id_to_fasta_file['U00096'] = op.join(self.ROOT_DIR, 'iJO1366\\atlas\\sequence_files\\protein\\by_organism\\U00096_renamed.faa')
-    #
-    #     self.atlas.find_bbh()
-    #
-    # def test_build_strain_specific_models(self):
-    #     self.atlas.build_strain_specific_models()
-    #
-    # @classmethod
-    # def tearDownClass(self):
-    #     # self.tempdir.cleanup()
-    #     pass
+    @classmethod
+    def setUpClass(self):
+        GEM_NAME = 'ecoli_test'
+        ROOT_DIR = op.join('test_files', 'out')
+        gem_file = op.join('test_files', 'Ec_core_flux1.xml')
+        my_gempro = GEMPRO(GEM_NAME, ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
+
+        # Prepare your ATLAS analysis
+        self.atlas = ATLAS(atlas_name='atlas_test', base_gempro=my_gempro)
+
+    def test_copy_base_gempro(self):
+        self.atlas.copy_base_gempro('copied')
+        # atlas_strains should now have a GEMPRO with the id 'copied'
+        self.assertTrue(self.atlas.atlas_strains.has_id('copied'))
+        # The GEMPRO should also append 'copied' to the gene IDs
+        self.atlas.atlas_strains.get_by_id('copied').genes[0].id.endswith('_copied')
+        self.atlas.atlas_strains.get_by_id('copied').genes[0].protein.id.endswith('_copied')
+

@@ -1,6 +1,5 @@
 import unittest
 import os.path as op
-import tempfile
 import ssbio.sequence.utils.alignment
 from Bio.Align import MultipleSeqAlignment
 
@@ -38,15 +37,17 @@ class TestAlignment(unittest.TestCase):
         """Test if needle alignment runs correctly on 2 input files
 
         """
-        working_dir = 'test_sequences'
+        outdir = op.join('test_files', 'out')
+        working_dir = op.join('test_files', 'sequences')
         infile_a = op.join(working_dir, 'P9WGE7.fasta')
         infile_b = op.join(working_dir, '1gn3_A.faa')
         test_outfile = op.join(working_dir, 'P9WGE7_1gn3_A_align.txt')
 
         outfile = ssbio.sequence.utils.alignment.run_needle_alignment_on_files(id_a='P9WGE7', faa_a=infile_a,
                                                                                id_b='1gn3_A', faa_b=infile_b,
-                                                                               outdir=tempfile.gettempdir(),
-                                                                               outfile='test_alignment.txt')
+                                                                               outdir=outdir,
+                                                                               outfile='test_alignment.txt',
+                                                                               force_rerun=True)
 
         # test if the file content is correct
         # ignore the first 12 lines because it is dated
@@ -62,6 +63,7 @@ class TestAlignment(unittest.TestCase):
         """Test if needle alignment runs correctly on 2 input strings
 
         """
+        outdir = op.join('test_files', 'out')
         str1 = 'MAEYTLPDLDWDYGALEPHISGQINELHHSKHHATYVKGANDAVAKLEEA'
         str2 = 'XAEYTLPDLDWDYGALEPHISGQINELYHSKHHANDVKGANDAVAKLEEA'
 
@@ -92,7 +94,7 @@ class TestAlignment(unittest.TestCase):
                   '#---------------------------------------',
                   '#---------------------------------------']
 
-        outfile = op.join(tempfile.gettempdir(), 'test_alignment2.txt')
+        outfile = op.join(outdir, 'test_alignment2.txt')
 
         outpath = ssbio.sequence.utils.alignment.run_needle_alignment(seq_a=str1, seq_b=str2, outfile=outfile)
 

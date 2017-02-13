@@ -1,6 +1,5 @@
 import os
 import os.path as op
-import tempfile
 import unittest
 import filecmp
 import ssbio.sequence.utils.fasta as fasta
@@ -10,7 +9,7 @@ class TestFasta(unittest.TestCase):
     """Unit tests for sequence/fasta tools."""
 
     def test_load_fasta_file(self):
-        sequences = fasta.load_fasta_file('test_sequences/X5D299-1.faa')
+        sequences = fasta.load_fasta_file(op.join('test_files', 'sequences', 'X5D299-1.faa'))
         self.assertEqual(len(sequences), 1)
         self.assertEqual(sequences[0].id, 'X5D299-1')
         self.assertRaises(IOError, fasta.load_fasta_file, 'NOTAFILE.faa')
@@ -55,20 +54,15 @@ class TestFasta(unittest.TestCase):
         tester = {'TEST': 'ASQAGIPSGVYNVIPCSRKNAKEVGEAICTDPLVSKISF'}
         custom_ext = '.fasta'
         custom_outname = 'TESTER'
-        overwrite = True
+        outdir = op.join('test_files', 'out')
 
-        with tempfile.TemporaryDirectory() as custom_dir:
-            written_file_cusdir = fasta.write_fasta_file_from_dict(tester, custom_outname,
-                                                                   outdir=custom_dir, force_rerun=overwrite)
-            self.assertEqual(written_file_cusdir, os.path.join(custom_dir, custom_outname + '.faa'))
+        written_file_cusdir = fasta.write_fasta_file_from_dict(tester, custom_outname,
+                                                               outdir=outdir, force_rerun=True)
+        self.assertEqual(written_file_cusdir, os.path.join(outdir, custom_outname + '.faa'))
 
-            written_file_cusdirid = fasta.write_fasta_file_from_dict(tester, custom_outname,
-                                                                     outdir=custom_dir, force_rerun=overwrite)
-            self.assertEqual(written_file_cusdirid, os.path.join(custom_dir, custom_outname + '.faa'))
-
-            written_file_cusdiridext = fasta.write_fasta_file_from_dict(tester, custom_outname,
-                                                                        outdir=custom_dir, outext=custom_ext, force_rerun=overwrite)
-            self.assertEqual(written_file_cusdiridext, os.path.join(custom_dir, custom_outname + custom_ext))
+        written_file_cusdiridext = fasta.write_fasta_file_from_dict(tester, custom_outname,
+                                                                    outdir=outdir, outext=custom_ext, force_rerun=True)
+        self.assertEqual(written_file_cusdiridext, os.path.join(outdir, custom_outname + custom_ext))
 
 if __name__ == "__main__":
     unittest.main()
