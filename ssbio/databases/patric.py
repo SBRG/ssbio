@@ -5,7 +5,7 @@ import os
 log = logging.getLogger(__name__)
 
 
-def download_genome_sequence(patric_id, seqtype, outdir='', outfile='', force_rerun=False):
+def download_coding_sequences(patric_id, seqtype, outdir='', outfile='', force_rerun=False):
     """Download the entire set of DNA or protein sequences from protein-encoding genes in a genome from NCBI.
 
     Saves a FASTA file in the optional directory specified.

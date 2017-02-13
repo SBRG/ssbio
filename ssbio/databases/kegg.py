@@ -2,14 +2,13 @@ import io
 import os.path as op
 from collections import defaultdict
 from bioservices import KEGG
-from slugify import slugify
 import ssbio.utils
 from ssbio.sequence.seqprop import SeqProp
 import logging
-log = logging.getLogger(__name__)
-# import cachetools
-# SEVEN_DAYS = 60 * 60 * 24 * 7
+from slugify import Slugify
 
+log = logging.getLogger(__name__)
+custom_slugify = Slugify(safe_chars='_')
 bs_kegg = KEGG()
 
 
@@ -62,7 +61,7 @@ def download_kegg_gene_metadata(gene_id, outdir=None, force_rerun=False):
         outdir = ''
 
     # Replace colon with dash in the KEGG gene ID
-    outfile = op.join(outdir, '{}.kegg'.format(slugify(gene_id)))
+    outfile = op.join(outdir, '{}.kegg'.format(custom_slugify(gene_id)))
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         raw_text = bs_kegg.get("{}".format(gene_id))
@@ -127,7 +126,7 @@ def download_kegg_aa_seq(gene_id, outdir=None, force_rerun=False):
     if not outdir:
         outdir = ''
 
-    outfile = op.join(outdir, '{}.faa'.format(slugify(gene_id)))
+    outfile = op.join(outdir, '{}.faa'.format(custom_slugify(gene_id)))
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         raw_text = bs_kegg.get("{}".format(gene_id), option='aaseq')
