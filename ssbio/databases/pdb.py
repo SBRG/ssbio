@@ -1,17 +1,15 @@
 import io
 import json
+import gzip
 import logging
 import os.path as op
-from io import BytesIO
-from ssbio.structure.structprop import StructProp
 import pandas as pd
 import requests
+import ssbio.utils
+from ssbio.structure.structprop import StructProp
+from io import BytesIO
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
-import ssbio.utils
-
-log = logging.getLogger(__name__)
-
 try:
     import urllib.request as urllib2
 except ImportError:
@@ -21,10 +19,8 @@ try:
 except ImportError:
     from io import StringIO
 
-import gzip
+log = logging.getLogger(__name__)
 
-
-SEVEN_DAYS = 60 * 60 * 24 * 7
 
 class PDBProp(StructProp):
     """Class to parse through PDB properties
@@ -40,22 +36,20 @@ class PDBProp(StructProp):
         self.date = None
         self.taxonomy_name = None
 
-    # TODO: test using cif or mmtf file formats -- this is the global flag here (which is a dumb place to be)
-    def download_structure_file(self, outdir, file_type='cif', force_rerun=False):
+    def download_structure_file(self, outdir, file_type, force_rerun=False):
         pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False,
                                       outdir=outdir,
                                       force_rerun=force_rerun)
         log.debug('{}: downloaded {} file'.format(self.id, file_type))
         self.load_structure_file(pdb_file, file_type)
 
-        if file_type=='cif':
+        if 'cif' in file_type:
             self.update(parse_mmcif_header(pdb_file))
 
     def download_cif_header_file(self, outdir, force_rerun=False):
         file_type = 'cif'
         cif_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=True,
-                                      outdir=outdir,
-                                      force_rerun=force_rerun)
+                                      outdir=outdir, force_rerun=force_rerun)
         log.debug('{}: downloaded mmCIF file header'.format(self.id))
 
         cif_dict = parse_mmcif_header(cif_file)
@@ -67,7 +61,7 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
 
     Args:
         pdb_id: PDB ID
-        file_type: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz
+        file_type: pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz
         outdir: Optional output directory
         outfile: Optional output name
         only_header: If only the header file should be downloaded
@@ -79,15 +73,17 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
     """
     pdb_id = pdb_id.lower()
     file_type = file_type.lower()
-    file_types = ['pdb', 'pdb.gz', 'cif', 'cif.gz', 'xml.gz', 'mmtf', 'mmtf.gz']
+    file_types = ['pdb', 'pdb.gz', 'mmcif', 'cif', 'cif.gz', 'xml.gz', 'mmtf', 'mmtf.gz']
     if file_type not in file_types:
         raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz')
 
-    if file_type == 'mmtf':
-        final_file_type = 'mmtf'
-        file_type = 'mmtf.gz'
+    if file_type.endswith('.gz') or file_type == 'mmtf':
+        gzipped = True
     else:
-        final_file_type = file_type
+        gzipped = False
+
+    if file_type == 'mmcif':
+        file_type = 'cif'
 
     if only_header:
         folder = 'header'
@@ -103,26 +99,18 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
             outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        if file_type == 'mmtf.gz':
+        if file_type == 'mmtf.gz' or file_type == 'mmtf':
             mmtf_api = '1.0'
             download_link = 'http://mmtf.rcsb.org/v{}/full/{}.mmtf.gz'.format(mmtf_api, pdb_id)
-            urllib2.urlretrieve(download_link, outfile)
-
-            if final_file_type == 'mmtf':
-                outfile = ssbio.utils.gunzip_file(infile=outfile,
-                                                  outfile=outfile.strip('.gz'),
-                                                  delete_original=True,
-                                                  force_rerun_flag=force_rerun)
         else:
             download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
-            req = requests.get(download_link)
 
-            # Raise error if request fails
-            # TODO: will fail if PDB is not available for something like a large structure. example: 5iqr and file_type=pdb
-            req.raise_for_status()
-
-            with open(outfile, 'w') as f:
-                f.write(req.text)
+        urllib2.urlretrieve(download_link, outfile)
+        if gzipped:
+            outfile = ssbio.utils.gunzip_file(infile=outfile,
+                                              outfile=outfile.strip('.gz'),
+                                              delete_original=True,
+                                              force_rerun_flag=force_rerun)
 
         log.debug('{}: Saved structure file'.format(outfile))
     else:
@@ -145,9 +133,6 @@ def parse_pdb_header(infile):
     """
     pass
 
-
-# @cachetools.func.ttl_cache(maxsize=500, ttl=SEVEN_DAYS)
-# @lru_cache(maxsize=500)
 def parse_mmcif_header(infile):
     """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
 
@@ -319,13 +304,9 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
     return my_pdb_resnum, my_pdb_annotation
 
 
-# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
-# @lru_cache(maxsize=1)
 def _theoretical_pdbs():
-    # TODO: biopython has these
+    # TODO: biopython has these, just use that!
     """Get the list of theoretical PDBs directly from the wwPDB.
-
-    Caches this list for up to seven days for quick access.
 
     Returns: list of theoretical PDBs
 
@@ -354,8 +335,6 @@ def is_theoretical_pdb(pdb_id):
     return pdb_id in _theoretical_pdbs()
 
 
-# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
-# @lru_cache(maxsize=1)
 def _obsolete_pdb_mapping():
     """Get the mapping of obsolete PDBs directly from the wwPDB.
 
@@ -387,6 +366,7 @@ def _obsolete_pdb_mapping():
             pdb_obsolete_mapping[entry[2].lower()] = new
 
     return pdb_obsolete_mapping
+
 
 def is_obsolete_pdb(pdb_id):
     """Check if a PDB ID is obsolete or not
@@ -566,19 +546,17 @@ def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0.0,
 
     return data
 
-
-# @cachetools.func.ttl_cache(maxsize=1024)
-# # @lru_cache(maxsize=500)
-def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0, link=False, force_rerun=False):
+def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0.0, link=False, force_rerun=False):
     """Returns a list of BLAST hits of a sequence to available structures in the PDB.
 
     Args:
         seq (str): Your sequence, in string format
         outfile (str): Name of output file
         outdir (str, optional): Path to output directory. Default is the current directory.
-        force_rerun (bool, optional): If existing BLAST results should not be used, set to True. Default is False
         evalue (float, optional): Cutoff for the E-value - filters for significant hits. 0.001 is liberal, 0.0001 is stringent (default).
-        link (bool, optional): Set to True if a link to the HTML results should be displated
+        seq_ident_cutoff (float, optional): Cutoff results based on percent coverage (in decimal form)
+        link (bool, optional): Set to True if a link to the HTML results should be displayed
+        force_rerun (bool, optional): If existing BLAST results should not be used, set to True. Default is False
 
     Returns:
         list: Rank ordered list of BLAST hits in dictionaries.
@@ -694,9 +672,6 @@ def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0
             'hit_num_similar', 'hit_percent_similar', 'hit_num_gaps', 'hit_percent_gaps']
     return pd.DataFrame.from_records(blast_results, columns=cols)
 
-
-# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
-# @lru_cache(maxsize=10)
 def _property_table():
     """Download the PDB -> resolution table directly from the RCSB PDB REST service.
 
@@ -711,8 +686,6 @@ def _property_table():
     p = pd.read_csv(StringIO(r.text)).set_index('structureId')
     return p
 
-
-# @lru_cache(maxsize=500)
 def get_resolution(pdb_id):
     """Quick way to get the resolution of a PDB ID using the table of results from the REST service
 
@@ -738,7 +711,6 @@ def get_resolution(pdb_id):
     return resolution
 
 
-# @lru_cache(maxsize=500)
 def get_release_date(pdb_id):
     """Quick way to get the release date of a PDB ID using the table of results from the REST service
 
@@ -760,9 +732,6 @@ def get_release_date(pdb_id):
 
     return release_date
 
-
-# @cachetools.func.ttl_cache(maxsize=1, ttl=SEVEN_DAYS)
-# @lru_cache(maxsize=1)
 def _sifts_mapping():
     baseURL = "ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/"
     filename = "pdb_chain_uniprot.csv.gz"
