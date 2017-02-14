@@ -15,9 +15,8 @@ import ssbio.sequence.utils.fasta
 import ssbio.sequence.utils.alignment
 import ssbio.utils
 import requests
-from ssbio.structure.utils.cleanpdb import CleanPDB
+from Bio.Seq import Seq
 import ssbio.structure.properties.quality
-import numpy as np
 import logging
 log = logging.getLogger(__name__)
 
@@ -202,22 +201,41 @@ class Protein(Object):
 
         return self.sequences.get_by_id(ident)
 
-    def load_manual_sequence(self, seq, ident=None, write_fasta_file=True, outname=None, outdir=None,
+    def load_manual_sequence(self, seq, ident=None, write_fasta_file=False, outname=None, outdir=None,
                              set_as_representative=False, force_rewrite=False):
         """Load a manual sequence given as a string and optionally set it as the representative sequence.
             Also store it in the sequences attribute.
 
         Args:
-            seq (str, Seq, SeqRecord):
+            seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
             ident (str): Optional identifier for the sequence, required if seq is a string. Also will override existing
                 IDs in Seq or SeqRecord objects if set.
+            write_fasta_file:
+            outname:
+            outdir:
             set_as_representative:
+            force_rewrite:
+
+        Returns:
 
         """
+        if isinstance(seq, str) or isinstance(seq, Seq):
+            if not ident:
+                raise ValueError('ID must be specified if sequence is a string or Seq object')
+        else:
+            if not ident:
+                # Use ID from SeqRecord ID if new ID not provided
+                ident = seq.id
+            else:
+                # Overwrite SeqRecord ID with new ID if provided
+                seq.id = ident
+
         if not outname:
             outname = ident
 
-        manual_sequence = SeqProp(ident=ident, seq_str=seq, write_fasta_file=write_fasta_file, outname=outname, outdir=outdir, force_rewrite=force_rewrite)
+        manual_sequence = SeqProp(ident=ident, seq=seq,
+                                  write_fasta_file=write_fasta_file, outname=outname, outdir=outdir,
+                                  force_rewrite=force_rewrite)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -227,7 +245,8 @@ class Protein(Object):
 
     def _representative_sequence_setter(self, seq_prop):
         """Make a copy of a SeqProp object and store it as the representative. Only keep certain attributes"""
-        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_file=seq_prop.sequence_path)
+
+        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_file=seq_prop.sequence_path, seq=seq_prop.seq_record)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self._representative_sequence_attributes)
 
     def set_representative_sequence(self):
@@ -288,24 +307,29 @@ class Protein(Object):
 
         return self.representative_sequence
 
-    def align_sequences_to_representative(self, outdir=None, engine='needle', parse=True, force_rerun=False, **kwargs):
+    def align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None, engine='needle', parse=True, force_rerun=False):
         """Align all sequences in the sequences attribute to the representative sequence.
 
         Stores the alignments the representative_sequence.sequence_alignments DictList
 
         Args:
-            outfile:
+            gapopen:
+            gapextend:
             outdir:
             engine:
-            parse: Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
+            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
             force_rerun:
-            **kwargs: Other options for sequence alignment (gap penalties, etc) See:
-                ssbio.sequence.utils.alignment.pairwise_sequence_alignment
+
+        Returns:
 
         """
         for seq in self.sequences:
             aln_id = '{}_{}'.format(self.id, seq.id)
             outfile = '{}.needle'.format(aln_id)
+
+            if not self.representative_sequence:
+                log.error('{}: no representative sequence set, skipping gene'.format(self.id))
+                continue
 
             if self.representative_sequence.sequence_alignments.has_id(aln_id):
                 log.debug('{}: alignment already completed'.format(seq.id))
@@ -323,6 +347,7 @@ class Protein(Object):
                                                                              a_seq_id=self.id,
                                                                              b_seq=seq.seq_str,
                                                                              b_seq_id=seq.id,
+                                                                             gapopen=gapopen, gapextend=gapextend,
                                                                              engine=engine,
                                                                              outdir=outdir,
                                                                              outfile=outfile,
@@ -625,9 +650,8 @@ class Protein(Object):
                     log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain_suffix))
                     return self.representative_structure
 
-        else:
-            log.warning('{}: no representative structure found'.format(self.id))
-            return None
+        log.warning('{}: no structures meet quality checks'.format(self.id))
+        return None
 
     def view_all_mutations(self, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
                            opacity_range=(0.8,1), scale_range=(1,5), gui=False):
