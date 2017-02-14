@@ -1,6 +1,8 @@
 import os
 import os.path as op
 import shutil
+import sys
+import logging
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
@@ -8,7 +10,7 @@ from bioservices import KEGG
 from bioservices import UniProt
 from cobra.core import DictList
 from cobra.core import Gene
-from slugify import slugify
+from slugify import Slugify
 from ssbio.core.genepro import GenePro
 from ssbio.core.object import Object
 import ssbio.cobra.utils
@@ -25,14 +27,13 @@ from ssbio.sequence.seqprop import SeqProp
 import ssbio.sequence.properties.tmhmm
 from ssbio.sequence.properties.scratch import SCRATCH
 from ssbio.structure.homology.itasser.itasserprep import ITASSERPrep
+from Bio.PDB.PDBExceptions import PDBException
 if utils.is_ipynb():
     from tqdm import tqdm_notebook as tqdm
 else:
     from tqdm import tqdm
-import sys
-import logging
 
-
+custom_slugify = Slugify(safe_chars='-_.')
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
@@ -541,7 +542,9 @@ class GEMPRO(Object):
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            manual_info = gene.protein.load_manual_sequence(ident=g, seq=s, outdir=gene_folder, set_as_representative=True)
+            manual_info = gene.protein.load_manual_sequence(ident=g, seq=s, outdir=gene_folder,
+                                                            write_fasta_file=True,
+                                                            set_as_representative=True)
             log.debug('{}: loaded manually defined sequence information'.format(g))
 
         log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
@@ -673,7 +676,7 @@ class GEMPRO(Object):
                 g.protein.representative_sequence.load_letter_annotations('RSA-accpro', scratch.accpro_results()[g.id])
                 g.protein.representative_sequence.load_letter_annotations('RSA-accpro20', scratch.accpro20_results()[g.id])
             else:
-                log.debug("{}: missing SCRATCH results".format(g.protein.representative_sequence.id))
+                log.error("{}: missing SCRATCH results".format(g.protein.representative_sequence.id))
 
     def get_tmhmm_predictions(self, tmhmm_results):
         """Parse TMHMM results and store in the representative sequences
@@ -682,13 +685,14 @@ class GEMPRO(Object):
             tmhmm_results (str): Path to TMHMM results (long format)
 
         """
-        tmhmm_dict = ssbio.sequence.properties.tmhmm.parse_tmhmm_long(op.join(self.data_dir, tmhmm_results))
+        tmhmm_dict = ssbio.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
         for g in tqdm(self.genes):
             if g.protein.representative_sequence.id in tmhmm_dict:
+                log.debug('{}: loading TMHMM results'.format(g.protein.representative_sequence.id))
                 g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g.id]['num_tm_helices']
                 g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g.id]['sequence'])
             else:
-                log.debug("{}: missing TMHMM results".format(g.protein.representative_sequence.id))
+                log.error("{}: missing TMHMM results".format(g.protein.representative_sequence.id))
     ### END SEQUENCE RELATED METHODS ###
     ####################################################################################################################
 
@@ -738,7 +742,7 @@ class GEMPRO(Object):
             else:
                 if uniprot_id in uniprots_to_pdbs:
                     best_structures = ssbio.databases.pdb.best_structures(uniprot_id,
-                                                                          outname='{}_best_structures'.format(slugify(uniprot_id)),
+                                                                          outname='{}_best_structures'.format(custom_slugify(uniprot_id)),
                                                                           outdir=op.join(outdir, g.id),
                                                                           seq_ident_cutoff=seq_ident_cutoff,
                                                                           force_rerun=force_rerun)
@@ -838,7 +842,7 @@ class GEMPRO(Object):
 
             # BLAST the sequence to the PDB
             blast_results = ssbio.databases.pdb.blast_pdb(seq_str,
-                                                          outfile='{}_blast_pdb.xml'.format(slugify(seq_name)),
+                                                          outfile='{}_blast_pdb.xml'.format(custom_slugify(seq_name)),
                                                           outdir=op.join(outdir, g.id),
                                                           force_rerun=force_rerun,
                                                           evalue=evalue,
@@ -1228,6 +1232,49 @@ class GEMPRO(Object):
                     'structure_file']
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
             log.info('Created PDB metadata dataframe.')
+
+    def get_dssp_annotations(self):
+        """Run DSSP on all representative structures and store calculations.
+
+        Stored in:
+            g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-dssp']
+
+        """
+        for g in tqdm(self.genes):
+            if g.protein.representative_structure:
+                try:
+                    g.protein.representative_structure.get_dssp_annotations(outdir=op.join(self.structure_single_chain_dir, g.id))
+                except PDBException:
+                    log.error('{}: DSSP failed to run on {}'.format(g.id, g.protein.representative_structure))
+                except TypeError:
+                    log.error('{}: SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
+
+    def get_msms_annotations(self):
+        """Run MSMS on all representative structures and store calculations.
+
+        Stored in:
+            g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-msms']
+        """
+        for g in tqdm(self.genes):
+            if g.protein.representative_structure:
+                try:
+                    g.protein.representative_structure.get_residue_depths(outdir=op.join(self.structure_single_chain_dir, g.id))
+                except TypeError:
+                    log.error('{}: SeqRecord mismatch with {}'.format(g.id, g.protein.representative_structure))
+
+    def get_disulfide_bridges(self):
+        """Run Biopython's disulfide bridge finder and store calculations.
+
+        Stored in:
+            g.protein.representative_structure.representative_chain.seq_record.annotations['SSBOND-biopython']
+
+        """
+        for g in tqdm(self.genes):
+            if g.protein.representative_structure:
+                try:
+                    g.protein.representative_structure.get_disulfide_bridges()
+                except KeyError:
+                    log.error('{}: unable to run disulfide bridge finder on {}'.format(g.id, g.protein.representative_structure))
 
     # def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
     #     """Run the entire GEM-PRO pipeline.
