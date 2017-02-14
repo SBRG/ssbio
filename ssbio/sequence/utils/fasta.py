@@ -51,7 +51,7 @@ def write_fasta_file_from_dict(indict, outname, outdir=None, outext='.faa', forc
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         seqs = []
         for i, s in indict.items():
-            seq = ssbio.sequence.utils.cast_to_seq_record(s, ident=i)
+            seq = ssbio.sequence.utils.cast_to_seq_record(s, id=i)
             seqs.append(seq)
         SeqIO.write(seqs, outfile, "fasta")
 
@@ -68,7 +68,7 @@ def write_seq_as_temp_fasta(seq):
         str: Path to temporary FASTA file (located in system temporary files directory)
 
     """
-    sr = ssbio.sequence.utils.cast_to_seq_record(seq, ident='tempfasta')
+    sr = ssbio.sequence.utils.cast_to_seq_record(seq, id='tempfasta')
     return write_fasta_file(seq_records=sr, outname='temp', outdir=tempfile.gettempdir(), force_rerun=True)
 
 
