@@ -54,7 +54,9 @@ def parse_tmhmm_long(tmhmm_results):
             log.warning('{}: no TMHMM predictions'.format(l))
             continue
 
-        # Look for the lines with tab separations, these are the TM predicted regions
+        # TODO: POSSIBLE N-term signal sequence - parse this
+
+        # Look for the lines without #, these are the TM predicted regions
         if '#' not in l:
             stuff = l.split()
             if stuff[1] == 'TMHMM2.0':
