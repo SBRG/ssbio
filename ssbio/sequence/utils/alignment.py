@@ -34,10 +34,10 @@ _aa_property_dict_one = {'Tiny': ['A','C','G','S','T'],
 _aa_property_dict_three = {k: [one_to_three(x) for x in v] for k,v in _aa_property_dict_one.items()}
 
 
-def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=None, outfile=None, outdir=None, force_rerun=False, **kwargs):
+def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=None,
+                                gapopen=10, gapextend=0.5,
+                                outfile=None, outdir=None, force_rerun=False):
     """Run a global pairwise sequence alignment between two sequence strings.
-
-    Returns a Bio.Align.MultipleSeqAlignment object.
 
     Args:
         a_seq:
@@ -45,7 +45,10 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
         engine (str): 'biopython' or 'needle'
         a_seq_id:
         b_seq_id:
+        gapopen:
+        gapextend:
         outfile:
+        outdir:
         force_rerun:
 
     Returns:
@@ -67,8 +70,11 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
 
     if engine == 'biopython':
         # TODO: allow different matrices? needle uses blosum62 by default, how to change that?
+        # TODO: how to define gap open/extend when using matrix in biopython global alignment?
+        log.warning('Gap penalties not implemented in Biopython yet')
+
         blosum62 = matlist.blosum62
-        alignments = pairwise2.align.globaldx(a_seq, b_seq, blosum62)
+        alignments = pairwise2.align.globaldx(a_seq, b_seq, blosum62)  # TODO: add gap penalties
         best_alignment = alignments[0]
 
         a = ssbio.sequence.utils.cast_to_seq_record(best_alignment[0], id=a_seq_id)
@@ -81,8 +87,8 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
         return alignment
 
     if engine == 'needle':
-        alignment_file = run_needle_alignment(seq_a=a_seq, seq_b=b_seq,
-                                              outdir=outdir, outfile=outfile, force_rerun=force_rerun, **kwargs)
+        alignment_file = run_needle_alignment(seq_a=a_seq, seq_b=b_seq, gapopen=gapopen, gapextend=gapextend,
+                                              outdir=outdir, outfile=outfile, force_rerun=force_rerun)
         log.debug('Needle alignment at {}'.format(alignment_file))
 
         # Use AlignIO to parse the needle alignment, alignments[0] is the first alignment (the only one in pairwise)
