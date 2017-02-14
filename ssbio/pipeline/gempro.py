@@ -278,7 +278,8 @@ class GEMPRO(Object):
 
     ####################################################################################################################
     ### SEQUENCE RELATED METHODS ###
-    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None, outdir=None, force_rerun=False):
+    def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None, outdir=None,
+                                  set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the KEGG service.
 
         This function does these things:
@@ -324,7 +325,8 @@ class GEMPRO(Object):
                 os.mkdir(gene_folder)
 
             kegg_prop = g.protein.load_kegg(kegg_id=kegg_g, kegg_organism_code=kegg_organism_code,
-                                            download=True, outdir=gene_folder, force_rerun=force_rerun)
+                                            download=True, outdir=gene_folder,
+                                            set_as_representative=set_as_representative, force_rerun=force_rerun)
 
             # Update potentially old UniProt ID
             if kegg_g in kegg_to_uniprot.keys():
@@ -360,7 +362,8 @@ class GEMPRO(Object):
             self.missing_kegg_mapping = list(set(kegg_missing))
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_kegg_mapping" attribute.'.format(len(self.missing_kegg_mapping)))
 
-    def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None, force_rerun=False):
+    def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
+                                     set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.
 
         Args:
@@ -419,8 +422,9 @@ class GEMPRO(Object):
                 log.debug('{}: unable to map to UniProt'.format(g.id))
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
-                    uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True,
-                                                          outdir=gene_folder, force_rerun=force_rerun)
+                    uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=gene_folder,
+                                                          set_as_representative=set_as_representative,
+                                                          force_rerun=force_rerun)
 
                     # Keep track of missing ones
                     if not uniprot_prop.sequence_file:
