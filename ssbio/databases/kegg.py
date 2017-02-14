@@ -8,7 +8,7 @@ import logging
 from slugify import Slugify
 
 log = logging.getLogger(__name__)
-custom_slugify = Slugify(safe_chars='_')
+custom_slugify = Slugify(safe_chars='-_')
 bs_kegg = KEGG()
 
 
@@ -139,7 +139,6 @@ def download_kegg_aa_seq(gene_id, outdir=None, force_rerun=False):
     return outfile
 
 
-# @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def map_kegg_all_genes(organism_code, target_db):
     """Map all of an organism's gene IDs to the target database.
 
