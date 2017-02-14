@@ -2,12 +2,10 @@ from ssbio.core.object import Object
 from os import path as op
 from Bio import SeqIO
 import ssbio.utils
+import ssbio.sequence.utils
 import ssbio.sequence.utils.fasta
 import ssbio.sequence.properties.residues
 from cobra.core import DictList
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC
 from copy import deepcopy
 from collections import defaultdict
 import logging
@@ -27,31 +25,30 @@ class SeqProp(Object):
         - .pdbs: Mapped PDB IDs
 
     2. Basic sequence attributes
+        - .seq_str: Sequence formatted as a string
         - .seq_len: Length of the amino acid sequence
 
     3. Pointers to filepaths
-        - .sequence_file: Basename of sequence file in FASTA format
         - .sequence_path: Full path to sequence file
-        - .metadata_file: Basename of metadata file in any format
         - .metadata_path: Full path to metadata file
-
-    4. Pointers to
-
 
     """
 
-    def __init__(self, ident, description=None, sequence_file=None, metadata_file=None, seq_record=None, seq_str=None,
+    def __init__(self, ident, sequence_file=None, metadata_file=None, seq=None, description="<unknown description>",
                  write_fasta_file=False, outname=None, outdir=None, force_rewrite=False):
         """Parses basic sequence properties like identifiers and sequence length.
         Provides paths to sequence and metadata files.
 
         Args:
-            ident: Identifier of the sequence (can be any string)
+            ident (str): Identifier of the sequence
+            description:
             sequence_file: Path to FASTA file of the sequence
             metadata_file: Path to metadata file of the sequence
-            seq_record: Biopython SeqRecord object
-            seq_str: Sequence formatted as a string
-
+            seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
+            write_fasta_file:
+            outname:
+            outdir:
+            force_rewrite:
         """
         Object.__init__(self, id=ident, description=description)
 
@@ -61,13 +58,13 @@ class SeqProp(Object):
         self.uniprot = None
         self.gene_name = None
         self.pdbs = None
-        self.seq_record = seq_record
+        self.seq_record = None
 
         self.sequence_path = sequence_file
         self.metadata_path = metadata_file
 
-        if seq_str:
-            self.seq_record = ssbio.sequence.utils.fasta.load_seq_string_as_seqrecord(seq_str, self.id)
+        if seq:
+            self.seq_record = ssbio.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
         if sequence_file:
             self.load_seq_file(sequence_file)
 
