@@ -157,11 +157,12 @@ class Object(object):
 
         log.debug('Saved {} dataframes at {}'.format(len(dfs), outdir))
 
-    def save_pickle(self, outname, outext='.pckl', outdir=None):
+    def save_pickle(self, outname, protocol=2, outext='.pckl', outdir=None):
         """Save the object as a pickle file
 
         Args:
             outname (str): Basename of file
+            protocol (int): Pickle protocol to use. Default is 2 to remain compatible with Python 2
             outext (str): Extension of file
             outdir (str): Path to output directory
 
@@ -175,6 +176,6 @@ class Object(object):
         outfile = ssbio.utils.outfile_maker(inname=outname, outext=outext, outdir=outdir)
 
         with open(outfile, 'wb') as f:
-            pickle.dump(self, f)
+            pickle.dump(self, f, protocol=protocol)
 
         return outfile

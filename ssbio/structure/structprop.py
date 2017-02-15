@@ -547,8 +547,12 @@ class StructProp(Object):
             NGLviewer object
 
         """
-        opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], structure_resnums, rescale=opacity_range)
-        scale_dict = ssbio.utils.scale_calculator(scale_range[0], structure_resnums, rescale=scale_range)
+        if isinstance(structure_resnums, dict):
+            opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], structure_resnums, rescale=opacity_range)
+            scale_dict = ssbio.utils.scale_calculator(scale_range[0], structure_resnums, rescale=scale_range)
+        else:
+            opacity_dict = {x: max(opacity_range) for x in ssbio.utils.force_list(structure_resnums)}
+            scale_dict = {x: max(scale_range) for x in ssbio.utils.force_list(structure_resnums)}
 
         view = self.view_structure(opacity=structure_opacity, gui=gui)
 

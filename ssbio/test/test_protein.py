@@ -46,7 +46,7 @@ class TestProtein(unittest.TestCase):
         self.assertTrue(self.prot.sequences.has_id('tester'))
         self.assertTrue(isinstance(new_manual, SeqProp))
 
-    def test_load_manual_sequence_str(self):
+    def test_load_manual_sequence(self):
         new_manual = self.prot.load_manual_sequence(ident='tester2', seq='ALALALAL', outdir='test_files/out/')
         self.assertTrue(self.prot.sequences.has_id('tester'))
         self.assertTrue(isinstance(new_manual, SeqProp))
