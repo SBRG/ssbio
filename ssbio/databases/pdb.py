@@ -7,13 +7,17 @@ import pandas as pd
 import requests
 import ssbio.utils
 from ssbio.structure.structprop import StructProp
+import ssbio.structure.properties.complexes as cplx
 from io import BytesIO
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
 try:
     import urllib.request as urllib2
+    python_version = 3
 except ImportError:
     import urllib2
+    python_version = 2
+
 try:
     from StringIO import StringIO
 except ImportError:
@@ -54,6 +58,22 @@ class PDBProp(StructProp):
 
         cif_dict = parse_mmcif_header(cif_file)
         self.update(cif_dict)
+
+    def get_pisa_complex_predictions(self, outdir, existing_pisa_multimer_xml=None):
+        if not self.is_experimental:
+            log.error('Complex predictions for homology models currently not implemented')
+            return
+
+        if not existing_pisa_multimer_xml:
+            pisa_xmls = cplx.download_pisa_multimers_xml(pdb_ids=self.id, outdir=outdir,
+                                                         save_single_xml_files=True)
+        else:
+            pisa_xmls = {}
+            pisa_xmls[self.id] = existing_pisa_multimer_xml
+        pisa_dict = cplx.parse_pisa_multimers_xml(pisa_xmls[self.id], download_structures=True,
+                                                  outdir=outdir)
+
+
 
 
 def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
@@ -105,7 +125,15 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
         else:
             download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
 
-        urllib2.urlretrieve(download_link, outfile)
+        if python_version == 2:
+            urllib2.urlretrieve(download_link, outfile)
+            html = urllib2.urlopen(download_link).read()
+            with open(outfile, 'wb') as f:
+                f.write(html)
+                f.close()
+        elif python_version == 3:
+            urllib2.urlretrieve(download_link, outfile)
+
         if gzipped:
             outfile = ssbio.utils.gunzip_file(infile=outfile,
                                               outfile=outfile.strip('.gz'),

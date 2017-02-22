@@ -6,11 +6,12 @@ import os
 import os.path as op
 from lxml import etree
 import logging
+import glob
 
 log = logging.getLogger(__name__)
 
 
-def download_pisa_multimers_xml(pdb_ids, outdir=None, force_rerun=False):
+def download_pisa_multimers_xml(pdb_ids, save_single_xml_files=True, outdir=None, force_rerun=False):
     """Download the PISA XML file for multimers.
 
     See: http://www.ebi.ac.uk/pdbe/pisa/pi_download.html for more info
@@ -36,28 +37,63 @@ def download_pisa_multimers_xml(pdb_ids, outdir=None, force_rerun=False):
     if not outdir:
         outdir = os.getcwd()
 
+    files = {}
     pdb_ids = ssbio.utils.force_lower_list(sorted(pdb_ids))
-    split_list = ssbio.utils.split_list_by_n(pdb_ids, 50)
 
-    files = []
-
-    for l in split_list:
-        pdbs = ','.join(l)
-        filename = op.join(outdir, '{}.xml'.format(pdbs))
-
-        if ssbio.utils.force_rerun(flag=force_rerun, outfile=filename):
-            # Request the xml file of the results
-            r = requests.get('http://www.ebi.ac.uk/pdbe/pisa/cgi-bin/multimers.pisa?{}'.format(pdbs))
-
-            # Save results to a file
-            with open(filename, 'w') as f:
-                f.write(r.text)
-
-            log.debug('Downloaded PISA results')
+    # If we want to save single PISA XML files per PDB ID...
+    if save_single_xml_files:
+        # Check for existing PISA XML files
+        if not force_rerun:
+            existing_files = [op.basename(x) for x in glob.glob(op.join(outdir, '*_multimers.pisa.xml'))]
+            # Store the paths to these files to return
+            files = {v.split('_')[0]: op.join(outdir, v) for v in existing_files}
+            log.debug('Already downloaded PISA files for {}'.format(list(files.keys())))
         else:
-            log.debug('PISA results already downloaded')
+            existing_files = []
 
-        files.append(filename)
+        # Filter PDB IDs based on existing file
+        pdb_ids = [x for x in pdb_ids if '{}_multimers.pisa.xml'.format(x) not in existing_files]
+
+        # Split the list into 50 to limit requests
+        split_list = ssbio.utils.split_list_by_n(pdb_ids, 40)
+
+        # Download PISA files
+        for l in split_list:
+            pdbs = ','.join(l)
+            all_pisa_link = 'http://www.ebi.ac.uk/pdbe/pisa/cgi-bin/multimers.pisa?{}'.format(pdbs)
+            r = requests.get(all_pisa_link)
+
+            # Parse PISA file and save individual XML files
+            parser = etree.XMLParser(ns_clean=True)
+            tree = etree.fromstring(r.text, parser)
+            for pdb in tree.findall('pdb_entry'):
+                filename = op.join(outdir, '{}_multimers.pisa.xml'.format(pdb.find('pdb_code').text))
+                add_root = etree.Element('pisa_multimers')
+                add_root.append(pdb)
+                with open(filename, 'wb') as f:
+                    f.write(etree.tostring(add_root))
+                files[pdb.find('pdb_code').text] = filename
+                log.debug('{}: downloaded PISA results'.format(pdb))
+
+    else:
+        split_list = ssbio.utils.split_list_by_n(pdb_ids, 40)
+
+        for l in split_list:
+            pdbs = ','.join(l)
+            all_pisa_link = 'http://www.ebi.ac.uk/pdbe/pisa/cgi-bin/multimers.pisa?{}'.format(pdbs)
+
+            filename = op.join(outdir, '{}_multimers.pisa.xml'.format(pdbs))
+
+            if ssbio.utils.force_rerun(flag=force_rerun, outfile=filename):
+                r = requests.get(all_pisa_link)
+                with open(filename, 'w') as f:
+                    f.write(r.text)
+                log.debug('Downloaded PISA results')
+            else:
+                log.debug('PISA results already downloaded')
+
+            for x in l:
+                files[x] = filename
 
     return files
 

@@ -6,6 +6,7 @@ import logging
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
+from copy import copy
 from bioservices import KEGG
 from bioservices import UniProt
 from cobra.core import DictList
@@ -604,7 +605,6 @@ class GEMPRO(Object):
             outname (str): Name of the output FASTA file without the extension
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
-            use_original_ids: If the original sequence IDs in the FASTA file should be used, or the model IDs
 
         """
 
@@ -618,10 +618,11 @@ class GEMPRO(Object):
 
         tmp = []
         for x in self.genes:
-            repseq = x.protein.representative_sequence.seq_record
+            repseq = x.protein.representative_sequence
             if repseq:
-                repseq.id = x.id
-                tmp.append(repseq)
+                if repseq.seq_record:
+                    repseq.seq_record.id = repseq.id
+                    tmp.append(repseq.seq_record)
 
         SeqIO.write(tmp, outfile, "fasta")
 
@@ -691,12 +692,14 @@ class GEMPRO(Object):
         """
         tmhmm_dict = ssbio.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
         for g in tqdm(self.genes):
-            if g.protein.representative_sequence.id in tmhmm_dict:
-                log.debug('{}: loading TMHMM results'.format(g.protein.representative_sequence.id))
-                g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g.id]['num_tm_helices']
-                g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g.id]['sequence'])
-            else:
-                log.error("{}: missing TMHMM results".format(g.protein.representative_sequence.id))
+            if g.protein.representative_sequence:
+                if g.protein.representative_sequence.seq_record:
+                    if g.protein.representative_sequence.id in tmhmm_dict:
+                        log.debug('{}: loading TMHMM results'.format(g.protein.representative_sequence.id))
+                        g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g.protein.representative_sequence.id]['num_tm_helices']
+                        g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g.protein.representative_sequence.id]['sequence'])
+                    else:
+                        log.error("{}: missing TMHMM results".format(g.protein.representative_sequence.id))
     ### END SEQUENCE RELATED METHODS ###
     ####################################################################################################################
 

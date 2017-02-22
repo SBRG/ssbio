@@ -527,7 +527,7 @@ class StructProp(Object):
         view.add_cartoon(selection='protein', color='silver', opacity=opacity)
         return view
 
-    def view_structure_and_highlight_residues(self, structure_resnums, color='red', unique_colors=False,
+    def view_structure_and_highlight_residues(self, structure_resnums, chain=None, color='red', unique_colors=False,
                                               structure_opacity=0.5, opacity_range=(0.5,1), scale_range=(.7, 10),
                                               gui=False):
         """Input a list of residue numbers to view on the structure. Or input a dictionary of residue numbers to counts
@@ -547,6 +547,17 @@ class StructProp(Object):
             NGLviewer object
 
         """
+        # TODO: chains must be specified otherwise all resnums matching the numbers are shown
+        # TODO: utilize mapped_chains attribute to show correct chains
+        if not chain:
+            chain = self.mapped_chains
+            if not chain:
+                parsed = self.parse_structure()
+                if not parsed:
+                    log.error('{}: unable to open structure to get chains'.format(self.id))
+                    return
+                log.info('Showing all residue numbers on all chains')
+
         if isinstance(structure_resnums, dict):
             opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], structure_resnums, rescale=opacity_range)
             scale_dict = ssbio.utils.scale_calculator(scale_range[0], structure_resnums, rescale=scale_range)
@@ -567,20 +578,29 @@ class StructProp(Object):
 
         colors = sns.color_palette("hls", len(unique_mutations)).as_hex()
 
+        to_show_chains = '( '
+        for c in chain:
+            to_show_chains += ':{} or'.format(c)
+        to_show_chains = to_show_chains.strip(' or ')
+        to_show_chains += ' )'
+
         for i, x in enumerate(unique_mutations):
             if isinstance(x, tuple):
-                to_show = ''
+                to_show_res = '( '
                 for mut in x:
-                    to_show += '{} or '.format(mut)
-                to_show = to_show.strip(' or ')
+                    to_show_res += '{} or '.format(mut)
+                to_show_res = to_show_res.strip(' or ')
+                to_show_res += ' )'
             else:
-                to_show = x
+                to_show_res = x
+
+            log.info('Selection: {} and not hydrogen and {}'.format(to_show_chains, to_show_res))
 
             if unique_colors:
-                view.add_ball_and_stick(selection='not hydrogen and {}'.format(to_show),
+                view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res),
                                         color=colors[i], opacity=opacity_dict[x], scale=scale_dict[x])
             else:
-                view.add_ball_and_stick(selection='not hydrogen and {}'.format(to_show),
+                view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res),
                                         color=color, opacity=opacity_dict[x], scale=scale_dict[x])
 
         return view
