@@ -498,6 +498,10 @@ class Protein(Object):
                                              only_keys=self._representative_structure_attributes,
                                              overwrite=True)
 
+        # Save the original PDB ID as an extra attribute
+        if struct_prop.is_experimental:
+            self.representative_structure.original_pdb_id = struct_prop.id
+
         # STORE REPRESENTATIVE CHAIN RESNUMS in the representative sequence seqrecord letter_annotations
         # Get the alignment
         alnid = '{}_{}'.format(self.representative_sequence.id, self.representative_structure.id)
