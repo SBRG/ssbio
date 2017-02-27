@@ -730,18 +730,17 @@ class GEMPRO(Object):
         # First get all UniProt IDs and check if they have PDBs
         all_representative_uniprots = []
         for g in self.genes:
-            if g.protein.representative_sequence:
+            if not g.protein.representative_sequence:
+                # Check if a representative sequence was set
+                log.warning('{}: no representative sequence set, cannot use best structures API'.format(g.id))
+                continue
+            else:
                 uniprot_id = g.protein.representative_sequence.uniprot
                 if uniprot_id:
                     all_representative_uniprots.append(uniprot_id)
         uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
 
         for g in tqdm(self.genes):
-            if not g.protein.representative_sequence:
-                # Check if a representative sequence was set
-                log.warning('{}: no representative sequence set, cannot use best structures API'.format(g.id))
-                continue
-
             uniprot_id = g.protein.representative_sequence.uniprot
             if not uniprot_id:
                 log.warning('{}: no representative UniProt ID set, cannot use best structures API'.format(g.id))
@@ -795,8 +794,8 @@ class GEMPRO(Object):
         self.df_pdb_ranking = pd.DataFrame.from_records(best_structures_pre_df, columns=cols)
 
         log.info('Completed UniProt -> best PDB mapping. See the "df_pdb_ranking" attribute.')
-        log.info('{}: number of genes with at least one structure'.format(len(self.genes_with_experimental_structures)))
-        log.info('{}: number of genes with no structures'.format(len(self.genes)-len(self.genes_with_experimental_structures)))
+        log.info('{}: number of genes with at least one experimental structure'.format(len(self.genes_with_experimental_structures)))
+        log.info('{}: number of genes with no experimental structures'.format(len(self.genes)-len(self.genes_with_experimental_structures)))
 
     def blast_seqs_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, all_genes=False, display_link=False,
                           outdir=None, force_rerun=False):
