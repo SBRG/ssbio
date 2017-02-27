@@ -199,6 +199,7 @@ def parse_mmcif_header(infile):
     else:
         log.debug('{}: No experimental method field'.format(infile))
 
+    # TODO: refactor how to get resolutions based on experimental method
     if '_refine.ls_d_res_high' in mmdict:
         try:
             if isinstance(mmdict['_refine.ls_d_res_high'], list):
@@ -206,8 +207,7 @@ def parse_mmcif_header(infile):
             else:
                 newdict['resolution'] = float(mmdict['_refine.ls_d_res_high'])
         except:
-            # TODO: double check EM structures, example is 5MDV
-            newdict['resolution'] = float(mmdict['_refine_ls_shell.d_res_high'])
+            newdict['resolution'] = float(mmdict['_em_3d_reconstruction.resolution'])
     else:
         log.debug('{}: No resolution field'.format(infile))
 
