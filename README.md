@@ -22,7 +22,7 @@ Clone this repository to any location and then install it.
 
 Cloning
 ```bash
-$ git clone https://github.com/nmih/ssbio.git
+$ git clone https://github.com/SBRG/ssbio.git
 ```
 
 Installation
