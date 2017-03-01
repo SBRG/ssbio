@@ -15,7 +15,7 @@ import ssbio.sequence.utils.fasta
 import ssbio.sequence.utils.alignment
 import ssbio.utils
 import requests
-import urllib
+from six.moves.urllib.error import URLError
 from Bio.Seq import Seq
 import ssbio.structure.properties.quality
 import logging
@@ -608,7 +608,7 @@ class Protein(Object):
                     # Download the mmCIF header file to get additional information
                     if 'cif' not in pdb_file_type:
                         pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
-                except requests.exceptions.HTTPError or urllib.error.URLError:
+                except requests.exceptions.HTTPError or URLError:
                     log.error('{}: structure file could not be downloaded'.format(pdb))
                     continue
                 pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
