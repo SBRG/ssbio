@@ -12,6 +12,7 @@ import subprocess
 import shlex
 import requests
 import json
+import warnings
 import gzip
 from collections import OrderedDict
 from collections import Callable
@@ -123,6 +124,20 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emmitted
+    when the function is used."""
+    def newFunc(*args, **kwargs):
+        warnings.warn("Call to deprecated function %s." % func.__name__,
+                      category=DeprecationWarning)
+        return func(*args, **kwargs)
+    newFunc.__name__ = func.__name__
+    newFunc.__doc__ = func.__doc__
+    newFunc.__dict__.update(func.__dict__)
+    return newFunc
 
 
 def split_folder_and_path(filepath):
@@ -386,6 +401,25 @@ def execute(cmd):
     return_code = popen.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
+
+
+def write_torque_script(command, outfile, walltime, queue, name, out, err, print_exec=True):
+
+    with open(outfile, 'w') as script:
+        script.write('#PBS -l walltime={}\n'.format(walltime))
+        script.write('#PBS -q regular\n')
+        script.write('#PBS -N {}\n'.format(name))
+        script.write('#PBS -o {}.out\n'.format(out))
+        script.write('#PBS -e {}.err\n'.format(err))
+        script.write('cd ${PBS_O_WORKDIR}\n')
+        script.write(command)
+
+    os.chmod(outfile, 0o755)
+
+    if print_exec:
+        print('qsub {};'.format(outfile))
+
+    return outfile
 
 
 def dict_head(d, N=5):

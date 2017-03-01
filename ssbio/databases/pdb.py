@@ -11,12 +11,7 @@ import ssbio.structure.properties.complexes as cplx
 from io import BytesIO
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
-try:
-    import urllib.request as urllib2
-    python_version = 3
-except ImportError:
-    import urllib2
-    python_version = 2
+from six.moves.urllib.request import urlopen, urlretrieve
 
 try:
     from StringIO import StringIO
@@ -74,8 +69,6 @@ class PDBProp(StructProp):
                                                   outdir=outdir)
 
 
-
-
 def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
     """Download a structure from the RCSB PDB by ID. Specify the file type desired.
 
@@ -91,6 +84,9 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
         str: Path to outfile
 
     """
+    # TODO: keep an eye on https://github.com/biopython/biopython/pull/943 Biopython PR#493 for functionality of this
+    # method in biopython. extra file types have not been added to biopython download yet
+
     pdb_id = pdb_id.lower()
     file_type = file_type.lower()
     file_types = ['pdb', 'pdb.gz', 'mmcif', 'cif', 'cif.gz', 'xml.gz', 'mmtf', 'mmtf.gz']
@@ -125,14 +121,7 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
         else:
             download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
 
-        if python_version == 2:
-            urllib2.urlretrieve(download_link, outfile)
-            html = urllib2.urlopen(download_link).read()
-            with open(outfile, 'wb') as f:
-                f.write(html)
-                f.close()
-        elif python_version == 3:
-            urllib2.urlretrieve(download_link, outfile)
+        urlretrieve(download_link, outfile)
 
         if gzipped:
             outfile = ssbio.utils.gunzip_file(infile=outfile,
@@ -140,9 +129,9 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
                                               delete_original=True,
                                               force_rerun_flag=force_rerun)
 
-        log.debug('{}: Saved structure file'.format(outfile))
+        log.debug('{}: saved structure file'.format(outfile))
     else:
-        log.debug('{}: Structure file already saved'.format(outfile))
+        log.debug('{}: structure file already saved'.format(outfile))
 
     return outfile
 
@@ -160,6 +149,7 @@ def parse_pdb_header(infile):
 
     """
     pass
+
 
 def parse_mmcif_header(infile):
     """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
@@ -229,23 +219,6 @@ def parse_mmcif_header(infile):
     return newdict
 
 
-# def download_and_load_pdb(pdb_id, output_dir, file_type='pdb'):
-#     """Download a PDB ID to a specified output directory, and of a specified file format (currently only .pdb supported)
-#
-#     Args:
-#         pdb_id: valid PDB ID
-#         output_dir: path to output directory
-#         file_type: pdb, xml, mmcif - TODO: add support
-#
-#     Returns: StructureIO object
-#
-#     """
-#     pdbl = PDBList()
-#     # TODO: currently saves as .ent file
-#     file_loc = pdbl.retrieve_pdb_file(pdb_id, pdir=output_dir)
-#     return file_loc
-
-
 # TODO: check this for python 2
 def download_sifts_xml(pdb_id, outdir='', outfile=''):
     """Download the SIFTS file for a PDB ID.
@@ -267,7 +240,7 @@ def download_sifts_xml(pdb_id, outdir='', outfile=''):
         outfile = op.join(outdir, filename.split('.')[0] + '.sifts.xml')
 
     if not op.exists(outfile):
-        response = urllib2.urlopen(baseURL + filename)
+        response = urlopen(baseURL + filename)
         with open(outfile, 'wb') as outfile:
             outfile.write(gzip.decompress(response.read()))
 
@@ -330,162 +303,6 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
                 return None, False
 
     return my_pdb_resnum, my_pdb_annotation
-
-
-def _theoretical_pdbs():
-    # TODO: biopython has these, just use that!
-    """Get the list of theoretical PDBs directly from the wwPDB.
-
-    Returns: list of theoretical PDBs
-
-    """
-    theoretical_pdbs_link = "ftp://ftp.wwpdb.org/pub/pdb/data/structures/models/index/titles.idx"
-    response = urllib2.urlopen(theoretical_pdbs_link)
-    theoretical_pdbs_raw = BytesIO(response.read())
-    theoretical_pdbs_df = pd.read_table(theoretical_pdbs_raw, sep='\t', header=None)
-    list_of_theoretical_pdbs = [x.lower() for x in theoretical_pdbs_df[0].tolist()]
-
-    return list_of_theoretical_pdbs
-
-
-def is_theoretical_pdb(pdb_id):
-    """Check if a PDB ID is theoretical or not
-
-    Args:
-        pdb_id (str): PDB ID
-
-    Returns:
-        True if the PDB is a theoretical model
-        False if not
-
-    """
-    pdb_id = pdb_id.lower()
-    return pdb_id in _theoretical_pdbs()
-
-
-def _obsolete_pdb_mapping():
-    """Get the mapping of obsolete PDBs directly from the wwPDB.
-
-    Caches this list for up to seven days for quick access.
-
-    Returns: a dictionary mapping obsolete PDBs to a list of their replacement(kegg).
-    If there is no replacement, it is marked as "obsolete"
-    Example:
-        {
-        '1HHB': ['2HHB', '3HHB', '4HHB'],
-        '1VSW': ['4V7G'],
-        '1FQH': 'obsolete'
-        }
-
-    """
-    pdb_obsolete_mapping = {}
-
-    req = urllib2.Request('ftp://ftp.wwpdb.org/pub/pdb/data/status/obsolete.dat')
-    response = urllib2.urlopen(req)
-    output = response.read().decode('utf-8').strip().split('\n')
-    for line in output:
-        entry = line.split()
-        if entry[0] == 'LIST':
-            continue
-        if len(entry) == 3:
-            pdb_obsolete_mapping[entry[2].lower()] = 'obsolete'
-        if len(entry) >= 4:
-            new = [y.lower() for y in entry[3:]]
-            pdb_obsolete_mapping[entry[2].lower()] = new
-
-    return pdb_obsolete_mapping
-
-
-def is_obsolete_pdb(pdb_id):
-    """Check if a PDB ID is obsolete or not
-
-    Args:
-        pdb_id (str): PDB ID
-
-    Returns:
-        True if the PDB is a obsolete model
-        False if not
-
-    """
-    pdb_id = pdb_id.lower()
-    return pdb_id in _obsolete_pdb_mapping().keys()
-
-
-def get_replacement_pdbs(pdb_id):
-    """Get the list of PDB IDs superseding an obsolete PDB ID
-
-    Args:
-        pdb_id (str): PDB ID
-
-    Returns:
-        A list of replacement PDB IDs,
-        None if the PDB is not obsolete or there is no replacement
-
-    """
-    pdb_id = pdb_id.lower()
-    if not is_obsolete_pdb(pdb_id):
-        return None
-    if _obsolete_pdb_mapping()[pdb_id] == 'obsolete':
-        return None
-    else:
-        return _obsolete_pdb_mapping()[pdb_id]
-
-
-def pdb_current_checker(pdb_ids):
-    """Batch check if a list of PDBs is current, theoretical, obsolete. If obsolete, provide new mapping.
-
-    Args:
-        pdb_ids (list): List of PDB IDs
-
-    Returns:
-        dict: Dictionary of {pdb_id: <status>}, where status can be
-            "theoretical", "current", or a list of PDB IDs giving the non-obsolete entry
-    """
-    pdb_ids = ssbio.utils.force_lower_list(pdb_ids)
-
-    log.debug('Checking list of PDBs: {}'.format(pdb_ids))
-
-    pdb_status = {}
-
-    theoretical = list(set(_theoretical_pdbs()).intersection(pdb_ids))
-    obsolete = list(set(_obsolete_pdb_mapping().keys()).intersection(pdb_ids))
-    current = list(set(pdb_ids).difference(theoretical, obsolete))
-
-    for t in theoretical:
-        pdb_status[t] = 'theoretical'
-    for o in obsolete:
-        pdb_status[o] = get_replacement_pdbs(o)
-    for c in current:
-        pdb_status[c] = 'current'
-
-    return pdb_status
-
-
-def update_pdb_list(pdb_ids):
-    """Filter a list of PDBs to remove obsolete and theoretical IDs. Replace obsolete ones with the updated IDs
-
-    Args:
-        pdb_ids: List of PDB IDs
-
-    Returns:
-        Updated list of PDB IDs
-
-    """
-    pdb_ids = ssbio.utils.force_lower_list(pdb_ids)
-    checked = pdb_current_checker(pdb_ids)
-
-    new_pdb_ids = []
-
-    for p in pdb_ids:
-        if not checked[p] == 'current':
-            if checked[p] == 'theoretical':
-                continue
-            elif checked[p]:
-                new_pdb_ids.extend(p)
-        else:
-            new_pdb_ids.append(p)
-
-    return list(set(new_pdb_ids))
 
 
 def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0.0, force_rerun=False):
@@ -573,6 +390,7 @@ def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0.0,
                 data.remove(result)
 
     return data
+
 
 def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0.0, link=False, force_rerun=False):
     """Returns a list of BLAST hits of a sequence to available structures in the PDB.
@@ -700,6 +518,7 @@ def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0
             'hit_num_similar', 'hit_percent_similar', 'hit_num_gaps', 'hit_percent_gaps']
     return pd.DataFrame.from_records(blast_results, columns=cols)
 
+
 def _property_table():
     """Download the PDB -> resolution table directly from the RCSB PDB REST service.
 
@@ -760,11 +579,30 @@ def get_release_date(pdb_id):
 
     return release_date
 
+
+@ssbio.utils.deprecated
+def _theoretical_pdbs():
+    # TODO: biopython has these, just use that!
+    """Get the list of theoretical PDBs directly from the wwPDB.
+
+    Returns: list of theoretical PDBs
+
+    """
+    theoretical_pdbs_link = "ftp://ftp.wwpdb.org/pub/pdb/data/structures/models/index/titles.idx"
+    response = urlopen(theoretical_pdbs_link)
+    theoretical_pdbs_raw = BytesIO(response.read())
+    theoretical_pdbs_df = pd.read_table(theoretical_pdbs_raw, sep='\t', header=None)
+    list_of_theoretical_pdbs = [x.lower() for x in theoretical_pdbs_df[0].tolist()]
+
+    return list_of_theoretical_pdbs
+
+
+@ssbio.utils.deprecated
 def _sifts_mapping():
     baseURL = "ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/"
     filename = "pdb_chain_uniprot.csv.gz"
 
-    response = urllib2.urlopen(baseURL + filename)
+    response = urlopen(baseURL + filename)
     compressed_file = io.BytesIO(response.read())
     decompressed_file = gzip.GzipFile(fileobj=compressed_file)
 
@@ -779,9 +617,157 @@ def _sifts_mapping():
     return SIFTS.sort_index()
 
 
+@ssbio.utils.deprecated
 def SIFTS():
     return _sifts_mapping()
 
 
+@ssbio.utils.deprecated
 def sifts_pdb_chain_to_uniprot(pdb, chain):
     return _sifts_mapping().ix[(pdb.lower(), chain.upper())]['SP_PRIMARY'].unique().tolist()
+
+
+@ssbio.utils.deprecated
+def is_theoretical_pdb(pdb_id):
+    """Check if a PDB ID is theoretical or not
+
+    Args:
+        pdb_id (str): PDB ID
+
+    Returns:
+        True if the PDB is a theoretical model
+        False if not
+
+    """
+    pdb_id = pdb_id.lower()
+    return pdb_id in _theoretical_pdbs()
+
+
+@ssbio.utils.deprecated
+def _obsolete_pdb_mapping():
+    """Get the mapping of obsolete PDBs directly from the wwPDB.
+
+    Caches this list for up to seven days for quick access.
+
+    Returns: a dictionary mapping obsolete PDBs to a list of their replacement(kegg).
+    If there is no replacement, it is marked as "obsolete"
+    Example:
+        {
+        '1HHB': ['2HHB', '3HHB', '4HHB'],
+        '1VSW': ['4V7G'],
+        '1FQH': 'obsolete'
+        }
+
+    """
+    pdb_obsolete_mapping = {}
+
+    req = urllib2.Request('ftp://ftp.wwpdb.org/pub/pdb/data/status/obsolete.dat')
+    response = urllib2.urlopen(req)
+    output = response.read().decode('utf-8').strip().split('\n')
+    for line in output:
+        entry = line.split()
+        if entry[0] == 'LIST':
+            continue
+        if len(entry) == 3:
+            pdb_obsolete_mapping[entry[2].lower()] = 'obsolete'
+        if len(entry) >= 4:
+            new = [y.lower() for y in entry[3:]]
+            pdb_obsolete_mapping[entry[2].lower()] = new
+
+    return pdb_obsolete_mapping
+
+
+@ssbio.utils.deprecated
+def is_obsolete_pdb(pdb_id):
+    """Check if a PDB ID is obsolete or not
+
+    Args:
+        pdb_id (str): PDB ID
+
+    Returns:
+        True if the PDB is a obsolete model
+        False if not
+
+    """
+    pdb_id = pdb_id.lower()
+    return pdb_id in _obsolete_pdb_mapping().keys()
+
+
+@ssbio.utils.deprecated
+def get_replacement_pdbs(pdb_id):
+    """Get the list of PDB IDs superseding an obsolete PDB ID
+
+    Args:
+        pdb_id (str): PDB ID
+
+    Returns:
+        A list of replacement PDB IDs,
+        None if the PDB is not obsolete or there is no replacement
+
+    """
+    pdb_id = pdb_id.lower()
+    if not is_obsolete_pdb(pdb_id):
+        return None
+    if _obsolete_pdb_mapping()[pdb_id] == 'obsolete':
+        return None
+    else:
+        return _obsolete_pdb_mapping()[pdb_id]
+
+
+@ssbio.utils.deprecated
+def pdb_current_checker(pdb_ids):
+    """Batch check if a list of PDBs is current, theoretical, obsolete. If obsolete, provide new mapping.
+
+    Args:
+        pdb_ids (list): List of PDB IDs
+
+    Returns:
+        dict: Dictionary of {pdb_id: <status>}, where status can be
+            "theoretical", "current", or a list of PDB IDs giving the non-obsolete entry
+    """
+    pdb_ids = ssbio.utils.force_lower_list(pdb_ids)
+
+    log.debug('Checking list of PDBs: {}'.format(pdb_ids))
+
+    pdb_status = {}
+
+    theoretical = list(set(_theoretical_pdbs()).intersection(pdb_ids))
+    obsolete = list(set(_obsolete_pdb_mapping().keys()).intersection(pdb_ids))
+    current = list(set(pdb_ids).difference(theoretical, obsolete))
+
+    for t in theoretical:
+        pdb_status[t] = 'theoretical'
+    for o in obsolete:
+        pdb_status[o] = get_replacement_pdbs(o)
+    for c in current:
+        pdb_status[c] = 'current'
+
+    return pdb_status
+
+
+@ssbio.utils.deprecated
+def update_pdb_list(pdb_ids):
+    """Filter a list of PDBs to remove obsolete and theoretical IDs. Replace obsolete ones with the updated IDs
+
+    Args:
+        pdb_ids: List of PDB IDs
+
+    Returns:
+        Updated list of PDB IDs
+
+    """
+    pdb_ids = ssbio.utils.force_lower_list(pdb_ids)
+    checked = pdb_current_checker(pdb_ids)
+
+    new_pdb_ids = []
+
+    for p in pdb_ids:
+        if not checked[p] == 'current':
+            if checked[p] == 'theoretical':
+                continue
+            elif checked[p]:
+                new_pdb_ids.extend(p)
+        else:
+            new_pdb_ids.append(p)
+
+    return list(set(new_pdb_ids))
