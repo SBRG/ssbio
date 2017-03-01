@@ -527,15 +527,73 @@ class StructProp(Object):
         view.add_cartoon(selection='protein', color='silver', opacity=opacity)
         return view
 
-    def view_structure_and_highlight_residues(self, structure_resnums, chain=None, color='red', unique_colors=False,
-                                              structure_opacity=0.5, opacity_range=(0.5,1), scale_range=(.7, 10),
-                                              gui=False):
+    def view_structure_and_highlight_residues(self, structure_resnums, chain=None, color='red',
+                                              structure_opacity=0.5, gui=False):
+        """Input a residue number or numbers to view on the structure.
+
+        Args:
+            structure_resnums (int, list): Residue number(s) to highlight
+            chain (str, list): Chain ID or IDs of which residues are a part of. If not provided, all chains in the
+                mapped_chains attribute will be used. PLEASE NOTE: if that is also empty, all residues in all chains
+                matching the residue numbers will be shown.
+            color (str): Color to highlight with
+            structure_opacity (float): Opacity of the protein structure cartoon representation
+            gui (bool): If the NGLview GUI should show up
+
+        Returns:
+            NGLviewer object
+
+        """
+        if not chain:
+            chain = self.mapped_chains
+            if not chain:
+                parsed = self.parse_structure()
+                if not parsed:
+                    log.error('{}: unable to open structure to get chains'.format(self.id))
+                    return
+                log.warning('Showing all residue numbers on all chains, please input chain if desired')
+
+        view = self.view_structure(opacity=structure_opacity, gui=gui)
+
+        if isinstance(structure_resnums, list):
+            unique_mutations = list(set(structure_resnums))
+        elif isinstance(structure_resnums, int):
+            unique_mutations = ssbio.utils.force_list(structure_resnums)
+
+        # TODO: add color by letter_annotations!
+
+        colors = sns.color_palette("hls", len(unique_mutations)).as_hex()
+
+        to_show_chains = '( '
+        for c in chain:
+            to_show_chains += ':{} or'.format(c)
+        to_show_chains = to_show_chains.strip(' or ')
+        to_show_chains += ' )'
+
+        to_show_res = '( '
+        for m in unique_mutations:
+            to_show_res += '{} or '.format(m)
+        to_show_res = to_show_res.strip(' or ')
+        to_show_res += ' )'
+
+        log.info('Selection: {} and not hydrogen and {}'.format(to_show_chains, to_show_res))
+
+        view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res), color=color)
+
+        return view
+
+    def view_structure_and_highlight_residues_scaled(self, structure_resnums, chain=None, color='red', unique_colors=False,
+                                                     structure_opacity=0.5, opacity_range=(0.5,1), scale_range=(.7, 10),
+                                                     gui=False):
         """Input a list of residue numbers to view on the structure. Or input a dictionary of residue numbers to counts
             to scale residues by counts (useful to view mutations).
 
         Args:
             structure_resnums (int, list, dict): Residue number(s) to highlight, or
                 a dictionary of residue number to frequency count
+            chain (str, list): Chain ID or IDs of which residues are a part of. If not provided, all chains in the
+                mapped_chains attribute will be used. PLEASE NOTE: if that is also empty, all residues in all chains
+                matching the residue numbers will be shown.
             color (str): Color to highlight with
             unique_colors (bool): If each mutation should be colored uniquely (will override color argument)
             structure_opacity (float): Opacity of the protein structure cartoon representation
@@ -547,8 +605,6 @@ class StructProp(Object):
             NGLviewer object
 
         """
-        # TODO: chains must be specified otherwise all resnums matching the numbers are shown
-        # TODO: utilize mapped_chains attribute to show correct chains
         if not chain:
             chain = self.mapped_chains
             if not chain:
@@ -556,7 +612,9 @@ class StructProp(Object):
                 if not parsed:
                     log.error('{}: unable to open structure to get chains'.format(self.id))
                     return
-                log.info('Showing all residue numbers on all chains')
+                log.warning('Showing all residue numbers on all chains, please input chain if desired')
+        else:
+            chain = ssbio.utils.force_list(chain)
 
         if isinstance(structure_resnums, dict):
             opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], structure_resnums, rescale=opacity_range)
@@ -604,4 +662,3 @@ class StructProp(Object):
                                         color=color, opacity=opacity_dict[x], scale=scale_dict[x])
 
         return view
-
