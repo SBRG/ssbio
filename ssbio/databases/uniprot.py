@@ -12,10 +12,7 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-try:
-    import urllib.request as urlrequest
-except ImportError:
-    import urllib as urlrequest
+from six.moves.urllib.request import urlretrieve
 
 import logging
 log = logging.getLogger(__name__)
@@ -289,7 +286,7 @@ def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
     outfile = op.join(outdir, my_file)
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        urlrequest.urlretrieve(url, outfile)
+        urlretrieve(url, outfile)
 
     return outfile
 

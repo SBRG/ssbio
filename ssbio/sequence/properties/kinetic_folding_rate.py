@@ -10,7 +10,7 @@ except ImportError:
     from urllib import urlencode
     from urllib2 import build_opener
     from urllib2 import HTTPCookieProcessor
-
+# TODO: replace urllib usage with six library
 import scipy.constants
 import math
 # import cachetools
