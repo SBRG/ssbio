@@ -541,6 +541,9 @@ class ATLAS(Object):
                 all_percent_identity = []
                 all_percent_similarity = []
                 for aln in rseq.sequence_alignments:
+                    # Gather the strain speicific stuff
+                    info[aln.annotations['b_seq'].split('_')[1]] = aln.annotations['percent_identity']
+
                     # Gather the percent identities/similarities
                     all_percent_identity.append(aln.annotations['percent_identity'])
                     all_percent_similarity.append(aln.annotations['percent_similarity'])
@@ -643,6 +646,7 @@ class ATLAS(Object):
                 'RepChain_percent_B-dssp', 'RepChain_percent_C-dssp', 'RepChain_percent_E-dssp',
                 'RepChain_percent_G-dssp', 'RepChain_percent_H-dssp', 'RepChain_percent_I-dssp',
                 'RepChain_percent_S-dssp', 'RepChain_percent_T-dssp', 'RepChain_SSBOND-biopython']
+        cols.extend([x.id for x in self.atlas_strains])
         df_atlas_summary = pd.DataFrame(all_info, columns=cols)
         # Drop columns that don't have anything in them
         df_atlas_summary.dropna(axis=1, how='all', inplace=True)
@@ -681,7 +685,7 @@ class ATLAS(Object):
             resnum = int(k[1])
             mutated_res = k[2]
             num_strains = len(strains)
-            strain_ids = [str(x.split(g.protein.representative_sequence.id + '_')[1]) for x in strains]
+            strain_ids = [str(x.split(g.id + '_')[1]) for x in strains]
             to_append['base_residue'] = orig_res
             to_append['base_resnum'] = resnum
             to_append['strain_residue'] = mutated_res
