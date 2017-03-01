@@ -15,6 +15,7 @@ import ssbio.sequence.utils.fasta
 import ssbio.sequence.utils.alignment
 import ssbio.utils
 import requests
+import urllib
 from Bio.Seq import Seq
 import ssbio.structure.properties.quality
 import logging
@@ -30,6 +31,13 @@ class Protein(Object):
                                             'resolution','taxonomy_name']
 
     def __init__(self, ident, description=None):
+        """Initialize a Protein object, which contains:
+            sequences, structures, and 1 representative sequence and structure.
+
+        Args:
+            ident (str): Unique identifier for this protein
+            description (str): Optional description for this protein
+        """
         Object.__init__(self, id=ident, description=description)
         self.sequences = DictList()
         self.structures = DictList()
@@ -248,9 +256,11 @@ class Protein(Object):
 
         self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_file=seq_prop.sequence_path, seq=seq_prop.seq_record)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self._representative_sequence_attributes)
+        if self.representative_sequence.seq_record:
+            self.representative_sequence.seq_record.id = self.representative_sequence.id
 
     def set_representative_sequence(self):
-        """Consolidate sequence that were loaded and set a single representative sequence."""
+        """Consolidate sequences that were loaded and set a single representative sequence."""
 
         if len(self.sequences) == 0:
             log.error('{}: no sequences mapped'.format(self.id))
@@ -285,14 +295,14 @@ class Protein(Object):
 
             best_u = uniprot_mappings.get_by_id(best_u_id)
             self._representative_sequence_setter(best_u)
-            log.debug('{}: Representative sequence set from UniProt ID {}'.format(self.id, best_u_id))
+            log.debug('{}: representative sequence set from UniProt ID {}'.format(self.id, best_u_id))
 
         # If there are both UniProt and KEGG annotations...
         elif len(kegg_mappings) > 0 and len(uniprot_mappings) > 0:
             # Use KEGG if the mapped UniProt is unique, and it has PDBs
             if kegg_to_use.num_pdbs > 0 and not uniprot_mappings.has_id(kegg_to_use.uniprot):
                 self._representative_sequence_setter(kegg_to_use)
-                log.debug('{}: Representative sequence set from KEGG ID {}'.format(self.id, kegg_to_use.id))
+                log.debug('{}: representative sequence set from KEGG ID {}'.format(self.id, kegg_to_use.id))
             else:
                 # If there are multiple uniprots rank them by the sum of reviewed (bool) + num_pdbs
                 u_ranker = []
@@ -598,7 +608,7 @@ class Protein(Object):
                     # Download the mmCIF header file to get additional information
                     if 'cif' not in pdb_file_type:
                         pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
-                except requests.exceptions.HTTPError:
+                except requests.exceptions.HTTPError or urllib.error.URLError:
                     log.error('{}: structure file could not be downloaded'.format(pdb))
                     continue
                 pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
