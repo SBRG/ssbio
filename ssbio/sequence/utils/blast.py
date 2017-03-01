@@ -54,7 +54,7 @@ def run_makeblastdb(infile, dbtype, outdir=''):
             log.debug('Made BLAST database at {}'.format(outfile_basename))
             return outfile_all
         else:
-            log.error('Error running makeblastdb!')
+            log.error('Error running makeblastdb, exit code {}'.format(retval))
 
 
 def run_bidirectional_blast(reference, other_genome, dbtype, outdir=''):
@@ -86,8 +86,8 @@ def run_bidirectional_blast(reference, other_genome, dbtype, outdir=''):
     g_folder, g_name, g_ext = utils.split_folder_and_path(other_genome)
 
     # make sure BLAST DBs have been made
-    run_makeblastdb(infile=reference, dbtype=dbtype, outdir=outdir)
-    run_makeblastdb(infile=other_genome, dbtype=dbtype, outdir=outdir)
+    run_makeblastdb(infile=reference, dbtype=dbtype, outdir=r_folder)
+    run_makeblastdb(infile=other_genome, dbtype=dbtype, outdir=g_folder)
 
     # Reference vs genome
     r_vs_g = r_name + '_vs_' + g_name + '_blast.out'
@@ -140,9 +140,9 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, ou
 
     if not r_name and not g_name:
         r_name = op.basename(blast_results_1).split('_vs_')[0]
-        g_name = op.basename(blast_results_1).split('_vs_')[1].strip('_blast.out')
+        g_name = op.basename(blast_results_1).split('_vs_')[1].replace('_blast.out', '')
 
-        r_name2 = op.basename(blast_results_2).split('_vs_')[1].strip('_blast.out')
+        r_name2 = op.basename(blast_results_2).split('_vs_')[1].replace('_blast.out', '')
         if r_name != r_name2:
             log.warning('{} != {}'.format(r_name, r_name2))
 
@@ -198,10 +198,6 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=80, bitscore
         outfile = op.join(outdir, outname)
     else:
         outfile = op.join(outdir, '{}_orthology.csv'.format(r_name))
-
-    if op.exists(outfile) and os.stat(outfile).st_size != 0:
-        log.debug('{} orthologous genes already found at {}'.format(r_name, outfile))
-        return outfile
 
     out = pd.DataFrame()
 
