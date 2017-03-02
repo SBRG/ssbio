@@ -5,6 +5,7 @@ import sys
 import logging
 import numpy as np
 import pandas as pd
+import requests
 from Bio import SeqIO
 from copy import copy
 from bioservices import KEGG
@@ -60,15 +61,14 @@ Gene.__new__ = staticmethod(__new__)
 
 
 class GEMPRO(Object):
-    """Generic class to represent all information of a GEM-PRO for a GEM.
+    """Generic class to represent all information for a GEM-PRO project
 
-    Main steps are:
+    Main methods provided are:
     1. Mapping of sequence IDs
         a. With KEGG mapper
         b. With UniProt mapper
-        c. Using both
-        d. Allowing manual gene ID --> protein sequence entry
-        e. Allowing manual gene ID --> UniProt ID
+        c. Allowing manual gene ID --> protein sequence entry
+        d. Allowing manual gene ID --> UniProt ID
     2. Consolidating sequence IDs and setting a representative sequence
     3. Mapping of representative sequence --> structures
         a. With UniProt --> ranking of PDB structures
@@ -79,7 +79,7 @@ class GEMPRO(Object):
         c. Parsing I-TASSER runs
     5. Running QC/QA on structures and setting a representative structure
 
-    Each step may generate reports as a Pandas DataFrame and various logging messages.
+    Each step may generate reports as a Pandas DataFrame and also output various logging messages.
 
     """
 
@@ -89,7 +89,7 @@ class GEMPRO(Object):
                  genes_list=None,
                  genes_and_sequences=None,
                  description=None):
-        """Initialize the GEM-PRO project with a GEM (genome-scale model) or a list of genes.
+        """Initialize the GEM-PRO project with a genome-scale model, a list of genes, or a dict of genes and sequences.
 
         Specify the name of your project, along with the root directory where a folder with that name will be created.
 
@@ -102,14 +102,16 @@ class GEMPRO(Object):
                 most mapping functions need an output directory specified.
             root_dir (str): Path to where the folder named gem_name will be created.
                 Default is current working directory.
+            genome_path (str): Simple reference link to the genome FASTA file (CDS)
             gem (Model): COBRApy Model object
             gem_file_path (str): Path to GEM file
-            gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' format
+            gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' formats
             genes_list (list): List of gene IDs that you want to map
             genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
-            genome_path (str): Simple reference link to the genome FASTA file (CDS)
             description (str): Optional string to describe your project
+
         """
+
         Object.__init__(self, id=gem_name, description=description)
 
         self.pdb_file_type = pdb_file_type
@@ -129,25 +131,12 @@ class GEMPRO(Object):
         self.model = None
         # Load a model object
         if gem:
-            self.model = gem
-            self.genes = self.model.genes
-            log.info('{}: loaded model'.format(gem.id))
-            log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
-            log.info('{}: number of reactions'.format(len(self.model.reactions)))
-            log.info('{}: number of reactions linked to a gene'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
-            log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.cobra.utils.true_num_genes(self.model)))
-            log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
+            self._load_cobra_model(gem)
 
-        # Or load the GEM file itself
+        # Or, load a GEM file
         elif gem_file_path and gem_file_type:
-            self.model = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type)
-            self.genes = self.model.genes
-            log.info('{}: loaded model'.format(gem_file_path))
-            log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
-            log.info('{}: number of reactions'.format(len(self.model.reactions)))
-            log.info('{}: number of reactions linked to a gene'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
-            log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.cobra.utils.true_num_genes(self.model)))
-            log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
+            gem_manual = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type)
+            self._load_cobra_model(gem_manual)
 
         # Or, load a list of gene IDs
         elif genes_list:
@@ -160,7 +149,7 @@ class GEMPRO(Object):
             self.manual_seq_mapping(genes_and_sequences)
             log.info('{}: number of genes'.format(len(self.genes)))
 
-        # If neither a model or genes are input, you can still add_genes_by_id later
+        # If neither a model or genes are input, you can still add IDs with method add_genes_by_id later
         else:
             self.genes = []
             log.warning('No model or genes input')
@@ -220,8 +209,25 @@ class GEMPRO(Object):
 
         log.info('{}: GEM-PRO project files location'.format(self.base_dir))
 
+    def _load_cobra_model(self, model):
+        """Load a COBRApy Model object into the GEM-PRO project.
+
+        Args:
+            model: COBRApy Model
+
+        """
+        self.model = model
+        self.genes = model.genes
+        log.info('{}: loaded model'.format(model.id))
+        log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
+        log.info('{}: number of reactions'.format(len(self.model.reactions)))
+        log.info('{}: number of reactions linked to a gene'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
+        log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.cobra.utils.true_num_genes(self.model)))
+        log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
+
     @property
     def genes_with_structures(self):
+        """Return a DictList of all genes with any available protein structures"""
         return DictList(x for x in self.genes if x.protein.num_structures > 0)
 
     @property
@@ -231,7 +237,7 @@ class GEMPRO(Object):
 
     @property
     def genes_with_homology_models(self):
-        """Return a DictList of all homology models in self.structures"""
+        """Return a DictList of all genes that have at least one homology model"""
         return DictList(x for x in self.genes_with_structures if x.protein.num_structures_homology > 0)
 
     @property
@@ -242,7 +248,7 @@ class GEMPRO(Object):
     def genes(self, genes_list):
         """Set the genes attribute to be a DictList of GenePro objects.
 
-        A "protein" attribute will be added to the Genes.
+        A "protein" attribute will be added to each Gene.
 
         Args:
             genes_list: DictList of COBRApy Gene objects, or list of gene IDs
@@ -274,14 +280,12 @@ class GEMPRO(Object):
 
         # Add unique genes only
         self.genes.union(new_genes)
-        # TODO: report union length?
-        # log.info('Added {} genes to the list of genes'.format(len(new_genes)))
 
     ####################################################################################################################
     ### SEQUENCE RELATED METHODS ###
     def kegg_mapping_and_metadata(self, kegg_organism_code, custom_gene_mapping=None, outdir=None,
                                   set_as_representative=False, force_rerun=False):
-        """Map all genes in the model to UniProt IDs using the KEGG service.
+        """Map all genes in the model to KEGG IDs using the KEGG service.
 
         This function does these things:
             1. Download all metadata and sequence files in the sequences directory
@@ -295,6 +299,7 @@ class GEMPRO(Object):
                 Dictionary keys must match model gene IDs.
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            set_as_representative (bool): If mapped KEGG IDs should be set as representative sequences
             force_rerun (bool): If you want to overwrite any existing mappings and files
 
         """
@@ -303,15 +308,14 @@ class GEMPRO(Object):
             if not outdir:
                 raise ValueError('Output directory must be specified')
 
-        # All data will be stored in a dataframe
+        # All data will be summarized in a dataframe
         kegg_pre_df = []
-        # TODO: update dataframe columns (there might be more now)
         df_cols = ['gene', 'kegg', 'refseq', 'uniprot', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
         # First map all of the organism's KEGG genes to UniProt
         kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
 
-        counter = 0
+        successfully_mapped_counter = 0
         kegg_missing = []
 
         for g in tqdm(self.genes):
@@ -320,11 +324,12 @@ class GEMPRO(Object):
             else:
                 kegg_g = g.id
 
-            # Always make the gene specific folder under the sequence_files directory
+            # Always make the gene specific folder under the sequences directory
             gene_folder = op.join(outdir, g.id)
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
+            # Download both FASTA and KEGG metadata files
             kegg_prop = g.protein.load_kegg(kegg_id=kegg_g, kegg_organism_code=kegg_organism_code,
                                             download=True, outdir=gene_folder,
                                             set_as_representative=set_as_representative, force_rerun=force_rerun)
@@ -336,11 +341,11 @@ class GEMPRO(Object):
                     if g.protein.representative_sequence.kegg == kegg_prop.kegg:
                         g.protein.representative_sequence.uniprot = kegg_to_uniprot[kegg_g]
 
-            # Keep track of missing mappings - missing means no sequence is available
+            # Keep track of missing mappings - missing is defined by no available sequence
             if not kegg_prop.sequence_file:
                 kegg_missing.append(g.id)
             else:
-                counter += 1
+                successfully_mapped_counter += 1
 
             # Get a (deep)copy of the KEGG properties
             kegg_dict = kegg_prop.get_dict(df_format=True, only_keys=df_cols)
@@ -351,7 +356,7 @@ class GEMPRO(Object):
 
             log.debug('{}: loaded KEGG information for gene'.format(g.id))
 
-        log.info('{} genes mapped to KEGG'.format(counter))
+        log.info('{}: number of genes mapped to KEGG'.format(successfully_mapped_counter))
 
         # Save a dataframe of the file mapping info
         self.df_kegg_metadata = pd.DataFrame.from_records(kegg_pre_df, columns=df_cols)
@@ -361,14 +366,15 @@ class GEMPRO(Object):
         # Info on genes that could not be mapped
         if len(kegg_missing) > 0:
             self.missing_kegg_mapping = list(set(kegg_missing))
-            log.warning('{} gene(s) could not be mapped. Inspect the "missing_kegg_mapping" attribute.'.format(len(self.missing_kegg_mapping)))
+            log.warning('{}: number of genes that could not be mapped. Inspect the "missing_kegg_mapping" attribute.'.format(len(self.missing_kegg_mapping)))
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
                                      set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.
 
         Args:
-            model_gene_source (str): the database source of your model gene IDs, see http://www.uniprot.org/help/programmatic_access
+            model_gene_source (str): the database source of your model gene IDs
+                See: http://www.uniprot.org/help/programmatic_access
                 Common model gene sources are:
                 Ensembl Genomes - ENSEMBLGENOME_ID (i.e. E. coli b-numbers)
                 Entrez Gene (GeneID) - P_ENTREZGENEID
@@ -378,6 +384,7 @@ class GEMPRO(Object):
                 Dictionary keys must match model genes.
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences
             force_rerun (bool): If you want to overwrite any existing mappings and files
 
         """
@@ -400,7 +407,7 @@ class GEMPRO(Object):
         df_cols = ['gene', 'uniprot', 'reviewed', 'gene_name', 'kegg', 'refseq', 'num_pdbs', 'pdbs', 'ec_number', 'pfam',
                    'seq_len', 'description', 'entry_version', 'seq_version', 'sequence_file', 'metadata_file']
 
-        counter = 0
+        successfully_mapped_counter = 0
         uniprot_missing = []
         for g in tqdm(self.genes):
             if custom_gene_mapping and g.id in custom_gene_mapping.keys():
@@ -423,15 +430,22 @@ class GEMPRO(Object):
                 log.debug('{}: unable to map to UniProt'.format(g.id))
             else:
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
-                    uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=gene_folder,
-                                                          set_as_representative=set_as_representative,
-                                                          force_rerun=force_rerun)
+                    try:
+                        uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=gene_folder,
+                                                              set_as_representative=set_as_representative,
+                                                              force_rerun=force_rerun)
+                    except requests.HTTPError as e:
+                        print(e)
+                        log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
+                        uniprot_missing.append(g.id)
+                        continue
 
                     # Keep track of missing ones
                     if not uniprot_prop.sequence_file:
                         uniprot_missing.append(g.id)
+                        continue
                     else:
-                        counter += 1
+                        successfully_mapped_counter += 1
 
                     uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
 
@@ -439,11 +453,14 @@ class GEMPRO(Object):
                     uniprot_dict['gene'] = g.id
                     uniprot_pre_df.append(uniprot_dict)
 
+        log.info('{}: number of genes mapped to UniProt'.format(successfully_mapped_counter))
+
         # Save a dataframe of the UniProt metadata
         if not self.df_uniprot_metadata.empty:
+            # TODO: updating dataframes should be a merge operation to ignore duplicates
             self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
             self.df_uniprot_metadata.fillna(value=np.nan, inplace=True)
-            log.info('Updated existing UniProt dataframe.')
+            log.info('Updated existing UniProt dataframe. See the "df_uniprot_metadata" attribute.')
         else:
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=df_cols)
             self.df_uniprot_metadata.fillna(value=np.nan, inplace=True)
@@ -455,8 +472,8 @@ class GEMPRO(Object):
             log.warning('{} gene(s) could not be mapped. Inspect the "missing_uniprot_mapping" attribute.'.format(
                     len(self.missing_uniprot_mapping)))
 
-    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None):
-        """Read a manual dictionary of model gene IDs --> UniProt IDs.
+    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, set_as_representative=True):
+        """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
 
@@ -467,6 +484,7 @@ class GEMPRO(Object):
                 ...
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences
 
         """
 
@@ -477,10 +495,11 @@ class GEMPRO(Object):
 
         uniprot_pre_df = []
         df_cols = ['gene', 'uniprot', 'seq_len', 'sequence_file', 'num_pdbs', 'pdbs', 'gene_name', 'reviewed',
-                    'kegg', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
-                    'metadata_file']
+                   'kegg', 'refseq', 'ec_number', 'pfam', 'description', 'entry_version', 'seq_version',
+                   'metadata_file']
 
-        for g,u in gene_to_uniprot_dict.items():
+        for g, u in gene_to_uniprot_dict.items():
+            g = str(g)
             gene = self.genes.get_by_id(g)
 
             # Make the gene folder
@@ -488,9 +507,14 @@ class GEMPRO(Object):
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
-            uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
-                                                     outdir=gene_folder, download=True,
-                                                     set_as_representative=True)
+            try:
+                uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
+                                                         outdir=gene_folder, download=True,
+                                                         set_as_representative=set_as_representative)
+            except requests.HTTPError as e:
+                print(e)
+                log.error('{}, {}: unable to complete web request'.format(g, u))
+                continue
 
             uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
 
@@ -511,17 +535,16 @@ class GEMPRO(Object):
         # Save a dataframe of the UniProt metadata
         # Add all new entries to the df_uniprot_metadata
         if not self.df_uniprot_metadata.empty:
+            # TODO: updating dataframes should be a merge operation to ignore duplicates
             self.df_uniprot_metadata = self.df_uniprot_metadata.append(uniprot_pre_df, ignore_index=True).reset_index(drop=True)
             log.info('Updated existing UniProt dataframe.')
         else:
             self.df_uniprot_metadata = pd.DataFrame.from_records(uniprot_pre_df, columns=df_cols)
             log.info('Created UniProt metadata dataframe.')
 
-    # TODO: should also have a seq --> uniprot id function (has to be 100% match) (what about organism?)
-    def manual_seq_mapping(self, gene_to_seq_dict, outdir=None):
-        """Read a manual input dictionary of model gene IDs --> protein sequences.
-
-        Save the sequence in the Gene object.
+    # TODO: should also have a seq --> uniprot id function (has to be 100% match) (also needs organism)
+    def manual_seq_mapping(self, gene_to_seq_dict, outdir=None, set_as_representative=True):
+        """Read a manual input dictionary of model gene IDs --> protein sequences. By default sets them as representative.
 
         Args:
             gene_to_seq_dict: Dictionary of mappings with key:value pairs:
@@ -530,6 +553,7 @@ class GEMPRO(Object):
                  ...}
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            set_as_representative (bool): If mapped sequences should be set as representative
 
         """
 
@@ -549,7 +573,7 @@ class GEMPRO(Object):
 
             manual_info = gene.protein.load_manual_sequence(ident=g, seq=s, outdir=gene_folder,
                                                             write_fasta_file=True,
-                                                            set_as_representative=True)
+                                                            set_as_representative=set_as_representative)
             log.debug('{}: loaded manually defined sequence information'.format(g))
 
         log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
@@ -568,7 +592,7 @@ class GEMPRO(Object):
         df_cols = ['gene', 'uniprot', 'kegg', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
         sequence_missing = []
-        counter = 0
+        successfully_mapped_counter = 0
         for g in tqdm(self.genes):
             repseq = g.protein.set_representative_sequence()
 
@@ -577,7 +601,7 @@ class GEMPRO(Object):
             elif not repseq.sequence_path:
                 sequence_missing.append(g.id)
             else:
-                counter += 1
+                successfully_mapped_counter += 1
 
             # For saving the dataframe
             gene_dict = g.protein.representative_sequence.get_dict(df_format=True, only_keys=df_cols)
@@ -586,7 +610,7 @@ class GEMPRO(Object):
 
         tmp = pd.DataFrame.from_records(seq_mapping_pre_df, columns=df_cols)
 
-        # TODO: info on genes that could be mapped!
+        log.info('{}: number of genes with a representative sequence'.format(successfully_mapped_counter))
 
         # Info on genes that could not be mapped
         if len(sequence_missing) > 0:
@@ -598,13 +622,14 @@ class GEMPRO(Object):
         self.df_representative_sequences.fillna(value=np.nan, inplace=True)
         log.info('Created sequence mapping dataframe. See the "df_representative_sequences" attribute.')
 
-    def write_representative_sequences_file(self, outname, outdir=None):
-        """Write all the model's sequences as a single FASTA file
+    def write_representative_sequences_file(self, outname, outdir=None, set_ids_from_model=True):
+        """Write all the model's sequences as a single FASTA file. By default, sets IDs to model gene IDs.
 
         Args:
             outname (str): Name of the output FASTA file without the extension
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            set_ids_from_model (bool): If the gene ID source should be the model gene IDs, not the original sequence ID
 
         """
 
@@ -613,7 +638,6 @@ class GEMPRO(Object):
             if not outdir:
                 raise ValueError('Output directory must be specified')
 
-        # TODO: not sure if i like this outname / outdir / outext thing
         outfile = op.join(outdir, outname + '.faa')
 
         tmp = []
@@ -621,8 +645,10 @@ class GEMPRO(Object):
             repseq = x.protein.representative_sequence
             if repseq:
                 if repseq.seq_record:
-                    repseq.seq_record.id = repseq.id
-                    tmp.append(repseq.seq_record)
+                    copied_seq_record = copy(repseq.seq_record)
+                    if set_ids_from_model:
+                        copied_seq_record.id = x.id
+                    tmp.append(copied_seq_record)
 
         SeqIO.write(tmp, outfile, "fasta")
 
@@ -631,7 +657,7 @@ class GEMPRO(Object):
         return self.genome_path
 
     def get_sequence_properties(self):
-        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize the protein sequences.
+        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
 
         Annotations are stored in the gene protein's representative sequence at .seq_record.annotations
 
@@ -641,14 +667,15 @@ class GEMPRO(Object):
                 g.protein.representative_sequence.get_biopython_pepstats()
                 g.protein.representative_sequence.get_emboss_pepstats()
             else:
-                log.warning('{}: no representative sequence set'.format(g.id))
+                log.warning('{}: no representative sequence set, unable to get sequence properties'.format(g.id))
 
-    def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', exposed_buried_cutoff=25):
+    def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', num_cores=1,
+                                exposed_buried_cutoff=25, custom_gene_mapping=None):
         """Run and parse SCRATCH results to predict secondary structure and solvent accessibility.
 
-        Annotations are stored in the gene protein's representative sequence at:
-            .seq_record.annotations and
-            .seq_record.letter_annotations
+            Annotations are stored in the gene protein's representative sequence at:
+                .seq_record.annotations and
+                .seq_record.letter_annotations
 
         Args:
             path_to_scratch (str): Path to SCRATCH executable
@@ -656,6 +683,9 @@ class GEMPRO(Object):
             scratch.acc, scratch.acc20)
             scratch_basename (str): Basename of the SCRATCH results ('scratch' is default)
             exposed_buried_cutoff (int): Cutoff of exposed/buried for the acc20 predictions
+            custom_gene_mapping (dict): Default parsing of SCRATCH output files is to look for the model gene IDs. If
+                your output files contain IDs which differ from the model gene IDs, use this dictionary to map model
+                gene IDs to result file IDs. Dictionary keys must match model genes.
 
         """
         if not self.genome_path:
@@ -664,42 +694,81 @@ class GEMPRO(Object):
 
         # Runs SCRATCH or loads existing results in results_dir
         scratch = SCRATCH(project_name=scratch_basename, seq_file=self.genome_path)
-        scratch.run_scratch(path_to_scratch=path_to_scratch, outdir=results_dir)
+        scratch.run_scratch(path_to_scratch=path_to_scratch, num_cores=num_cores, outdir=results_dir)
+
+        counter = 0
 
         # Adding the scratch annotations to the representative_sequences letter_annotations
         for g in tqdm(self.genes):
-            if g.protein.representative_sequence.id in scratch.sspro_summary():
+            if custom_gene_mapping:
+                g_id = custom_gene_mapping[g.id]
+            else:
+                g_id = g.id
+
+            if not g.protein.representative_sequence:
+                log.error('{}: no representative sequence set'.format(g.id))
+                continue
+
+            if not g.protein.representative_sequence.seq_record:
+                log.error('{}: no sequence loaded'.format(g.id))
+                continue
+
+            if g_id in scratch.sspro_summary():
                 # Secondary structure
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.sspro_summary()[g.id])
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.sspro8_summary()[g.id])
-                g.protein.representative_sequence.load_letter_annotations('SS-sspro', scratch.sspro_results()[g.id])
-                g.protein.representative_sequence.load_letter_annotations('SS-sspro8', scratch.sspro8_results()[g.id])
+                g.protein.representative_sequence.seq_record.annotations.update(scratch.sspro_summary()[g_id])
+                g.protein.representative_sequence.seq_record.annotations.update(scratch.sspro8_summary()[g_id])
+                g.protein.representative_sequence.load_letter_annotations('SS-sspro', scratch.sspro_results()[g_id])
+                g.protein.representative_sequence.load_letter_annotations('SS-sspro8', scratch.sspro8_results()[g_id])
 
                 # Solvent accessibility
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.accpro_summary()[g.id])
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.accpro20_summary(exposed_buried_cutoff)[g.id])
-                g.protein.representative_sequence.load_letter_annotations('RSA-accpro', scratch.accpro_results()[g.id])
-                g.protein.representative_sequence.load_letter_annotations('RSA-accpro20', scratch.accpro20_results()[g.id])
-            else:
-                log.error("{}: missing SCRATCH results".format(g.protein.representative_sequence.id))
+                g.protein.representative_sequence.seq_record.annotations.update(scratch.accpro_summary()[g_id])
+                g.protein.representative_sequence.seq_record.annotations.update(scratch.accpro20_summary(exposed_buried_cutoff)[g_id])
+                g.protein.representative_sequence.load_letter_annotations('RSA-accpro', scratch.accpro_results()[g_id])
+                g.protein.representative_sequence.load_letter_annotations('RSA-accpro20', scratch.accpro20_results()[g_id])
 
-    def get_tmhmm_predictions(self, tmhmm_results):
+                counter += 1
+            else:
+                log.error('{}: missing SCRATCH results'.format(g.id))
+
+        log.info('{}: number of genes with SCRATCH predictions loaded'.format(counter))
+
+    def get_tmhmm_predictions(self, tmhmm_results, custom_gene_mapping):
         """Parse TMHMM results and store in the representative sequences
 
         Args:
             tmhmm_results (str): Path to TMHMM results (long format)
+            custom_gene_mapping (dict): Default parsing of TMHMM output is to look for the model gene IDs. If
+                your output file contains IDs which differ from the model gene IDs, use this dictionary to map model
+                gene IDs to result file IDs. Dictionary keys must match model genes.
 
         """
         tmhmm_dict = ssbio.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
+
+        counter = 0
         for g in tqdm(self.genes):
-            if g.protein.representative_sequence:
-                if g.protein.representative_sequence.seq_record:
-                    if g.protein.representative_sequence.id in tmhmm_dict:
-                        log.debug('{}: loading TMHMM results'.format(g.protein.representative_sequence.id))
-                        g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g.protein.representative_sequence.id]['num_tm_helices']
-                        g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g.protein.representative_sequence.id]['sequence'])
-                    else:
-                        log.error("{}: missing TMHMM results".format(g.protein.representative_sequence.id))
+            if custom_gene_mapping:
+                g_id = custom_gene_mapping[g.id]
+            else:
+                g_id = g.id
+
+            if not g.protein.representative_sequence:
+                log.error('{}: no representative sequence set'.format(g.id))
+                continue
+
+            if not g.protein.representative_sequence.seq_record:
+                log.error('{}: no sequence loaded'.format(g.id))
+                continue
+
+            if g.protein.representative_sequence.id in tmhmm_dict:
+                log.debug('{}: loading TMHMM results'.format(g.id))
+                g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g_id]['num_tm_helices']
+                g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g_id]['sequence'])
+                counter += 1
+            else:
+                log.error("{}: missing TMHMM results".format(g.id))
+
+        log.info('[}: number of genes with TMHMM predictions loaded'.format(counter))
+
     ### END SEQUENCE RELATED METHODS ###
     ####################################################################################################################
 
@@ -740,11 +809,20 @@ class GEMPRO(Object):
                     all_representative_uniprots.append(uniprot_id)
         uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
 
+        # Now run the best_structures API for all genes
         for g in tqdm(self.genes):
+
+            # Check if a representative sequence was set
+            if not g.protein.representative_sequence:
+                log.warning('{}: no representative sequence set, cannot use best structures API'.format(g.id))
+                continue
+
+            # Check if a UniProt ID is attached to the representative sequence
             uniprot_id = g.protein.representative_sequence.uniprot
             if not uniprot_id:
                 log.warning('{}: no representative UniProt ID set, cannot use best structures API'.format(g.id))
                 continue
+
             else:
                 if uniprot_id in uniprots_to_pdbs:
                     best_structures = ssbio.databases.pdb.best_structures(uniprot_id,
@@ -761,11 +839,13 @@ class GEMPRO(Object):
 
                             # load_pdb will append this protein to the list
                             new_pdb = g.protein.load_pdb(pdb_id=currpdb, mapped_chains=currchain)
-                            # Also add this chain to the chains attribute so we can save the info we get from best_structures
+
+                            # Also add this chain to the chains attribute so we can save the
+                            # info we get from best_structures
                             new_pdb.add_chain_ids(currchain)
 
-                            pdb_specific_keys = ['experimental_method','resolution']
-                            chain_specific_keys = ['coverage','start','end','unp_start','unp_end']
+                            pdb_specific_keys = ['experimental_method', 'resolution']
+                            chain_specific_keys = ['coverage', 'start', 'end', 'unp_start', 'unp_end']
 
                             new_pdb.update(best_structure, only_keys=pdb_specific_keys)
                             new_chain = new_pdb.chains.get_by_id(currchain)
@@ -820,6 +900,7 @@ class GEMPRO(Object):
                 raise ValueError('Output directory must be specified')
 
         blast_results_pre_df = []
+        counter = 0
 
         for g in tqdm(self.genes):
             # Check if a representative sequence was set
@@ -827,15 +908,12 @@ class GEMPRO(Object):
                 log.warning('{}: no representative sequence set, cannot BLAST'.format(g.id))
                 continue
 
-            seq_name = g.protein.representative_sequence.id
-            seq_str = g.protein.representative_sequence.seq_str
-
-            if not seq_str:
-                log.warning('{}: no representative sequence set, cannot BLAST'.format(g.id))
+            # Also need to check if a sequence has been stored
+            if not g.protein.representative_sequence.seq_str:
+                log.warning('{}: no representative sequence loaded, cannot BLAST'.format(g.id))
                 continue
 
-            # If all_genes=False, BLAST only genes without a uniprot->pdb mapping
-
+            # If all_genes=False, BLAST only genes without a uniprot -> pdb mapping
             if g.protein.num_structures > 0 and not all_genes:
                 log.debug('{}: skipping BLAST, {} structures already mapped and all_genes flag is False'.format(g.protein.num_structures,
                                                                                                                 g.id))
@@ -846,21 +924,29 @@ class GEMPRO(Object):
             if not op.exists(gene_folder):
                 os.mkdir(gene_folder)
 
+            seq_name = g.protein.representative_sequence.id
+            seq_str = g.protein.representative_sequence.seq_str
             # BLAST the sequence to the PDB
-            blast_results = ssbio.databases.pdb.blast_pdb(seq_str,
-                                                          outfile='{}_blast_pdb.xml'.format(custom_slugify(seq_name)),
-                                                          outdir=op.join(outdir, g.id),
-                                                          force_rerun=force_rerun,
-                                                          evalue=evalue,
-                                                          seq_ident_cutoff=seq_ident_cutoff,
-                                                          link=display_link)
+            try:
+                blast_results = ssbio.databases.pdb.blast_pdb(seq_str,
+                                                              outfile='{}_blast_pdb.xml'.format(custom_slugify(seq_name)),
+                                                              outdir=op.join(outdir, g.id),
+                                                              force_rerun=force_rerun,
+                                                              evalue=evalue,
+                                                              seq_ident_cutoff=seq_ident_cutoff,
+                                                              link=display_link)
+            except requests.ConnectionError as e:
+                print(e)
+                log.error('{}: BLAST request timed out'.format(g.id))
+                continue
 
             if blast_results:
                 # Filter for new BLASTed PDBs
                 pdbs = [x['hit_pdb'].lower() for x in blast_results]
                 new_pdbs = [y for y in pdbs if not g.protein.structures.has_id(y)]
                 if new_pdbs:
-                    log.info('{}: adding {} PDBs from BLAST results'.format(g.id, len(new_pdbs)))
+                    log.debug('{}: adding {} PDBs from BLAST results'.format(g.id, len(new_pdbs)))
+                    counter += 1
                 blast_results = [z for z in blast_results if z['hit_pdb'].lower() in new_pdbs]
 
                 for blast_result in blast_results:
@@ -868,12 +954,15 @@ class GEMPRO(Object):
                     chains = blast_result['hit_pdb_chains']
 
                     for chain in chains:
-                        # load_pdb will append this protein to the list
+                        # load_pdb will append this protein to the list of structures
                         new_pdb = g.protein.load_pdb(pdb_id=pdb, mapped_chains=chain)
                         new_pdb.add_chain_ids(chain)
                         new_chain = new_pdb.chains.get_by_id(chain)
+                        # Store BLAST results
+                        # TODO: should these be their own attributes? or just a dictionary under a "blast_results" attr
                         new_chain.update(blast_result, only_keys=['hit_score', 'hit_evalue', 'hit_percent_similar',
                                                                   'hit_percent_ident', 'hit_num_ident', 'hit_num_similar'])
+
                         # For saving in the summary dataframe
                         pdb_dict = new_pdb.get_dict_with_chain(chain=chain, df_format=True)
                         pdb_dict['gene'] = g.id
@@ -890,7 +979,7 @@ class GEMPRO(Object):
         self.df_pdb_blast = pd.DataFrame.from_records(blast_results_pre_df, columns=cols)
 
         log.info('Completed sequence --> PDB BLAST. See the "df_pdb_blast" attribute.')
-        # TODO: log.info for counts - num pdbs with no blast hits, number with (instead of in the for loop)
+        log.info('{}: number of genes with additional structures added from BLAST'.format(counter))
 
     def manual_homology_models(self, input_dict, outdir=None, clean=True, force_rerun=False):
         """Copy homology models to the GEM-PRO project.
@@ -936,13 +1025,13 @@ class GEMPRO(Object):
                         # Just copy the file to the structure directory and store the file name
                         shutil.copy2(hdict['model_file'], dest_gene_dir)
 
-                # TODO: how to handle other info?
+                # TODO: need to handle other info in the provided dictionary, if any
                 new_homology.update(hdict)
 
                 log.debug('{}: updated homology model information and copied model file.'.format(g.id))
             counter += 1
 
-        # TODO: dataframe for this stuff
+        # TODO: dataframe for this stuff?
 
         log.info('Updated homology model information for {} genes.'.format(counter))
 
@@ -1020,7 +1109,7 @@ class GEMPRO(Object):
             else:
                 log.debug('{}: homology modeling unfinished'.format(g.id))
 
-        # TODO: write a "dataframe_update" method to 1) create a new df if empty, 2) or append to an existing one but
+        # TODO: use merging functions here to 1) create a new df if empty, 2) or append to an existing one but
         # checks for existing gene IDs (has to be an empty row value tho?)
         if not self.df_itasser.empty:
             self.df_itasser = self.df_itasser.append(itasser_pre_df, ignore_index=True).reset_index(drop=True)
@@ -1030,9 +1119,8 @@ class GEMPRO(Object):
         # Drop columns that don't have anything in them
         self.df_itasser.dropna(axis=1, how='all', inplace=True)
 
-        log.info('Completed copying of {} I-TASSER models to GEM-PRO directory'.format(counter))
-        log.info('{} I-TASSER models total'.format(len(self.df_itasser)))
-        log.info('See the "df_itasser" attribute for a summary dataframe')
+        log.info('Completed copying of {} I-TASSER models to GEM-PRO directory. See the "df_itasser" attribute.'.format(counter))
+        log.info('{}: total number of I-TASSER models'.format(len(self.df_itasser)))
 
     def set_representative_structure(self, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
                                      engine='needle', always_use_homology=False,
@@ -1203,6 +1291,7 @@ class GEMPRO(Object):
 
         pdb_pre_df = []
 
+        counter = 0
         for g in tqdm(self.genes):
             # Make the gene directory for structures
             gene_struct_dir = op.join(outdir, g.id)
@@ -1227,17 +1316,20 @@ class GEMPRO(Object):
                 infodict['gene'] = g.id
                 infodict['pdb_id'] = s.id
                 pdb_pre_df.append(infodict)
+                counter += 1
 
         # Save a dataframe of the PDB metadata
         if not self.df_pdb_metadata.empty:
             self.df_pdb_metadata = self.df_pdb_metadata.append(pdb_pre_df, ignore_index=True).drop_duplicates().reset_index(drop=True)
-            log.info('Updated existing PDB dataframe.')
+            log.info('Updated existing PDB dataframe. See the "df_pdb_metadata" attribute.')
         else:
             cols = ['gene', 'pdb_id', 'pdb_title','description', 'experimental_method',
                     'resolution', 'chemicals', 'date', 'taxonomy_name',
                     'structure_file']
             self.df_pdb_metadata = pd.DataFrame.from_records(pdb_pre_df, columns=cols)
-            log.info('Created PDB metadata dataframe.')
+            log.info('Created PDB metadata dataframe. See the "df_pdb_metadata" attribute.')
+
+        log.info('Saved {} structures to {}'.format(counter, outdir))
 
     def get_dssp_annotations(self):
         """Run DSSP on all representative structures and store calculations.
@@ -1253,7 +1345,7 @@ class GEMPRO(Object):
                 except PDBException:
                     log.error('{}: DSSP failed to run on {}'.format(g.id, g.protein.representative_structure))
                 except TypeError:
-                    log.error('{}: SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
+                    log.error('{}: DSSP SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
 
     def get_msms_annotations(self):
         """Run MSMS on all representative structures and store calculations.
@@ -1266,7 +1358,7 @@ class GEMPRO(Object):
                 try:
                     g.protein.representative_structure.get_residue_depths(outdir=op.join(self.structure_single_chain_dir, g.id))
                 except TypeError:
-                    log.error('{}: SeqRecord mismatch with {}'.format(g.id, g.protein.representative_structure))
+                    log.error('{}: MSMS SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
 
     def get_disulfide_bridges(self):
         """Run Biopython's disulfide bridge finder and store calculations.
