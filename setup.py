@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='ssbio',
-        version='1.0.0-alpha',
+        version='1.0.0a0',
         author='Nathan Mih',
         author_email='nmih@ucsd.edu',
         license='MIT',
@@ -35,5 +35,6 @@ setup(
                           #'nglview',
                           'ipywidgets',
                           'qgrid',
-                          'lxml']
+                          'lxml',
+                          'json_tricks']
 )

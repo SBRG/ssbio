@@ -1,7 +1,7 @@
 Python API
 ==========
 
-.. automodule:: ssbio.gempro.pipeline
+.. automodule:: ssbio.pipeline.gempro
 
 .. autoclass:: GEMPRO
    :members:

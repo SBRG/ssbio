@@ -1,171 +1,633 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Python API &#8212; ssbio 0.1 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="ssbio 0.1 documentation" href="index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="test.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
   
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head>
-  <body role="document">
+  <title>Python API &mdash; ssbio 1.0.0-alpha documentation</title>
   
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="ssbio 1.0.0-alpha documentation" href="index.html"/>
+        <link rel="next" title="GEM-PRO pipeline" href="gempro.html"/>
+        <link rel="prev" title="Where" href="test.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ssbio
+          
+
+          
+          </a>
+
+          
             
-  <div class="section" id="module-ssbio.gempro.pipeline">
-<span id="python-api"></span><h1>Python API<a class="headerlink" href="#module-ssbio.gempro.pipeline" title="Permalink to this headline">¶</a></h1>
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Escher, COBRA, and COBRApy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Where</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gempro.html">GEM-PRO pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gempro.html#introduction">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gempro.html#starting-with-an-sbml-model">Starting with an SBML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gempro.html#starting-with-a-list-of-gene-ids">Starting with a list of gene IDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gempro.html#starting-with-a-dictionary-of-gene-ids-and-their-sequences">Starting with a dictionary of gene IDs and their sequences</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ssbio</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Python API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/python_api.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="module-ssbio.pipeline.gempro">
+<span id="python-api"></span><h1>Python API<a class="headerlink" href="#module-ssbio.pipeline.gempro" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="ssbio.gempro.pipeline.GEMPRO">
-<em class="property">class </em><code class="descclassname">ssbio.gempro.pipeline.</code><code class="descname">GEMPRO</code><span class="sig-paren">(</span><em>gem_name</em>, <em>root_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generic class to represent all information of a GEM-PRO for a GEM</p>
-<p>Main steps are:
-1. Preparation of folders
-2. Automatic ID mapping
-3. QC/QA
-4. Homology modeling
-5. Representative structures</p>
-<p>Each step may generate a report and also request additional files if mappings are incomplete</p>
+<dt id="ssbio.pipeline.gempro.GEMPRO">
+<em class="property">class </em><code class="descclassname">ssbio.pipeline.gempro.</code><code class="descname">GEMPRO</code><span class="sig-paren">(</span><em>gem_name</em>, <em>pdb_file_type='cif'</em>, <em>create_dirs=True</em>, <em>root_dir=None</em>, <em>genome_path=None</em>, <em>gem=None</em>, <em>gem_file_path=None</em>, <em>gem_file_type=None</em>, <em>genes_list=None</em>, <em>genes_and_sequences=None</em>, <em>description=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic class to represent all information for a GEM-PRO project</p>
+<p>Main methods provided are:
+1. Mapping of sequence IDs</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>With KEGG mapper</li>
+<li>With UniProt mapper</li>
+<li>Allowing manual gene ID &#8211;&gt; protein sequence entry</li>
+<li>Allowing manual gene ID &#8211;&gt; UniProt ID</li>
+</ol>
+</div></blockquote>
+<ol class="arabic" start="2">
+<li><p class="first">Consolidating sequence IDs and setting a representative sequence</p>
+</li>
+<li><dl class="first docutils">
+<dt>Mapping of representative sequence &#8211;&gt; structures</dt>
+<dd><ol class="first last loweralpha simple">
+<li>With UniProt &#8211;&gt; ranking of PDB structures</li>
+<li>BLAST representative sequence &#8211;&gt; PDB database</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Homology modeling</dt>
+<dd><ol class="first last loweralpha simple">
+<li>Mapping to existing models</li>
+<li>Preparation for running I-TASSER</li>
+<li>Parsing I-TASSER runs</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p class="first">Running QC/QA on structures and setting a representative structure</p>
+</li>
+</ol>
+<p>Each step may generate reports as a Pandas DataFrame and also output various logging messages.</p>
 <dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.blast_seqs_to_pdb">
-<code class="descname">blast_seqs_to_pdb</code><span class="sig-paren">(</span><em>custom_df</em>, <em>evalue=0.001</em>, <em>link=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.blast_seqs_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.blast_seqs_to_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>BLAST each gene sequence to the PDB. Results are saved as dataframes in the structure_files folder.</p>
-<p>Returns: Path to summary results dataframe which details best hit for each gene.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.cosonlidate_mappings">
-<code class="descname">cosonlidate_mappings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.cosonlidate_mappings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.cosonlidate_mappings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Combine information from KEGG, UniProt, and manual mappings.</p>
-<p>Returns:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.kegg_mapping_and_metadata">
-<code class="descname">kegg_mapping_and_metadata</code><span class="sig-paren">(</span><em>kegg_organism_code</em>, <em>custom_gene_mapping=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.kegg_mapping_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.kegg_mapping_and_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Map all genes in the model to UniProt IDs using the KEGG service. Also download all metadata and sequences</p>
+<dt id="ssbio.pipeline.gempro.GEMPRO.add_genes_by_id">
+<code class="descname">add_genes_by_id</code><span class="sig-paren">(</span><em>genes_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.add_genes_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.add_genes_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add gene IDs manually into our GEM-PRO project.</p>
 <dl class="docutils">
+<dt>Args:</dt>
+<dd>genes_list (list): List of gene IDs as strings.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.base_dir">
+<code class="descname">base_dir</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.base_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>GEM-PRO project folder</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.blast_seqs_to_pdb">
+<code class="descname">blast_seqs_to_pdb</code><span class="sig-paren">(</span><em>seq_ident_cutoff=0</em>, <em>evalue=0.0001</em>, <em>all_genes=False</em>, <em>display_link=False</em>, <em>outdir=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.blast_seqs_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.blast_seqs_to_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>BLAST each gene sequence to the PDB. Saves raw BLAST results (XML files).</p>
+<blockquote>
+<div>Also creates a summary dataframe accessible by the attribute &#8220;df_pdb_blast&#8221;.</div></blockquote>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">seq_ident_cutoff (float, optional): Cutoff results based on percent coverage (in decimal form)
+evalue (float, optional): Cutoff for the E-value - filters for significant hits. 0.001 is liberal, 0.0001 is stringent (default).
+all_genes (bool): If all genes should be BLASTed, or only those without any structures currently mapped
+display_link (bool, optional): Set to True if links to the HTML results should be displayed
+outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</p>
+<blockquote>
+<div>were not created initially</div></blockquote>
+<p class="last">force_rerun (bool, optional): If existing BLAST results should not be used, set to True. Default is False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.data_dir">
+<code class="descname">data_dir</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.data_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where all data (dataframes and more) will be stored</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.genes_dir">
+<code class="descname">genes_dir</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.genes_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where all gene specific information is stored</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.genes_with_experimental_structures">
+<code class="descname">genes_with_experimental_structures</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.genes_with_experimental_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a DictList of all genes that have at least one experimental structure</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.genes_with_homology_models">
+<code class="descname">genes_with_homology_models</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.genes_with_homology_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a DictList of all genes that have at least one homology model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.genes_with_structures">
+<code class="descname">genes_with_structures</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.genes_with_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a DictList of all genes with any available protein structures</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_disulfide_bridges">
+<code class="descname">get_disulfide_bridges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_disulfide_bridges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_disulfide_bridges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run Biopython&#8217;s disulfide bridge finder and store calculations.</p>
+<dl class="docutils">
+<dt>Stored in:</dt>
+<dd>g.protein.representative_structure.representative_chain.seq_record.annotations[&#8216;SSBOND-biopython&#8217;]</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_dssp_annotations">
+<code class="descname">get_dssp_annotations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_dssp_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_dssp_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run DSSP on all representative structures and store calculations.</p>
+<dl class="docutils">
+<dt>Stored in:</dt>
+<dd>g.protein.representative_structure.representative_chain.seq_record.letter_annotations[&#8216;<a href="#id1"><span class="problematic" id="id2">*</span></a>-dssp&#8217;]</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_itasser_models">
+<code class="descname">get_itasser_models</code><span class="sig-paren">(</span><em>homology_raw_dir</em>, <em>custom_itasser_name_mapping=None</em>, <em>outdir=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_itasser_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_itasser_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy generated I-TASSER models from a directory to the GEM-PRO directory.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">homology_raw_dir (str): Root directory of I-TASSER folders.
+custom_itasser_name_mapping (dict): Use this if your I-TASSER folder names differ from your model gene names.</p>
+<blockquote>
+<div>Input a dict of {model_gene: ITASSER_folder}.</div></blockquote>
+<dl class="docutils">
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
+</dl>
+<p class="last">force_rerun (bool): If homology files should be copied again even if they exist in the GEM-PRO directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_msms_annotations">
+<code class="descname">get_msms_annotations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_msms_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_msms_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run MSMS on all representative structures and store calculations.</p>
+<dl class="docutils">
+<dt>Stored in:</dt>
+<dd>g.protein.representative_structure.representative_chain.seq_record.letter_annotations[&#8216;<a href="#id3"><span class="problematic" id="id4">*</span></a>-msms&#8217;]</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_scratch_predictions">
+<code class="descname">get_scratch_predictions</code><span class="sig-paren">(</span><em>path_to_scratch</em>, <em>results_dir</em>, <em>scratch_basename='scratch'</em>, <em>num_cores=1</em>, <em>exposed_buried_cutoff=25</em>, <em>custom_gene_mapping=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_scratch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_scratch_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run and parse SCRATCH results to predict secondary structure and solvent accessibility.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Annotations are stored in the gene protein&#8217;s representative sequence at:</dt>
+<dd>.seq_record.annotations and
+.seq_record.letter_annotations</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">path_to_scratch (str): Path to SCRATCH executable
+results_dir (str): Path to SCRATCH results folder, which will have the files (scratch.ss, scratch.ss8,
+scratch.acc, scratch.acc20)
+scratch_basename (str): Basename of the SCRATCH results (&#8216;scratch&#8217; is default)
+exposed_buried_cutoff (int): Cutoff of exposed/buried for the acc20 predictions
+custom_gene_mapping (dict): Default parsing of SCRATCH output files is to look for the model gene IDs. If</p>
+<blockquote class="last">
+<div>your output files contain IDs which differ from the model gene IDs, use this dictionary to map model
+gene IDs to result file IDs. Dictionary keys must match model genes.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_sequence_properties">
+<code class="descname">get_sequence_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_sequence_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_sequence_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.</p>
+<p>Annotations are stored in the gene protein&#8217;s representative sequence at .seq_record.annotations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.get_tmhmm_predictions">
+<code class="descname">get_tmhmm_predictions</code><span class="sig-paren">(</span><em>tmhmm_results</em>, <em>custom_gene_mapping</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.get_tmhmm_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.get_tmhmm_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse TMHMM results and store in the representative sequences</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">tmhmm_results (str): Path to TMHMM results (long format)
+custom_gene_mapping (dict): Default parsing of TMHMM output is to look for the model gene IDs. If</p>
+<blockquote class="last">
+<div>your output file contains IDs which differ from the model gene IDs, use this dictionary to map model
+gene IDs to result file IDs. Dictionary keys must match model genes.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.kegg_mapping_and_metadata">
+<code class="descname">kegg_mapping_and_metadata</code><span class="sig-paren">(</span><em>kegg_organism_code</em>, <em>custom_gene_mapping=None</em>, <em>outdir=None</em>, <em>set_as_representative=False</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.kegg_mapping_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.kegg_mapping_and_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all genes in the model to KEGG IDs using the KEGG service.</p>
+<dl class="docutils">
+<dt>This function does these things:</dt>
+<dd><ol class="first last arabic simple">
+<li>Download all metadata and sequence files in the sequences directory</li>
+<li>Creates a KEGGProp object in the protein.sequences attribute</li>
+<li>Returns a Pandas DataFrame of mapping results</li>
+</ol>
+</dd>
 <dt>Args:</dt>
 <dd><p class="first">kegg_organism_code (str): The three letter KEGG code of your organism
 custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,</p>
 <blockquote>
 <div>custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
-Dictionary keys must match model genes.</div></blockquote>
-<dl class="last docutils">
-<dt>force_rerun (bool): Flag to indicate if function should be rerun (True) or if</dt>
-<dd>cached files that match the format <a href="#id1"><span class="problematic" id="id2">*</span></a>_kegg_df.csv should be used instead (default, False).</dd>
+Dictionary keys must match model gene IDs.</div></blockquote>
+<dl class="docutils">
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
 </dl>
+<p class="last">set_as_representative (bool): If mapped KEGG IDs should be set as representative sequences
+force_rerun (bool): If you want to overwrite any existing mappings and files</p>
 </dd>
 </dl>
-<p>Returns: path to metadata/mapping dataframe</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.load_model">
-<code class="descname">load_model</code><span class="sig-paren">(</span><em>gem_file</em>, <em>file_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.load_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the GEM using COBRApy. Accept SBML or MAT files as input</p>
+<dt id="ssbio.pipeline.gempro.GEMPRO.manual_homology_models">
+<code class="descname">manual_homology_models</code><span class="sig-paren">(</span><em>input_dict</em>, <em>outdir=None</em>, <em>clean=True</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.manual_homology_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.manual_homology_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy homology models to the GEM-PRO project.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>file_type: if your model is in &#8220;SBML&#8221; (or &#8220;XML&#8221;), or &#8220;Matlab&#8221; formats</dd>
+<dd><dl class="first docutils">
+<dt>input_dict: Dictionary of dictionaries of gene names to homology model IDs and information. Input a dict of:</dt>
+<dd><dl class="first docutils">
+<dt>{model_gene: {homology_model_id1: {&#8216;model_file&#8217;: &#8216;/path/to/homology/model&#8217;},</dt>
+<dd><blockquote class="first">
+<div>homology_model_id2: {&#8216;model_file&#8217;: &#8216;/path/to/homology/model&#8217;}</div></blockquote>
+<p class="last">},</p>
+</dd>
 </dl>
-<p>Returns: None - loads the model in the GEMPRO object instance</p>
+<p class="last">}</p>
+</dd>
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
+</dl>
+<p class="last">clean (bool): If homology files should be cleaned and saved as a new PDB file
+force_rerun (bool): If homology files should be copied again even if they exist in the GEM-PRO directory</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.manual_id_mapping">
-<code class="descname">manual_id_mapping</code><span class="sig-paren">(</span><em>mapping_infile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.manual_id_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.manual_id_mapping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a manual input file of model gene IDs &#8211;&gt; KEGG or UniProt IDs.</p>
+<dt id="ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping">
+<code class="descname">manual_seq_mapping</code><span class="sig-paren">(</span><em>gene_to_seq_dict</em>, <em>outdir=None</em>, <em>set_as_representative=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.manual_seq_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a manual input dictionary of model gene IDs &#8211;&gt; protein sequences. By default sets them as representative.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>gene_to_seq_dict: Dictionary of mappings with key:value pairs:</dt>
+<dd><dl class="first last docutils">
+<dt>{&lt;gene_id1&gt;:&lt;protein_seq1&gt;,</dt>
+<dd>&lt;gene_id2&gt;:&lt;protein_seq2&gt;,
+...}</dd>
+</dl>
+</dd>
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
+</dl>
+<p class="last">set_as_representative (bool): If mapped sequences should be set as representative</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.manual_uniprot_mapping">
+<code class="descname">manual_uniprot_mapping</code><span class="sig-paren">(</span><em>gene_to_uniprot_dict</em>, <em>outdir=None</em>, <em>set_as_representative=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.manual_uniprot_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.manual_uniprot_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a manual dictionary of model gene IDs &#8211;&gt; UniProt IDs. By default sets them as representative.</p>
 <p>This allows for mapping of the missing genes, or overriding of automatic mappings.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><dl class="first last docutils">
-<dt>mapping_infile: Path to .csv file with the headers:</dt>
-<dd>m_gene - model gene ID</dd>
+<dd><dl class="first docutils">
+<dt>gene_to_uniprot_dict: Dictionary of mappings with key:value pairs:</dt>
+<dd>&lt;gene_id1&gt;:&lt;uniprot_id1&gt;,
+&lt;gene_id2&gt;:&lt;uniprot_id2&gt;,
+...</dd>
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
 </dl>
+<p class="last">set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences</p>
 </dd>
 </dl>
-<p>Returns:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.organize_itasser_models">
-<code class="descname">organize_itasser_models</code><span class="sig-paren">(</span><em>raw_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.organize_itasser_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.organize_itasser_models" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reorganize the raw information from I-TASSER modeling.</p>
-<ul class="simple">
-<li>Copies the model1.pdb file to the matching gene folder in structure_files/by_gene/</li>
-<li>Parses modeling information such as C-scores, template, etc</li>
-<li>Also will parse binding site (COACH) information if it exists</li>
+<dt id="ssbio.pipeline.gempro.GEMPRO.map_uniprot_to_pdb">
+<code class="descname">map_uniprot_to_pdb</code><span class="sig-paren">(</span><em>seq_ident_cutoff=0.0</em>, <em>outdir=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.map_uniprot_to_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.map_uniprot_to_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map UniProt IDs to a ranked list of PDB structures available.</p>
+<blockquote>
+<div>Uses the &#8220;Best structures&#8221; API availble from <a class="reference external" href="https://www.ebi.ac.uk/pdbe/api/doc/sifts.html">https://www.ebi.ac.uk/pdbe/api/doc/sifts.html</a>
+The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
+if the same, resolution. Also creates a summary dataframe accessible by the attribute &#8220;df_pdb_ranking&#8221;.</div></blockquote>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
+outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</p>
+<blockquote>
+<div>were not created initially</div></blockquote>
+<p class="last">force_rerun (bool): Obtain best structures mapping ignoring previously downloaded results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.model_dir">
+<code class="descname">model_dir</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.model_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where original GEMs and GEM-related files are stored</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.pdb_downloader_and_metadata">
+<code class="descname">pdb_downloader_and_metadata</code><span class="sig-paren">(</span><em>outdir=None</em>, <em>file_type=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.pdb_downloader_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.pdb_downloader_and_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download all structures which have been mapped to our genes.</p>
+<p>Obtains the PDB file and mmCIF header and creates a metadata table &#8220;df_pdb_metadata&#8221;.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
+<dt>file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - PDB structure file type that</dt>
+<dd>should be downloaded</dd>
+</dl>
+<p class="last">force_rerun (bool): If you want to overwrite any existing mappings and files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.prep_itasser_models">
+<code class="descname">prep_itasser_models</code><span class="sig-paren">(</span><em>itasser_installation</em>, <em>itlib_folder</em>, <em>runtype</em>, <em>create_in_dir=None</em>, <em>execute_from_dir=None</em>, <em>all_genes=False</em>, <em>print_exec=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.prep_itasser_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.prep_itasser_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare to run I-TASSER homology modeling for genes without structures, or all genes.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">itasser_installation (str): Path to I-TASSER folder, i.e. &#8216;~/software/I-TASSER4.4&#8217;
+itlib_folder (str): Path to ITLIB folder, i.e. &#8216;~/software/ITLIB&#8217;
+runtype: How you will be running I-TASSER - local, slurm, or torque
+create_in_dir (str): Local directory where folders will be created
+execute_from_dir (str): Optional path to execution directory - use this if you are copying the homology</p>
+<blockquote>
+<div>models to another location such as a supercomputer for running</div></blockquote>
+<p class="last">all_genes (bool): If all genes should be prepped, or only those without any mapped structures
+print_exec (bool): If the execution statement should be printed to run modelling
+<a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: TODO - options for SLURM or Torque execution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ssbio.pipeline.gempro.GEMPRO.root_dir">
+<code class="descname">root_dir</code><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.root_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where GEM-PRO project folder is located</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.set_representative_sequence">
+<code class="descname">set_representative_sequence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.set_representative_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.set_representative_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine information from KEGG, UniProt, and manual mappings. Saves a DataFrame of results.</p>
+<p>Manual mappings override all existing mappings. UniProt mappings override KEGG mappings except
+when KEGG mappings have PDBs associated with them and UniProt doesn&#8217;t.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.set_representative_structure">
+<code class="descname">set_representative_structure</code><span class="sig-paren">(</span><em>seq_outdir=None</em>, <em>struct_outdir=None</em>, <em>pdb_file_type=None</em>, <em>engine='needle'</em>, <em>always_use_homology=False</em>, <em>seq_ident_cutoff=0.5</em>, <em>allow_missing_on_termini=0.2</em>, <em>allow_mutants=True</em>, <em>allow_deletions=False</em>, <em>allow_insertions=False</em>, <em>allow_unresolved=True</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.set_representative_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.set_representative_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the representative protein structure for a gene.</p>
+<dl class="docutils">
+<dt>Each gene can have a combination of the following, which will be analyzed to set a representative structure.</dt>
+<dd><ul class="first last simple">
+<li>Homology model(s)</li>
+<li>Ranked PDBs</li>
+<li>BLASTed PDBs</li>
 </ul>
-<p>TODO: what else to parse?
-TODO: finish summary df stuff</p>
-<p>Returns: path to summary results dataframe</p>
+</dd>
+<dt>If the always_use_homology flag is true, homology models are always set as representative when they exist.</dt>
+<dd>If there are multiple homology models, we rank by the percent sequence coverage.</dd>
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>seq_outdir (str): Path to output directory of sequence alignment files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
+<dt>struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
+<dt>pdb_file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - PDB structure file type that</dt>
+<dd>should be downloaded</dd>
+<dt>engine (str): &#8220;needle&#8221; or &#8220;biopython&#8221; - which pairwise sequence alignment engine should be used</dt>
+<dd>needle is the standard EMBOSS tool to run pairwise alignments
+biopython is Biopython&#8217;s implementation of needle. Results can differ!</dd>
+</dl>
+<p>always_use_homology (bool): If homology models should always be set as the representative structure
+seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
+allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored</p>
+<blockquote>
+<div>when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
+5 to 95 will be checked for modifications.</div></blockquote>
+<p class="last">allow_mutants (bool): If mutations should be allowed or checked for
+allow_deletions (bool): If deletions should be allowed or checked for
+allow_insertions (bool): If insertions should be allowed or checked for
+allow_unresolved (bool): If unresolved residues should be allowed or checked for
+force_rerun (bool): If sequence to structure alignment should be rerun</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.prep_folder">
-<code class="descname">prep_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.prep_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.prep_folder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare all folders for a GEM-PRO project</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.run_pipeline">
-<code class="descname">run_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.run_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.run_pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the entire GEM-PRO pipel ine.</p>
-<p>Options include:
-...</p>
-<p>Returns:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ssbio.gempro.pipeline.GEMPRO.uniprot_mapping_and_metadata">
-<code class="descname">uniprot_mapping_and_metadata</code><span class="sig-paren">(</span><em>model_gene_source</em>, <em>custom_gene_mapping=None</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/gempro/pipeline.html#GEMPRO.uniprot_mapping_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.gempro.pipeline.GEMPRO.uniprot_mapping_and_metadata" title="Permalink to this definition">¶</a></dt>
+<dt id="ssbio.pipeline.gempro.GEMPRO.uniprot_mapping_and_metadata">
+<code class="descname">uniprot_mapping_and_metadata</code><span class="sig-paren">(</span><em>model_gene_source</em>, <em>custom_gene_mapping=None</em>, <em>outdir=None</em>, <em>set_as_representative=False</em>, <em>force_rerun=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.uniprot_mapping_and_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.uniprot_mapping_and_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><dl class="first last docutils">
-<dt>model_gene_source (str): the database source of your model gene IDs, see <a class="reference external" href="http://www.uniprot.org/help/programmatic_access">http://www.uniprot.org/help/programmatic_access</a></dt>
-<dd>Common model gene sources are:
-Ensembl Genomes - ENSEMBLGENOME_ID
+<dd><dl class="first docutils">
+<dt>model_gene_source (str): the database source of your model gene IDs</dt>
+<dd>See: <a class="reference external" href="http://www.uniprot.org/help/programmatic_access">http://www.uniprot.org/help/programmatic_access</a>
+Common model gene sources are:
+Ensembl Genomes - ENSEMBLGENOME_ID (i.e. E. coli b-numbers)
 Entrez Gene (GeneID) - P_ENTREZGENEID
 RefSeq Protein - P_REFSEQ_AC</dd>
 <dt>custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,</dt>
 <dd>custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
 Dictionary keys must match model genes.</dd>
-<dt>force_rerun (bool): Flag to indicate if function should be rerun (True) or if</dt>
-<dd>cached files that match the format <a href="#id3"><span class="problematic" id="id4">*</span></a>_uniprot_df.csv should be used instead (default, False).</dd>
+<dt>outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</dt>
+<dd>were not created initially</dd>
 </dl>
+<p class="last">set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences
+force_rerun (bool): If you want to overwrite any existing mappings and files</p>
 </dd>
 </dl>
-<p>Returns: path to metadata/mapping dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssbio.pipeline.gempro.GEMPRO.write_representative_sequences_file">
+<code class="descname">write_representative_sequences_file</code><span class="sig-paren">(</span><em>outname</em>, <em>outdir=None</em>, <em>set_ids_from_model=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssbio/pipeline/gempro.html#GEMPRO.write_representative_sequences_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ssbio.pipeline.gempro.GEMPRO.write_representative_sequences_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all the model&#8217;s sequences as a single FASTA file. By default, sets IDs to model gene IDs.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">outname (str): Name of the output FASTA file without the extension
+outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories</p>
+<blockquote>
+<div>were not created initially</div></blockquote>
+<p class="last">set_ids_from_model (bool): If the gene ID source should be the model gene IDs, not the original sequence ID</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -173,53 +635,72 @@ Dictionary keys must match model genes.</dd>
 </div>
 
 
+           </div>
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gempro.html" class="btn btn-neutral float-right" title="GEM-PRO pipeline" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="test.html" class="btn btn-neutral" title="Where" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Nathan Mih.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="test.html" title="previous chapter">&lt;no title&gt;</a></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/python_api.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2016, Nathan Mih.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
-      
-      |
-      <a href="_sources/python_api.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

@@ -17,6 +17,13 @@ of structural systems biology. The main goals of this package are to:
 - How can I compare the structural features of an entire proteome?
 - and more...
 
+## External programs to install
+```bash
+$ sudo apt-get install emboss
+$ sudo apt-get install dssp
+$ pip install nglview
+```
+
 ## Quick install
 Clone this repository to any location and then install it.
 

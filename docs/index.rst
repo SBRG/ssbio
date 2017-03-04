@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ssbio's documentation!
+Welcome to the documentation for ssbio
 =================================
 
 Contents:
@@ -14,6 +14,7 @@ Contents:
    tutorial
    test
    python_api
+   gempro
 
 
 Indices and tables
