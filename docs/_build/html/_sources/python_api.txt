@@ -1,7 +1,4 @@
 Python API
 ==========
 
-.. automodule:: ssbio.pipeline.gempro
-
-.. autoclass:: GEMPRO
-   :members:
+.. automethod:: ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping

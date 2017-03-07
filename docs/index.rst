@@ -1,26 +1,72 @@
-.. ssbio documentation master file, created by
-   sphinx-quickstart on Mon Oct 10 16:46:45 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+*************************************************
+ssbio: A Framework for Structural Systems Biology
+*************************************************
 
-Welcome to the documentation for ssbio
-=================================
+Introduction
+============
 
-Contents:
+This Python package provides a collection of tools for people with questions in the realm of structural systems biology. The main goals of this package are to:
+
+#. Provide an easy way to map proteins to sequences and structures
+#. Directly link structures to genome-scale SBML models
+#. Prepare structures for downstream analyses, such as their use in molecular modeling software
+
+Example questions you can answer with this package:
+
+- How can I determine the number of protein structures available for my list of genes?
+- What is the best, representative structure for my protein?
+- Where, in a metabolic network, do these proteins work?
+- Where do popular mutations show up on a protein?
+- How can I compare the structural features of entire proteomes?
+- and more...
+
+Installation
+============
+
+
+Dependencies
+------------
+
+Features
+============
+- Easily map sequence and structure information to a COBRA model
+- Set a best
+-
+
+.. tip:: this is a tip!
+
+Here's a link to :func:`ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping`
+test2
+
+Citation
+============
+``this is ccode``
+
+.. code-block:: python
+
+    dis is python code
+
+`namedlink`_
+
+.. _namedlink: https://github.com/mgaitan/sublime-rst-completion
+
+Currently, use of this package can be cited by our 2016 paper in BMC Systems Biology[#]_, which details the GEM-PRO pipeline. The manuscript for the ``ssbio`` package itself is in preparation at this moment.
+
+.. [#] Brunk, E.*, Mih, N.*, Monk, J., Zhang, Z., O’Brien, E. J., Bliven, S. E., Bourne, P. E., Palsson, B. O. (2016). Systems biology of the structural proteome. BMC Systems Biology, 10(1), 26. http://doi.org/10.1186/s12918-016-0271-6. *Authors contributed equally.
+
+
+Contents
+============
 
 .. toctree::
-   :maxdepth: 2
+   :glob:
+   :maxdepth: 4
 
-   tutorial
-   test
-   python_api
+   getting_started
+   structure
+   protein
    gempro
-
-
-Indices and tables
-==================
+   atlas
+   python_api
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

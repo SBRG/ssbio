@@ -23,6 +23,10 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
 
+from recommonmark.parser import CommonMarkParser
+source_parsers = {'.md': CommonMarkParser, }
+source_suffix = ['.rst', '.md']
+
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
@@ -38,6 +42,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'nbsphinx',
     'sphinx.ext.mathjax',
+    'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx.ext.todo',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -89,7 +95,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints', '**-checkpoint.ipynb']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -133,6 +139,17 @@ import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"
 
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+html_theme_options = {
+    'collapse_navigation': False,
+    'display_version': False,
+}
+
+html_context = {
+    'css_files': [
+        '_static/theme_overrides.css',
+    ],
+}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
