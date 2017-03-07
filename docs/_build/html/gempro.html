@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -9,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; ssbio 1.0.0a0 documentation</title>
+  <title>The GEM-PRO Pipeline &mdash; ssbio 1.0.0a0 documentation</title>
   
 
   
@@ -34,9 +33,11 @@
 
   
         <link rel="index" title="Index"
-              href="#"/>
+              href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="ssbio 1.0.0a0 documentation" href="index.html"/> 
+    <link rel="top" title="ssbio 1.0.0a0 documentation" href="index.html"/>
+        <link rel="next" title="GEM-PRO - Genes &amp; Sequences" href="notebooks/GEM-PRO - Genes &amp; Sequences.html"/>
+        <link rel="prev" title="Protein - Structure Mapping, Alignments, and Visualization" href="notebooks/Protein - Structure Mapping, Alignments, and Visualization.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -78,7 +79,7 @@
           
             
             
-                <ul>
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#the-basics">The basics</a></li>
@@ -116,9 +117,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="gempro.html">The GEM-PRO Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="gempro.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gempro.html#tutorials">Tutorials</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The GEM-PRO Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorials">Tutorials</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html">GEM-PRO - Genes &amp; Sequences</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html#Imports">Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html#Initialization-of-the-project">Initialization of the project</a></li>
@@ -178,7 +179,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -186,9 +187,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+    <li>The GEM-PRO Pipeline</li>
       <li class="wy-breadcrumbs-aside">
         
+          
+            <a href="_sources/gempro.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -198,56 +201,99 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
 
-<h1 id="index">Index</h1>
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
 
-<div class="genindex-jumpbox">
- <a href="#K"><strong>K</strong></a>
- | <a href="#M"><strong>M</strong></a>
- | <a href="#U"><strong>U</strong></a>
- 
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="the-gem-pro-pipeline">
+<h1>The GEM-PRO Pipeline<a class="headerlink" href="#the-gem-pro-pipeline" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The GEM-PRO pipeline is focused on annotating genome-scale models with protein structure information. Any SBML model can be used as input to
+the pipeline, although it is not required to have a one. Here are the possible starting points for using the pipeline:</p>
+<ul class="simple">
+<li>An SBML model in <cite>.xml</cite>, <cite>.mat</cite>, or <cite>.json</cite> formats</li>
+<li>A list of gene IDs (<cite>[&#8216;b0001&#8217;, &#8216;b0002&#8217;, ...]</cite>)</li>
+<li>A dictionary of gene IDs and their sequences (<cite>{&#8216;b0001&#8217;:&#8217;MSAVEVEEAP..&#8217;, &#8216;b0002&#8217;:&#8217;AERAPLS&#8217;, ...}</cite>)</li>
+</ul>
 </div>
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="notebooks/GEM-PRO - SBML Model (iNJ661).html#ssbio.pipeline.gempro.GEMPRO.kegg_mapping_and_metadata">kegg_mapping_and_metadata() (ssbio.pipeline.gempro.GEMPRO method)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="M">M</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="notebooks/GEM-PRO - SBML Model (iNJ661).html#ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping">manual_seq_mapping() (ssbio.pipeline.gempro.GEMPRO method)</a>, <a href="python_api.html#ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping">[1]</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="notebooks/GEM-PRO - SBML Model (iNJ661).html#ssbio.pipeline.gempro.GEMPRO.manual_uniprot_mapping">manual_uniprot_mapping() (ssbio.pipeline.gempro.GEMPRO method)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="notebooks/GEM-PRO - SBML Model (iNJ661).html#ssbio.pipeline.gempro.GEMPRO.uniprot_mapping_and_metadata">uniprot_mapping_and_metadata() (ssbio.pipeline.gempro.GEMPRO method)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
+<div class="section" id="tutorials">
+<h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html">GEM-PRO - Genes &amp; Sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html#Imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html#Mapping-sequence--&gt;-structure">Mapping sequence -&gt; structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - Genes &amp; Sequences.html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/GEM-PRO - List of Gene IDs.html">GEM-PRO - List of Gene IDs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - List of Gene IDs.html#Imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - List of Gene IDs.html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - List of Gene IDs.html#Mapping-gene-ID--&gt;-sequence">Mapping gene ID -&gt; sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - List of Gene IDs.html#Mapping-representative-sequence-to-structure">Mapping representative sequence to structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - List of Gene IDs.html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html">GEM-PRO - SBML Model (iNJ661)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Mapping-gene-ID--&gt;-sequence">Mapping gene ID -&gt; sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Mapping-representative-sequence-to-structure">Mapping representative sequence to structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Creating-homology-models">Creating homology models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/GEM-PRO - SBML Model (iNJ661).html#Saving-your-GEM-PRO">Saving your GEM-PRO</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="notebooks/GEM-PRO - Genes &amp; Sequences.html" class="btn btn-neutral float-right" title="GEM-PRO - Genes &amp; Sequences" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="notebooks/Protein - Structure Mapping, Alignments, and Visualization.html" class="btn btn-neutral" title="Protein - Structure Mapping, Alignments, and Visualization" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

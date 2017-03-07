@@ -1,0 +1,2112 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# GEM-PRO - SBML Model (iNJ661)\n",
+    "\n",
+    "This notebook gives an example of how to run the GEM-PRO pipeline with a **SBML model**, in this case *i*NJ661, the metabolic model of *M. tuberculosis*.\n",
+    "\n",
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "**Input:** \n",
+    "GEM (in SBML, JSON, or MAT formats)\n",
+    "\n",
+    "</div>\n",
+    "\n",
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "**Output:**\n",
+    "GEM-PRO model\n",
+    "\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Imports"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "import sys\n",
+    "import logging"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "# Import the GEM-PRO class\n",
+    "from ssbio.pipeline.gempro import GEMPRO"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "# Printing multiple outputs per cell\n",
+    "from IPython.core.interactiveshell import InteractiveShell\n",
+    "InteractiveShell.ast_node_interactivity = \"all\""
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Logging\n",
+    "\n",
+    "Set the logging level in `logger.setLevel(logging.<LEVEL_HERE>)` to specify how verbose you want the pipeline to be. Debug is most verbose.\n",
+    "\n",
+    "- `CRITICAL`\n",
+    "     - Only really important messages shown\n",
+    "- `ERROR`\n",
+    "     - Major errors\n",
+    "- `WARNING`\n",
+    "     - Warnings that don't affect running of the pipeline\n",
+    "- `INFO` (default)\n",
+    "     - Info such as the number of structures mapped per gene\n",
+    "- `DEBUG`\n",
+    "     - Really detailed information that will print out a lot of stuff\n",
+    "     \n",
+    "<div class=\"alert alert-warning\">\n",
+    "\n",
+    "**Warning:** \n",
+    "`DEBUG` mode prints out a large amount of information, especially if you have a lot of genes. This may stall your notebook!\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# Create logger\n",
+    "logger = logging.getLogger()\n",
+    "logger.setLevel(logging.INFO)  # SET YOUR LOGGING LEVEL HERE #"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# Other logger stuff for Jupyter notebooks\n",
+    "handler = logging.StreamHandler(sys.stderr)\n",
+    "formatter = logging.Formatter('[%(asctime)s] [%(name)s] %(levelname)s: %(message)s', datefmt=\"%Y-%m-%d %H:%M\")\n",
+    "handler.setFormatter(formatter)\n",
+    "logger.handlers = [handler]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Initialization of the project\n",
+    "\n",
+    "Set these three things:\n",
+    "\n",
+    "- `ROOT_DIR`\n",
+    "    - The directory where a folder named after your `PROJECT` will be created\n",
+    "- `PROJECT`\n",
+    "    - Your project name\n",
+    "- `LIST_OF_GENES`\n",
+    "    - Your list of gene IDs\n",
+    "    \n",
+    "A directory will be created in `ROOT_DIR` with your `PROJECT` name. The folders are organized like so:\n",
+    "```\n",
+    "    ROOT_DIR\n",
+    "    └── PROJECT\n",
+    "        ├── data  # General storage for pipeline outputs\n",
+    "        ├── model  # SBML and GEM-PRO models are stored here\n",
+    "        ├── genes  # Per gene information\n",
+    "        │   ├── <gene_id1>  # Specific gene directory\n",
+    "        │   │   └── protein\n",
+    "        │   │       ├── sequences  # Protein sequence files, alignments, etc.\n",
+    "        │   │       └── structures  # Protein structure files, calculations, etc.\n",
+    "        │   └── <gene_id2>\n",
+    "        │       └── protein\n",
+    "        │           ├── sequences\n",
+    "        │           └── structures\n",
+    "        ├── reactions  # Per reaction information\n",
+    "        │   └── <reaction_id1>  # Specific reaction directory\n",
+    "        │       └── complex\n",
+    "        │           └── structures  # Protein complex files\n",
+    "        └── metabolites  # Per metabolite information\n",
+    "            └── <metabolite_id1>  # Specific metabolite directory\n",
+    "                └── chemical\n",
+    "                    └── structures  # Metabolite 2D and 3D structure files\n",
+    "                \n",
+    "```\n",
+    "\n",
+    "<div class=\"alert alert-info\">**Note:** Methods for protein complexes and metabolites are still in development.</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# SET FOLDERS AND DATA HERE\n",
+    "import tempfile\n",
+    "ROOT_DIR = tempfile.gettempdir()\n",
+    "\n",
+    "PROJECT = 'iNJ661_GP'\n",
+    "GEM_FILE = '/home/nathan/Downloads/iNJ661.json'\n",
+    "GEM_FILE_TYPE = 'json'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: iNJ661: loaded model\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: 1025: number of reactions\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: 720: number of reactions linked to a gene\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: 661: number of genes (excluding spontaneous)\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: 826: number of metabolites\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] WARNING: IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: /tmp/iNJ661_GP: GEM-PRO project location\n",
+      "[2017-03-06 18:06] [ssbio.pipeline.gempro] INFO: 661: number of genes\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Create the GEM-PRO project\n",
+    "my_gempro = GEMPRO(gem_name=PROJECT, root_dir=ROOT_DIR, gem_file_path=GEM_FILE, gem_file_type=GEM_FILE_TYPE)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Mapping gene ID -> sequence\n",
+    "\n",
+    "First, we need to map these IDs to their protein sequences. There are 2 ID mapping services provided to do this - through **KEGG** or **UniProt**. The end goal is to map a UniProt ID to each ID, since there is a comprehensive mapping (and some useful APIs) between UniProt and the PDB.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Note:** You only need to map gene IDs using one service. However you can run both if some genes don't map in one service and do map in another!</div></p>\n",
+    "\n",
+    "However, you don't need to map using these services if you already have the amino acid sequences for each protein. You can just manually load in the sequences as shown using the method `manual_seq_mapping`. Or, if you already have the UniProt IDs, you can load those in using the method `manual_uniprot_mapping`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `manual_seq_mapping`\n",
+    "\n",
+    "If you have sequences that you want to provide, just input a dictionary of the gene IDs and their protein sequences.\n",
+    "\n",
+    "- `gene_to_seq_dict`\n",
+    "    - A dictionary of `{<gene_id>: <protein_seq>}`\n",
+    "- What's saved?\n",
+    "    - Sequences are stored in each gene\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.sequences\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. automethod:: ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "id Rv1295 is already present in list",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-8-265d682b7b9d>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m gene_to_seq_dict = {'Rv1295': 'MTVPPTATHQPWPGVIAAYRDRLPVGDDWTPVTLLEGGTPLIAATNLSKQTGCTIHLKVEGLNPTGSFKDRGMTMAVTDALAHGQRAVLCASTGNTSASAAAYAARAGITCAVLIPQGKIAMGKLAQAVMHGAKIIQIDGNFDDCLELARKMAADFPTISLVNSVNPVRIEGQKTAAFEIVDVLGTAPDVHALPVGNAGNITAYWKGYTEYHQLGLIDKLPRMLGTQAAGAAPLVLGEPVSHPETIATAIRIGSPASWTSAVEAQQQSKGRFLAASDEEILAAYHLVARVEGVFVEPASAASIAGLLKAIDDGWVARGSTVVCTVTGNGLKDPDTALKDMPSVSPVPVDPVAVVEKLGLA',\n\u001b[1;32m      2\u001b[0m                     'Rv2233': 'VSSPRERRPASQAPRLSRRPPAHQTSRSSPDTTAPTGSGLSNRFVNDNGIVTDTTASGTNCPPPPRAAARRASSPGESPQLVIFDLDGTLTDSARGIVSSFRHALNHIGAPVPEGDLATHIVGPPMHETLRAMGLGESAEEAIVAYRADYSARGWAMNSLFDGIGPLLADLRTAGVRLAVATSKAEPTARRILRHFGIEQHFEVIAGASTDGSRGSKVDVLAHALAQLRPLPERLVMVGDRSHDVDGAAAHGIDTVVVGWGYGRADFIDKTSTTVVTHAATIDELREALGV'}\n\u001b[0;32m----> 3\u001b[0;31m \u001b[0mmy_gempro\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmanual_seq_mapping\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgene_to_seq_dict\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;32m/mnt/projects/ssbio/ssbio/pipeline/gempro.py\u001b[0m in \u001b[0;36mmanual_seq_mapping\u001b[0;34m(self, gene_to_seq_dict, outdir, set_as_representative)\u001b[0m\n\u001b[1;32m    517\u001b[0m             manual_info = gene.protein.load_manual_sequence(ident=g, seq=s, outdir=outdir,\n\u001b[1;32m    518\u001b[0m                                                             \u001b[0mwrite_fasta_file\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 519\u001b[0;31m                                                             set_as_representative=set_as_representative)\n\u001b[0m\u001b[1;32m    520\u001b[0m             \u001b[0mlog\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdebug\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'{}: loaded manually defined sequence information'\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mg\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    521\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/mnt/projects/ssbio/ssbio/core/protein.py\u001b[0m in \u001b[0;36mload_manual_sequence\u001b[0;34m(self, seq, ident, write_fasta_file, outname, outdir, set_as_representative, force_rewrite)\u001b[0m\n\u001b[1;32m    348\u001b[0m         manual_sequence = SeqProp(ident=ident, seq=seq, write_fasta_file=write_fasta_file,\n\u001b[1;32m    349\u001b[0m                                   outname=outname, outdir=outdir, force_rewrite=force_rewrite)\n\u001b[0;32m--> 350\u001b[0;31m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msequences\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmanual_sequence\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    351\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    352\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mset_as_representative\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/home/nathan/anaconda3/lib/python3.5/site-packages/cobra/core/DictList.py\u001b[0m in \u001b[0;36mappend\u001b[0;34m(self, object)\u001b[0m\n\u001b[1;32m    102\u001b[0m         \u001b[0;34m\"\"\"append object to end\"\"\"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    103\u001b[0m         \u001b[0mthe_id\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mobject\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mid\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 104\u001b[0;31m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_check\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mthe_id\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    105\u001b[0m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_dict\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mthe_id\u001b[0m\u001b[0;34m]\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    106\u001b[0m         \u001b[0mlist\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mobject\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/home/nathan/anaconda3/lib/python3.5/site-packages/cobra/core/DictList.py\u001b[0m in \u001b[0;36m_check\u001b[0;34m(self, id)\u001b[0m\n\u001b[1;32m     39\u001b[0m         \"\"\"\n\u001b[1;32m     40\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mid\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_dict\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 41\u001b[0;31m             \u001b[0;32mraise\u001b[0m \u001b[0mValueError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"id %s is already present in list\"\u001b[0m \u001b[0;34m%\u001b[0m \u001b[0mstr\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mid\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     42\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     43\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0m_generate_index\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mValueError\u001b[0m: id Rv1295 is already present in list"
+     ]
+    }
+   ],
+   "source": [
+    "gene_to_seq_dict = {'Rv1295': 'MTVPPTATHQPWPGVIAAYRDRLPVGDDWTPVTLLEGGTPLIAATNLSKQTGCTIHLKVEGLNPTGSFKDRGMTMAVTDALAHGQRAVLCASTGNTSASAAAYAARAGITCAVLIPQGKIAMGKLAQAVMHGAKIIQIDGNFDDCLELARKMAADFPTISLVNSVNPVRIEGQKTAAFEIVDVLGTAPDVHALPVGNAGNITAYWKGYTEYHQLGLIDKLPRMLGTQAAGAAPLVLGEPVSHPETIATAIRIGSPASWTSAVEAQQQSKGRFLAASDEEILAAYHLVARVEGVFVEPASAASIAGLLKAIDDGWVARGSTVVCTVTGNGLKDPDTALKDMPSVSPVPVDPVAVVEKLGLA',\n",
+    "                    'Rv2233': 'VSSPRERRPASQAPRLSRRPPAHQTSRSSPDTTAPTGSGLSNRFVNDNGIVTDTTASGTNCPPPPRAAARRASSPGESPQLVIFDLDGTLTDSARGIVSSFRHALNHIGAPVPEGDLATHIVGPPMHETLRAMGLGESAEEAIVAYRADYSARGWAMNSLFDGIGPLLADLRTAGVRLAVATSKAEPTARRILRHFGIEQHFEVIAGASTDGSRGSKVDVLAHALAQLRPLPERLVMVGDRSHDVDGAAAHGIDTVVVGWGYGRADFIDKTSTTVVTHAATIDELREALGV'}\n",
+    "my_gempro.manual_seq_mapping(gene_to_seq_dict)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `manual_uniprot_mapping`\n",
+    "\n",
+    "If you already know the UniProt mappings, you can manually provide a dictionary of that. This is also useful if some IDs don't map properly using the automatic mapper.\n",
+    "\n",
+    "- `manual_uniprot_dict`\n",
+    "    - A dictionary of `{<gene_id>: <uniprot_id>}`\n",
+    "- What's saved?\n",
+    "    - Sequences are stored in each gene\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.sequences\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_uniprot_metadata` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_uniprot_metadata\n",
+    "    ```\n",
+    "    - Any gene IDs that were missing before and supplied here are removed from the `missing_uniprot_mapping` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_uniprot_mapping\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. automethod:: ssbio.pipeline.gempro.GEMPRO.manual_uniprot_mapping"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:32] [ssbio.pipeline.gempro] INFO: Completed manual ID mapping --> UniProt. See the \"df_uniprot_metadata\" attribute for a summary dataframe.\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>reviewed</th>\n",
+       "      <th>gene_name</th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>refseq</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>ec_number</th>\n",
+       "      <th>pfam</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>description</th>\n",
+       "      <th>entry_version</th>\n",
+       "      <th>seq_version</th>\n",
+       "      <th>sequence_file</th>\n",
+       "      <th>metadata_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv3535c</th>\n",
+       "      <td>P9WQH3</td>\n",
+       "      <td>True</td>\n",
+       "      <td>mhpF</td>\n",
+       "      <td>mtu:Rv3535c;mtv:RVBD_3535c</td>\n",
+       "      <td>NP_218052.1;NC_000962.3;WP_003419251.1;NZ_KK33...</td>\n",
+       "      <td>1</td>\n",
+       "      <td>4JN6</td>\n",
+       "      <td>1.2.1.10</td>\n",
+       "      <td>PF09290;PF01118</td>\n",
+       "      <td>303</td>\n",
+       "      <td>Acetaldehyde dehydrogenase [acetylating] {ECO:...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WQH3.fasta</td>\n",
+       "      <td>P9WQH3.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2589</th>\n",
+       "      <td>P9WQ79</td>\n",
+       "      <td>True</td>\n",
+       "      <td>gabT</td>\n",
+       "      <td>mtu:Rv2589</td>\n",
+       "      <td>NP_217105.1;NC_000962.3;WP_003413395.1;NZ_KK33...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.6.1.22;2.6.1.19</td>\n",
+       "      <td>PF00202</td>\n",
+       "      <td>449</td>\n",
+       "      <td>L-AIBAT;Glutamate:succinic semialdehyde transa...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WQ79.fasta</td>\n",
+       "      <td>P9WQ79.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv3290c</th>\n",
+       "      <td>P9WQ77</td>\n",
+       "      <td>True</td>\n",
+       "      <td>lat</td>\n",
+       "      <td>mtu:Rv3290c</td>\n",
+       "      <td>NP_217807.1;NC_000962.3;WP_003900004.1;NZ_KK33...</td>\n",
+       "      <td>8</td>\n",
+       "      <td>2JJH;2CIN;2JJF;2CJH;2JJE;2JJG;2CJD;2CJG</td>\n",
+       "      <td>2.6.1.36</td>\n",
+       "      <td>PF00202</td>\n",
+       "      <td>449</td>\n",
+       "      <td>Lysine 6-aminotransferase;L-lysine aminotransf...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WQ77.fasta</td>\n",
+       "      <td>P9WQ77.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv3815c</th>\n",
+       "      <td>O07808</td>\n",
+       "      <td>False</td>\n",
+       "      <td>Rv3815c</td>\n",
+       "      <td>mtu:Rv3815c;mtv:RVBD_3815c</td>\n",
+       "      <td>NP_218332.1;NC_000962.3;WP_003420824.1;NZ_KK33...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>PF01553</td>\n",
+       "      <td>251</td>\n",
+       "      <td>Possible acyltransferase {ECO:0000313|EMBL:CCP...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>1997-07-01</td>\n",
+       "      <td>O07808.fasta</td>\n",
+       "      <td>O07808.txt</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        uniprot reviewed gene_name                        kegg  \\\n",
+       "gene                                                             \n",
+       "Rv3535c  P9WQH3     True      mhpF  mtu:Rv3535c;mtv:RVBD_3535c   \n",
+       "Rv2589   P9WQ79     True      gabT                  mtu:Rv2589   \n",
+       "Rv3290c  P9WQ77     True       lat                 mtu:Rv3290c   \n",
+       "Rv3815c  O07808    False   Rv3815c  mtu:Rv3815c;mtv:RVBD_3815c   \n",
+       "\n",
+       "                                                    refseq  num_pdbs  \\\n",
+       "gene                                                                   \n",
+       "Rv3535c  NP_218052.1;NC_000962.3;WP_003419251.1;NZ_KK33...         1   \n",
+       "Rv2589   NP_217105.1;NC_000962.3;WP_003413395.1;NZ_KK33...         0   \n",
+       "Rv3290c  NP_217807.1;NC_000962.3;WP_003900004.1;NZ_KK33...         8   \n",
+       "Rv3815c  NP_218332.1;NC_000962.3;WP_003420824.1;NZ_KK33...         0   \n",
+       "\n",
+       "                                            pdbs          ec_number  \\\n",
+       "gene                                                                  \n",
+       "Rv3535c                                     4JN6           1.2.1.10   \n",
+       "Rv2589                                       NaN  2.6.1.22;2.6.1.19   \n",
+       "Rv3290c  2JJH;2CIN;2JJF;2CJH;2JJE;2JJG;2CJD;2CJG           2.6.1.36   \n",
+       "Rv3815c                                      NaN                NaN   \n",
+       "\n",
+       "                    pfam  seq_len  \\\n",
+       "gene                                \n",
+       "Rv3535c  PF09290;PF01118      303   \n",
+       "Rv2589           PF00202      449   \n",
+       "Rv3290c          PF00202      449   \n",
+       "Rv3815c          PF01553      251   \n",
+       "\n",
+       "                                               description entry_version  \\\n",
+       "gene                                                                       \n",
+       "Rv3535c  Acetaldehyde dehydrogenase [acetylating] {ECO:...    2017-02-15   \n",
+       "Rv2589   L-AIBAT;Glutamate:succinic semialdehyde transa...    2017-02-15   \n",
+       "Rv3290c  Lysine 6-aminotransferase;L-lysine aminotransf...    2017-02-15   \n",
+       "Rv3815c  Possible acyltransferase {ECO:0000313|EMBL:CCP...    2017-02-15   \n",
+       "\n",
+       "        seq_version sequence_file metadata_file  \n",
+       "gene                                             \n",
+       "Rv3535c  2014-04-16  P9WQH3.fasta    P9WQH3.txt  \n",
+       "Rv2589   2014-04-16  P9WQ79.fasta    P9WQ79.txt  \n",
+       "Rv3290c  2014-04-16  P9WQ77.fasta    P9WQ77.txt  \n",
+       "Rv3815c  1997-07-01  O07808.fasta    O07808.txt  "
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "manual_uniprot_dict = {'Rv1755c': 'P9WIA9', 'Rv2321c': 'P71891', 'Rv0619': 'Q79FY3', 'Rv0618': 'Q79FY4', 'Rv2322c': 'P71890'}\n",
+    "my_gempro.manual_uniprot_mapping(manual_uniprot_dict)\n",
+    "my_gempro.df_uniprot_metadata.tail(4)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `kegg_mapping_and_metadata`\n",
+    "\n",
+    "Per gene, the KEGG sequence and metadata is downloaded in the gene's protein/sequence folder.\n",
+    "\n",
+    "- `kegg_organism_code`\n",
+    "    - See the full list of organisms here: http://www.genome.jp/kegg/catalog/org_list.html\n",
+    "        - *E. coli* MG1655 is \"eco\"\n",
+    "        - *M. tuberculosis* is \"mtu\"\n",
+    "- `custom_gene_mapping`\n",
+    "    - If the model gene IDs differ from the KEGG gene IDs, and you know the mapping, supply it as a dictionary here. \n",
+    "    - An example would be for the *T. maritima* SBML model, where the model IDs are formatted without an underscore (\"TM0001\") while in KEGG they have an underscore (\"TM_0001\").\n",
+    "- `force_rerun`\n",
+    "    - If you want to force the rerun of mapping, set this to True.\n",
+    "- What's saved?\n",
+    "    - Sequences are stored in each gene\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.sequences\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_kegg_metadata` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_kegg_metadata\n",
+    "    ```\n",
+    "    - Any gene IDs that are missing a mapping are reported in the `missing_kegg_mapping` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_kegg_mapping\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. automethod:: ssbio.pipeline.gempro.GEMPRO.kegg_mapping_and_metadata"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: 655/661: number of genes mapped to KEGG\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Completed ID mapping --> KEGG. See the \"df_kegg_metadata\" attribute for a summary dataframe.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Missing KEGG mapping:  ['Rv1755c', 'Rv0618', 'Rv2321c', 'Rv2233', 'Rv0619', 'Rv2322c']\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>refseq</th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>sequence_file</th>\n",
+       "      <th>metadata_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv0417</th>\n",
+       "      <td>mtu:Rv0417</td>\n",
+       "      <td>NP_214931</td>\n",
+       "      <td>P9WG73</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>252</td>\n",
+       "      <td>mtu-Rv0417.faa</td>\n",
+       "      <td>mtu-Rv0417.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2291</th>\n",
+       "      <td>mtu:Rv2291</td>\n",
+       "      <td>NP_216807</td>\n",
+       "      <td>P9WHF5</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>284</td>\n",
+       "      <td>mtu-Rv2291.faa</td>\n",
+       "      <td>mtu-Rv2291.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv3737</th>\n",
+       "      <td>mtu:Rv3737</td>\n",
+       "      <td>NP_218254</td>\n",
+       "      <td>O69704</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>529</td>\n",
+       "      <td>mtu-Rv3737.faa</td>\n",
+       "      <td>mtu-Rv3737.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1295</th>\n",
+       "      <td>mtu:Rv1295</td>\n",
+       "      <td>NP_215811</td>\n",
+       "      <td>P9WG59</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2D1F</td>\n",
+       "      <td>360</td>\n",
+       "      <td>mtu-Rv1295.faa</td>\n",
+       "      <td>mtu-Rv1295.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1559</th>\n",
+       "      <td>mtu:Rv1559</td>\n",
+       "      <td>NP_216075</td>\n",
+       "      <td>P9WG95</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>429</td>\n",
+       "      <td>mtu-Rv1559.faa</td>\n",
+       "      <td>mtu-Rv1559.kegg</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "              kegg     refseq uniprot  num_pdbs  pdbs  seq_len  \\\n",
+       "gene                                                             \n",
+       "Rv0417  mtu:Rv0417  NP_214931  P9WG73         0   NaN      252   \n",
+       "Rv2291  mtu:Rv2291  NP_216807  P9WHF5         0   NaN      284   \n",
+       "Rv3737  mtu:Rv3737  NP_218254  O69704         0   NaN      529   \n",
+       "Rv1295  mtu:Rv1295  NP_215811  P9WG59         1  2D1F      360   \n",
+       "Rv1559  mtu:Rv1559  NP_216075  P9WG95         0   NaN      429   \n",
+       "\n",
+       "         sequence_file    metadata_file  \n",
+       "gene                                     \n",
+       "Rv0417  mtu-Rv0417.faa  mtu-Rv0417.kegg  \n",
+       "Rv2291  mtu-Rv2291.faa  mtu-Rv2291.kegg  \n",
+       "Rv3737  mtu-Rv3737.faa  mtu-Rv3737.kegg  \n",
+       "Rv1295  mtu-Rv1295.faa  mtu-Rv1295.kegg  \n",
+       "Rv1559  mtu-Rv1559.faa  mtu-Rv1559.kegg  "
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# KEGG mapping of gene ids\n",
+    "my_gempro.kegg_mapping_and_metadata(kegg_organism_code='mtu')\n",
+    "print('Missing KEGG mapping: ', my_gempro.missing_kegg_mapping)\n",
+    "my_gempro.df_kegg_metadata.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `uniprot_mapping_and_metadata`\n",
+    "\n",
+    "You can try mapping your genes using the actual service [here](http://www.uniprot.org/uploadlists/).\n",
+    "\n",
+    "- `model_gene_source`\n",
+    "    - [Here is a list of the gene IDs that can be mapped to UniProt IDs](http://www.uniprot.org/help/programmatic_access#id_mapping_examples)\n",
+    "    - *M. tuberculosis* gene IDs in this example are of the source `\"TUBERCULIST_ID\"`\n",
+    "- What's saved?\n",
+    "    - Sequences are stored in each gene\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.sequences\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_uniprot_metadata` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_uniprot_metadata\n",
+    "    ```\n",
+    "    - Any gene IDs that are missing a mapping are reported in the `missing_uniprot_mapping` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_uniprot_mapping\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext"
+   },
+   "source": [
+    ".. automethod:: ssbio.pipeline.gempro.GEMPRO.uniprot_mapping_and_metadata"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [root] INFO: getUserAgent: Begin\n",
+      "[2017-03-06 18:33] [root] INFO: getUserAgent: user_agent: EBI-Sample-Client/ (services.py; Python 3.5.2; Linux) Python-requests/2.12.4\n",
+      "[2017-03-06 18:33] [root] INFO: getUserAgent: End\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: 589/661: number of genes mapped to UniProt\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Completed ID mapping --> UniProt. See the \"df_uniprot_metadata\" attribute for a summary dataframe.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Missing UniProt mapping:  ['Rv3379c', 'Rv1164', 'Rv2062c', 'Rv0147', 'Rv2318', 'Rv2524c', 'Rv3331', 'Rv2381c', 'Rv3332', 'Rv0974c', 'Rv2316', 'Rv0252', 'Rv3113', 'Rv2436', 'Rv3777', 'Rv2382c', 'Rv0082', 'Rv2471', 'Rv1647', 'Rv1005c', 'Rv2398c', 'Rv2380c', 'Rv0511', 'Rv2320c', 'Rv3317', 'Rv3737', 'Rv1902c', 'Rv0253', 'Rv3759c', 'Rv1511', 'Rv2590', 'Rv1916', 'Rv1915', 'Rv0993', 'Rv0753c', 'Rv0266c', 'Rv0156', 'Rv1928c', 'Rv3565', 'Rv2671', 'Rv0812', 'Rv1239c', 'Rv3468c', 'Rv3281', 'Rv3784', 'Rv3758c', 'Rv0860', 'Rv2379c', 'Rv2233', 'Rv2458', 'Rv2858c', 'Rv1512', 'Rv0143c', 'Rv0317c', 'Rv1662', 'Rv1704c', 'Rv0727c', 'Rv0375c', 'Rv1618', 'Rv1163', 'Rv0958', 'Rv1127c', 'Rv0155', 'Rv0649', 'Rv1844c', 'Rv3469c', 'Rv1162', 'Rv2833c']\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>reviewed</th>\n",
+       "      <th>gene_name</th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>refseq</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>ec_number</th>\n",
+       "      <th>pfam</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>description</th>\n",
+       "      <th>entry_version</th>\n",
+       "      <th>seq_version</th>\n",
+       "      <th>sequence_file</th>\n",
+       "      <th>metadata_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv0417</th>\n",
+       "      <td>P9WG73</td>\n",
+       "      <td>True</td>\n",
+       "      <td>thiG</td>\n",
+       "      <td>mtu:Rv0417</td>\n",
+       "      <td>NP_214931.1;NC_000962.3;WP_003916659.1;NZ_KK33...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.8.1.10</td>\n",
+       "      <td>PF05690</td>\n",
+       "      <td>252</td>\n",
+       "      <td>Thiazole synthase {ECO:0000255|HAMAP-Rule:MF_0...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WG73.fasta</td>\n",
+       "      <td>P9WG73.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2291</th>\n",
+       "      <td>P9WHF5</td>\n",
+       "      <td>True</td>\n",
+       "      <td>sseB</td>\n",
+       "      <td>mtu:Rv2291</td>\n",
+       "      <td>NP_216807.1;NC_000962.3;WP_003899253.1;NZ_KK33...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.8.1.1</td>\n",
+       "      <td>PF00581</td>\n",
+       "      <td>284</td>\n",
+       "      <td>Putative thiosulfate sulfurtransferase SseB</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WHF5.fasta</td>\n",
+       "      <td>P9WHF5.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1295</th>\n",
+       "      <td>P9WG59</td>\n",
+       "      <td>True</td>\n",
+       "      <td>thrC</td>\n",
+       "      <td>mtu:Rv1295</td>\n",
+       "      <td>NP_215811.1;NC_000962.3;WP_003406652.1;NZ_KK33...</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2D1F</td>\n",
+       "      <td>4.2.3.1</td>\n",
+       "      <td>PF00291</td>\n",
+       "      <td>360</td>\n",
+       "      <td>TS;Threonine synthase</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WG59.fasta</td>\n",
+       "      <td>P9WG59.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1559</th>\n",
+       "      <td>P9WG95</td>\n",
+       "      <td>True</td>\n",
+       "      <td>ilvA</td>\n",
+       "      <td>mtu:Rv1559</td>\n",
+       "      <td>NP_216075.1;NC_000962.3;WP_003407781.1;NZ_KK33...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>4.3.1.19</td>\n",
+       "      <td>PF00291;PF00585</td>\n",
+       "      <td>429</td>\n",
+       "      <td>Threonine deaminase;L-threonine dehydratase bi...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2014-04-16</td>\n",
+       "      <td>P9WG95.fasta</td>\n",
+       "      <td>P9WG95.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2447c</th>\n",
+       "      <td>I6Y0R5</td>\n",
+       "      <td>True</td>\n",
+       "      <td>folC</td>\n",
+       "      <td>mtu:Rv2447c;mtv:RVBD_2447c</td>\n",
+       "      <td>NP_216963.1;NC_000962.3;WP_003899324.1;NZ_KK33...</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2VOR;2VOS</td>\n",
+       "      <td>6.3.2.17;6.3.2.12</td>\n",
+       "      <td>PF02875;PF08245</td>\n",
+       "      <td>487</td>\n",
+       "      <td>Tetrahydrofolylpolyglutamate synthase;Folylpol...</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2012-10-03</td>\n",
+       "      <td>I6Y0R5.fasta</td>\n",
+       "      <td>I6Y0R5.txt</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        uniprot reviewed gene_name                        kegg  \\\n",
+       "gene                                                             \n",
+       "Rv0417   P9WG73     True      thiG                  mtu:Rv0417   \n",
+       "Rv2291   P9WHF5     True      sseB                  mtu:Rv2291   \n",
+       "Rv1295   P9WG59     True      thrC                  mtu:Rv1295   \n",
+       "Rv1559   P9WG95     True      ilvA                  mtu:Rv1559   \n",
+       "Rv2447c  I6Y0R5     True      folC  mtu:Rv2447c;mtv:RVBD_2447c   \n",
+       "\n",
+       "                                                    refseq  num_pdbs  \\\n",
+       "gene                                                                   \n",
+       "Rv0417   NP_214931.1;NC_000962.3;WP_003916659.1;NZ_KK33...         0   \n",
+       "Rv2291   NP_216807.1;NC_000962.3;WP_003899253.1;NZ_KK33...         0   \n",
+       "Rv1295   NP_215811.1;NC_000962.3;WP_003406652.1;NZ_KK33...         1   \n",
+       "Rv1559   NP_216075.1;NC_000962.3;WP_003407781.1;NZ_KK33...         0   \n",
+       "Rv2447c  NP_216963.1;NC_000962.3;WP_003899324.1;NZ_KK33...         2   \n",
+       "\n",
+       "              pdbs          ec_number             pfam  seq_len  \\\n",
+       "gene                                                              \n",
+       "Rv0417         NaN           2.8.1.10          PF05690      252   \n",
+       "Rv2291         NaN            2.8.1.1          PF00581      284   \n",
+       "Rv1295        2D1F            4.2.3.1          PF00291      360   \n",
+       "Rv1559         NaN           4.3.1.19  PF00291;PF00585      429   \n",
+       "Rv2447c  2VOR;2VOS  6.3.2.17;6.3.2.12  PF02875;PF08245      487   \n",
+       "\n",
+       "                                               description entry_version  \\\n",
+       "gene                                                                       \n",
+       "Rv0417   Thiazole synthase {ECO:0000255|HAMAP-Rule:MF_0...    2017-02-15   \n",
+       "Rv2291         Putative thiosulfate sulfurtransferase SseB    2017-02-15   \n",
+       "Rv1295                               TS;Threonine synthase    2017-02-15   \n",
+       "Rv1559   Threonine deaminase;L-threonine dehydratase bi...    2017-02-15   \n",
+       "Rv2447c  Tetrahydrofolylpolyglutamate synthase;Folylpol...    2017-02-15   \n",
+       "\n",
+       "        seq_version sequence_file metadata_file  \n",
+       "gene                                             \n",
+       "Rv0417   2014-04-16  P9WG73.fasta    P9WG73.txt  \n",
+       "Rv2291   2014-04-16  P9WHF5.fasta    P9WHF5.txt  \n",
+       "Rv1295   2014-04-16  P9WG59.fasta    P9WG59.txt  \n",
+       "Rv1559   2014-04-16  P9WG95.fasta    P9WG95.txt  \n",
+       "Rv2447c  2012-10-03  I6Y0R5.fasta    I6Y0R5.txt  "
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# UniProt mapping\n",
+    "my_gempro.uniprot_mapping_and_metadata(model_gene_source='TUBERCULIST_ID')\n",
+    "print('Missing UniProt mapping: ', my_gempro.missing_uniprot_mapping)\n",
+    "my_gempro.df_uniprot_metadata.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `set_representative_sequence`\n",
+    "\n",
+    "If you have mapped with both KEGG and UniProt mappers, then you can set a representative sequence for the gene using this function. If you used just one, this will just set that ID as representative.\n",
+    "\n",
+    "- If any sequences or IDs were provided manually, these will be set as representative first.\n",
+    "- UniProt mappings override KEGG mappings except when KEGG mappings have PDBs associated with them and UniProt doesn't.\n",
+    "\n",
+    "<p><div class=\"alert alert-warning\">**Warning:** Setting representative sequences from different sources is potentially inconsistent (ie. sources may be different genome assemblies)</div></p>\n",
+    "\n",
+    "- What's saved?\n",
+    "    - Representative sequences are set\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.representative_sequence\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_representative_sequences` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_representative_sequences\n",
+    "    ```\n",
+    "    - Any gene IDs that are missing a mapping are reported in the `missing_repseq` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_repseq\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: 661/661: number of genes with a representative sequence\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: See the \"df_representative_sequences\" attribute for a summary dataframe.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Missing a representative sequence:  []\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>sequence_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv0417</th>\n",
+       "      <td>P9WG73</td>\n",
+       "      <td>mtu:Rv0417</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>252</td>\n",
+       "      <td>P9WG73.fasta</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2291</th>\n",
+       "      <td>P9WHF5</td>\n",
+       "      <td>mtu:Rv2291</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>284</td>\n",
+       "      <td>P9WHF5.fasta</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv3737</th>\n",
+       "      <td>O69704</td>\n",
+       "      <td>mtu:Rv3737</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>529</td>\n",
+       "      <td>mtu-Rv3737.faa</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1295</th>\n",
+       "      <td>P9WG59</td>\n",
+       "      <td>mtu:Rv1295</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2D1F</td>\n",
+       "      <td>360</td>\n",
+       "      <td>Rv1295.faa</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1559</th>\n",
+       "      <td>P9WG95</td>\n",
+       "      <td>mtu:Rv1559</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>429</td>\n",
+       "      <td>P9WG95.fasta</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       uniprot        kegg  num_pdbs  pdbs  seq_len   sequence_file\n",
+       "gene                                                               \n",
+       "Rv0417  P9WG73  mtu:Rv0417         0   NaN      252    P9WG73.fasta\n",
+       "Rv2291  P9WHF5  mtu:Rv2291         0   NaN      284    P9WHF5.fasta\n",
+       "Rv3737  O69704  mtu:Rv3737         0   NaN      529  mtu-Rv3737.faa\n",
+       "Rv1295  P9WG59  mtu:Rv1295         1  2D1F      360      Rv1295.faa\n",
+       "Rv1559  P9WG95  mtu:Rv1559         0   NaN      429    P9WG95.fasta"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Set representative sequences\n",
+    "my_gempro.set_representative_sequence()\n",
+    "print('Missing a representative sequence: ', my_gempro.missing_representative_sequence)\n",
+    "my_gempro.df_representative_sequences.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Mapping representative sequence to structure\n",
+    "\n",
+    "These are the ways to map sequence to structure:\n",
+    "\n",
+    "1. Use the UniProt ID and their automatic mappings to the PDB\n",
+    "2. BLAST the sequence to the PDB\n",
+    "3. Make homology models or \n",
+    "4. Map to existing homology models\n",
+    "\n",
+    "You can only utilize option #1 to map to PDBs if there is a mapped UniProt ID set in the representative sequence. If not, you'll have to BLAST your sequence to the PDB or make a homology model. You can also run both for maximum coverage."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `map_uniprot_to_pdb`\n",
+    "\n",
+    "This uses the `best_structures` API [from the PDBe](https://www.ebi.ac.uk/pdbe/api/doc/sifts.html) to return a rank ordered list of PDBs that match a UniProt ID. \n",
+    "\n",
+    "- Method description:\n",
+    "    - Here is the ranking algorithm described by the PDB paper: https://nar.oxfordjournals.org/content/44/D1/D385.full\n",
+    "    - More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html\n",
+    "    - Link used to retrieve results: https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession\n",
+    "    - The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and, if the same, resolution.\n",
+    "\n",
+    "- `seq_ident_cutoff`\n",
+    "    - From 0 to 1\n",
+    "    - Provide the seq_ident_cutoff as a percentage to filter for structures with only a percent identity above the cutoff.\n",
+    "\n",
+    "<p><div class=\"alert alert-warning\">**Warning:** if you set the `seq_ident_cutoff` too high you risk filtering out PDBs that do match the sequence, but are just missing large portions of it.</div></p>\n",
+    "\n",
+    "\n",
+    "- What's saved?\n",
+    "    - A .json file of the results is saved from the web request in the \"sequences\" folder\n",
+    "    - No PDBs are downloaded yet\n",
+    "    - PDB IDs are saved in an ordered list based on their resolution and sequence coverage\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.structures\n",
+    "    ```\n",
+    "    - The ranking of PDBs is saved as a dataframe\n",
+    "    ```python\n",
+    "    my_gempro.df_pdb_ranking\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Mapping UniProt IDs --> PDB IDs...\n",
+      "[2017-03-06 18:33] [root] INFO: getUserAgent: Begin\n",
+      "[2017-03-06 18:33] [root] INFO: getUserAgent: user_agent: EBI-Sample-Client/ (services.py; Python 3.5.2; Linux) Python-requests/2.12.4\n",
+      "[2017-03-06 18:33] [root] INFO: getUserAgent: End\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: 184/661: number of genes with at least one experimental structure\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Completed UniProt --> best PDB mapping. See the \"df_pdb_ranking\" attribute for a summary dataframe.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>coverage</th>\n",
+       "      <th>end</th>\n",
+       "      <th>experimental_method</th>\n",
+       "      <th>pdb_chain_id</th>\n",
+       "      <th>pdb_id</th>\n",
+       "      <th>rank</th>\n",
+       "      <th>resolution</th>\n",
+       "      <th>start</th>\n",
+       "      <th>taxonomy_name</th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>unp_end</th>\n",
+       "      <th>unp_start</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv1295</th>\n",
+       "      <td>1.000</td>\n",
+       "      <td>360</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>A</td>\n",
+       "      <td>2d1f</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2.50</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Mycobacterium tuberculosis</td>\n",
+       "      <td>P9WG59</td>\n",
+       "      <td>360</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1295</th>\n",
+       "      <td>1.000</td>\n",
+       "      <td>360</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>B</td>\n",
+       "      <td>2d1f</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2.50</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Mycobacterium tuberculosis</td>\n",
+       "      <td>P9WG59</td>\n",
+       "      <td>360</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1201c</th>\n",
+       "      <td>0.997</td>\n",
+       "      <td>319</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>A</td>\n",
+       "      <td>3fsy</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1.97</td>\n",
+       "      <td>4</td>\n",
+       "      <td>Mycobacterium tuberculosis</td>\n",
+       "      <td>P9WP21</td>\n",
+       "      <td>317</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1201c</th>\n",
+       "      <td>0.997</td>\n",
+       "      <td>319</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>B</td>\n",
+       "      <td>3fsy</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1.97</td>\n",
+       "      <td>4</td>\n",
+       "      <td>Mycobacterium tuberculosis</td>\n",
+       "      <td>P9WP21</td>\n",
+       "      <td>317</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1201c</th>\n",
+       "      <td>0.997</td>\n",
+       "      <td>319</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>C</td>\n",
+       "      <td>3fsy</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1.97</td>\n",
+       "      <td>4</td>\n",
+       "      <td>Mycobacterium tuberculosis</td>\n",
+       "      <td>P9WP21</td>\n",
+       "      <td>317</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         coverage  end experimental_method pdb_chain_id pdb_id  rank  \\\n",
+       "gene                                                                   \n",
+       "Rv1295      1.000  360   X-ray diffraction            A   2d1f     1   \n",
+       "Rv1295      1.000  360   X-ray diffraction            B   2d1f     2   \n",
+       "Rv1201c     0.997  319   X-ray diffraction            A   3fsy     1   \n",
+       "Rv1201c     0.997  319   X-ray diffraction            B   3fsy     2   \n",
+       "Rv1201c     0.997  319   X-ray diffraction            C   3fsy     3   \n",
+       "\n",
+       "         resolution  start               taxonomy_name uniprot  unp_end  \\\n",
+       "gene                                                                      \n",
+       "Rv1295         2.50      1  Mycobacterium tuberculosis  P9WG59      360   \n",
+       "Rv1295         2.50      1  Mycobacterium tuberculosis  P9WG59      360   \n",
+       "Rv1201c        1.97      4  Mycobacterium tuberculosis  P9WP21      317   \n",
+       "Rv1201c        1.97      4  Mycobacterium tuberculosis  P9WP21      317   \n",
+       "Rv1201c        1.97      4  Mycobacterium tuberculosis  P9WP21      317   \n",
+       "\n",
+       "         unp_start  \n",
+       "gene                \n",
+       "Rv1295           1  \n",
+       "Rv1295           1  \n",
+       "Rv1201c          2  \n",
+       "Rv1201c          2  \n",
+       "Rv1201c          2  "
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Mapping using the PDBe best_structures service\n",
+    "my_gempro.map_uniprot_to_pdb(seq_ident_cutoff=.3)\n",
+    "my_gempro.df_pdb_ranking.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `blast_seqs_to_pdb`\n",
+    "This will BLAST the representative sequence against the entire PDB, and return significant hits. XML files of the BLAST results are saved in the respective sequence folders for a protein.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Warning:** A PDB BLAST may return hits in other organisms.</div></p>\n",
+    "\n",
+    "- `seq_ident_cutoff`\n",
+    "    - Default: `0`\n",
+    "    - From 0 to 1\n",
+    "- `evalue`\n",
+    "    - Default: `0.0001`\n",
+    "    - Significance of BLAST results\n",
+    "- `all_genes`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want all genes and their sequences BLASTed\n",
+    "    - Set to `False` if you only want to BLAST sequences that did not have any PDBs mapped to them already\n",
+    "- `display_link`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want a clickable HTML link to be printed\n",
+    "- `force_rerun`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want to ignore any existing XML results and run the BLAST again\n",
+    "    \n",
+    "    \n",
+    "- What's saved?\n",
+    "    - An .xml file from the web request in the \"sequences\" folder\n",
+    "    - No PDBs are downloaded yet\n",
+    "    - Protein structures\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.structures\n",
+    "    ```\n",
+    "    - DataFrames\n",
+    "    ```python\n",
+    "    my_gempro.df_pdb_blast\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Completed sequence --> PDB BLAST. See the \"df_pdb_blast\" attribute for a summary dataframe.\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: 0: number of genes with additional structures added from BLAST\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>pdb_id</th>\n",
+       "      <th>pdb_chain_id</th>\n",
+       "      <th>hit_score</th>\n",
+       "      <th>hit_evalue</th>\n",
+       "      <th>hit_percent_similar</th>\n",
+       "      <th>hit_percent_ident</th>\n",
+       "      <th>hit_num_ident</th>\n",
+       "      <th>hit_num_similar</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv3846</th>\n",
+       "      <td>1gn2</td>\n",
+       "      <td>A</td>\n",
+       "      <td>1023.0</td>\n",
+       "      <td>2.657300e-111</td>\n",
+       "      <td>0.995169</td>\n",
+       "      <td>0.995169</td>\n",
+       "      <td>206</td>\n",
+       "      <td>206</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv3846</th>\n",
+       "      <td>1gn2</td>\n",
+       "      <td>B</td>\n",
+       "      <td>1023.0</td>\n",
+       "      <td>2.657300e-111</td>\n",
+       "      <td>0.995169</td>\n",
+       "      <td>0.995169</td>\n",
+       "      <td>206</td>\n",
+       "      <td>206</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       pdb_id pdb_chain_id  hit_score     hit_evalue  hit_percent_similar  \\\n",
+       "gene                                                                        \n",
+       "Rv3846   1gn2            A     1023.0  2.657300e-111             0.995169   \n",
+       "Rv3846   1gn2            B     1023.0  2.657300e-111             0.995169   \n",
+       "\n",
+       "        hit_percent_ident  hit_num_ident  hit_num_similar  \n",
+       "gene                                                       \n",
+       "Rv3846           0.995169            206              206  \n",
+       "Rv3846           0.995169            206              206  "
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Mapping using BLAST\n",
+    "my_gempro.blast_seqs_to_pdb(all_genes=True, seq_ident_cutoff=.9, evalue=0.00001)\n",
+    "my_gempro.df_pdb_blast.head(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `get_itasser_models`\n",
+    "\n",
+    "This will organize the homology models generated by I-TASSER\n",
+    "\n",
+    "- Method:\n",
+    "    - text\n",
+    "\n",
+    "\n",
+    "- Files created:\n",
+    "    - Copies homology models and a couple summary result files into the GEM-PRO \"structures\" directory\n",
+    "    \n",
+    "    \n",
+    "- Usage:\n",
+    "        my_gempro.get_itasser_models(homology_raw_dir, custom_itasser_name_mapping=None, force_rerun=False)\n",
+    "        \n",
+    "        \n",
+    "- Arguments:\n",
+    "\n",
+    "    - *homology_raw_dir*\n",
+    "        - \n",
+    "        \n",
+    "    - *custom_itasser_name_mapping*\n",
+    "        - \n",
+    "        \n",
+    "- Creates attributes:\n",
+    "\n",
+    "    - A summary of the I-TASSER modeling is available in the \"df_homology_models\" attribute.\n",
+    "            my_gempro.df_homology_models\n",
+    "            "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Completed copying of 435 I-TASSER models to GEM-PRO directory. See the \"df_homology_models\" attribute for a summary dataframe.\n",
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Completed copying of 9 I-TASSER models to GEM-PRO directory. See the \"df_homology_models\" attribute for a summary dataframe.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>c_score</th>\n",
+       "      <th>difficulty</th>\n",
+       "      <th>id</th>\n",
+       "      <th>model_date</th>\n",
+       "      <th>model_file</th>\n",
+       "      <th>rmsd</th>\n",
+       "      <th>rmsd_err</th>\n",
+       "      <th>tm_score</th>\n",
+       "      <th>tm_score_err</th>\n",
+       "      <th>top_template_chain</th>\n",
+       "      <th>top_template_pdb</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Rv0417</th>\n",
+       "      <td>1.66</td>\n",
+       "      <td>easy</td>\n",
+       "      <td>P9WG73</td>\n",
+       "      <td>2015-12-30</td>\n",
+       "      <td>P9WG73_model1.pdb</td>\n",
+       "      <td>2.6</td>\n",
+       "      <td>1.9</td>\n",
+       "      <td>0.95</td>\n",
+       "      <td>0.05</td>\n",
+       "      <td>C</td>\n",
+       "      <td>2htm</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2291</th>\n",
+       "      <td>1.38</td>\n",
+       "      <td>easy</td>\n",
+       "      <td>P9WHF5</td>\n",
+       "      <td>2016-01-04</td>\n",
+       "      <td>P9WHF5_model1.pdb</td>\n",
+       "      <td>3.3</td>\n",
+       "      <td>2.3</td>\n",
+       "      <td>0.91</td>\n",
+       "      <td>0.06</td>\n",
+       "      <td>A</td>\n",
+       "      <td>3olh</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv1559</th>\n",
+       "      <td>0.73</td>\n",
+       "      <td>easy</td>\n",
+       "      <td>P9WG95</td>\n",
+       "      <td>2016-01-08</td>\n",
+       "      <td>P9WG95_model1.pdb</td>\n",
+       "      <td>5.4</td>\n",
+       "      <td>3.4</td>\n",
+       "      <td>0.81</td>\n",
+       "      <td>0.09</td>\n",
+       "      <td>A</td>\n",
+       "      <td>1tdj</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv3113</th>\n",
+       "      <td>0.72</td>\n",
+       "      <td>easy</td>\n",
+       "      <td>O05790</td>\n",
+       "      <td>2015-12-30</td>\n",
+       "      <td>O05790_model1.pdb</td>\n",
+       "      <td>4.1</td>\n",
+       "      <td>2.8</td>\n",
+       "      <td>0.81</td>\n",
+       "      <td>0.09</td>\n",
+       "      <td>A</td>\n",
+       "      <td>3sd7</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Rv2447c</th>\n",
+       "      <td>0.07</td>\n",
+       "      <td>easy</td>\n",
+       "      <td>I6Y0R5</td>\n",
+       "      <td>2016-01-08</td>\n",
+       "      <td>I6Y0R5_model1.pdb</td>\n",
+       "      <td>7.1</td>\n",
+       "      <td>4.2</td>\n",
+       "      <td>0.72</td>\n",
+       "      <td>0.11</td>\n",
+       "      <td>A</td>\n",
+       "      <td>2vos</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         c_score difficulty      id  model_date         model_file  rmsd  \\\n",
+       "gene                                                                       \n",
+       "Rv0417      1.66       easy  P9WG73  2015-12-30  P9WG73_model1.pdb   2.6   \n",
+       "Rv2291      1.38       easy  P9WHF5  2016-01-04  P9WHF5_model1.pdb   3.3   \n",
+       "Rv1559      0.73       easy  P9WG95  2016-01-08  P9WG95_model1.pdb   5.4   \n",
+       "Rv3113      0.72       easy  O05790  2015-12-30  O05790_model1.pdb   4.1   \n",
+       "Rv2447c     0.07       easy  I6Y0R5  2016-01-08  I6Y0R5_model1.pdb   7.1   \n",
+       "\n",
+       "         rmsd_err  tm_score  tm_score_err top_template_chain top_template_pdb  \n",
+       "gene                                                                           \n",
+       "Rv0417        1.9      0.95          0.05                  C             2htm  \n",
+       "Rv2291        2.3      0.91          0.06                  A             3olh  \n",
+       "Rv1559        3.4      0.81          0.09                  A             1tdj  \n",
+       "Rv3113        2.8      0.81          0.09                  A             3sd7  \n",
+       "Rv2447c       4.2      0.72          0.11                  A             2vos  "
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tb_homology_dir = '/home/nathan/projects_archive/homology_models/MTUBERCULOSIS/'\n",
+    "\n",
+    "##### EXAMPLE SPECIFIC CODE #####\n",
+    "# Needed to map to older IDs used in this example\n",
+    "import pandas as pd\n",
+    "import os.path as op\n",
+    "old_gene_to_homology = pd.read_csv(op.join(tb_homology_dir, 'data/161031-old_gene_to_uniprot_mapping.csv'))\n",
+    "gene_to_uniprot = old_gene_to_homology.set_index('m_gene').to_dict()['u_uniprot_acc']\n",
+    "my_gempro.get_itasser_models(homology_raw_dir=op.join(tb_homology_dir, 'raw'), custom_itasser_name_mapping=gene_to_uniprot)\n",
+    "### END EXAMPLE SPECIFIC CODE ###\n",
+    "\n",
+    "# Organizing I-TASSER homology models\n",
+    "my_gempro.get_itasser_models(homology_raw_dir=op.join(tb_homology_dir, 'raw'))\n",
+    "my_gempro.df_homology_models.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `manual_homology_models`\n",
+    "\n",
+    "This will map to existing homology models\n",
+    "\n",
+    "- Method:\n",
+    "    - text\n",
+    "\n",
+    "\n",
+    "- Files created:\n",
+    "    - Copies homology models into the GEM-PRO \"structures\" directory\n",
+    "    \n",
+    "    \n",
+    "- Usage:\n",
+    "        my_gempro.manual_homology_models(input_dict)\n",
+    "        \n",
+    "        \n",
+    "- Arguments:\n",
+    "\n",
+    "    - *input_dict*\n",
+    "        -  Dictionary of dictionaries of gene names to homology model IDs and information. Input a dict of:\n",
+    "                {model_gene: {homology_model_id1: {'model_file': '/path/to/homology/model',\n",
+    "                                                  'other_info': 'other_info_here',\n",
+    "                                                  ...},\n",
+    "                              homology_model_id2: {'model_file': '/path/to/homology/model',\n",
+    "                                                  'other_info': 'other_info_here',\n",
+    "                                                  ...}}}\n",
+    "            "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.pipeline.gempro] INFO: Updated homology model information for 0 genes.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "homology_model_dict = {}\n",
+    "my_gempro.manual_homology_models(homology_model_dict)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Downloading and ranking structures"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `pdb_downloader_and_metadata`\n",
+    "Download **all** structures per protein. This also adds metadata to each PDB object in the list of structures.\n",
+    "\n",
+    "<p><div class=\"alert alert-warning\">**Warning:** Don't run this if you don't need all PDB structures - just set representative structures below if you want 1 structure per protein.</div></p>\n",
+    "\n",
+    "- `outdir`\n",
+    "    - Default: `None`\n",
+    "    - Set this to a custom location if you want to save PDB files outside the GEM-PRO project folder\n",
+    "- `pdb_file_type`\n",
+    "    - Default: `'cif'` (set in GEMPRO project initialization, but can be changed here)\n",
+    "    - `'pdb'`, `'pdb.gz'`, `'mmcif'`, `'cif'`, `'cif.gz'`, `'xml.gz'`, `'mmtf'`, `'mmtf.gz'` - File type for files downloaded from the PDB.\n",
+    "- `force_rerun`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want to re-download PDB files.\n",
+    "- What's saved?\n",
+    "    - Additional metadata per structure\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.structures\n",
+    "    ```\n",
+    "    - DataFrames\n",
+    "    ```python\n",
+    "    my_gempro.df_pdb_metadata\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "ename": "KeyboardInterrupt",
+     "evalue": "",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mKeyboardInterrupt\u001b[0m                         Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-17-e04244474cca>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m# Download all mapped PDBs and gather the metadata\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0mmy_gempro\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mpdb_downloader_and_metadata\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      3\u001b[0m \u001b[0mmy_gempro\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdf_pdb_metadata\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mhead\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/mnt/projects/ssbio/ssbio/pipeline/gempro.py\u001b[0m in \u001b[0;36mpdb_downloader_and_metadata\u001b[0;34m(self, outdir, pdb_file_type, force_rerun)\u001b[0m\n\u001b[1;32m   1052\u001b[0m         \u001b[0mcounter\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1053\u001b[0m         \u001b[0;32mfor\u001b[0m \u001b[0mg\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mtqdm\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgenes\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1054\u001b[0;31m             \u001b[0mpdbs\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mg\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mprotein\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mpdb_downloader_and_metadata\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0moutdir\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0moutdir\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mpdb_file_type\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpdb_file_type\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mforce_rerun\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mforce_rerun\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1055\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1056\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0mpdbs\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/mnt/projects/ssbio/ssbio/core/protein.py\u001b[0m in \u001b[0;36mpdb_downloader_and_metadata\u001b[0;34m(self, outdir, pdb_file_type, force_rerun)\u001b[0m\n\u001b[1;32m    794\u001b[0m         \u001b[0;32mfor\u001b[0m \u001b[0ms\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget_experimental_structures\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    795\u001b[0m             \u001b[0mlog\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdebug\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'{}: downloading structure file from the PDB...'\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0ms\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mid\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 796\u001b[0;31m             \u001b[0ms\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdownload_structure_file\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0moutdir\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0moutdir\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mfile_type\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpdb_file_type\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mforce_rerun\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mforce_rerun\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    797\u001b[0m             \u001b[0;31m# Download the mmCIF header file to get additional information\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    798\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0;34m'cif'\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mpdb_file_type\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/mnt/projects/ssbio/ssbio/databases/pdb.py\u001b[0m in \u001b[0;36mdownload_structure_file\u001b[0;34m(self, outdir, file_type, force_rerun)\u001b[0m\n\u001b[1;32m     44\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     45\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0;34m'cif'\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mfile_type\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 46\u001b[0;31m             \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mupdate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mparse_mmcif_header\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpdb_file\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     47\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     48\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mdownload_cif_header_file\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0moutdir\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mforce_rerun\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mFalse\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/mnt/projects/ssbio/ssbio/databases/pdb.py\u001b[0m in \u001b[0;36mparse_mmcif_header\u001b[0;34m(infile)\u001b[0m\n\u001b[1;32m    165\u001b[0m     \"\"\"\n\u001b[1;32m    166\u001b[0m     \u001b[0mnewdict\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m{\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 167\u001b[0;31m     \u001b[0mmmdict\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mMMCIF2Dict\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0minfile\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    168\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    169\u001b[0m     \u001b[0mchemical_ids_exclude\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m[\u001b[0m\u001b[0;34m'HOH'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/home/nathan/anaconda3/lib/python3.5/site-packages/Bio/PDB/MMCIF2Dict.py\u001b[0m in \u001b[0;36m__init__\u001b[0;34m(self, filename)\u001b[0m\n\u001b[1;32m     39\u001b[0m                     \u001b[0;32mcontinue\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     40\u001b[0m                 \u001b[0;32melif\u001b[0m \u001b[0mloop_flag\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 41\u001b[0;31m                     \u001b[0;32mif\u001b[0m \u001b[0mtoken\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstartswith\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"_\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     42\u001b[0m                         \u001b[0;32mif\u001b[0m \u001b[0mi\u001b[0m \u001b[0;34m>\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     43\u001b[0m                             \u001b[0mloop_flag\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;32mFalse\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mKeyboardInterrupt\u001b[0m: "
+     ]
+    }
+   ],
+   "source": [
+    "# Download all mapped PDBs and gather the metadata\n",
+    "my_gempro.pdb_downloader_and_metadata()\n",
+    "my_gempro.df_pdb_metadata.head(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `set_representative_structure`\n",
+    "Rank available structures, run QC/QA, download and clean the final structure.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Note:** PDBs don't need to be downloaded before running this step. This is useful to limit the number of structures downloaded from the PDB.</div></p>\n",
+    "\n",
+    "- `pdb_file_type`\n",
+    "    - Default: `'cif'` (set in GEMPRO project initialization, but can be changed here)\n",
+    "    - `'pdb'`, `'pdb.gz'`, `'mmcif'`, `'cif'`, `'cif.gz'`, `'xml.gz'`, `'mmtf'`, `'mmtf.gz'` - File type for files downloaded from the PDB.\n",
+    "- `engine`\n",
+    "    - Default: `'needle'`\n",
+    "    - Set to `'biopython'` if you want to utilize Biopython's built-in pairwise alignment algorithm.\n",
+    "- `always_use_homology`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you always want to use homology models.\n",
+    "- `seq_ident_cutoff`\n",
+    "    - Default: `0.5`\n",
+    "    - QC/QA: sets the minimum sequence identity a structure has to have to be selected as representative.\n",
+    "- `allow_missing_on_termini`\n",
+    "    - Default: `0.2`\n",
+    "    - QC/QA: Percentage of the total length of the reference sequence which will be ignored when checking for modifications (mutations, deletions, insertions, or unresolved residues). Example: if `0.1`, and reference sequence is 100 AA, then only residues 5 to 95 will be checked for modifications.\n",
+    "- `allow_mutants`\n",
+    "    - Default: `True`\n",
+    "    - QC/QA: set to `True` if point mutations within the structure should be allowed.\n",
+    "- `allow_deletions`\n",
+    "    - Default: `False`\n",
+    "    - QC/QA: set to `True` if deletions within the structure should be allowed.\n",
+    "- `allow_insertions`\n",
+    "    - Default: `False`\n",
+    "    - QC/QA: set to `True` if insertions within the structure should be allowed.\n",
+    "- `allow_unresolved`\n",
+    "    - Default: `True`\n",
+    "    - QC/QA: set to `True` if unresolved regions within the structure should be allowed.\n",
+    "- `force_rerun`\n",
+    "    - Default: `False`\n",
+    "    - QC/QA: set to `True` if pairwise alignments and structure cleaning should be rerun even if files exist.\n",
+    "- What's saved?\n",
+    "    - Representative protein structures\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.representative_structure\n",
+    "    ```\n",
+    "    - DataFrames\n",
+    "    ```python\n",
+    "    my_gempro.df_representative_structures\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:33] [ssbio.core.protein] WARNING: Rv0432: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv1286: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2934: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2932: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2933: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2931: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2945c: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2941: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2495c: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2380c: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2987c: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv3859c: no structures meet quality checks\n",
+      "[2017-03-06 18:34] [ssbio.core.protein] WARNING: Rv2476c: no structures meet quality checks\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Set representative structures\n",
+    "my_gempro.set_representative_structure()\n",
+    "my_gempro.df_representative_structures.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<StructProp 2d1f-A at 0x7fc9d57b3828>"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "text/plain": [
+       "{'_structure_dir': '/tmp/iNJ661_GP/genes/Rv1295/Rv1295_protein/structures',\n",
+       " 'chains': [<ChainProp A at 0x7fc9c278f198>],\n",
+       " 'date': ['2006-09-05', '2009-02-24', '2009-04-28', '2011-07-13'],\n",
+       " 'description': 'Threonine synthase (E.C.4.2.3.1)',\n",
+       " 'file_type': 'pdb',\n",
+       " 'id': '2d1f-A',\n",
+       " 'is_experimental': True,\n",
+       " 'mapped_chains': ['A'],\n",
+       " 'original_pdb_id': '2d1f',\n",
+       " 'reference_seq': <SeqProp Rv1295 at 0x7fc9c30de320>,\n",
+       " 'reference_seq_top_coverage': 96.9,\n",
+       " 'representative_chain': <ChainProp A at 0x7fc9c30de7f0>,\n",
+       " 'resolution': 2.5,\n",
+       " 'structure_file': '2d1f-A_clean.pdb',\n",
+       " 'taxonomy_name': 'Mycobacterium tuberculosis'}"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Looking at the information saved within a gene\n",
+    "my_gempro.genes.get_by_id('Rv1295').protein.representative_structure\n",
+    "my_gempro.genes.get_by_id('Rv1295').protein.representative_structure.get_dict()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Creating homology models"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For those proteins with no representative structure, we can create homology models for them. `ssbio` contains some built in functions for easily running [I-TASSER](http://zhanglab.ccmb.med.umich.edu/I-TASSER/download/) locally or on machines with `SLURM` (ie. on NERSC) or `Torque` job scheduling.\n",
+    "\n",
+    "You can load in I-TASSER models once they complete using the `get_itasser_models` later.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Info:** Homology modeling can take a long time - about 24-72 hours per protein (highly dependent on the sequence length, as well as if there are available templates).</div></p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `prep_itasser_models`\n",
+    "\n",
+    "This will prepare sequences for homology modeling using I-TASSER or allow you to organize already generated ones.\n",
+    "\n",
+    "- Method:\n",
+    "    - Prepare representative sequences for I-TASSER runs on your local machine, or using Torque (qsub, available on ssb0-ssb4) or SLURM (sbatch, currently used on NERSC) job scheduler systems.\n",
+    "   \n",
+    "- Arguments:\n",
+    "\n",
+    "    - `outdir`\n",
+    "        - outdir\n",
+    "        \n",
+    "    - `itasser_installation`\n",
+    "        - text\n",
+    "        \n",
+    "    - `itlib_location`\n",
+    "        - text\n",
+    "        \n",
+    "    - `runtype`\n",
+    "        - text\n",
+    "        \n",
+    "    - `print_exec`\n",
+    "        - text\n",
+    "        \n",
+    "    - `kwargs`\n",
+    "        - text\n",
+    "        \n",
+    "        \n",
+    "- What's saved?\n",
+    "    - Creates homology modeling files in a specified directory"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2934: I-TASSER modeling will not run as sequence length (1827) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2932: I-TASSER modeling will not run as sequence length (1538) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2933: I-TASSER modeling will not run as sequence length (2188) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2931: I-TASSER modeling will not run as sequence length (1876) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2380c: I-TASSER modeling will not run as sequence length (1682) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv3859c: I-TASSER modeling will not run as sequence length (1527) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2476c: I-TASSER modeling will not run as sequence length (1624) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv3800c: I-TASSER modeling will not run as sequence length (1733) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv0107c: I-TASSER modeling will not run as sequence length (1632) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2940c: I-TASSER modeling will not run as sequence length (2111) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv1662: I-TASSER modeling will not run as sequence length (1602) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.structure.homology.itasser.itasserprep] WARNING: Rv2524c: I-TASSER modeling will not run as sequence length (3069) is not in the range [10, 1500]\n",
+      "[2017-03-06 18:17] [ssbio.pipeline.gempro] INFO: Prepared I-TASSER modeling folders for 71 genes in folder /tmp/iNJ661_GP/data/homology_models\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Prep I-TASSER model folders\n",
+    "my_gempro.prep_itasser_models('~/software/I-TASSER4.4', '~/software/ITLIB/', runtype='local', all_genes=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Saving your GEM-PRO"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<p><div class=\"alert alert-warning\">**Warning:** Saving is still experimental. For a full GEM-PRO with sequences & structures, depending on the number of genes, saving can take >5 minutes.</div></p>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[2017-03-06 18:17] [root] WARNING: json-tricks: numpy scalar serialization is experimental and may work differently in future versions\n",
+      "[2017-03-06 18:21] [ssbio.core.io] INFO: Saved <class 'ssbio.pipeline.gempro.GEMPRO'> (id: iNJ661_GP) to /home/nathan/Desktop/gempro.json\n"
+     ]
+    }
+   ],
+   "source": [
+    "my_gempro.save_json('/home/nathan/Desktop/gempro.json', compression=False)"
+   ]
+  }
+ ],
+ "metadata": {
+  "_draft": {
+   "nbviewer_url": "https://gist.github.com/342e44766d1dda637e975a4ef61dae19"
+  },
+  "anaconda-cloud": {},
+  "celltoolbar": "Raw Cell Format",
+  "gist": {
+   "data": {
+    "description": "GEM-PRO pipeline example for a list of gene IDs",
+    "public": false
+   },
+   "id": "342e44766d1dda637e975a4ef61dae19"
+  },
+  "kernelspec": {
+   "display_name": "Python [default]",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}

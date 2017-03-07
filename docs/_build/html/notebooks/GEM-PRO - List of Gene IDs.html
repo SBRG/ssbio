@@ -1,0 +1,1938 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GEM-PRO - List of Gene IDs &mdash; ssbio 1.0.0a0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="ssbio 1.0.0a0 documentation" href="../index.html"/>
+        <link rel="up" title="The GEM-PRO Pipeline" href="../gempro.html"/>
+        <link rel="next" title="GEM-PRO - SBML Model (iNJ661)" href="GEM-PRO - SBML Model (iNJ661).html"/>
+        <link rel="prev" title="GEM-PRO - Genes &amp; Sequences" href="GEM-PRO - Genes &amp; Sequences.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ssbio
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#structural-biology">Structural biology</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#protein-structures">Protein structures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#biopython">Biopython</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#systems-biology">Systems biology</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#cobra-models-cobrapy">COBRA models &amp; COBRApy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#reading">Reading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The Structure Class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#introduction">Introduction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../protein.html">The Protein Class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../protein.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../protein.html#tutorials">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html">Protein - Structure Mapping, Alignments, and Visualization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Mapping-sequence--&gt;-structure">Mapping sequence -&gt; structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Loading-and-aligning-new-sequences">Loading and aligning new sequences</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Viewing-structures">Viewing structures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Mapping-sequence-residue-numbers-to-structure-residue-numbers">Mapping sequence residue numbers to structure residue numbers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Protein - Structure Mapping, Alignments, and Visualization.html#Saving">Saving</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../gempro.html">The GEM-PRO Pipeline</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../gempro.html#introduction">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../gempro.html#tutorials">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html">GEM-PRO - Genes &amp; Sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Mapping-sequence--&gt;-structure">Mapping sequence -&gt; structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">GEM-PRO - List of Gene IDs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Mapping-gene-ID--&gt;-sequence">Mapping gene ID -&gt; sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Mapping-representative-sequence-to-structure">Mapping representative sequence to structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html">GEM-PRO - SBML Model (iNJ661)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Mapping-gene-ID--&gt;-sequence">Mapping gene ID -&gt; sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Mapping-representative-sequence-to-structure">Mapping representative sequence to structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Creating-homology-models">Creating homology models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Saving-your-GEM-PRO">Saving your GEM-PRO</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../atlas.html">The ATLAS Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../atlas.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../atlas.html#tutorials">Tutorials</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">Python API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">ssbio</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../gempro.html">The GEM-PRO Pipeline</a> &raquo;</li>
+      
+    <li>GEM-PRO - List of Gene IDs</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/notebooks/GEM-PRO - List of Gene IDs.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="GEM-PRO---List-of-Gene-IDs">
+<h1>GEM-PRO - List of Gene IDs<a class="headerlink" href="#GEM-PRO---List-of-Gene-IDs" title="Permalink to this headline">¶</a></h1>
+<p>This notebook gives an example of how to run the GEM-PRO pipeline with a
+<strong>list of gene IDs</strong>.</p>
+<p><div class="admonition note">
+<strong>Input:</strong> List of gene IDs</div>
+<div class="admonition note">
+<strong>Output:</strong> GEM-PRO model</div>
+</p><div class="section" id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Import the GEM-PRO class</span>
+<span class="kn">from</span> <span class="nn">ssbio.pipeline.gempro</span> <span class="kn">import</span> <span class="n">GEMPRO</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Printing multiple outputs per cell</span>
+<span class="kn">from</span> <span class="nn">IPython.core.interactiveshell</span> <span class="kn">import</span> <span class="n">InteractiveShell</span>
+<span class="n">InteractiveShell</span><span class="o">.</span><span class="n">ast_node_interactivity</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Logging">
+<h3>Logging<a class="headerlink" href="#Logging" title="Permalink to this headline">¶</a></h3>
+<p>Set the logging level in <code class="docutils literal"><span class="pre">logger.setLevel(logging.&lt;LEVEL_HERE&gt;)</span></code> to
+specify how verbose you want the pipeline to be. Debug is most verbose.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">CRITICAL</span></code><ul>
+<li>Only really important messages shown</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">ERROR</span></code><ul>
+<li>Major errors</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">WARNING</span></code><ul>
+<li>Warnings that don&#8217;t affect running of the pipeline</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">INFO</span></code> (default)<ul>
+<li>Info such as the number of structures mapped per gene</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">DEBUG</span></code><ul>
+<li>Really detailed information that will print out a lot of stuff</li>
+</ul>
+</li>
+</ul>
+<div class="admonition warning">
+<strong>Warning:</strong> <code class="docutils literal"><span class="pre">DEBUG</span></code> mode prints out a large amount of information,
+especially if you have a lot of genes. This may stall your notebook!</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Create logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>  <span class="c1"># SET YOUR LOGGING LEVEL HERE #</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Initialization-of-the-project">
+<h2>Initialization of the project<a class="headerlink" href="#Initialization-of-the-project" title="Permalink to this headline">¶</a></h2>
+<p>Set these three things:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ROOT_DIR</span></code><ul>
+<li>The directory where a folder named after your <code class="docutils literal"><span class="pre">PROJECT</span></code> will be
+created</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">PROJECT</span></code><ul>
+<li>Your project name</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">LIST_OF_GENES</span></code><ul>
+<li>Your list of gene IDs</li>
+</ul>
+</li>
+</ul>
+<p>A directory will be created in <code class="docutils literal"><span class="pre">ROOT_DIR</span></code> with your <code class="docutils literal"><span class="pre">PROJECT</span></code> name.
+The folders are organized like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>ROOT_DIR
+└── PROJECT
+    ├── data  # General storage for pipeline outputs
+    ├── model  # SBML and GEM-PRO models are stored here
+    ├── genes  # Per gene information
+    │   ├── &lt;gene_id1&gt;  # Specific gene directory
+    │   │   └── protein
+    │   │       ├── sequences  # Protein sequence files, alignments, etc.
+    │   │       └── structures  # Protein structure files, calculations, etc.
+    │   └── &lt;gene_id2&gt;
+    │       └── protein
+    │           ├── sequences
+    │           └── structures
+    ├── reactions  # Per reaction information
+    │   └── &lt;reaction_id1&gt;  # Specific reaction directory
+    │       └── complex
+    │           └── structures  # Protein complex files
+    └── metabolites  # Per metabolite information
+        └── &lt;metabolite_id1&gt;  # Specific metabolite directory
+            └── chemical
+                └── structures  # Metabolite 2D and 3D structure files
+</pre></div>
+</div>
+<div class="admonition note">
+<strong>Note:</strong> Methods for protein complexes and metabolites are still in
+development.</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># SET FOLDERS AND DATA HERE</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="n">ROOT_DIR</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
+<span class="n">PROJECT</span> <span class="o">=</span> <span class="s1">&#39;genes_GP&#39;</span>
+<span class="n">LIST_OF_GENES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b0761&#39;</span><span class="p">,</span> <span class="s1">&#39;b0889&#39;</span><span class="p">,</span> <span class="s1">&#39;b0995&#39;</span><span class="p">,</span> <span class="s1">&#39;b1013&#39;</span><span class="p">,</span> <span class="s1">&#39;b1014&#39;</span><span class="p">,</span> <span class="s1">&#39;b1040&#39;</span><span class="p">,</span> <span class="s1">&#39;b1130&#39;</span><span class="p">,</span> <span class="s1">&#39;b1187&#39;</span><span class="p">,</span> <span class="s1">&#39;b1221&#39;</span><span class="p">,</span> <span class="s1">&#39;b1299&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Create the GEM-PRO project</span>
+<span class="n">my_gempro</span> <span class="o">=</span> <span class="n">GEMPRO</span><span class="p">(</span><span class="n">gem_name</span><span class="o">=</span><span class="n">PROJECT</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="n">ROOT_DIR</span><span class="p">,</span> <span class="n">genes_list</span><span class="o">=</span><span class="n">LIST_OF_GENES</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.pipeline.gempro:/tmp/genes_GP: GEM-PRO project location
+INFO:ssbio.pipeline.gempro:10: number of genes
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Mapping-gene-ID--&gt;-sequence">
+<h2>Mapping gene ID -&gt; sequence<a class="headerlink" href="#Mapping-gene-ID-->-sequence" title="Permalink to this headline">¶</a></h2>
+<p>First, we need to map these IDs to their protein sequences. There are 2
+ID mapping services provided to do this - through <strong>KEGG</strong> or
+<strong>UniProt</strong>. The end goal is to map a UniProt ID to each ID, since there
+is a comprehensive mapping (and some useful APIs) between UniProt and
+the PDB.</p>
+<p><div class="admonition note">
+<strong>Note:</strong> You only need to map gene IDs using one service. However you
+can run both if some genes don&#8217;t map in one service and do map in
+another!</div>
+</p><div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="kegg_mapping_and_metadata">
+<h4><code class="docutils literal"><span class="pre">kegg_mapping_and_metadata</span></code><a class="headerlink" href="#kegg_mapping_and_metadata" title="Permalink to this headline">¶</a></h4>
+<p>Per gene, the KEGG sequence and metadata is downloaded in the gene&#8217;s
+protein/sequence folder.</p>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">kegg_organism_code</span></code></p>
+<ul class="simple">
+<li>See the full list of organisms here:
+<a class="reference external" href="http://www.genome.jp/kegg/catalog/org_list.html">http://www.genome.jp/kegg/catalog/org_list.html</a><ul>
+<li><em>E. coli</em> MG1655 is &#8220;eco&#8221;</li>
+<li><em>M. tuberculosis</em> is &#8220;mtu&#8221;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">custom_gene_mapping</span></code></p>
+<ul class="simple">
+<li>If the model gene IDs differ from the KEGG gene IDs, and you know
+the mapping, supply it as a dictionary here.</li>
+<li>An example would be for the <em>T. maritima</em> SBML model, where the
+model IDs are formatted without an underscore (&#8220;TM0001&#8221;) while in
+KEGG they have an underscore (&#8220;TM_0001&#8221;).</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>If you want to force the rerun of mapping, set this to True.</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Sequences are stored in each gene</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">sequences</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">A summary of the metadata is available in the <code class="docutils literal"><span class="pre">df_kegg_metadata</span></code>
+attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_kegg_metadata</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Any gene IDs that are missing a mapping are reported in the
+<code class="docutils literal"><span class="pre">missing_kegg_mapping</span></code> attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">missing_kegg_mapping</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># KEGG mapping of gene ids</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">kegg_mapping_and_metadata</span><span class="p">(</span><span class="n">kegg_organism_code</span><span class="o">=</span><span class="s1">&#39;eco&#39;</span><span class="p">)</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_kegg_metadata</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.pipeline.gempro:10: number of genes mapped to KEGG
+INFO:ssbio.pipeline.gempro:Created KEGG metadata dataframe. See the &#34;df_kegg_metadata&#34; attribute.
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[6]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>kegg</th>
+      <th>refseq</th>
+      <th>uniprot</th>
+      <th>num_pdbs</th>
+      <th>pdbs</th>
+      <th>seq_len</th>
+      <th>sequence_file</th>
+      <th>metadata_file</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0995</th>
+      <td>eco:b0995</td>
+      <td>NP_415515</td>
+      <td>P38684</td>
+      <td>1</td>
+      <td>1ZGZ</td>
+      <td>230</td>
+      <td>eco-b0995.faa</td>
+      <td>eco-b0995.kegg</td>
+    </tr>
+    <tr>
+      <th>b1130</th>
+      <td>eco:b1130</td>
+      <td>NP_415648</td>
+      <td>P23836</td>
+      <td>2</td>
+      <td>2PL1;2PKX</td>
+      <td>223</td>
+      <td>eco-b1130.faa</td>
+      <td>eco-b1130.kegg</td>
+    </tr>
+    <tr>
+      <th>b1187</th>
+      <td>eco:b1187</td>
+      <td>NP_415705</td>
+      <td>P0A8V6</td>
+      <td>5</td>
+      <td>1HW1;1H9T;1HW2;1H9G;1E2X</td>
+      <td>239</td>
+      <td>eco-b1187.faa</td>
+      <td>eco-b1187.kegg</td>
+    </tr>
+    <tr>
+      <th>b1014</th>
+      <td>eco:b1014</td>
+      <td>NP_415534</td>
+      <td>P09546</td>
+      <td>16</td>
+      <td>3E2Q;4JNZ;3E2R;4JNY;2GPE;4O8A;3E2S;2FZN;1TJ1;1...</td>
+      <td>1320</td>
+      <td>eco-b1014.faa</td>
+      <td>eco-b1014.kegg</td>
+    </tr>
+    <tr>
+      <th>b1299</th>
+      <td>eco:b1299</td>
+      <td>NP_415815</td>
+      <td>P0A9U6</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>185</td>
+      <td>eco-b1299.faa</td>
+      <td>eco-b1299.kegg</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="uniprot_mapping_and_metadata">
+<h4><code class="docutils literal"><span class="pre">uniprot_mapping_and_metadata</span></code><a class="headerlink" href="#uniprot_mapping_and_metadata" title="Permalink to this headline">¶</a></h4>
+<p>You can try mapping your genes using the actual service
+<a class="reference external" href="http://www.uniprot.org/uploadlists/">here</a>.</p>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">model_gene_source</span></code></p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.uniprot.org/help/programmatic_access#id_mapping_examples">Here is a list of the gene IDs that can be mapped to UniProt
+IDs</a></li>
+<li><em>E. coli</em> b-numbers in this example are of the source
+<code class="docutils literal"><span class="pre">&quot;ENSEMBLGENOME_ID&quot;</span></code></li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Sequences are stored in each gene</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">sequences</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">A summary of the metadata is available in the
+<code class="docutils literal"><span class="pre">df_uniprot_metadata</span></code> attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_uniprot_metadata</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Any gene IDs that are missing a mapping are reported in the
+<code class="docutils literal"><span class="pre">missing_uniprot_mapping</span></code> attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">missing_uniprot_mapping</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># UniProt mapping</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">uniprot_mapping_and_metadata</span><span class="p">(</span><span class="n">model_gene_source</span><span class="o">=</span><span class="s1">&#39;ENSEMBLGENOME_ID&#39;</span><span class="p">)</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_uniprot_metadata</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:root:getUserAgent: Begin
+INFO:root:getUserAgent: user_agent: EBI-Sample-Client/ (services.py; Python 3.5.2; Linux) Python-requests/2.12.4
+INFO:root:getUserAgent: End
+INFO:ssbio.pipeline.gempro:10: number of genes mapped to UniProt
+INFO:ssbio.pipeline.gempro:Created UniProt metadata dataframe. See the &#34;df_uniprot_metadata&#34; attribute.
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[7]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>uniprot</th>
+      <th>reviewed</th>
+      <th>gene_name</th>
+      <th>kegg</th>
+      <th>refseq</th>
+      <th>num_pdbs</th>
+      <th>pdbs</th>
+      <th>ec_number</th>
+      <th>pfam</th>
+      <th>seq_len</th>
+      <th>description</th>
+      <th>entry_version</th>
+      <th>seq_version</th>
+      <th>sequence_file</th>
+      <th>metadata_file</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0995</th>
+      <td>P38684</td>
+      <td>True</td>
+      <td>torR</td>
+      <td>ecj:JW0980;eco:b0995</td>
+      <td>NP_415515.1;NC_000913.3;WP_001120125.1;NZ_LN83...</td>
+      <td>1</td>
+      <td>1ZGZ</td>
+      <td>NaN</td>
+      <td>PF00072;PF00486</td>
+      <td>230</td>
+      <td>&lt;unknown description&gt;</td>
+      <td>2017-02-15</td>
+      <td>1997-11-01</td>
+      <td>P38684.fasta</td>
+      <td>P38684.txt</td>
+    </tr>
+    <tr>
+      <th>b1130</th>
+      <td>P23836</td>
+      <td>True</td>
+      <td>phoP</td>
+      <td>ecj:JW1116;eco:b1130</td>
+      <td>NP_415648.1;NC_000913.3;WP_001265471.1;NZ_LN83...</td>
+      <td>2</td>
+      <td>2PKX;2PL1</td>
+      <td>NaN</td>
+      <td>PF00072;PF00486</td>
+      <td>223</td>
+      <td>&lt;unknown description&gt;</td>
+      <td>2017-02-15</td>
+      <td>1991-11-01</td>
+      <td>P23836.fasta</td>
+      <td>P23836.txt</td>
+    </tr>
+    <tr>
+      <th>b1187</th>
+      <td>P0A8V6</td>
+      <td>True</td>
+      <td>fadR</td>
+      <td>ecj:JW1176;eco:b1187</td>
+      <td>NP_415705.1;NC_000913.3;WP_000234823.1;NZ_LN83...</td>
+      <td>5</td>
+      <td>1HW2;1H9G;1E2X;1HW1;1H9T</td>
+      <td>NaN</td>
+      <td>PF07840;PF00392</td>
+      <td>239</td>
+      <td>&lt;unknown description&gt;</td>
+      <td>2017-02-15</td>
+      <td>2007-01-23</td>
+      <td>P0A8V6.fasta</td>
+      <td>P0A8V6.txt</td>
+    </tr>
+    <tr>
+      <th>b1014</th>
+      <td>P09546</td>
+      <td>True</td>
+      <td>putA</td>
+      <td>ecj:JW0999;eco:b1014</td>
+      <td>NP_415534.1;NC_000913.3;WP_001326840.1;NZ_LN83...</td>
+      <td>16</td>
+      <td>4JNY;1TIW;1TJ2;1TJ1;4O8A;2RBF;4JNZ;2FZM;3E2Q;2...</td>
+      <td>1.2.1.88;1.5.5.2</td>
+      <td>PF00171;PF01619;PF14850</td>
+      <td>1320</td>
+      <td>&lt;unknown description&gt;</td>
+      <td>2017-02-15</td>
+      <td>1997-11-01</td>
+      <td>P09546.fasta</td>
+      <td>P09546.txt</td>
+    </tr>
+    <tr>
+      <th>b1299</th>
+      <td>P0A9U6</td>
+      <td>True</td>
+      <td>puuR</td>
+      <td>ecj:JW1292;eco:b1299</td>
+      <td>NP_415815.1;NC_000913.3;WP_001278727.1;NZ_LN83...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>PF07883;PF01381</td>
+      <td>185</td>
+      <td>&lt;unknown description&gt;</td>
+      <td>2017-02-15</td>
+      <td>2005-07-19</td>
+      <td>P0A9U6.fasta</td>
+      <td>P0A9U6.txt</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="set_representative_sequence">
+<h4><code class="docutils literal"><span class="pre">set_representative_sequence</span></code><a class="headerlink" href="#set_representative_sequence" title="Permalink to this headline">¶</a></h4>
+<p>If you have mapped with both KEGG and UniProt mappers, then you can set
+a representative sequence for the gene using this function. If you used
+just one, this will just set that ID as representative.</p>
+<ul class="simple">
+<li>If any sequences were provided manually, these will be set as
+representative first.</li>
+<li>UniProt mappings override KEGG mappings except when KEGG mappings
+have PDBs associated with them and UniProt doesn&#8217;t.</li>
+</ul>
+<p><div class="admonition warning">
+<strong>Warning:</strong> Setting representative sequences from different sources is
+potentially inconsistent (ie. sources may be different genome
+assemblies)</div>
+</p><ul>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Representative sequences are set</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">representative_sequence</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">A summary of the metadata is available in the
+<code class="docutils literal"><span class="pre">df_representative_sequences</span></code> attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_representative_sequences</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Any gene IDs that are missing a mapping are reported in the
+<code class="docutils literal"><span class="pre">missing_repseq</span></code> attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">missing_repseq</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Set representative sequences</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">set_representative_sequence</span><span class="p">()</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_representative_sequences</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.pipeline.gempro:10: number of genes with a representative sequence
+INFO:ssbio.pipeline.gempro:Created sequence mapping dataframe. See the &#34;df_representative_sequences&#34; attribute.
+INFO:ssbio.pipeline.gempro:10/10: genes with a representative sequence
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>uniprot</th>
+      <th>kegg</th>
+      <th>num_pdbs</th>
+      <th>pdbs</th>
+      <th>seq_len</th>
+      <th>sequence_file</th>
+      <th>metadata_file</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0995</th>
+      <td>P38684</td>
+      <td>ecj:JW0980;eco:b0995</td>
+      <td>1</td>
+      <td>1ZGZ</td>
+      <td>230</td>
+      <td>P38684.fasta</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>b1130</th>
+      <td>P23836</td>
+      <td>ecj:JW1116;eco:b1130</td>
+      <td>2</td>
+      <td>2PKX;2PL1</td>
+      <td>223</td>
+      <td>P23836.fasta</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>b1187</th>
+      <td>P0A8V6</td>
+      <td>ecj:JW1176;eco:b1187</td>
+      <td>5</td>
+      <td>1HW2;1H9G;1E2X;1HW1;1H9T</td>
+      <td>239</td>
+      <td>P0A8V6.fasta</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>b1014</th>
+      <td>P09546</td>
+      <td>ecj:JW0999;eco:b1014</td>
+      <td>16</td>
+      <td>4JNY;1TIW;1TJ2;1TJ1;4O8A;2RBF;4JNZ;2FZM;3E2Q;2...</td>
+      <td>1320</td>
+      <td>P09546.fasta</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>b1299</th>
+      <td>P0A9U6</td>
+      <td>ecj:JW1292;eco:b1299</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>185</td>
+      <td>P0A9U6.fasta</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Mapping-representative-sequence-to-structure">
+<h2>Mapping representative sequence to structure<a class="headerlink" href="#Mapping-representative-sequence-to-structure" title="Permalink to this headline">¶</a></h2>
+<p>These are the ways to map sequence to structure:</p>
+<ol class="arabic simple">
+<li>Use the UniProt ID and their automatic mappings to the PDB</li>
+<li>BLAST the sequence to the PDB</li>
+<li>Make homology models or</li>
+<li>Map to existing homology models</li>
+</ol>
+<p>You can only utilize option #1 to map to PDBs if there is a mapped
+UniProt ID set in the representative sequence. If not, you&#8217;ll have to
+BLAST your sequence to the PDB or make a homology model. You can also
+run both for maximum coverage.</p>
+<div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="map_uniprot_to_pdb">
+<h4><code class="docutils literal"><span class="pre">map_uniprot_to_pdb</span></code><a class="headerlink" href="#map_uniprot_to_pdb" title="Permalink to this headline">¶</a></h4>
+<p>This uses the <code class="docutils literal"><span class="pre">best_structures</span></code> API <a class="reference external" href="https://www.ebi.ac.uk/pdbe/api/doc/sifts.html">from the
+PDBe</a> to return a rank
+ordered list of PDBs that match a UniProt ID.</p>
+<ul class="simple">
+<li>Method description:<ul>
+<li>Here is the ranking algorithm described by the PDB paper:
+<a class="reference external" href="https://nar.oxfordjournals.org/content/44/D1/D385.full">https://nar.oxfordjournals.org/content/44/D1/D385.full</a></li>
+<li>More information found here:
+<a class="reference external" href="https://www.ebi.ac.uk/pdbe/api/doc/sifts.html">https://www.ebi.ac.uk/pdbe/api/doc/sifts.html</a></li>
+<li>Link used to retrieve results:
+<a class="reference external" href="https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession">https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession</a></li>
+<li>The list of PDB structures mapping to a UniProt accession sorted
+by coverage of the protein and, if the same, resolution.</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">seq_ident_cutoff</span></code><ul>
+<li>From 0 to 1</li>
+<li>Provide the seq_ident_cutoff as a percentage to filter for
+structures with only a percent identity above the cutoff.</li>
+</ul>
+</li>
+</ul>
+<p><div class="admonition warning">
+<strong>Warning:</strong> if you set the <code class="docutils literal"><span class="pre">seq_ident_cutoff</span></code> too high you risk
+filtering out PDBs that do match the sequence, but are just missing
+large portions of it.</div>
+</p><ul>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">A .json file of the results is saved from the web request in the
+&#8220;sequences&#8221; folder</p>
+</li>
+<li><p class="first">No PDBs are downloaded yet</p>
+</li>
+<li><p class="first">PDB IDs are saved in an ordered list based on their resolution and
+sequence coverage</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;Rv1295&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">structures</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The ranking of PDBs is saved as a dataframe</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_pdb_ranking</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Mapping using the PDBe best_structures service</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">map_uniprot_to_pdb</span><span class="p">(</span><span class="n">seq_ident_cutoff</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_pdb_ranking</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:root:getUserAgent: Begin
+INFO:root:getUserAgent: user_agent: EBI-Sample-Client/ (services.py; Python 3.5.2; Linux) Python-requests/2.12.4
+INFO:root:getUserAgent: End
+INFO:ssbio.pipeline.gempro:Completed UniProt --&gt; best PDB mapping. See the &#34;df_pdb_ranking&#34; attribute.
+INFO:ssbio.pipeline.gempro:8: number of genes with at least one experimental structure
+INFO:ssbio.pipeline.gempro:2: number of genes with no experimental structures
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[9]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>uniprot</th>
+      <th>pdb_id</th>
+      <th>pdb_chain_id</th>
+      <th>experimental_method</th>
+      <th>resolution</th>
+      <th>coverage</th>
+      <th>taxonomy_name</th>
+      <th>start</th>
+      <th>end</th>
+      <th>unp_start</th>
+      <th>unp_end</th>
+      <th>rank</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0995</th>
+      <td>P38684</td>
+      <td>1zgz</td>
+      <td>A</td>
+      <td>X-ray diffraction</td>
+      <td>1.8</td>
+      <td>0.530</td>
+      <td>None</td>
+      <td>1</td>
+      <td>122</td>
+      <td>1</td>
+      <td>122</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>b0995</th>
+      <td>P38684</td>
+      <td>1zgz</td>
+      <td>B</td>
+      <td>X-ray diffraction</td>
+      <td>1.8</td>
+      <td>0.530</td>
+      <td>None</td>
+      <td>1</td>
+      <td>122</td>
+      <td>1</td>
+      <td>122</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>b0995</th>
+      <td>P38684</td>
+      <td>1zgz</td>
+      <td>C</td>
+      <td>X-ray diffraction</td>
+      <td>1.8</td>
+      <td>0.530</td>
+      <td>None</td>
+      <td>1</td>
+      <td>122</td>
+      <td>1</td>
+      <td>122</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>b0995</th>
+      <td>P38684</td>
+      <td>1zgz</td>
+      <td>D</td>
+      <td>X-ray diffraction</td>
+      <td>1.8</td>
+      <td>0.530</td>
+      <td>None</td>
+      <td>1</td>
+      <td>122</td>
+      <td>1</td>
+      <td>122</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>b1130</th>
+      <td>P23836</td>
+      <td>2pl1</td>
+      <td>A</td>
+      <td>X-ray diffraction</td>
+      <td>1.9</td>
+      <td>0.543</td>
+      <td>None</td>
+      <td>1</td>
+      <td>121</td>
+      <td>1</td>
+      <td>121</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="blast_seqs_to_pdb">
+<h4><code class="docutils literal"><span class="pre">blast_seqs_to_pdb</span></code><a class="headerlink" href="#blast_seqs_to_pdb" title="Permalink to this headline">¶</a></h4>
+<p>This will BLAST the representative sequence against the entire PDB, and
+return significant hits. XML files of the BLAST results are saved in the
+respective sequence folders for a protein.</p>
+<p><div class="admonition note">
+<strong>Warning:</strong> A PDB BLAST may return hits in other organisms.</div>
+</p><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">seq_ident_cutoff</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0</span></code></li>
+<li>From 0 to 1</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">evalue</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.0001</span></code></li>
+<li>Significance of BLAST results</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">all_genes</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want all genes and their sequences BLASTed</li>
+<li>Set to <code class="docutils literal"><span class="pre">False</span></code> if you only want to BLAST sequences that did not
+have any PDBs mapped to them already</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">display_link</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want a clickable HTML link to be printed</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want to ignore any existing XML results and
+run the BLAST again</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">An .xml file from the web request in the &#8220;sequences&#8221; folder</p>
+</li>
+<li><p class="first">No PDBs are downloaded yet</p>
+</li>
+<li><p class="first">Protein structures</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;Rv1295&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">structures</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">DataFrames</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_pdb_blast</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Mapping using BLAST</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">blast_seqs_to_pdb</span><span class="p">(</span><span class="n">all_genes</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">seq_ident_cutoff</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">evalue</span><span class="o">=</span><span class="mf">0.00001</span><span class="p">)</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_pdb_blast</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.pipeline.gempro:Completed sequence --&gt; PDB BLAST. See the &#34;df_pdb_blast&#34; attribute.
+INFO:ssbio.pipeline.gempro:1: number of genes with additional structures added from BLAST
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[10]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pdb_id</th>
+      <th>pdb_chain_id</th>
+      <th>hit_score</th>
+      <th>hit_evalue</th>
+      <th>hit_percent_similar</th>
+      <th>hit_percent_ident</th>
+      <th>hit_num_ident</th>
+      <th>hit_num_similar</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b1013</th>
+      <td>4x1e</td>
+      <td>A</td>
+      <td>966.0</td>
+      <td>1.283880e-104</td>
+      <td>0.910377</td>
+      <td>0.910377</td>
+      <td>193</td>
+      <td>193</td>
+    </tr>
+    <tr>
+      <th>b1013</th>
+      <td>4x1e</td>
+      <td>B</td>
+      <td>966.0</td>
+      <td>1.283880e-104</td>
+      <td>0.910377</td>
+      <td>0.910377</td>
+      <td>193</td>
+      <td>193</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Downloading-and-ranking-structures">
+<h2>Downloading and ranking structures<a class="headerlink" href="#Downloading-and-ranking-structures" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="pdb_downloader_and_metadata">
+<h4><code class="docutils literal"><span class="pre">pdb_downloader_and_metadata</span></code><a class="headerlink" href="#pdb_downloader_and_metadata" title="Permalink to this headline">¶</a></h4>
+<p>Download <strong>all</strong> structures per protein. This also adds metadata to each
+PDB object in the list of structures.</p>
+<p><div class="admonition warning">
+<strong>Warning:</strong> Don&#8217;t run this if you don&#8217;t need all PDB structures - just
+set representative structures below if you want 1 structure per protein.</div>
+</p><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">outdir</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">None</span></code></li>
+<li>Set this to a custom location if you want to save PDB files
+outside the GEM-PRO project folder</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">pdb_file_type</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'cif'</span></code> (set in GEMPRO project initialization, but can
+be changed here)</li>
+<li><code class="docutils literal"><span class="pre">'pdb'</span></code>, <code class="docutils literal"><span class="pre">'pdb.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmcif'</span></code>, <code class="docutils literal"><span class="pre">'cif'</span></code>, <code class="docutils literal"><span class="pre">'cif.gz'</span></code>,
+<code class="docutils literal"><span class="pre">'xml.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmtf'</span></code>, <code class="docutils literal"><span class="pre">'mmtf.gz'</span></code> - File type for files
+downloaded from the PDB.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want to re-download PDB files.</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Additional metadata per structure</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">structures</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">DataFrames</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_pdb_metadata</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Download all mapped PDBs and gather the metadata</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">pdb_downloader_and_metadata</span><span class="p">()</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_pdb_metadata</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.pipeline.gempro:Updated PDB metadata dataframe. See the &#34;df_pdb_metadata&#34; attribute.
+INFO:ssbio.pipeline.gempro:Saved 40 structures total
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[11]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pdb_id</th>
+      <th>pdb_title</th>
+      <th>description</th>
+      <th>experimental_method</th>
+      <th>resolution</th>
+      <th>chemicals</th>
+      <th>date</th>
+      <th>taxonomy_name</th>
+      <th>structure_file</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0995</th>
+      <td>1zgz</td>
+      <td>Crystal Structure Of The Receiver Domain Of TM...</td>
+      <td>TorCAD operon transcriptional regulatory prote...</td>
+      <td>X-ray diffraction</td>
+      <td>1.8</td>
+      <td>SO4;GOL</td>
+      <td>2005-12-13;2009-02-24;2011-07-13</td>
+      <td>Escherichia coli</td>
+      <td>1zgz.cif</td>
+    </tr>
+    <tr>
+      <th>b1130</th>
+      <td>2pl1</td>
+      <td>Berrylium Fluoride activated receiver domain o...</td>
+      <td>Transcriptional regulatory protein phoP</td>
+      <td>X-ray diffraction</td>
+      <td>1.9</td>
+      <td>PT;MG;BEF</td>
+      <td>2007-05-22;2007-08-14;2009-02-24</td>
+      <td>Escherichia coli</td>
+      <td>2pl1.cif</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="set_representative_structure">
+<h4><code class="docutils literal"><span class="pre">set_representative_structure</span></code><a class="headerlink" href="#set_representative_structure" title="Permalink to this headline">¶</a></h4>
+<p>Rank available structures, run QC/QA, download and clean the final
+structure.</p>
+<p><div class="admonition note">
+<strong>Note:</strong> PDBs don&#8217;t need to be downloaded before running this step.
+This is useful to limit the number of structures downloaded from the
+PDB.</div>
+</p><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">pdb_file_type</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'cif'</span></code> (set in GEMPRO project initialization, but can
+be changed here)</li>
+<li><code class="docutils literal"><span class="pre">'pdb'</span></code>, <code class="docutils literal"><span class="pre">'pdb.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmcif'</span></code>, <code class="docutils literal"><span class="pre">'cif'</span></code>, <code class="docutils literal"><span class="pre">'cif.gz'</span></code>,
+<code class="docutils literal"><span class="pre">'xml.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmtf'</span></code>, <code class="docutils literal"><span class="pre">'mmtf.gz'</span></code> - File type for files
+downloaded from the PDB.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">engine</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'needle'</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">'biopython'</span></code> if you want to utilize Biopython&#8217;s built-in
+pairwise alignment algorithm.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">always_use_homology</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you always want to use homology models.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">seq_ident_cutoff</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.5</span></code></li>
+<li>QC/QA: sets the minimum sequence identity a structure has to have
+to be selected as representative.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_missing_on_termini</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.2</span></code></li>
+<li>QC/QA: Percentage of the total length of the reference sequence
+which will be ignored when checking for modifications (mutations,
+deletions, insertions, or unresolved residues). Example: if
+<code class="docutils literal"><span class="pre">0.1</span></code>, and reference sequence is 100 AA, then only residues 5 to
+95 will be checked for modifications.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_mutants</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">True</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if point mutations within the structure
+should be allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_deletions</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if deletions within the structure should be
+allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_insertions</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if insertions within the structure should
+be allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_unresolved</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">True</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if unresolved regions within the structure
+should be allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if pairwise alignments and structure
+cleaning should be rerun even if files exist.</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Representative protein structures</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">representative_structure</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">DataFrames</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_gempro</span><span class="o">.</span><span class="n">df_representative_structures</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Set representative structures</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">set_representative_structure</span><span class="p">()</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">df_representative_structures</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+WARNING:ssbio.core.protein:b0995: no structures meet quality checks
+WARNING:ssbio.core.protein:b1130: no structures meet quality checks
+WARNING:ssbio.core.protein:b1014: no structures meet quality checks
+WARNING:ssbio.pipeline.gempro:5 gene(s) could not be mapped. Inspect the &#34;missing_repstruct&#34; attribute.
+INFO:ssbio.pipeline.gempro:Created representative structures dataframe. See the &#34;df_representative_structures&#34; attribute.
+INFO:ssbio.pipeline.gempro:5/10: genes with a representative structure
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[12]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>is_experimental</th>
+      <th>reference_seq</th>
+      <th>reference_seq_top_coverage</th>
+    </tr>
+    <tr>
+      <th>gene</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b1187</th>
+      <td>1hw1-A</td>
+      <td>True</td>
+      <td>P0A8V6</td>
+      <td>94.6</td>
+    </tr>
+    <tr>
+      <th>b0761</th>
+      <td>1b9m-A</td>
+      <td>True</td>
+      <td>P0A9G8</td>
+      <td>96.2</td>
+    </tr>
+    <tr>
+      <th>b1221</th>
+      <td>1a04-A</td>
+      <td>True</td>
+      <td>P0AF28</td>
+      <td>94.9</td>
+    </tr>
+    <tr>
+      <th>b0889</th>
+      <td>2gqq-A</td>
+      <td>True</td>
+      <td>P0ACJ0</td>
+      <td>93.3</td>
+    </tr>
+    <tr>
+      <th>b1013</th>
+      <td>4jyk-A</td>
+      <td>True</td>
+      <td>P0ACU2</td>
+      <td>94.8</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Looking at the information saved within a gene</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">representative_structure</span>
+<span class="n">my_gempro</span><span class="o">.</span><span class="n">genes</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="s1">&#39;b1187&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">representative_structure</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[14]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;StructProp 1hw1-A at 0x7fc02c6b9d30&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[14]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>{&#39;_structure_dir&#39;: &#39;/tmp/genes_GP/genes/b1187/b1187_protein/structures&#39;,
+ &#39;chains&#39;: [&lt;ChainProp A at 0x7fc02c8e8320&gt;],
+ &#39;date&#39;: [&#39;2001-01-24&#39;, &#39;2001-06-06&#39;, &#39;2003-04-01&#39;, &#39;2009-02-24&#39;],
+ &#39;description&#39;: &#39;FATTY ACID METABOLISM REGULATOR PROTEIN&#39;,
+ &#39;file_type&#39;: &#39;pdb&#39;,
+ &#39;id&#39;: &#39;1hw1-A&#39;,
+ &#39;is_experimental&#39;: True,
+ &#39;mapped_chains&#39;: [&#39;A&#39;],
+ &#39;original_pdb_id&#39;: &#39;1hw1&#39;,
+ &#39;reference_seq&#39;: &lt;SeqProp P0A8V6 at 0x7fc02c8e8b38&gt;,
+ &#39;reference_seq_top_coverage&#39;: 94.6,
+ &#39;representative_chain&#39;: &lt;ChainProp A at 0x7fc02c8e8470&gt;,
+ &#39;resolution&#39;: 1.5,
+ &#39;structure_file&#39;: &#39;1hw1-A_clean.pdb&#39;,
+ &#39;taxonomy_name&#39;: &#39;Escherichia coli&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="GEM-PRO - SBML Model (iNJ661).html" class="btn btn-neutral float-right" title="GEM-PRO - SBML Model (iNJ661)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="GEM-PRO - Genes &amp; Sequences.html" class="btn btn-neutral" title="GEM-PRO - Genes &amp; Sequences" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Nathan Mih.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0a0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,1632 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Protein - Structure Mapping, Alignments, and Visualization &mdash; ssbio 1.0.0a0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="ssbio 1.0.0a0 documentation" href="../index.html"/>
+        <link rel="up" title="The Protein Class" href="../protein.html"/>
+        <link rel="next" title="The GEM-PRO Pipeline" href="../gempro.html"/>
+        <link rel="prev" title="The Protein Class" href="../protein.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ssbio
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#structural-biology">Structural biology</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#protein-structures">Protein structures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#biopython">Biopython</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#systems-biology">Systems biology</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#cobra-models-cobrapy">COBRA models &amp; COBRApy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#reading">Reading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The Structure Class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#introduction">Introduction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../protein.html">The Protein Class</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../protein.html#introduction">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../protein.html#tutorials">Tutorials</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Protein - Structure Mapping, Alignments, and Visualization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Mapping-sequence--&gt;-structure">Mapping sequence -&gt; structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Loading-and-aligning-new-sequences">Loading and aligning new sequences</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Viewing-structures">Viewing structures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Mapping-sequence-residue-numbers-to-structure-residue-numbers">Mapping sequence residue numbers to structure residue numbers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Saving">Saving</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gempro.html">The GEM-PRO Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../gempro.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gempro.html#tutorials">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html">GEM-PRO - Genes &amp; Sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Mapping-sequence--&gt;-structure">Mapping sequence -&gt; structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - Genes &amp; Sequences.html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="GEM-PRO - List of Gene IDs.html">GEM-PRO - List of Gene IDs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - List of Gene IDs.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - List of Gene IDs.html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - List of Gene IDs.html#Mapping-gene-ID--&gt;-sequence">Mapping gene ID -&gt; sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - List of Gene IDs.html#Mapping-representative-sequence-to-structure">Mapping representative sequence to structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - List of Gene IDs.html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html">GEM-PRO - SBML Model (iNJ661)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Initialization-of-the-project">Initialization of the project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Mapping-gene-ID--&gt;-sequence">Mapping gene ID -&gt; sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Mapping-representative-sequence-to-structure">Mapping representative sequence to structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Downloading-and-ranking-structures">Downloading and ranking structures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Creating-homology-models">Creating homology models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="GEM-PRO - SBML Model (iNJ661).html#Saving-your-GEM-PRO">Saving your GEM-PRO</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../atlas.html">The ATLAS Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../atlas.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../atlas.html#tutorials">Tutorials</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">Python API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">ssbio</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../protein.html">The Protein Class</a> &raquo;</li>
+      
+    <li>Protein - Structure Mapping, Alignments, and Visualization</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/notebooks/Protein - Structure Mapping, Alignments, and Visualization.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="Protein---Structure-Mapping,-Alignments,-and-Visualization">
+<h1>Protein - Structure Mapping, Alignments, and Visualization<a class="headerlink" href="#Protein---Structure-Mapping,-Alignments,-and-Visualization" title="Permalink to this headline">¶</a></h1>
+<p>This notebook gives an example of how to <strong>map a single protein sequence
+to its structure</strong>, along with conducting sequence alignments and
+visualizing the mutations.</p>
+<p><div class="admonition note">
+<strong>Input:</strong> Protein ID + amino acid sequence + mutated sequence(s)</div>
+<div class="admonition note">
+<strong>Output:</strong> Representative protein structure, sequence alignments, and
+visualization of mutations</div>
+</p><div class="section" id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Import the Protein class</span>
+<span class="kn">from</span> <span class="nn">ssbio.core.protein</span> <span class="kn">import</span> <span class="n">Protein</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Printing multiple outputs per cell</span>
+<span class="kn">from</span> <span class="nn">IPython.core.interactiveshell</span> <span class="kn">import</span> <span class="n">InteractiveShell</span>
+<span class="n">InteractiveShell</span><span class="o">.</span><span class="n">ast_node_interactivity</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Logging">
+<h3>Logging<a class="headerlink" href="#Logging" title="Permalink to this headline">¶</a></h3>
+<p>Set the logging level in <code class="docutils literal"><span class="pre">logger.setLevel(logging.&lt;LEVEL_HERE&gt;)</span></code> to
+specify how verbose you want the pipeline to be. Debug is most verbose.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">CRITICAL</span></code><ul>
+<li>Only really important messages shown</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">ERROR</span></code><ul>
+<li>Major errors</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">WARNING</span></code><ul>
+<li>Warnings that don&#8217;t affect running of the pipeline</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">INFO</span></code> (default)<ul>
+<li>Info such as the number of structures mapped per gene</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">DEBUG</span></code><ul>
+<li>Really detailed information that will print out a lot of stuff</li>
+</ul>
+</li>
+</ul>
+<p><div class="admonition warning">
+<strong>Warning:</strong> <code class="docutils literal"><span class="pre">DEBUG</span></code> mode prints out a large amount of information,
+especially if you have a lot of genes. This may stall your notebook!</div>
+</p><div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Create logger</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>  <span class="c1"># SET YOUR LOGGING LEVEL HERE #</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [87]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Other logger stuff for Jupyter notebooks</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%(asctime)s</span><span class="s1">] [</span><span class="si">%(name)s</span><span class="s1">] </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">handler</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Initialization-of-the-project">
+<h2>Initialization of the project<a class="headerlink" href="#Initialization-of-the-project" title="Permalink to this headline">¶</a></h2>
+<p>Set these three things:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ROOT_DIR</span></code><ul>
+<li>The directory where a folder named after your <code class="docutils literal"><span class="pre">PROTEIN_ID</span></code> will
+be created</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">PROTEIN_ID</span></code><ul>
+<li>Your protein ID</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">PROTEIN_SEQ</span></code><ul>
+<li>Your protein sequence</li>
+</ul>
+</li>
+</ul>
+<p>A directory will be created in <code class="docutils literal"><span class="pre">ROOT_DIR</span></code> with your <code class="docutils literal"><span class="pre">PROTEIN_ID</span></code>
+name. The folders are organized like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>ROOT_DIR
+└── PROTEIN_ID
+    ├── sequences  # Protein sequence files, alignments, etc.
+    └── structures  # Protein structure files, calculations, etc.
+</pre></div>
+</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [88]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># SET FOLDERS AND DATA HERE</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="n">ROOT_DIR</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
+<span class="n">PROTEIN_ID</span> <span class="o">=</span> <span class="s1">&#39;SRR1753782_00918&#39;</span>
+<span class="n">PROTEIN_SEQ</span> <span class="o">=</span> <span class="s1">&#39;MSKQQIGVVGMAVMGRNLALNIESRGYTVSVFNRSREKTEEVIAENPGKKLVPYYTVKEFVESLETPRRILLMVKAGAGTDAAIDSLKPYLEKGDIIIDGGNTFFQDTIRRNRELSAEGFNFIGTGVSGGEEGALKGPSIMPGGQKDAYELVAPILTKIAAVAEDGEPCVTYIGADGAGHYVKMVHNGIEYGDMQLIAEAYSLLKGGLNLSNEELANTFTEWNNGELSSYLIDITKDIFTKKDEDGNYLVDVILDEAANKGTGKWTSQSALDLGEPLSLITESVFARYISSLKAQRVAASKVLSGPKAQPAGDKAEFIEKVRRALYLGKIVSYAQGFSQLRAASDEYHWDLNYGEIAKIFRAGCIIRAQFLQKITDAYAENADIANLLLAPYFKKIADEYQQALRDVVAYAVQNGIPVPTFSAAVAYYDSYRAAVLPANLIQAQRDYFGAHTYKRTDKEGIFHTEWLE&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [89]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Create the Protein object</span>
+<span class="n">my_protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">ident</span><span class="o">=</span><span class="n">PROTEIN_ID</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="n">ROOT_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [90]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Load the protein sequence</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">load_manual_sequence</span><span class="p">(</span><span class="n">seq</span><span class="o">=</span><span class="n">PROTEIN_SEQ</span><span class="p">,</span> <span class="n">ident</span><span class="o">=</span><span class="s1">&#39;WT&#39;</span><span class="p">,</span> <span class="n">write_fasta_file</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">set_as_representative</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+DEBUG - [2017-03-06 16:30] [ssbio.core.protein] &#34;WT: set as representative sequence&#34;
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[90]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;SeqProp WT at 0x7faabd47aa58&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Mapping-sequence--&gt;-structure">
+<h2>Mapping sequence -&gt; structure<a class="headerlink" href="#Mapping-sequence-->-structure" title="Permalink to this headline">¶</a></h2>
+<p>Since the sequence has been provided, we just need to BLAST it to the
+PDB.</p>
+<p><div class="admonition note">
+<strong>Note:</strong> These methods do not download any 3D structure files.</div>
+</p><div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="blast_representative_sequence_to_pdb">
+<h4><code class="docutils literal"><span class="pre">blast_representative_sequence_to_pdb</span></code><a class="headerlink" href="#blast_representative_sequence_to_pdb" title="Permalink to this headline">¶</a></h4>
+<p>This will BLAST the representative sequence against the entire PDB, and
+return significant hits. XML files of the BLAST results are saved in the
+respective sequence folders for a protein.</p>
+<p><div class="admonition note">
+<strong>Warning:</strong> A PDB BLAST may return hits in other organisms.</div>
+</p><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">seq_ident_cutoff</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0</span></code></li>
+<li>From 0 to 1</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">evalue</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.0001</span></code></li>
+<li>Significance of BLAST results</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">all_genes</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want all genes and their sequences BLASTed</li>
+<li>Set to <code class="docutils literal"><span class="pre">False</span></code> if you only want to BLAST sequences that did not
+have any PDBs mapped to them already</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">display_link</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want a clickable HTML link to be printed</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want to ignore any existing XML results and
+run the BLAST again</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Protein structures</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">structures</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">DataFrames</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">df_pdb_blast</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Mapping using BLAST</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">blast_representative_sequence_to_pdb</span><span class="p">(</span><span class="n">seq_ident_cutoff</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">evalue</span><span class="o">=</span><span class="mf">0.00001</span><span class="p">)</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">df_pdb_blast</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+2017-03-06 16:25:56,469 ssbio.databases.pdb DEBUG    /tmp/SRR1753782_00918/sequences/WT_blast_pdb.xml: Loaded existing BLAST XML results
+2017-03-06 16:25:56,469 ssbio.databases.pdb DEBUG    2W90: does not meet sequence identity cutoff
+2017-03-06 16:25:56,470 ssbio.databases.pdb DEBUG    2W8Z: does not meet sequence identity cutoff
+2017-03-06 16:25:56,470 ssbio.databases.pdb DEBUG    2IZ1: does not meet sequence identity cutoff
+2017-03-06 16:25:56,471 ssbio.databases.pdb DEBUG    2IZ0: does not meet sequence identity cutoff
+2017-03-06 16:25:56,471 ssbio.databases.pdb DEBUG    2IYO: does not meet sequence identity cutoff
+2017-03-06 16:25:56,472 ssbio.databases.pdb DEBUG    2IYP: does not meet sequence identity cutoff
+2017-03-06 16:25:56,472 ssbio.databases.pdb DEBUG    2PGD: does not meet sequence identity cutoff
+2017-03-06 16:25:56,473 ssbio.databases.pdb DEBUG    1PGQ: does not meet sequence identity cutoff
+2017-03-06 16:25:56,473 ssbio.databases.pdb DEBUG    1PGP: does not meet sequence identity cutoff
+2017-03-06 16:25:56,474 ssbio.databases.pdb DEBUG    1PGO: does not meet sequence identity cutoff
+2017-03-06 16:25:56,474 ssbio.databases.pdb DEBUG    1PGN: does not meet sequence identity cutoff
+2017-03-06 16:25:56,475 ssbio.databases.pdb DEBUG    2JKV: does not meet sequence identity cutoff
+2017-03-06 16:25:56,475 ssbio.databases.pdb DEBUG    4GWK: does not meet sequence identity cutoff
+2017-03-06 16:25:56,476 ssbio.databases.pdb DEBUG    4GWG: does not meet sequence identity cutoff
+2017-03-06 16:25:56,477 ssbio.databases.pdb DEBUG    2P4Q: does not meet sequence identity cutoff
+2017-03-06 16:25:56,477 ssbio.databases.pdb DEBUG    1PGJ: does not meet sequence identity cutoff
+2017-03-06 16:25:56,478 ssbio.databases.pdb DEBUG    4E21: does not meet sequence identity cutoff
+2017-03-06 16:25:56,479 ssbio.databases.pdb DEBUG    5U5G: does not meet sequence identity cutoff
+2017-03-06 16:25:56,479 ssbio.databases.pdb DEBUG    3WS7: does not meet sequence identity cutoff
+2017-03-06 16:25:56,480 ssbio.databases.pdb DEBUG    3W6U: does not meet sequence identity cutoff
+2017-03-06 16:25:56,481 ssbio.databases.pdb DEBUG    3W6Z: does not meet sequence identity cutoff
+2017-03-06 16:25:56,481 ssbio.databases.pdb DEBUG    2CVZ: does not meet sequence identity cutoff
+2017-03-06 16:25:56,482 ssbio.databases.pdb DEBUG    1WP4: does not meet sequence identity cutoff
+2017-03-06 16:25:56,482 ssbio.databases.pdb DEBUG    1VPD: does not meet sequence identity cutoff
+2017-03-06 16:25:56,483 ssbio.databases.pdb DEBUG    4: Number of BLAST hits
+2017-03-06 16:25:56,484 ssbio.core.protein DEBUG    SRR1753782_00918: adding 4 PDBs from BLAST results
+2017-03-06 16:25:56,485 ssbio.structure.structprop DEBUG    A: added to chains list
+2017-03-06 16:25:56,485 ssbio.structure.structprop DEBUG    A: added to list of mapped chains
+2017-03-06 16:25:56,486 ssbio.structure.structprop DEBUG    A: chain already present
+2017-03-06 16:25:56,486 ssbio.core.protein DEBUG    2zyd: PDB ID already present in list of structures
+2017-03-06 16:25:56,486 ssbio.structure.structprop DEBUG    B: added to list of mapped chains
+2017-03-06 16:25:56,487 ssbio.structure.structprop DEBUG    B: added to chains list
+2017-03-06 16:25:56,487 ssbio.structure.structprop DEBUG    A: added to chains list
+2017-03-06 16:25:56,488 ssbio.structure.structprop DEBUG    A: added to list of mapped chains
+2017-03-06 16:25:56,488 ssbio.structure.structprop DEBUG    A: chain already present
+2017-03-06 16:25:56,488 ssbio.core.protein DEBUG    2zya: PDB ID already present in list of structures
+2017-03-06 16:25:56,489 ssbio.structure.structprop DEBUG    B: added to list of mapped chains
+2017-03-06 16:25:56,489 ssbio.structure.structprop DEBUG    B: added to chains list
+2017-03-06 16:25:56,489 ssbio.structure.structprop DEBUG    A: added to chains list
+2017-03-06 16:25:56,490 ssbio.structure.structprop DEBUG    A: added to list of mapped chains
+2017-03-06 16:25:56,490 ssbio.structure.structprop DEBUG    A: chain already present
+2017-03-06 16:25:56,491 ssbio.core.protein DEBUG    3fwn: PDB ID already present in list of structures
+2017-03-06 16:25:56,491 ssbio.structure.structprop DEBUG    B: added to list of mapped chains
+2017-03-06 16:25:56,491 ssbio.structure.structprop DEBUG    B: added to chains list
+2017-03-06 16:25:56,492 ssbio.structure.structprop DEBUG    A: added to chains list
+2017-03-06 16:25:56,492 ssbio.structure.structprop DEBUG    A: added to list of mapped chains
+2017-03-06 16:25:56,492 ssbio.structure.structprop DEBUG    A: chain already present
+2017-03-06 16:25:56,493 ssbio.core.protein DEBUG    2zyg: PDB ID already present in list of structures
+2017-03-06 16:25:56,493 ssbio.structure.structprop DEBUG    B: added to list of mapped chains
+2017-03-06 16:25:56,493 ssbio.structure.structprop DEBUG    B: added to chains list
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[33]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&#39;2zyd&#39;, &#39;2zya&#39;, &#39;3fwn&#39;, &#39;2zyg&#39;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[33]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pdb_chain_id</th>
+      <th>hit_score</th>
+      <th>hit_evalue</th>
+      <th>hit_percent_similar</th>
+      <th>hit_percent_ident</th>
+      <th>hit_num_ident</th>
+      <th>hit_num_similar</th>
+    </tr>
+    <tr>
+      <th>pdb_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2zyd</th>
+      <td>A</td>
+      <td>2319.0</td>
+      <td>0.0</td>
+      <td>0.987179</td>
+      <td>0.963675</td>
+      <td>451</td>
+      <td>462</td>
+    </tr>
+    <tr>
+      <th>2zyd</th>
+      <td>B</td>
+      <td>2319.0</td>
+      <td>0.0</td>
+      <td>0.987179</td>
+      <td>0.963675</td>
+      <td>451</td>
+      <td>462</td>
+    </tr>
+    <tr>
+      <th>2zya</th>
+      <td>A</td>
+      <td>2319.0</td>
+      <td>0.0</td>
+      <td>0.987179</td>
+      <td>0.963675</td>
+      <td>451</td>
+      <td>462</td>
+    </tr>
+    <tr>
+      <th>2zya</th>
+      <td>B</td>
+      <td>2319.0</td>
+      <td>0.0</td>
+      <td>0.987179</td>
+      <td>0.963675</td>
+      <td>451</td>
+      <td>462</td>
+    </tr>
+    <tr>
+      <th>3fwn</th>
+      <td>A</td>
+      <td>2312.0</td>
+      <td>0.0</td>
+      <td>0.987179</td>
+      <td>0.963675</td>
+      <td>451</td>
+      <td>462</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Downloading-and-ranking-structures">
+<h2>Downloading and ranking structures<a class="headerlink" href="#Downloading-and-ranking-structures" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="pdb_downloader_and_metadata">
+<h4><code class="docutils literal"><span class="pre">pdb_downloader_and_metadata</span></code><a class="headerlink" href="#pdb_downloader_and_metadata" title="Permalink to this headline">¶</a></h4>
+<p>Download <strong>all</strong> structures per protein. This also adds metadata to each
+PDB object in the list of structures.</p>
+<p><div class="admonition warning">
+<strong>Warning:</strong> Don&#8217;t run this if you don&#8217;t need all PDB structures - just
+set representative structures below if you want 1 structure per protein.</div>
+</p><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">outdir</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">None</span></code></li>
+<li>Set this to a custom location if you want to save PDB files
+outside the GEM-PRO project folder</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">pdb_file_type</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'cif'</span></code> (set in Protein initialization, but can be
+changed here)</li>
+<li><code class="docutils literal"><span class="pre">'pdb'</span></code>, <code class="docutils literal"><span class="pre">'pdb.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmcif'</span></code>, <code class="docutils literal"><span class="pre">'cif'</span></code>, <code class="docutils literal"><span class="pre">'cif.gz'</span></code>,
+<code class="docutils literal"><span class="pre">'xml.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmtf'</span></code>, <code class="docutils literal"><span class="pre">'mmtf.gz'</span></code> - File type for files
+downloaded from the PDB.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you want to re-download PDB files.</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Additional metadata per structure</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">structures</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">DataFrames</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">df_pdb_metadata</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Download all mapped PDBs and gather the metadata</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">pdb_downloader_and_metadata</span><span class="p">()</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">df_pdb_metadata</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&#39;2zyd&#39;, &#39;2zya&#39;, &#39;3fwn&#39;, &#39;2zyg&#39;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area container">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pdb_title</th>
+      <th>description</th>
+      <th>experimental_method</th>
+      <th>mapped_chains</th>
+      <th>resolution</th>
+      <th>chemicals</th>
+      <th>date</th>
+      <th>taxonomy_name</th>
+      <th>structure_file</th>
+    </tr>
+    <tr>
+      <th>pdb_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2zyd</th>
+      <td>Dimeric 6-phosphogluconate dehydrogenase compl...</td>
+      <td>6-phosphogluconate dehydrogenase, decarboxylat...</td>
+      <td>X-RAY DIFFRACTION</td>
+      <td>A;B</td>
+      <td>1.5</td>
+      <td>GLO</td>
+      <td>2009-09-01;2011-07-13;2014-01-22</td>
+      <td>Escherichia coli</td>
+      <td>2zyd.cif</td>
+    </tr>
+    <tr>
+      <th>2zya</th>
+      <td>Dimeric 6-phosphogluconate dehydrogenase compl...</td>
+      <td>6-phosphogluconate dehydrogenase, decarboxylat...</td>
+      <td>X-RAY DIFFRACTION</td>
+      <td>A;B</td>
+      <td>1.6</td>
+      <td>6PG</td>
+      <td>2009-09-01;2011-07-13;2014-01-22</td>
+      <td>Escherichia coli</td>
+      <td>2zya.cif</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="set_representative_structure">
+<h4><code class="docutils literal"><span class="pre">set_representative_structure</span></code><a class="headerlink" href="#set_representative_structure" title="Permalink to this headline">¶</a></h4>
+<p>Rank available structures, run QC/QA, download and clean the final
+structure.</p>
+<p><div class="admonition note">
+<strong>Note:</strong> PDBs don&#8217;t need to be downloaded before running this step.
+This is useful to limit the number of structures downloaded from the
+PDB.</div>
+</p><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">pdb_file_type</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'cif'</span></code> (set in Protein initialization, but can be
+changed here)</li>
+<li><code class="docutils literal"><span class="pre">'pdb'</span></code>, <code class="docutils literal"><span class="pre">'pdb.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmcif'</span></code>, <code class="docutils literal"><span class="pre">'cif'</span></code>, <code class="docutils literal"><span class="pre">'cif.gz'</span></code>,
+<code class="docutils literal"><span class="pre">'xml.gz'</span></code>, <code class="docutils literal"><span class="pre">'mmtf'</span></code>, <code class="docutils literal"><span class="pre">'mmtf.gz'</span></code> - File type for files
+downloaded from the PDB.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">engine</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'needle'</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">'biopython'</span></code> if you want to utilize Biopython&#8217;s built-in
+pairwise alignment algorithm.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">always_use_homology</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if you always want to use homology models.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">seq_ident_cutoff</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.5</span></code></li>
+<li>QC/QA: sets the minimum sequence identity a structure has to have
+to be selected as representative.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_missing_on_termini</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.2</span></code></li>
+<li>QC/QA: Percentage of the total length of the reference sequence
+which will be ignored when checking for modifications (mutations,
+deletions, insertions, or unresolved residues). Example: if
+<code class="docutils literal"><span class="pre">0.1</span></code>, and reference sequence is 100 AA, then only residues 5 to
+95 will be checked for modifications.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_mutants</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">True</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if point mutations within the structure
+should be allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_deletions</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if deletions within the structure should be
+allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_insertions</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if insertions within the structure should
+be allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">allow_unresolved</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">True</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if unresolved regions within the structure
+should be allowed.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>QC/QA: set to <code class="docutils literal"><span class="pre">True</span></code> if pairwise alignments and structure
+cleaning should be rerun even if files exist.</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Representative protein structures</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">representative_structure</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Set representative structures</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">set_representative_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;StructProp 2zyd-A at 0x7f0581a5c828&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Loading-and-aligning-new-sequences">
+<h2>Loading and aligning new sequences<a class="headerlink" href="#Loading-and-aligning-new-sequences" title="Permalink to this headline">¶</a></h2>
+<p>You can load additional sequences into this protein object and align
+them to the representative sequence.</p>
+<div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="load_manual_sequence">
+<h4><code class="docutils literal"><span class="pre">load_manual_sequence</span></code><a class="headerlink" href="#load_manual_sequence" title="Permalink to this headline">¶</a></h4>
+<p>Loads in a new sequence string (same as what we used above)</p>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Input your mutated sequence and load it</span>
+<span class="n">mutated_protein1_id</span> <span class="o">=</span> <span class="s1">&#39;N17P_SNP&#39;</span>
+<span class="n">mutated_protein1_seq</span> <span class="o">=</span> <span class="s1">&#39;MSKQQIGVVGMAVMGRPLALNIESRGYTVSVFNRSREKTEEVIAENPGKKLVPYYTVKEFVESLETPRRILLMVKAGAGTDAAIDSLKPYLEKGDIIIDGGNTFFQDTIRRNRELSAEGFNFIGTGVSGGEEGALKGPSIMPGGQKDAYELVAPILTKIAAVAEDGEPCVTYIGADGAGHYVKMVHNGIEYGDMQLIAEAYSLLKGGLNLSNEELANTFTEWNNGELSSYLIDITKDIFTKKDEDGNYLVDVILDEAANKGTGKWTSQSALDLGEPLSLITESVFARYISSLKAQRVAASKVLSGPKAQPAGDKAEFIEKVRRALYLGKIVSYAQGFSQLRAASDEYHWDLNYGEIAKIFRAGCIIRAQFLQKITDAYAENADIANLLLAPYFKKIADEYQQALRDVVAYAVQNGIPVPTFSAAVAYYDSYRAAVLPANLIQAQRDYFGAHTYKRTDKEGIFHTEWLE&#39;</span>
+
+<span class="n">my_protein</span><span class="o">.</span><span class="n">load_manual_sequence</span><span class="p">(</span><span class="n">ident</span><span class="o">=</span><span class="n">mutated_protein1_id</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="n">mutated_protein1_seq</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[10]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;SeqProp N17P_SNP at 0x7fe5246abef0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Input another mutated sequence and load it</span>
+<span class="n">mutated_protein2_id</span> <span class="o">=</span> <span class="s1">&#39;Q4S_N17P_SNP&#39;</span>
+<span class="n">mutated_protein2_seq</span> <span class="o">=</span> <span class="s1">&#39;MSKSQIGVVGMAVMGRPLALNIESRGYTVSVFNRSREKTEEVIAENPGKKLVPYYTVKEFVESLETPRRILLMVKAGAGTDAAIDSLKPYLEKGDIIIDGGNTFFQDTIRRNRELSAEGFNFIGTGVSGGEEGALKGPSIMPGGQKDAYELVAPILTKIAAVAEDGEPCVTYIGADGAGHYVKMVHNGIEYGDMQLIAEAYSLLKGGLNLSNEELANTFTEWNNGELSSYLIDITKDIFTKKDEDGNYLVDVILDEAANKGTGKWTSQSALDLGEPLSLITESVFARYISSLKAQRVAASKVLSGPKAQPAGDKAEFIEKVRRALYLGKIVSYAQGFSQLRAASDEYHWDLNYGEIAKIFRAGCIIRAQFLQKITDAYAENADIANLLLAPYFKKIADEYQQALRDVVAYAVQNGIPVPTFSAAVAYYDSYRAAVLPANLIQAQRDYFGAHTYKRTDKEGIFHTEWLE&#39;</span>
+
+<span class="n">my_protein</span><span class="o">.</span><span class="n">load_manual_sequence</span><span class="p">(</span><span class="n">ident</span><span class="o">=</span><span class="n">mutated_protein2_id</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="n">mutated_protein2_seq</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[11]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;SeqProp Q4S_N17P_SNP at 0x7fe5244fb550&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="pairwise_align_sequences_to_representative">
+<h4><code class="docutils literal"><span class="pre">pairwise_align_sequences_to_representative</span></code><a class="headerlink" href="#pairwise_align_sequences_to_representative" title="Permalink to this headline">¶</a></h4>
+<p>Conduct <strong>pairwise alignments</strong> of all sequences in the <code class="docutils literal"><span class="pre">sequences</span></code>
+attribute to the representative sequence.</p>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">gapopen</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">10</span></code></li>
+<li>Gap open penalty</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">gapextend</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">0.5</span></code></li>
+<li>Gap extension penalty</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">outdir</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">None</span></code></li>
+<li>Set this to a custom location if you want to save alignment files
+outside the Protein folder</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">engine</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">'needle'</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">'biopython'</span></code> if you want to utilize Biopython&#8217;s built-in
+pairwise alignment algorithm.</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">parse</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">True</span></code></li>
+<li>Parse the results of the pairwise alignments, and store the
+information as Biopython SeqRecord annotations</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">force_rerun</span></code></p>
+<ul class="simple">
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>Set to <code class="docutils literal"><span class="pre">True</span></code> if pairwise alignments and structure cleaning
+should be rerun even if files exist.</li>
+</ul>
+</li>
+<li><p class="first">What&#8217;s saved?</p>
+<ul>
+<li><p class="first">Sequence alignments (as <code class="docutils literal"><span class="pre">Biopython.Align.MultipleSeqAlignment</span></code>
+objects)</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">representative_sequence</span><span class="o">.</span><span class="n">sequence_alignments</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Conduct pairwise sequence alignments</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">pairwise_align_sequences_to_representative</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># View the stored information for one of the alignments</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">representative_sequence</span><span class="o">.</span><span class="n">sequence_alignments</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">representative_sequence</span><span class="o">.</span><span class="n">sequence_alignments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">annotations</span>
+
+<span class="nb">str</span><span class="p">(</span><span class="n">my_protein</span><span class="o">.</span><span class="n">representative_sequence</span><span class="o">.</span><span class="n">sequence_alignments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+<span class="nb">str</span><span class="p">(</span><span class="n">my_protein</span><span class="o">.</span><span class="n">representative_sequence</span><span class="o">.</span><span class="n">sequence_alignments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&lt;&lt;class &#39;Bio.Align.MultipleSeqAlignment&#39;&gt; instance (2 records of length 468, SingleLetterAlphabet()) at 7fe5244fb6a0&gt;,
+ &lt;&lt;class &#39;Bio.Align.MultipleSeqAlignment&#39;&gt; instance (2 records of length 468, SingleLetterAlphabet()) at 7fe5244fb9e8&gt;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>{&#39;a_seq&#39;: &#39;WT&#39;,
+ &#39;b_seq&#39;: &#39;N17P_SNP&#39;,
+ &#39;deletions&#39;: [],
+ &#39;insertions&#39;: [],
+ &#39;mutations&#39;: [(&#39;N&#39;, 17, &#39;P&#39;)],
+ &#39;percent_gaps&#39;: 0.0,
+ &#39;percent_identity&#39;: 99.8,
+ &#39;percent_similarity&#39;: 99.8,
+ &#39;score&#39;: 2381.0}
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&#39;MSKQQIGVVGMAVMGRNLALNIESRGYTVSVFNRSREKTEEVIAENPGKKLVPYYTVKEFVESLETPRRILLMVKAGAGTDAAIDSLKPYLEKGDIIIDGGNTFFQDTIRRNRELSAEGFNFIGTGVSGGEEGALKGPSIMPGGQKDAYELVAPILTKIAAVAEDGEPCVTYIGADGAGHYVKMVHNGIEYGDMQLIAEAYSLLKGGLNLSNEELANTFTEWNNGELSSYLIDITKDIFTKKDEDGNYLVDVILDEAANKGTGKWTSQSALDLGEPLSLITESVFARYISSLKAQRVAASKVLSGPKAQPAGDKAEFIEKVRRALYLGKIVSYAQGFSQLRAASDEYHWDLNYGEIAKIFRAGCIIRAQFLQKITDAYAENADIANLLLAPYFKKIADEYQQALRDVVAYAVQNGIPVPTFSAAVAYYDSYRAAVLPANLIQAQRDYFGAHTYKRTDKEGIFHTEWLE&#39;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&#39;MSKQQIGVVGMAVMGRPLALNIESRGYTVSVFNRSREKTEEVIAENPGKKLVPYYTVKEFVESLETPRRILLMVKAGAGTDAAIDSLKPYLEKGDIIIDGGNTFFQDTIRRNRELSAEGFNFIGTGVSGGEEGALKGPSIMPGGQKDAYELVAPILTKIAAVAEDGEPCVTYIGADGAGHYVKMVHNGIEYGDMQLIAEAYSLLKGGLNLSNEELANTFTEWNNGELSSYLIDITKDIFTKKDEDGNYLVDVILDEAANKGTGKWTSQSALDLGEPLSLITESVFARYISSLKAQRVAASKVLSGPKAQPAGDKAEFIEKVRRALYLGKIVSYAQGFSQLRAASDEYHWDLNYGEIAKIFRAGCIIRAQFLQKITDAYAENADIANLLLAPYFKKIADEYQQALRDVVAYAVQNGIPVPTFSAAVAYYDSYRAAVLPANLIQAQRDYFGAHTYKRTDKEGIFHTEWLE&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="representative_sequence.sequence_mutation_summary">
+<h4><code class="docutils literal"><span class="pre">representative_sequence.sequence_mutation_summary</span></code><a class="headerlink" href="#representative_sequence.sequence_mutation_summary" title="Permalink to this headline">¶</a></h4>
+<p>Summarize all mutations found. Returns 2 dictionaries,
+<code class="docutils literal"><span class="pre">single_counter</span></code> and <code class="docutils literal"><span class="pre">fingerprint_counter</span></code>.</p>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">single_counter</span></code> is a dictionary of point mutations and a list of
+sequences the point mutation shows up in.</p>
+<ul>
+<li><p class="first">Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">):</span> <span class="p">[</span><span class="s1">&#39;Seq1&#39;</span><span class="p">,</span> <span class="s1">&#39;Seq2&#39;</span><span class="p">,</span> <span class="s1">&#39;Seq4&#39;</span><span class="p">],</span>
+<span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span> <span class="p">[</span><span class="s1">&#39;Seq2&#39;</span><span class="p">]}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">fingerprint_counter</span></code> is a dictionary of groups of point mutations
+and a list of sequences the groups show up in.</p>
+<ul>
+<li><p class="first">This reports which sequences have the specific combinations (or
+&#8220;fingerprints&#8221;) of point mutations</p>
+</li>
+<li><p class="first">Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{((</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">)):</span> <span class="p">[</span><span class="s1">&#39;Seq2&#39;</span><span class="p">],</span>
+<span class="p">((</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">)):</span> <span class="p">[</span><span class="s1">&#39;Seq1&#39;</span><span class="p">,</span> <span class="s1">&#39;Seq4&#39;</span><span class="p">]}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Summarize all the mutations in all alignments</span>
+<span class="n">s</span><span class="p">,</span><span class="n">f</span> <span class="o">=</span> <span class="n">my_protein</span><span class="o">.</span><span class="n">representative_sequence</span><span class="o">.</span><span class="n">sequence_mutation_summary</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Single mutations:&#39;</span><span class="p">)</span>
+<span class="n">s</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;---------------------&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Mutation fingerprints&#39;</span><span class="p">)</span>
+<span class="n">f</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+Single mutations:
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[14]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>{(&#39;N&#39;, 17, &#39;P&#39;): [&#39;N17P_SNP&#39;, &#39;Q4S_N17P_SNP&#39;], (&#39;Q&#39;, 4, &#39;S&#39;): [&#39;Q4S_N17P_SNP&#39;]}
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="output_area container">
+<div class="highlight"><pre>
+---------------------
+Mutation fingerprints
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[14]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>{((&#39;N&#39;, 17, &#39;P&#39;),): [&#39;N17P_SNP&#39;],
+ ((&#39;Q&#39;, 4, &#39;S&#39;), (&#39;N&#39;, 17, &#39;P&#39;)): [&#39;Q4S_N17P_SNP&#39;]}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Viewing-structures">
+<h2>Viewing structures<a class="headerlink" href="#Viewing-structures" title="Permalink to this headline">¶</a></h2>
+<p>The awesome package <a class="reference external" href="https://github.com/arose/nglview">nglview</a> is
+utilized as a backend for viewing structures within a Jupyter notebook.
+There are many more options which can be set if you run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nglview</span>
+<span class="n">view</span> <span class="o">=</span> <span class="n">nglview</span><span class="o">.</span><span class="n">show_structure_file</span><span class="p">(</span><span class="n">my_protein</span><span class="o">.</span><span class="n">representative_structure</span><span class="o">.</span><span class="n">structure_path</span><span class="p">)</span>
+<span class="n">view</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">ssbio</span></code> provides some wrapper functions to easily view structures and
+also map sequence residue numbers to structure residue numbers:</p>
+<div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="representative_structure.view_structure">
+<h4><code class="docutils literal"><span class="pre">representative_structure.view_structure</span></code><a class="headerlink" href="#representative_structure.view_structure" title="Permalink to this headline">¶</a></h4>
+<p>View the protein structure.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">opacity</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">1</span></code></li>
+<li>Opacity of the structure</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">gui</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>If the NGLview GUI should show up</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># View just the structure</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">representative_structure</span><span class="o">.</span><span class="n">view_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="view_all_mutations">
+<h4><code class="docutils literal"><span class="pre">view_all_mutations</span></code><a class="headerlink" href="#view_all_mutations" title="Permalink to this headline">¶</a></h4>
+<p>Map all sequence alignment mutations to the structure and scale the
+visualization based on frequency of mutation.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">grouped</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>If groups of mutations should be colored and sized together</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">color</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">'red'</span></code></li>
+<li>Color of the mutations (overridden if unique_colors=True)</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">unique_colors</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">True</span></code></li>
+<li>If each mutation/mutation group should be colored uniquely</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">structure_opacity</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">0.5</span></code></li>
+<li>Opacity of the protein structure cartoon representation</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">opacity_range</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">(0.8,</span> <span class="pre">1)</span></code></li>
+<li>Min/max opacity values (mutations that show up more will be
+opaque)</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">scale_range</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">(1,</span> <span class="pre">5)</span></code></li>
+<li>Min/max size values (mutations that show up more will be bigger)</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">gui</span></code><ul>
+<li>Default: <code class="docutils literal"><span class="pre">False</span></code></li>
+<li>If the NGLview GUI should show up</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Map the mutations on the visualization (scale increased)</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">view_all_mutations</span><span class="p">(</span><span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.structure.structprop:Selection: ( :A ) and not hydrogen and 17
+INFO:ssbio.structure.structprop:Selection: ( :A ) and not hydrogen and 4
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="representative_structure.view_structure_and_highlight_residues">
+<h4><code class="docutils literal"><span class="pre">representative_structure.view_structure_and_highlight_residues</span></code><a class="headerlink" href="#representative_structure.view_structure_and_highlight_residues" title="Permalink to this headline">¶</a></h4>
+<p>View any residue on the representative chain (by the structure residue
+number).</p>
+<p><div class="admonition warning">
+<strong>Warning:</strong> Sometimes, the residue numbering of a structure doesn&#8217;t
+match a mapped sequence. You can use the method in the <a class="reference external" href="#Mapping-sequence-residue-numbers-to-structure-residue-numbers">next
+section</a>
+to easily map residue numbers between the representative sequence and
+structure.</div>
+</p><ul class="simple">
+<li><code class="docutils literal"><span class="pre">structure_resnums</span></code><ul>
+<li>(int, list): Residue numbers in the structure</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># View just the structure</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">representative_structure</span><span class="o">.</span><span class="n">view_structure_and_highlight_residues</span><span class="p">(</span><span class="n">structure_resnums</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.structure.structprop:Selection: ( :A ) and not hydrogen and ( 1 or 2 or 3 )
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Mapping-sequence-residue-numbers-to-structure-residue-numbers">
+<h2>Mapping sequence residue numbers to structure residue numbers<a class="headerlink" href="#Mapping-sequence-residue-numbers-to-structure-residue-numbers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Methods">
+<h3>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="representative_structure.map_repseq_resnums_to_structure_resnums">
+<h4><code class="docutils literal"><span class="pre">representative_structure.map_repseq_resnums_to_structure_resnums</span></code><a class="headerlink" href="#representative_structure.map_repseq_resnums_to_structure_resnums" title="Permalink to this headline">¶</a></h4>
+<p><div class="admonition note">
+<strong>Note:</strong> This method has not been implemented for other chains or other
+stored structures yet.</div>
+</p><p>Map a residue number in the reference_seq to the actual structure
+file&#8217;s residue number</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">resnums</span></code><ul>
+<li>(int, list): Residue numbers in the representative sequence</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">my_protein</span><span class="o">.</span><span class="n">representative_structure</span><span class="o">.</span><span class="n">map_repseq_resnums_to_structure_resnums</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+WARNING:ssbio.structure.structprop:2zyd-A, 1: structure file does not contain coordinates for this residue
+WARNING:ssbio.structure.structprop:2zyd-A, 2: structure file does not contain coordinates for this residue
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[18]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>{3: (&#39; &#39;, 3, &#39; &#39;), 4: (&#39; &#39;, 4, &#39; &#39;)}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Saving">
+<h2>Saving<a class="headerlink" href="#Saving" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="kn">as</span> <span class="nn">op</span>
+<span class="n">my_protein</span><span class="o">.</span><span class="n">save_json</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_protein</span><span class="o">.</span><span class="n">protein_dir</span><span class="p">,</span> <span class="s1">&#39;protein.json&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="prompt empty container">
+</div>
+<div class="stderr output_area container">
+<div class="highlight"><pre>
+INFO:ssbio.core.io:Saved &lt;class &#39;ssbio.core.protein.Protein&#39;&gt; (id: SRR1753782_00918) to /tmp/SRR1753782_00918/protein.json
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../gempro.html" class="btn btn-neutral float-right" title="The GEM-PRO Pipeline" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../protein.html" class="btn btn-neutral" title="The Protein Class" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Nathan Mih.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0a0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
