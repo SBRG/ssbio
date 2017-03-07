@@ -1,0 +1,1546 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# GEM-PRO - List of Gene IDs\n",
+    "\n",
+    "This notebook gives an example of how to run the GEM-PRO pipeline with a **list of gene IDs**.\n",
+    "<p>\n",
+    "<div class=\"alert alert-info\">\n",
+    "**Input:** List of gene IDs\n",
+    "</div>\n",
+    "<div class=\"alert alert-info\">\n",
+    "**Output:** GEM-PRO model\n",
+    "</div>\n",
+    "</p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Imports"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "# Import the GEM-PRO class\n",
+    "from ssbio.pipeline.gempro import GEMPRO"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "# Printing multiple outputs per cell\n",
+    "from IPython.core.interactiveshell import InteractiveShell\n",
+    "InteractiveShell.ast_node_interactivity = \"all\""
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Logging\n",
+    "\n",
+    "Set the logging level in `logger.setLevel(logging.<LEVEL_HERE>)` to specify how verbose you want the pipeline to be. Debug is most verbose.\n",
+    "\n",
+    "- `CRITICAL`\n",
+    "     - Only really important messages shown\n",
+    "- `ERROR`\n",
+    "     - Major errors\n",
+    "- `WARNING`\n",
+    "     - Warnings that don't affect running of the pipeline\n",
+    "- `INFO` (default)\n",
+    "     - Info such as the number of structures mapped per gene\n",
+    "- `DEBUG`\n",
+    "     - Really detailed information that will print out a lot of stuff\n",
+    "     \n",
+    "<div class=\"alert alert-warning\">**Warning:** `DEBUG` mode prints out a large amount of information, especially if you have a lot of genes. This may stall your notebook!</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# Create logger\n",
+    "import logging\n",
+    "logger = logging.getLogger()\n",
+    "logger.setLevel(logging.INFO)  # SET YOUR LOGGING LEVEL HERE #"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Initialization of the project\n",
+    "\n",
+    "Set these three things:\n",
+    "\n",
+    "- `ROOT_DIR`\n",
+    "    - The directory where a folder named after your `PROJECT` will be created\n",
+    "- `PROJECT`\n",
+    "    - Your project name\n",
+    "- `LIST_OF_GENES`\n",
+    "    - Your list of gene IDs\n",
+    "    \n",
+    "A directory will be created in `ROOT_DIR` with your `PROJECT` name. The folders are organized like so:\n",
+    "```\n",
+    "    ROOT_DIR\n",
+    "    └── PROJECT\n",
+    "        ├── data  # General storage for pipeline outputs\n",
+    "        ├── model  # SBML and GEM-PRO models are stored here\n",
+    "        ├── genes  # Per gene information\n",
+    "        │   ├── <gene_id1>  # Specific gene directory\n",
+    "        │   │   └── protein\n",
+    "        │   │       ├── sequences  # Protein sequence files, alignments, etc.\n",
+    "        │   │       └── structures  # Protein structure files, calculations, etc.\n",
+    "        │   └── <gene_id2>\n",
+    "        │       └── protein\n",
+    "        │           ├── sequences\n",
+    "        │           └── structures\n",
+    "        ├── reactions  # Per reaction information\n",
+    "        │   └── <reaction_id1>  # Specific reaction directory\n",
+    "        │       └── complex\n",
+    "        │           └── structures  # Protein complex files\n",
+    "        └── metabolites  # Per metabolite information\n",
+    "            └── <metabolite_id1>  # Specific metabolite directory\n",
+    "                └── chemical\n",
+    "                    └── structures  # Metabolite 2D and 3D structure files\n",
+    "                \n",
+    "```\n",
+    "\n",
+    "<div class=\"alert alert-info\">**Note:** Methods for protein complexes and metabolites are still in development.</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# SET FOLDERS AND DATA HERE\n",
+    "import tempfile\n",
+    "ROOT_DIR = tempfile.gettempdir()\n",
+    "\n",
+    "PROJECT = 'genes_GP'\n",
+    "LIST_OF_GENES = ['b0761', 'b0889', 'b0995', 'b1013', 'b1014', 'b1040', 'b1130', 'b1187', 'b1221', 'b1299']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:ssbio.pipeline.gempro:/tmp/genes_GP: GEM-PRO project location\n",
+      "INFO:ssbio.pipeline.gempro:10: number of genes\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Create the GEM-PRO project\n",
+    "my_gempro = GEMPRO(gem_name=PROJECT, root_dir=ROOT_DIR, genes_list=LIST_OF_GENES)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Mapping gene ID -> sequence\n",
+    "\n",
+    "First, we need to map these IDs to their protein sequences. There are 2 ID mapping services provided to do this - through **KEGG** or **UniProt**. The end goal is to map a UniProt ID to each ID, since there is a comprehensive mapping (and some useful APIs) between UniProt and the PDB.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Note:** You only need to map gene IDs using one service. However you can run both if some genes don't map in one service and do map in another!</div></p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `kegg_mapping_and_metadata`\n",
+    "\n",
+    "Per gene, the KEGG sequence and metadata is downloaded in the gene's protein/sequence folder.\n",
+    "\n",
+    "- `kegg_organism_code`\n",
+    "    - See the full list of organisms here: http://www.genome.jp/kegg/catalog/org_list.html\n",
+    "        - *E. coli* MG1655 is \"eco\"\n",
+    "        - *M. tuberculosis* is \"mtu\"\n",
+    "- `custom_gene_mapping`\n",
+    "    - If the model gene IDs differ from the KEGG gene IDs, and you know the mapping, supply it as a dictionary here. \n",
+    "    - An example would be for the *T. maritima* SBML model, where the model IDs are formatted without an underscore (\"TM0001\") while in KEGG they have an underscore (\"TM_0001\").\n",
+    "- `force_rerun`\n",
+    "    - If you want to force the rerun of mapping, set this to True.\n",
+    "- What's saved?\n",
+    "    - Sequences are stored in each gene\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('b1187').protein.sequences\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_kegg_metadata` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_kegg_metadata\n",
+    "    ```\n",
+    "    - Any gene IDs that are missing a mapping are reported in the `missing_kegg_mapping` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_kegg_mapping\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:ssbio.pipeline.gempro:10: number of genes mapped to KEGG\n",
+      "INFO:ssbio.pipeline.gempro:Created KEGG metadata dataframe. See the \"df_kegg_metadata\" attribute.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>refseq</th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>sequence_file</th>\n",
+       "      <th>metadata_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>eco:b0995</td>\n",
+       "      <td>NP_415515</td>\n",
+       "      <td>P38684</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1ZGZ</td>\n",
+       "      <td>230</td>\n",
+       "      <td>eco-b0995.faa</td>\n",
+       "      <td>eco-b0995.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1130</th>\n",
+       "      <td>eco:b1130</td>\n",
+       "      <td>NP_415648</td>\n",
+       "      <td>P23836</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2PL1;2PKX</td>\n",
+       "      <td>223</td>\n",
+       "      <td>eco-b1130.faa</td>\n",
+       "      <td>eco-b1130.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1187</th>\n",
+       "      <td>eco:b1187</td>\n",
+       "      <td>NP_415705</td>\n",
+       "      <td>P0A8V6</td>\n",
+       "      <td>5</td>\n",
+       "      <td>1HW1;1H9T;1HW2;1H9G;1E2X</td>\n",
+       "      <td>239</td>\n",
+       "      <td>eco-b1187.faa</td>\n",
+       "      <td>eco-b1187.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1014</th>\n",
+       "      <td>eco:b1014</td>\n",
+       "      <td>NP_415534</td>\n",
+       "      <td>P09546</td>\n",
+       "      <td>16</td>\n",
+       "      <td>3E2Q;4JNZ;3E2R;4JNY;2GPE;4O8A;3E2S;2FZN;1TJ1;1...</td>\n",
+       "      <td>1320</td>\n",
+       "      <td>eco-b1014.faa</td>\n",
+       "      <td>eco-b1014.kegg</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1299</th>\n",
+       "      <td>eco:b1299</td>\n",
+       "      <td>NP_415815</td>\n",
+       "      <td>P0A9U6</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>185</td>\n",
+       "      <td>eco-b1299.faa</td>\n",
+       "      <td>eco-b1299.kegg</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            kegg     refseq uniprot  num_pdbs  \\\n",
+       "gene                                            \n",
+       "b0995  eco:b0995  NP_415515  P38684         1   \n",
+       "b1130  eco:b1130  NP_415648  P23836         2   \n",
+       "b1187  eco:b1187  NP_415705  P0A8V6         5   \n",
+       "b1014  eco:b1014  NP_415534  P09546        16   \n",
+       "b1299  eco:b1299  NP_415815  P0A9U6         0   \n",
+       "\n",
+       "                                                    pdbs  seq_len  \\\n",
+       "gene                                                                \n",
+       "b0995                                               1ZGZ      230   \n",
+       "b1130                                          2PL1;2PKX      223   \n",
+       "b1187                           1HW1;1H9T;1HW2;1H9G;1E2X      239   \n",
+       "b1014  3E2Q;4JNZ;3E2R;4JNY;2GPE;4O8A;3E2S;2FZN;1TJ1;1...     1320   \n",
+       "b1299                                                NaN      185   \n",
+       "\n",
+       "       sequence_file   metadata_file  \n",
+       "gene                                  \n",
+       "b0995  eco-b0995.faa  eco-b0995.kegg  \n",
+       "b1130  eco-b1130.faa  eco-b1130.kegg  \n",
+       "b1187  eco-b1187.faa  eco-b1187.kegg  \n",
+       "b1014  eco-b1014.faa  eco-b1014.kegg  \n",
+       "b1299  eco-b1299.faa  eco-b1299.kegg  "
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# KEGG mapping of gene ids\n",
+    "my_gempro.kegg_mapping_and_metadata(kegg_organism_code='eco')\n",
+    "my_gempro.df_kegg_metadata.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `uniprot_mapping_and_metadata`\n",
+    "\n",
+    "You can try mapping your genes using the actual service [here](http://www.uniprot.org/uploadlists/).\n",
+    "\n",
+    "- `model_gene_source`\n",
+    "    - [Here is a list of the gene IDs that can be mapped to UniProt IDs](http://www.uniprot.org/help/programmatic_access#id_mapping_examples)\n",
+    "    - *E. coli* b-numbers in this example are of the source `\"ENSEMBLGENOME_ID\"`\n",
+    "- What's saved?\n",
+    "    - Sequences are stored in each gene\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('b1187').protein.sequences\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_uniprot_metadata` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_uniprot_metadata\n",
+    "    ```\n",
+    "    - Any gene IDs that are missing a mapping are reported in the `missing_uniprot_mapping` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_uniprot_mapping\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:root:getUserAgent: Begin\n",
+      "INFO:root:getUserAgent: user_agent: EBI-Sample-Client/ (services.py; Python 3.5.2; Linux) Python-requests/2.12.4\n",
+      "INFO:root:getUserAgent: End\n",
+      "INFO:ssbio.pipeline.gempro:10: number of genes mapped to UniProt\n",
+      "INFO:ssbio.pipeline.gempro:Created UniProt metadata dataframe. See the \"df_uniprot_metadata\" attribute.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>reviewed</th>\n",
+       "      <th>gene_name</th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>refseq</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>ec_number</th>\n",
+       "      <th>pfam</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>description</th>\n",
+       "      <th>entry_version</th>\n",
+       "      <th>seq_version</th>\n",
+       "      <th>sequence_file</th>\n",
+       "      <th>metadata_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>P38684</td>\n",
+       "      <td>True</td>\n",
+       "      <td>torR</td>\n",
+       "      <td>ecj:JW0980;eco:b0995</td>\n",
+       "      <td>NP_415515.1;NC_000913.3;WP_001120125.1;NZ_LN83...</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1ZGZ</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>PF00072;PF00486</td>\n",
+       "      <td>230</td>\n",
+       "      <td>&lt;unknown description&gt;</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>1997-11-01</td>\n",
+       "      <td>P38684.fasta</td>\n",
+       "      <td>P38684.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1130</th>\n",
+       "      <td>P23836</td>\n",
+       "      <td>True</td>\n",
+       "      <td>phoP</td>\n",
+       "      <td>ecj:JW1116;eco:b1130</td>\n",
+       "      <td>NP_415648.1;NC_000913.3;WP_001265471.1;NZ_LN83...</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2PKX;2PL1</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>PF00072;PF00486</td>\n",
+       "      <td>223</td>\n",
+       "      <td>&lt;unknown description&gt;</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>1991-11-01</td>\n",
+       "      <td>P23836.fasta</td>\n",
+       "      <td>P23836.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1187</th>\n",
+       "      <td>P0A8V6</td>\n",
+       "      <td>True</td>\n",
+       "      <td>fadR</td>\n",
+       "      <td>ecj:JW1176;eco:b1187</td>\n",
+       "      <td>NP_415705.1;NC_000913.3;WP_000234823.1;NZ_LN83...</td>\n",
+       "      <td>5</td>\n",
+       "      <td>1HW2;1H9G;1E2X;1HW1;1H9T</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>PF07840;PF00392</td>\n",
+       "      <td>239</td>\n",
+       "      <td>&lt;unknown description&gt;</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2007-01-23</td>\n",
+       "      <td>P0A8V6.fasta</td>\n",
+       "      <td>P0A8V6.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1014</th>\n",
+       "      <td>P09546</td>\n",
+       "      <td>True</td>\n",
+       "      <td>putA</td>\n",
+       "      <td>ecj:JW0999;eco:b1014</td>\n",
+       "      <td>NP_415534.1;NC_000913.3;WP_001326840.1;NZ_LN83...</td>\n",
+       "      <td>16</td>\n",
+       "      <td>4JNY;1TIW;1TJ2;1TJ1;4O8A;2RBF;4JNZ;2FZM;3E2Q;2...</td>\n",
+       "      <td>1.2.1.88;1.5.5.2</td>\n",
+       "      <td>PF00171;PF01619;PF14850</td>\n",
+       "      <td>1320</td>\n",
+       "      <td>&lt;unknown description&gt;</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>1997-11-01</td>\n",
+       "      <td>P09546.fasta</td>\n",
+       "      <td>P09546.txt</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1299</th>\n",
+       "      <td>P0A9U6</td>\n",
+       "      <td>True</td>\n",
+       "      <td>puuR</td>\n",
+       "      <td>ecj:JW1292;eco:b1299</td>\n",
+       "      <td>NP_415815.1;NC_000913.3;WP_001278727.1;NZ_LN83...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>PF07883;PF01381</td>\n",
+       "      <td>185</td>\n",
+       "      <td>&lt;unknown description&gt;</td>\n",
+       "      <td>2017-02-15</td>\n",
+       "      <td>2005-07-19</td>\n",
+       "      <td>P0A9U6.fasta</td>\n",
+       "      <td>P0A9U6.txt</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      uniprot reviewed gene_name                  kegg  \\\n",
+       "gene                                                     \n",
+       "b0995  P38684     True      torR  ecj:JW0980;eco:b0995   \n",
+       "b1130  P23836     True      phoP  ecj:JW1116;eco:b1130   \n",
+       "b1187  P0A8V6     True      fadR  ecj:JW1176;eco:b1187   \n",
+       "b1014  P09546     True      putA  ecj:JW0999;eco:b1014   \n",
+       "b1299  P0A9U6     True      puuR  ecj:JW1292;eco:b1299   \n",
+       "\n",
+       "                                                  refseq  num_pdbs  \\\n",
+       "gene                                                                 \n",
+       "b0995  NP_415515.1;NC_000913.3;WP_001120125.1;NZ_LN83...         1   \n",
+       "b1130  NP_415648.1;NC_000913.3;WP_001265471.1;NZ_LN83...         2   \n",
+       "b1187  NP_415705.1;NC_000913.3;WP_000234823.1;NZ_LN83...         5   \n",
+       "b1014  NP_415534.1;NC_000913.3;WP_001326840.1;NZ_LN83...        16   \n",
+       "b1299  NP_415815.1;NC_000913.3;WP_001278727.1;NZ_LN83...         0   \n",
+       "\n",
+       "                                                    pdbs         ec_number  \\\n",
+       "gene                                                                         \n",
+       "b0995                                               1ZGZ               NaN   \n",
+       "b1130                                          2PKX;2PL1               NaN   \n",
+       "b1187                           1HW2;1H9G;1E2X;1HW1;1H9T               NaN   \n",
+       "b1014  4JNY;1TIW;1TJ2;1TJ1;4O8A;2RBF;4JNZ;2FZM;3E2Q;2...  1.2.1.88;1.5.5.2   \n",
+       "b1299                                                NaN               NaN   \n",
+       "\n",
+       "                          pfam  seq_len            description entry_version  \\\n",
+       "gene                                                                           \n",
+       "b0995          PF00072;PF00486      230  <unknown description>    2017-02-15   \n",
+       "b1130          PF00072;PF00486      223  <unknown description>    2017-02-15   \n",
+       "b1187          PF07840;PF00392      239  <unknown description>    2017-02-15   \n",
+       "b1014  PF00171;PF01619;PF14850     1320  <unknown description>    2017-02-15   \n",
+       "b1299          PF07883;PF01381      185  <unknown description>    2017-02-15   \n",
+       "\n",
+       "      seq_version sequence_file metadata_file  \n",
+       "gene                                           \n",
+       "b0995  1997-11-01  P38684.fasta    P38684.txt  \n",
+       "b1130  1991-11-01  P23836.fasta    P23836.txt  \n",
+       "b1187  2007-01-23  P0A8V6.fasta    P0A8V6.txt  \n",
+       "b1014  1997-11-01  P09546.fasta    P09546.txt  \n",
+       "b1299  2005-07-19  P0A9U6.fasta    P0A9U6.txt  "
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# UniProt mapping\n",
+    "my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')\n",
+    "my_gempro.df_uniprot_metadata.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `set_representative_sequence`\n",
+    "\n",
+    "If you have mapped with both KEGG and UniProt mappers, then you can set a representative sequence for the gene using this function. If you used just one, this will just set that ID as representative.\n",
+    "\n",
+    "- If any sequences were provided manually, these will be set as representative first.\n",
+    "- UniProt mappings override KEGG mappings except when KEGG mappings have PDBs associated with them and UniProt doesn't.\n",
+    "\n",
+    "<p><div class=\"alert alert-warning\">**Warning:** Setting representative sequences from different sources is potentially inconsistent (ie. sources may be different genome assemblies)</div></p>\n",
+    "\n",
+    "- What's saved?\n",
+    "    - Representative sequences are set\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('b1187').protein.representative_sequence\n",
+    "    ```\n",
+    "    - A summary of the metadata is available in the `df_representative_sequences` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.df_representative_sequences\n",
+    "    ```\n",
+    "    - Any gene IDs that are missing a mapping are reported in the `missing_repseq` attribute.\n",
+    "    ```python\n",
+    "    my_gempro.missing_repseq\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:ssbio.pipeline.gempro:10: number of genes with a representative sequence\n",
+      "INFO:ssbio.pipeline.gempro:Created sequence mapping dataframe. See the \"df_representative_sequences\" attribute.\n",
+      "INFO:ssbio.pipeline.gempro:10/10: genes with a representative sequence\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>kegg</th>\n",
+       "      <th>num_pdbs</th>\n",
+       "      <th>pdbs</th>\n",
+       "      <th>seq_len</th>\n",
+       "      <th>sequence_file</th>\n",
+       "      <th>metadata_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>P38684</td>\n",
+       "      <td>ecj:JW0980;eco:b0995</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1ZGZ</td>\n",
+       "      <td>230</td>\n",
+       "      <td>P38684.fasta</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1130</th>\n",
+       "      <td>P23836</td>\n",
+       "      <td>ecj:JW1116;eco:b1130</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2PKX;2PL1</td>\n",
+       "      <td>223</td>\n",
+       "      <td>P23836.fasta</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1187</th>\n",
+       "      <td>P0A8V6</td>\n",
+       "      <td>ecj:JW1176;eco:b1187</td>\n",
+       "      <td>5</td>\n",
+       "      <td>1HW2;1H9G;1E2X;1HW1;1H9T</td>\n",
+       "      <td>239</td>\n",
+       "      <td>P0A8V6.fasta</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1014</th>\n",
+       "      <td>P09546</td>\n",
+       "      <td>ecj:JW0999;eco:b1014</td>\n",
+       "      <td>16</td>\n",
+       "      <td>4JNY;1TIW;1TJ2;1TJ1;4O8A;2RBF;4JNZ;2FZM;3E2Q;2...</td>\n",
+       "      <td>1320</td>\n",
+       "      <td>P09546.fasta</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1299</th>\n",
+       "      <td>P0A9U6</td>\n",
+       "      <td>ecj:JW1292;eco:b1299</td>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>185</td>\n",
+       "      <td>P0A9U6.fasta</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      uniprot                  kegg  num_pdbs  \\\n",
+       "gene                                            \n",
+       "b0995  P38684  ecj:JW0980;eco:b0995         1   \n",
+       "b1130  P23836  ecj:JW1116;eco:b1130         2   \n",
+       "b1187  P0A8V6  ecj:JW1176;eco:b1187         5   \n",
+       "b1014  P09546  ecj:JW0999;eco:b1014        16   \n",
+       "b1299  P0A9U6  ecj:JW1292;eco:b1299         0   \n",
+       "\n",
+       "                                                    pdbs  seq_len  \\\n",
+       "gene                                                                \n",
+       "b0995                                               1ZGZ      230   \n",
+       "b1130                                          2PKX;2PL1      223   \n",
+       "b1187                           1HW2;1H9G;1E2X;1HW1;1H9T      239   \n",
+       "b1014  4JNY;1TIW;1TJ2;1TJ1;4O8A;2RBF;4JNZ;2FZM;3E2Q;2...     1320   \n",
+       "b1299                                                NaN      185   \n",
+       "\n",
+       "      sequence_file  metadata_file  \n",
+       "gene                                \n",
+       "b0995  P38684.fasta            NaN  \n",
+       "b1130  P23836.fasta            NaN  \n",
+       "b1187  P0A8V6.fasta            NaN  \n",
+       "b1014  P09546.fasta            NaN  \n",
+       "b1299  P0A9U6.fasta            NaN  "
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Set representative sequences\n",
+    "my_gempro.set_representative_sequence()\n",
+    "my_gempro.df_representative_sequences.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Mapping representative sequence to structure\n",
+    "\n",
+    "These are the ways to map sequence to structure:\n",
+    "\n",
+    "1. Use the UniProt ID and their automatic mappings to the PDB\n",
+    "2. BLAST the sequence to the PDB\n",
+    "3. Make homology models or \n",
+    "4. Map to existing homology models\n",
+    "\n",
+    "You can only utilize option #1 to map to PDBs if there is a mapped UniProt ID set in the representative sequence. If not, you'll have to BLAST your sequence to the PDB or make a homology model. You can also run both for maximum coverage."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `map_uniprot_to_pdb`\n",
+    "\n",
+    "This uses the `best_structures` API [from the PDBe](https://www.ebi.ac.uk/pdbe/api/doc/sifts.html) to return a rank ordered list of PDBs that match a UniProt ID. \n",
+    "\n",
+    "- Method description:\n",
+    "    - Here is the ranking algorithm described by the PDB paper: https://nar.oxfordjournals.org/content/44/D1/D385.full\n",
+    "    - More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html\n",
+    "    - Link used to retrieve results: https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession\n",
+    "    - The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and, if the same, resolution.\n",
+    "\n",
+    "- `seq_ident_cutoff`\n",
+    "    - From 0 to 1\n",
+    "    - Provide the seq_ident_cutoff as a percentage to filter for structures with only a percent identity above the cutoff.\n",
+    "\n",
+    "<p><div class=\"alert alert-warning\">**Warning:** if you set the `seq_ident_cutoff` too high you risk filtering out PDBs that do match the sequence, but are just missing large portions of it.</div></p>\n",
+    "\n",
+    "\n",
+    "- What's saved?\n",
+    "    - A .json file of the results is saved from the web request in the \"sequences\" folder\n",
+    "    - No PDBs are downloaded yet\n",
+    "    - PDB IDs are saved in an ordered list based on their resolution and sequence coverage\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.structures\n",
+    "    ```\n",
+    "    - The ranking of PDBs is saved as a dataframe\n",
+    "    ```python\n",
+    "    my_gempro.df_pdb_ranking\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:root:getUserAgent: Begin\n",
+      "INFO:root:getUserAgent: user_agent: EBI-Sample-Client/ (services.py; Python 3.5.2; Linux) Python-requests/2.12.4\n",
+      "INFO:root:getUserAgent: End\n",
+      "INFO:ssbio.pipeline.gempro:Completed UniProt --> best PDB mapping. See the \"df_pdb_ranking\" attribute.\n",
+      "INFO:ssbio.pipeline.gempro:8: number of genes with at least one experimental structure\n",
+      "INFO:ssbio.pipeline.gempro:2: number of genes with no experimental structures\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>uniprot</th>\n",
+       "      <th>pdb_id</th>\n",
+       "      <th>pdb_chain_id</th>\n",
+       "      <th>experimental_method</th>\n",
+       "      <th>resolution</th>\n",
+       "      <th>coverage</th>\n",
+       "      <th>taxonomy_name</th>\n",
+       "      <th>start</th>\n",
+       "      <th>end</th>\n",
+       "      <th>unp_start</th>\n",
+       "      <th>unp_end</th>\n",
+       "      <th>rank</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>P38684</td>\n",
+       "      <td>1zgz</td>\n",
+       "      <td>A</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.8</td>\n",
+       "      <td>0.530</td>\n",
+       "      <td>None</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>P38684</td>\n",
+       "      <td>1zgz</td>\n",
+       "      <td>B</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.8</td>\n",
+       "      <td>0.530</td>\n",
+       "      <td>None</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>P38684</td>\n",
+       "      <td>1zgz</td>\n",
+       "      <td>C</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.8</td>\n",
+       "      <td>0.530</td>\n",
+       "      <td>None</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>P38684</td>\n",
+       "      <td>1zgz</td>\n",
+       "      <td>D</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.8</td>\n",
+       "      <td>0.530</td>\n",
+       "      <td>None</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>1</td>\n",
+       "      <td>122</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1130</th>\n",
+       "      <td>P23836</td>\n",
+       "      <td>2pl1</td>\n",
+       "      <td>A</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.9</td>\n",
+       "      <td>0.543</td>\n",
+       "      <td>None</td>\n",
+       "      <td>1</td>\n",
+       "      <td>121</td>\n",
+       "      <td>1</td>\n",
+       "      <td>121</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      uniprot pdb_id pdb_chain_id experimental_method  resolution  coverage  \\\n",
+       "gene                                                                          \n",
+       "b0995  P38684   1zgz            A   X-ray diffraction         1.8     0.530   \n",
+       "b0995  P38684   1zgz            B   X-ray diffraction         1.8     0.530   \n",
+       "b0995  P38684   1zgz            C   X-ray diffraction         1.8     0.530   \n",
+       "b0995  P38684   1zgz            D   X-ray diffraction         1.8     0.530   \n",
+       "b1130  P23836   2pl1            A   X-ray diffraction         1.9     0.543   \n",
+       "\n",
+       "      taxonomy_name  start  end  unp_start  unp_end  rank  \n",
+       "gene                                                       \n",
+       "b0995          None      1  122          1      122     1  \n",
+       "b0995          None      1  122          1      122     2  \n",
+       "b0995          None      1  122          1      122     3  \n",
+       "b0995          None      1  122          1      122     4  \n",
+       "b1130          None      1  121          1      121     1  "
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Mapping using the PDBe best_structures service\n",
+    "my_gempro.map_uniprot_to_pdb(seq_ident_cutoff=.3)\n",
+    "my_gempro.df_pdb_ranking.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `blast_seqs_to_pdb`\n",
+    "This will BLAST the representative sequence against the entire PDB, and return significant hits. XML files of the BLAST results are saved in the respective sequence folders for a protein.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Warning:** A PDB BLAST may return hits in other organisms.</div></p>\n",
+    "\n",
+    "- `seq_ident_cutoff`\n",
+    "    - Default: `0`\n",
+    "    - From 0 to 1\n",
+    "- `evalue`\n",
+    "    - Default: `0.0001`\n",
+    "    - Significance of BLAST results\n",
+    "- `all_genes`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want all genes and their sequences BLASTed\n",
+    "    - Set to `False` if you only want to BLAST sequences that did not have any PDBs mapped to them already\n",
+    "- `display_link`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want a clickable HTML link to be printed\n",
+    "- `force_rerun`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want to ignore any existing XML results and run the BLAST again\n",
+    "    \n",
+    "    \n",
+    "- What's saved?\n",
+    "    - An .xml file from the web request in the \"sequences\" folder\n",
+    "    - No PDBs are downloaded yet\n",
+    "    - Protein structures\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('Rv1295').protein.structures\n",
+    "    ```\n",
+    "    - DataFrames\n",
+    "    ```python\n",
+    "    my_gempro.df_pdb_blast\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:ssbio.pipeline.gempro:Completed sequence --> PDB BLAST. See the \"df_pdb_blast\" attribute.\n",
+      "INFO:ssbio.pipeline.gempro:1: number of genes with additional structures added from BLAST\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>pdb_id</th>\n",
+       "      <th>pdb_chain_id</th>\n",
+       "      <th>hit_score</th>\n",
+       "      <th>hit_evalue</th>\n",
+       "      <th>hit_percent_similar</th>\n",
+       "      <th>hit_percent_ident</th>\n",
+       "      <th>hit_num_ident</th>\n",
+       "      <th>hit_num_similar</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b1013</th>\n",
+       "      <td>4x1e</td>\n",
+       "      <td>A</td>\n",
+       "      <td>966.0</td>\n",
+       "      <td>1.283880e-104</td>\n",
+       "      <td>0.910377</td>\n",
+       "      <td>0.910377</td>\n",
+       "      <td>193</td>\n",
+       "      <td>193</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1013</th>\n",
+       "      <td>4x1e</td>\n",
+       "      <td>B</td>\n",
+       "      <td>966.0</td>\n",
+       "      <td>1.283880e-104</td>\n",
+       "      <td>0.910377</td>\n",
+       "      <td>0.910377</td>\n",
+       "      <td>193</td>\n",
+       "      <td>193</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      pdb_id pdb_chain_id  hit_score     hit_evalue  hit_percent_similar  \\\n",
+       "gene                                                                       \n",
+       "b1013   4x1e            A      966.0  1.283880e-104             0.910377   \n",
+       "b1013   4x1e            B      966.0  1.283880e-104             0.910377   \n",
+       "\n",
+       "       hit_percent_ident  hit_num_ident  hit_num_similar  \n",
+       "gene                                                      \n",
+       "b1013           0.910377            193              193  \n",
+       "b1013           0.910377            193              193  "
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Mapping using BLAST\n",
+    "my_gempro.blast_seqs_to_pdb(all_genes=True, seq_ident_cutoff=.9, evalue=0.00001)\n",
+    "my_gempro.df_pdb_blast.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Downloading and ranking structures"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Methods"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `pdb_downloader_and_metadata`\n",
+    "Download **all** structures per protein. This also adds metadata to each PDB object in the list of structures.\n",
+    "\n",
+    "<p><div class=\"alert alert-warning\">**Warning:** Don't run this if you don't need all PDB structures - just set representative structures below if you want 1 structure per protein.</div></p>\n",
+    "\n",
+    "- `outdir`\n",
+    "    - Default: `None`\n",
+    "    - Set this to a custom location if you want to save PDB files outside the GEM-PRO project folder\n",
+    "- `pdb_file_type`\n",
+    "    - Default: `'cif'` (set in GEMPRO project initialization, but can be changed here)\n",
+    "    - `'pdb'`, `'pdb.gz'`, `'mmcif'`, `'cif'`, `'cif.gz'`, `'xml.gz'`, `'mmtf'`, `'mmtf.gz'` - File type for files downloaded from the PDB.\n",
+    "- `force_rerun`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you want to re-download PDB files.\n",
+    "- What's saved?\n",
+    "    - Additional metadata per structure\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('b1187').protein.structures\n",
+    "    ```\n",
+    "    - DataFrames\n",
+    "    ```python\n",
+    "    my_gempro.df_pdb_metadata\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:ssbio.pipeline.gempro:Updated PDB metadata dataframe. See the \"df_pdb_metadata\" attribute.\n",
+      "INFO:ssbio.pipeline.gempro:Saved 40 structures total\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>pdb_id</th>\n",
+       "      <th>pdb_title</th>\n",
+       "      <th>description</th>\n",
+       "      <th>experimental_method</th>\n",
+       "      <th>resolution</th>\n",
+       "      <th>chemicals</th>\n",
+       "      <th>date</th>\n",
+       "      <th>taxonomy_name</th>\n",
+       "      <th>structure_file</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b0995</th>\n",
+       "      <td>1zgz</td>\n",
+       "      <td>Crystal Structure Of The Receiver Domain Of TM...</td>\n",
+       "      <td>TorCAD operon transcriptional regulatory prote...</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.8</td>\n",
+       "      <td>SO4;GOL</td>\n",
+       "      <td>2005-12-13;2009-02-24;2011-07-13</td>\n",
+       "      <td>Escherichia coli</td>\n",
+       "      <td>1zgz.cif</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1130</th>\n",
+       "      <td>2pl1</td>\n",
+       "      <td>Berrylium Fluoride activated receiver domain o...</td>\n",
+       "      <td>Transcriptional regulatory protein phoP</td>\n",
+       "      <td>X-ray diffraction</td>\n",
+       "      <td>1.9</td>\n",
+       "      <td>PT;MG;BEF</td>\n",
+       "      <td>2007-05-22;2007-08-14;2009-02-24</td>\n",
+       "      <td>Escherichia coli</td>\n",
+       "      <td>2pl1.cif</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      pdb_id                                          pdb_title  \\\n",
+       "gene                                                              \n",
+       "b0995   1zgz  Crystal Structure Of The Receiver Domain Of TM...   \n",
+       "b1130   2pl1  Berrylium Fluoride activated receiver domain o...   \n",
+       "\n",
+       "                                             description experimental_method  \\\n",
+       "gene                                                                           \n",
+       "b0995  TorCAD operon transcriptional regulatory prote...   X-ray diffraction   \n",
+       "b1130            Transcriptional regulatory protein phoP   X-ray diffraction   \n",
+       "\n",
+       "       resolution  chemicals                              date  \\\n",
+       "gene                                                             \n",
+       "b0995         1.8    SO4;GOL  2005-12-13;2009-02-24;2011-07-13   \n",
+       "b1130         1.9  PT;MG;BEF  2007-05-22;2007-08-14;2009-02-24   \n",
+       "\n",
+       "          taxonomy_name structure_file  \n",
+       "gene                                    \n",
+       "b0995  Escherichia coli       1zgz.cif  \n",
+       "b1130  Escherichia coli       2pl1.cif  "
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Download all mapped PDBs and gather the metadata\n",
+    "my_gempro.pdb_downloader_and_metadata()\n",
+    "my_gempro.df_pdb_metadata.head(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### `set_representative_structure`\n",
+    "Rank available structures, run QC/QA, download and clean the final structure.\n",
+    "\n",
+    "<p><div class=\"alert alert-info\">**Note:** PDBs don't need to be downloaded before running this step. This is useful to limit the number of structures downloaded from the PDB.</div></p>\n",
+    "\n",
+    "- `pdb_file_type`\n",
+    "    - Default: `'cif'` (set in GEMPRO project initialization, but can be changed here)\n",
+    "    - `'pdb'`, `'pdb.gz'`, `'mmcif'`, `'cif'`, `'cif.gz'`, `'xml.gz'`, `'mmtf'`, `'mmtf.gz'` - File type for files downloaded from the PDB.\n",
+    "- `engine`\n",
+    "    - Default: `'needle'`\n",
+    "    - Set to `'biopython'` if you want to utilize Biopython's built-in pairwise alignment algorithm.\n",
+    "- `always_use_homology`\n",
+    "    - Default: `False`\n",
+    "    - Set to `True` if you always want to use homology models.\n",
+    "- `seq_ident_cutoff`\n",
+    "    - Default: `0.5`\n",
+    "    - QC/QA: sets the minimum sequence identity a structure has to have to be selected as representative.\n",
+    "- `allow_missing_on_termini`\n",
+    "    - Default: `0.2`\n",
+    "    - QC/QA: Percentage of the total length of the reference sequence which will be ignored when checking for modifications (mutations, deletions, insertions, or unresolved residues). Example: if `0.1`, and reference sequence is 100 AA, then only residues 5 to 95 will be checked for modifications.\n",
+    "- `allow_mutants`\n",
+    "    - Default: `True`\n",
+    "    - QC/QA: set to `True` if point mutations within the structure should be allowed.\n",
+    "- `allow_deletions`\n",
+    "    - Default: `False`\n",
+    "    - QC/QA: set to `True` if deletions within the structure should be allowed.\n",
+    "- `allow_insertions`\n",
+    "    - Default: `False`\n",
+    "    - QC/QA: set to `True` if insertions within the structure should be allowed.\n",
+    "- `allow_unresolved`\n",
+    "    - Default: `True`\n",
+    "    - QC/QA: set to `True` if unresolved regions within the structure should be allowed.\n",
+    "- `force_rerun`\n",
+    "    - Default: `False`\n",
+    "    - QC/QA: set to `True` if pairwise alignments and structure cleaning should be rerun even if files exist.\n",
+    "- What's saved?\n",
+    "    - Representative protein structures\n",
+    "    ```python\n",
+    "    my_gempro.genes.get_by_id('b1187').protein.representative_structure\n",
+    "    ```\n",
+    "    - DataFrames\n",
+    "    ```python\n",
+    "    my_gempro.df_representative_structures\n",
+    "    ```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "WARNING:ssbio.core.protein:b0995: no structures meet quality checks\n",
+      "WARNING:ssbio.core.protein:b1130: no structures meet quality checks\n",
+      "WARNING:ssbio.core.protein:b1014: no structures meet quality checks\n",
+      "WARNING:ssbio.pipeline.gempro:5 gene(s) could not be mapped. Inspect the \"missing_repstruct\" attribute.\n",
+      "INFO:ssbio.pipeline.gempro:Created representative structures dataframe. See the \"df_representative_structures\" attribute.\n",
+      "INFO:ssbio.pipeline.gempro:5/10: genes with a representative structure\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>id</th>\n",
+       "      <th>is_experimental</th>\n",
+       "      <th>reference_seq</th>\n",
+       "      <th>reference_seq_top_coverage</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>gene</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>b1187</th>\n",
+       "      <td>1hw1-A</td>\n",
+       "      <td>True</td>\n",
+       "      <td>P0A8V6</td>\n",
+       "      <td>94.6</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b0761</th>\n",
+       "      <td>1b9m-A</td>\n",
+       "      <td>True</td>\n",
+       "      <td>P0A9G8</td>\n",
+       "      <td>96.2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1221</th>\n",
+       "      <td>1a04-A</td>\n",
+       "      <td>True</td>\n",
+       "      <td>P0AF28</td>\n",
+       "      <td>94.9</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b0889</th>\n",
+       "      <td>2gqq-A</td>\n",
+       "      <td>True</td>\n",
+       "      <td>P0ACJ0</td>\n",
+       "      <td>93.3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b1013</th>\n",
+       "      <td>4jyk-A</td>\n",
+       "      <td>True</td>\n",
+       "      <td>P0ACU2</td>\n",
+       "      <td>94.8</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           id is_experimental reference_seq  reference_seq_top_coverage\n",
+       "gene                                                                   \n",
+       "b1187  1hw1-A            True        P0A8V6                        94.6\n",
+       "b0761  1b9m-A            True        P0A9G8                        96.2\n",
+       "b1221  1a04-A            True        P0AF28                        94.9\n",
+       "b0889  2gqq-A            True        P0ACJ0                        93.3\n",
+       "b1013  4jyk-A            True        P0ACU2                        94.8"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Set representative structures\n",
+    "my_gempro.set_representative_structure()\n",
+    "my_gempro.df_representative_structures.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<StructProp 1hw1-A at 0x7fc02c6b9d30>"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "text/plain": [
+       "{'_structure_dir': '/tmp/genes_GP/genes/b1187/b1187_protein/structures',\n",
+       " 'chains': [<ChainProp A at 0x7fc02c8e8320>],\n",
+       " 'date': ['2001-01-24', '2001-06-06', '2003-04-01', '2009-02-24'],\n",
+       " 'description': 'FATTY ACID METABOLISM REGULATOR PROTEIN',\n",
+       " 'file_type': 'pdb',\n",
+       " 'id': '1hw1-A',\n",
+       " 'is_experimental': True,\n",
+       " 'mapped_chains': ['A'],\n",
+       " 'original_pdb_id': '1hw1',\n",
+       " 'reference_seq': <SeqProp P0A8V6 at 0x7fc02c8e8b38>,\n",
+       " 'reference_seq_top_coverage': 94.6,\n",
+       " 'representative_chain': <ChainProp A at 0x7fc02c8e8470>,\n",
+       " 'resolution': 1.5,\n",
+       " 'structure_file': '1hw1-A_clean.pdb',\n",
+       " 'taxonomy_name': 'Escherichia coli'}"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Looking at the information saved within a gene\n",
+    "my_gempro.genes.get_by_id('b1187').protein.representative_structure\n",
+    "my_gempro.genes.get_by_id('b1187').protein.representative_structure.get_dict()"
+   ]
+  }
+ ],
+ "metadata": {
+  "_draft": {
+   "nbviewer_url": "https://gist.github.com/342e44766d1dda637e975a4ef61dae19"
+  },
+  "anaconda-cloud": {},
+  "gist": {
+   "data": {
+    "description": "GEM-PRO pipeline example for a list of gene IDs",
+    "public": false
+   },
+   "id": "342e44766d1dda637e975a4ef61dae19"
+  },
+  "kernelspec": {
+   "display_name": "Python [default]",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
