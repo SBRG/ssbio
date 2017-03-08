@@ -7,9 +7,8 @@ class TestSeqProp(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.sp = SeqProp(ident='P0ABP8',
-                          sequence_file='test_files/sequences/P0ABP8.fasta',
-                          metadata_file='test_files/sequences/P0ABP8.txt')
+        self.sp = SeqProp(ident='P0ABP8', sequence_path='test_files/sequences/P0ABP8.fasta',
+                          metadata_path='test_files/sequences/P0ABP8.txt')
 
     def test_load_seq_file(self):
         self.assertEqual(self.sp.sequence_file, 'P0ABP8.fasta')
@@ -24,9 +23,8 @@ class TestSeqProp(unittest.TestCase):
         self.assertEqual(self.sp.seq_str, seq)
 
     def test_equal_to(self):
-        newsp = SeqProp(ident='P0ABP8',
-                          sequence_file='test_files/sequences/P0ABP8.fasta',
-                          metadata_file='test_files/sequences/P0ABP8.txt')
+        newsp = SeqProp(ident='P0ABP8', sequence_path='test_files/sequences/P0ABP8.fasta',
+                        metadata_path='test_files/sequences/P0ABP8.txt')
         self.assertTrue(self.sp.equal_to(newsp))
 
     def test_equal_to_fasta(self):

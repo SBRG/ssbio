@@ -5,6 +5,7 @@ import datetime
 import os.path as op
 import glob
 import pandas as pd
+import numpy as np
 import contextlib
 import logging
 import distutils.spawn
@@ -124,6 +125,27 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
+
+def clean_df(df, fill_nan=True, drop_empty_columns=True):
+    """Clean a pandas dataframe by:
+        1. Filling empty values with Nan
+        2. Dropping columns with all empty values
+
+    Args:
+        df: Pandas DataFrame
+        fill_nan (bool): If any empty values (strings, None, etc) should be replaced with NaN
+        drop_empty_columns (bool): If columns whose values are all empty should be dropped
+
+    Returns:
+        DataFrame: cleaned DataFrame
+
+    """
+    if fill_nan:
+        df = df.fillna(value=np.nan)
+    if drop_empty_columns:
+        df = df.dropna(axis=1, how='all')
+    return df
 
 
 def deprecated(func):
@@ -734,11 +756,7 @@ def make_dir(path):
     """
     if not op.exists(path):
         os.mkdir(path)
-        log.debug('{}: created folder'.format(path))
-    else:
-        log.debug('{}: folder already exists'.format(path))
-
-
+    return path
 
 
 def remap( x, oMin, oMax, nMin, nMax ):

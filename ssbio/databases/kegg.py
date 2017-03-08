@@ -13,33 +13,33 @@ bs_kegg = KEGG()
 
 
 class KEGGProp(SeqProp):
-    def __init__(self, kegg_id, sequence_file=None, metadata_file=None):
+    def __init__(self, kegg_id, sequence_path=None, metadata_path=None):
 
-        SeqProp.__init__(self, ident=kegg_id, sequence_file=sequence_file, metadata_file=metadata_file)
+        SeqProp.__init__(self, ident=kegg_id, sequence_path=sequence_path, metadata_path=metadata_path)
 
         if kegg_id:
             self.kegg = kegg_id
 
-        if metadata_file:
-            self.load_metadata_file(metadata_file)
+        if metadata_path:
+            self.load_metadata_file(metadata_path)
 
-    def load_metadata_file(self, metadata_file):
-        SeqProp.load_metadata_file(self, metadata_file)
-        self.update(parse_kegg_gene_metadata(metadata_file))
+    def load_metadata_file(self, metadata_path):
+        SeqProp.load_metadata_file(self, metadata_path)
+        self.update(parse_kegg_gene_metadata(metadata_path), overwrite=True)
 
     def download_seq_file(self, outdir, force_rerun=False):
         kegg_seq_file = download_kegg_aa_seq(gene_id=self.id,
-                                              outdir=outdir,
-                                              force_rerun=force_rerun)
+                                             outdir=outdir,
+                                             force_rerun=force_rerun)
         if kegg_seq_file:
-            self.load_seq_file(kegg_seq_file)
+            self.load_sequence_path(kegg_seq_file)
         else:
             log.warning('{}: no sequence file available'.format(self.id))
 
     def download_metadata_file(self, outdir, force_rerun=False):
         kegg_metadata_file = download_kegg_gene_metadata(gene_id=self.id,
-                                                          outdir=outdir,
-                                                          force_rerun=force_rerun)
+                                                         outdir=outdir,
+                                                         force_rerun=force_rerun)
         if kegg_metadata_file:
             self.load_metadata_file(kegg_metadata_file)
         else:
@@ -71,6 +71,10 @@ def download_kegg_gene_metadata(gene_id, outdir=None, force_rerun=False):
         with io.open(outfile, mode='wt', encoding='utf-8') as f:
             f.write(raw_text)
 
+        log.debug('{}: downloaded KEGG metadata file'.format(outfile))
+    else:
+        log.debug('{}: KEGG metadata file already exists'.format(outfile))
+
     return outfile
 
 
@@ -99,7 +103,12 @@ def parse_kegg_gene_metadata(infile):
 
     if 'DBLINKS' in kegg_parsed.keys():
         if 'UniProt' in kegg_parsed['DBLINKS']:
-            metadata['uniprot'] = str(kegg_parsed['DBLINKS']['UniProt']).split(' ')
+            unis = str(kegg_parsed['DBLINKS']['UniProt']).split(' ')
+            # TODO: losing other uniprot ids by doing this
+            if isinstance(unis, list):
+                metadata['uniprot'] = unis[0]
+            else:
+                metadata['uniprot'] = unis
         if 'NCBI-ProteinID' in kegg_parsed['DBLINKS']:
             metadata['refseq'] = str(kegg_parsed['DBLINKS']['NCBI-ProteinID'])
     if 'STRUCTURE' in kegg_parsed.keys():
@@ -135,6 +144,10 @@ def download_kegg_aa_seq(gene_id, outdir=None, force_rerun=False):
 
         with io.open(outfile, mode='wt', encoding='utf-8') as f:
            f.write(raw_text)
+
+        log.debug('{}: downloaded KEGG FASTA file'.format(outfile))
+    else:
+        log.debug('{}: KEGG FASTA file already exists'.format(outfile))
 
     return outfile
 

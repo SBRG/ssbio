@@ -5,11 +5,14 @@ import ssbio.utils
 import ssbio.sequence.utils
 import ssbio.sequence.utils.fasta
 import ssbio.sequence.properties.residues
+import ssbio.databases.pdb
 from cobra.core import DictList
 from copy import deepcopy
 from collections import defaultdict
 import logging
-
+from slugify import Slugify
+import requests
+custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
 
@@ -34,16 +37,17 @@ class SeqProp(Object):
 
     """
 
-    def __init__(self, ident, sequence_file=None, metadata_file=None, seq=None, description="<unknown description>",
+    def __init__(self, ident, sequence_path=None, metadata_path=None, seq=None, description="<unknown description>",
                  write_fasta_file=False, outname=None, outdir=None, force_rewrite=False):
         """Parses basic sequence properties like identifiers and sequence length.
-        Provides paths to sequence and metadata files.
+
+            Provides paths to sequence and metadata files.
 
         Args:
             ident (str): Identifier of the sequence
             description:
-            sequence_file: Path to FASTA file of the sequence
-            metadata_file: Path to metadata file of the sequence
+            sequence_path: Path to FASTA file of the sequence
+            metadata_path: Path to metadata file of the sequence
             seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
             write_fasta_file:
             outname:
@@ -60,13 +64,18 @@ class SeqProp(Object):
         self.pdbs = None
         self.seq_record = None
 
-        self.sequence_path = sequence_file
-        self.metadata_path = metadata_file
+        self._sequence_dir = None
+        self.sequence_file = None
+        if sequence_path:
+            self.load_sequence_path(sequence_path)
+
+        self._metadata_dir = None
+        self.metadata_file = None
+        if metadata_path:
+            self.load_metadata_file(metadata_path)
 
         if seq:
             self.seq_record = ssbio.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
-        if sequence_file:
-            self.load_seq_file(sequence_file)
 
         if write_fasta_file:
             self.write_fasta_file(outname=outname, outdir=outdir, force_rerun=force_rewrite)
@@ -74,6 +83,56 @@ class SeqProp(Object):
         # Store AlignIO objects of this sequence to others in alignments
         self.sequence_alignments = DictList()
         self.structure_alignments = DictList()
+
+    @property
+    def sequence_dir(self):
+        return self._sequence_dir
+
+    @sequence_dir.setter
+    def sequence_dir(self, path):
+        if not op.exists(path):
+            raise ValueError('{}: folder does not exist'.format(path))
+
+        self._sequence_dir = path
+
+    @property
+    def sequence_path(self):
+        if self.sequence_dir and self.sequence_file:
+            path = op.join(self.sequence_dir, self.sequence_file)
+            if not op.exists(path):
+                raise ValueError('{}: file does not exist'.format(path))
+            return path
+        else:
+            if not self.sequence_dir:
+                log.debug('{}: sequence directory not set'.format(self.id))
+            if not self.sequence_file:
+                log.debug('{}: sequence file not available'.format(self.id))
+            return None
+
+    @property
+    def metadata_dir(self):
+        return self._metadata_dir
+
+    @metadata_dir.setter
+    def metadata_dir(self, path):
+        if not op.exists(path):
+            raise ValueError('{}: folder does not exist'.format(path))
+
+        self._metadata_dir = path
+
+    @property
+    def metadata_path(self):
+        if self.metadata_dir and self.metadata_file:
+            path = op.join(self.metadata_dir, self.metadata_file)
+            if not op.exists(path):
+                raise ValueError('{}: file does not exist'.format(path))
+            return path
+        else:
+            if not self.metadata_dir:
+                log.debug('{}: metadata directory not set'.format(self.id))
+            if not self.metadata_file:
+                log.debug('{}: metadata file not available'.format(self.id))
+            return None
 
     @property
     def seq_str(self):
@@ -90,20 +149,6 @@ class SeqProp(Object):
         return len(self.seq_record.seq)
 
     @property
-    def sequence_file(self):
-        """Get the name of the sequence file"""
-        if not self.sequence_path:
-            return None
-        return op.basename(self.sequence_path)
-
-    @property
-    def metadata_file(self):
-        """Get the name of the metadata file"""
-        if not self.metadata_path:
-            return None
-        return op.basename(self.metadata_path)
-
-    @property
     def num_pdbs(self):
         """Report the number of PDB IDs mapped"""
         if not self.pdbs:
@@ -111,71 +156,26 @@ class SeqProp(Object):
         else:
             return len(self.pdbs)
 
-    def get_dict(self, only_keys=None, exclude_attributes=None, df_format=False):
-        """Get a copy of all attributes as a dictionary, including object properties
-
-        Args:
-            only_keys:
-            exclude_attributes:
-            df_format:
-
-        Returns:
-
-        """
-        my_dict = Object.get_dict(self, only_keys=only_keys, exclude_attributes=exclude_attributes, df_format=df_format)
-
-        additional_keys = ['seq_str', 'seq_len', 'sequence_file', 'metadata_file', 'num_pdbs']
-        for k in additional_keys:
-            my_dict[k] = deepcopy(getattr(self, k))
-
-        # Choose attributes to return, return everything in the object if a list is not specified
-        if not only_keys:
-            keys = list(my_dict.keys())
-        else:
-            keys = ssbio.utils.force_list(only_keys)
-
-        # Remove keys you don't want returned
-        if exclude_attributes:
-            exclude_attributes = ssbio.utils.force_list(exclude_attributes)
-            for x in exclude_attributes:
-                if x in keys:
-                    keys.remove(x)
-
-        # Copy attributes into a new dictionary
-        for k, v in my_dict.items():
-            if k in keys:
-                if df_format:
-                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v, float) and not isinstance(v, bool):
-                        try:
-                            my_dict[k] = ssbio.utils.force_string(v)
-                        except TypeError:
-                            log.warning('{}: excluding attribute from dict, cannot transform into string'.format(k))
-                    else:
-                        my_dict[k] = v
-                else:
-                    my_dict[k] = v
-            else:
-                log.debug('{}: not copying attribute'.format(k))
-        return my_dict
-
-    def load_seq_file(self, sequence_file):
+    def load_sequence_path(self, sequence_path):
         """Load a sequence file and provide pointers to its location
 
         Args:
-            sequence_file: Path to sequence file
+            sequence_path: Path to sequence file
 
         """
-        self.sequence_path = sequence_file
-        self.seq_record = SeqIO.read(open(sequence_file), 'fasta')
+        self.sequence_dir = op.dirname(sequence_path)
+        self.sequence_file = op.basename(sequence_path)
+        self.seq_record = SeqIO.read(open(sequence_path), 'fasta')
 
-    def load_metadata_file(self, metadata_file):
+    def load_metadata_file(self, metadata_path):
         """Load a metadata file and provide pointers to its location
 
         Args:
-            metadata_file: Path to metadata file
+            metadata_path: Path to metadata file
 
         """
-        self.metadata_path = metadata_file
+        self.metadata_dir = op.dirname(metadata_path)
+        self.metadata_file = op.basename(metadata_path)
 
     def write_fasta_file(self, outname=None, outdir=None, force_rerun=False):
         """Write a FASTA file for the sequence
@@ -188,10 +188,11 @@ class SeqProp(Object):
         """
         if not outname:
             outname = self.id
-        self.sequence_path = ssbio.sequence.utils.fasta.write_fasta_file(self.seq_record,
-                                                                         outname=outname,
-                                                                         outdir=outdir,
-                                                                         force_rerun=force_rerun)
+        sequence_path = ssbio.sequence.utils.fasta.write_fasta_file(self.seq_record,
+                                                                    outname=outname,
+                                                                    outdir=outdir,
+                                                                    force_rerun=force_rerun)
+        self.load_sequence_path(sequence_path)
 
     def equal_to(self, seq_prop):
         """Test if the sequence is equal to another SeqProp object's sequence
@@ -203,6 +204,15 @@ class SeqProp(Object):
             bool: If the sequences are the same
 
         """
+        if not self.seq_str:
+            return False
+
+        if not seq_prop:
+            return False
+
+        if not seq_prop.seq_str:
+            return False
+
         return self.seq_str == seq_prop.seq_str
 
     def equal_to_fasta(self, seq_file):
@@ -237,7 +247,11 @@ class SeqProp(Object):
 
         Stores statistics in the seq_record.annotations attribute.
         """
-        pepstats = ssbio.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
+        try:
+            pepstats = ssbio.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
+        except KeyError as e:
+            log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
+            return
         self.seq_record.annotations.update(pepstats)
 
     def get_emboss_pepstats(self):
@@ -249,6 +263,33 @@ class SeqProp(Object):
         outfile = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
         pepstats = ssbio.sequence.properties.residues.emboss_pepstats_parser(outfile)
         self.seq_record.annotations.update(pepstats)
+
+    def blast_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
+                  outdir=None, force_rerun=False):
+        """BLAST this sequence to the PDB"""
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        if not self.seq_str:
+            log.error('{}: no sequence loaded'.format(self.id))
+            return None
+
+        try:
+            blast_results = ssbio.databases.pdb.blast_pdb(self.seq_str,
+                                                          outfile='{}_blast_pdb.xml'.format(custom_slugify(self.id)),
+                                                          outdir=outdir,
+                                                          force_rerun=force_rerun,
+                                                          evalue=evalue,
+                                                          seq_ident_cutoff=seq_ident_cutoff,
+                                                          link=display_link)
+        except requests.ConnectionError as e:
+            print(e)
+            log.error('{}: BLAST request timed out'.format(seq_prop.id))
+            return None
+
+        return blast_results
 
     def summary(self, as_df):
         """Summarize this sequence.
@@ -293,10 +334,62 @@ class SeqProp(Object):
 
             if mutations:
                 # Turn this list of mutations into a tuple so it can be a dictionary key
-                mutations = tuple(mutations)
+                mutations = tuple(tuple(x) for x in mutations)
                 fingerprint_counter[mutations].append(other_sequence)
 
                 for m in mutations:
                     single_counter[m].append(other_sequence)
 
         return dict(single_counter), dict(fingerprint_counter)
+
+    def get_dict(self, only_keys=None, exclude_attributes=None, df_format=False):
+        """Get a copy of all attributes as a dictionary, including object properties
+
+        Args:
+            only_keys:
+            exclude_attributes:
+            df_format:
+
+        Returns:
+
+        """
+        my_dict = Object.get_dict(self, only_keys=only_keys, exclude_attributes=exclude_attributes, df_format=df_format)
+
+        additional_keys = ['seq_str', 'seq_len', 'sequence_file', 'metadata_file', 'num_pdbs']
+        for k in additional_keys:
+            my_dict[k] = deepcopy(getattr(self, k))
+
+        # Choose attributes to return, return everything in the object if a list is not specified
+        if not only_keys:
+            keys = list(my_dict.keys())
+        else:
+            keys = ssbio.utils.force_list(only_keys)
+
+        # Remove keys you don't want returned
+        if exclude_attributes:
+            exclude_attributes = ssbio.utils.force_list(exclude_attributes)
+            for x in exclude_attributes:
+                if x in keys:
+                    keys.remove(x)
+
+        # Copy attributes into a new dictionary
+        for k, v in my_dict.items():
+            if k in keys:
+                if df_format:
+                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v, float) and not isinstance(v, bool):
+                        try:
+                            my_dict[k] = ssbio.utils.force_string(v)
+                        except TypeError:
+                            log.warning('{}: excluding attribute from dict, cannot transform into string'.format(k))
+                    else:
+                        my_dict[k] = v
+                else:
+                    my_dict[k] = v
+        return my_dict
+
+    def __json_decode__(self, **attrs):
+        for k, v in attrs.items():
+            if k == 'sequence_alignments' or k == 'structure_alignments':
+                setattr(self, k, DictList(v))
+            else:
+                setattr(self, k, v)

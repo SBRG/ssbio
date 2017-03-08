@@ -1,4 +1,4 @@
-import os
+import shutil
 import pandas as pd
 from cobra.core import DictList
 from collections import OrderedDict
@@ -10,15 +10,19 @@ from ssbio.databases.kegg import KEGGProp
 from ssbio.databases.uniprot import UniProtProp
 from ssbio.structure import StructProp
 from ssbio.databases.pdb import PDBProp
+import ssbio.databases.pdb
 from ssbio.structure.homology.itasser.itasserprop import ITASSERProp
 import ssbio.sequence.utils.fasta
 import ssbio.sequence.utils.alignment
 import ssbio.utils
 import requests
+import os.path as op
 from six.moves.urllib.error import URLError
 from Bio.Seq import Seq
 import ssbio.structure.properties.quality
+from slugify import Slugify
 import logging
+custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
 
@@ -30,13 +34,17 @@ class Protein(Object):
     _representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
                                             'resolution','taxonomy_name']
 
-    def __init__(self, ident, description=None):
-        """Initialize a Protein object, which contains:
-            sequences, structures, and 1 representative sequence and structure.
+    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='cif'):
+        """
+        Initialize a Protein object.
+
+        A Protein contains sequences, structures, and a single representative sequence and structure.
 
         Args:
             ident (str): Unique identifier for this protein
             description (str): Optional description for this protein
+            root_dir:
+            pdb_file_type:
         """
         Object.__init__(self, id=ident, description=description)
         self.sequences = DictList()
@@ -44,9 +52,62 @@ class Protein(Object):
         self.representative_sequence = None
         self.representative_structure = None
 
-        # TODO: define this instead of doing op.join(gempro.sequence_dir, gene.id) for a lot of things
-        # self.sequence_dir = seq_dir
-        # self.structure_dir = struct_dir
+        self.root_dir = root_dir
+        self.pdb_file_type = pdb_file_type
+
+    @property
+    def root_dir(self):
+        """Directory where Protein project folder is located"""
+        return self._root_dir
+
+    @root_dir.setter
+    def root_dir(self, path):
+        self._root_dir = path
+
+        if path:
+            if not op.exists(path):
+                raise ValueError('{}: folder does not exist'.format(path))
+
+            for d in [self.protein_dir, self.sequence_dir, self.structure_dir]:
+                ssbio.utils.make_dir(d)
+
+            for seq in self.sequences:
+                seq.sequence_dir = self.sequence_dir
+                seq.metadata_dir = self.sequence_dir
+
+            for struct in self.structures:
+                struct.root_dir = self.structure_dir
+
+    @property
+    def protein_dir(self):
+        """Protein folder"""
+        if self.root_dir:
+            # Add a _protein suffix to the folder if it has the same name as its root folder
+            folder_name = self.id
+            if folder_name == op.basename(self.root_dir):
+                folder_name = self.id + '_protein'
+            return op.join(self.root_dir, folder_name)
+        else:
+            log.warning('Root directory not set')
+            return None
+
+    @property
+    def sequence_dir(self):
+        """Directory where sequence related files are stored"""
+        if self.root_dir:
+            return op.join(self.protein_dir, 'sequences')
+        else:
+            log.debug('Root directory not set')
+            return None
+
+    @property
+    def structure_dir(self):
+        """Directory where structure related files are stored"""
+        if self.root_dir:
+            return op.join(self.protein_dir, 'structures')
+        else:
+            log.debug('Root directory not set')
+            return None
 
     @property
     def num_structures(self):
@@ -72,13 +133,13 @@ class Protein(Object):
         return DictList(x for x in self.structures if not x.is_experimental)
 
     def filter_sequences(self, seq_type):
-        """Get a DictList of only specified types in the sequences attribute.
+        """Return a DictList of only specified types in the sequences attribute.
 
         Args:
-            seq_type: Object type
+            seq_type (SeqProp): Object type
 
         Returns:
-            DictList: of Object type mappings only
+            DictList: A filtered DictList of specified object type only
 
         """
         return DictList(x for x in self.sequences if isinstance(x, seq_type))
@@ -102,6 +163,12 @@ class Protein(Object):
             KEGGProp: object contained in the sequences attribute
 
         """
+        if download:
+            if not outdir:
+                outdir = self.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+
         if kegg_organism_code:
             kegg_id = kegg_organism_code + ':' + kegg_id
 
@@ -130,7 +197,17 @@ class Protein(Object):
                     if not self.representative_sequence.uniprot:
                         if kegg_prop.equal_to(self.representative_sequence):
                             # Update the representative sequence field with KEGG metadata
-                            self.representative_sequence.update(kegg_prop.get_dict())
+                            self.representative_sequence.update(kegg_prop.get_dict(), only_keys=['sequence_path',
+                                                                                                 'metadata_path',
+                                                                                                 'kegg',
+                                                                                                 'description',
+                                                                                                 'taxonomy',
+                                                                                                 'id',
+                                                                                                 'pdbs',
+                                                                                                 'uniprot',
+                                                                                                 'seq_record',
+                                                                                                 'gene_name',
+                                                                                                 'refseq'])
                         else:
                             # TODO: add option to use manual or kegg sequence if things do not match
                             log.warning('{}: representative sequence does not match mapped KEGG sequence.'.format(self.id))
@@ -158,6 +235,12 @@ class Protein(Object):
         Returns:
 
         """
+        if download:
+            if not outdir:
+                outdir = self.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+
         # If we have already loaded the KEGG ID
         if self.sequences.has_id(uniprot_id):
             # Remove it if we want to force rerun things
@@ -180,7 +263,17 @@ class Protein(Object):
                 # Test equality
                 if uniprot_prop.equal_to(self.representative_sequence):
                     # Update the representative sequence field with UniProt metadata
-                    self.representative_sequence.update(uniprot_prop.get_dict())
+                    self.representative_sequence.update(uniprot_prop.get_dict(), only_keys=['sequence_path',
+                                                                                            'metadata_path',
+                                                                                            'kegg',
+                                                                                            'description',
+                                                                                            'taxonomy',
+                                                                                            'id',
+                                                                                            'pdbs',
+                                                                                            'uniprot',
+                                                                                            'seq_record',
+                                                                                            'gene_name',
+                                                                                            'refseq'])
                 else:
                     # TODO: add option to use manual or uniprot sequence if things do not match
                     log.warning('{}: representative sequence does not match mapped UniProt sequence'.format(self.id))
@@ -191,17 +284,27 @@ class Protein(Object):
 
         return self.sequences.get_by_id(uniprot_id)
 
-    def load_manual_sequence_file(self, ident, seq_file, set_as_representative=False):
+    def load_manual_sequence_file(self, ident, seq_file, copy_file=False, outdir=None, set_as_representative=False):
         """Load a manual sequence given as a FASTA file and optionally set it as the representative sequence.
             Also store it in the sequences attribute.
 
         Args:
             ident:
             seq_file:
+            copy_file:
+            outdir:
             set_as_representative:
 
         """
-        manual_sequence = SeqProp(ident=ident, sequence_file=seq_file)
+        if copy_file:
+            if not outdir:
+                outdir = self.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+            shutil.copy(seq_file, outdir)
+            seq_file = op.join(outdir, seq_file)
+
+        manual_sequence = SeqProp(ident=ident, sequence_path=seq_file)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -227,6 +330,12 @@ class Protein(Object):
         Returns:
 
         """
+        if write_fasta_file:
+            if not outdir:
+                outdir = self.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+
         if isinstance(seq, str) or isinstance(seq, Seq):
             if not ident:
                 raise ValueError('ID must be specified if sequence is a string or Seq object')
@@ -241,9 +350,8 @@ class Protein(Object):
         if not outname:
             outname = ident
 
-        manual_sequence = SeqProp(ident=ident, seq=seq,
-                                  write_fasta_file=write_fasta_file, outname=outname, outdir=outdir,
-                                  force_rewrite=force_rewrite)
+        manual_sequence = SeqProp(ident=ident, seq=seq, write_fasta_file=write_fasta_file,
+                                  outname=outname, outdir=outdir, force_rewrite=force_rewrite)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -254,10 +362,12 @@ class Protein(Object):
     def _representative_sequence_setter(self, seq_prop):
         """Make a copy of a SeqProp object and store it as the representative. Only keep certain attributes"""
 
-        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_file=seq_prop.sequence_path, seq=seq_prop.seq_record)
+        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=seq_prop.sequence_path,
+                                               seq=seq_prop.seq_record)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self._representative_sequence_attributes)
         if self.representative_sequence.seq_record:
             self.representative_sequence.seq_record.id = self.representative_sequence.id
+        log.debug('{}: set as representative sequence'.format(seq_prop.id))
 
     def set_representative_sequence(self):
         """Consolidate sequences that were loaded and set a single representative sequence."""
@@ -317,7 +427,8 @@ class Protein(Object):
 
         return self.representative_sequence
 
-    def align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None, engine='needle', parse=True, force_rerun=False):
+    def pairwise_align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None,
+                                                   engine='needle', parse=True, force_rerun=False):
         """Align all sequences in the sequences attribute to the representative sequence.
 
         Stores the alignments the representative_sequence.sequence_alignments DictList
@@ -333,6 +444,11 @@ class Protein(Object):
         Returns:
 
         """
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
         for seq in self.sequences:
             aln_id = '{}_{}'.format(self.id, seq.id)
             outfile = '{}.needle'.format(aln_id)
@@ -376,6 +492,148 @@ class Protein(Object):
 
             self.representative_sequence.sequence_alignments.append(aln)
 
+    def blast_representative_sequence_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
+                                             outdir=None, force_rerun=False):
+        """BLAST repseq to PDB and return the list of new structures added, also saves df_pdb_blast"""
+        # Check if a representative sequence was set
+        if not self.representative_sequence:
+            log.warning('{}: no representative sequence set, cannot BLAST'.format(self.id))
+            return None
+
+        # Also need to check if a sequence has been stored
+        if not self.representative_sequence.seq_str:
+            log.warning('{}: no representative sequence loaded, cannot BLAST'.format(self.id))
+            return None
+
+        # BLAST the sequence to the PDB
+        blast_results = self.representative_sequence.blast_pdb(seq_ident_cutoff=seq_ident_cutoff,
+                                                               evalue=evalue,
+                                                               display_link=display_link,
+                                                               outdir=outdir,
+                                                               force_rerun=force_rerun)
+
+        new_pdbs = []
+        # Add BLAST results to the list of structures
+        if blast_results:
+            # Filter for new BLASTed PDBs
+            pdbs = [x['hit_pdb'].lower() for x in blast_results]
+            new_pdbs = [y for y in pdbs if not self.structures.has_id(y)]
+            if new_pdbs:
+                log.debug('{}: adding {} PDBs from BLAST results'.format(self.id, len(new_pdbs)))
+            blast_results = [z for z in blast_results if z['hit_pdb'].lower() in new_pdbs]
+
+            for blast_result in blast_results:
+                pdb = blast_result['hit_pdb'].lower()
+                chains = blast_result['hit_pdb_chains']
+
+                for chain in chains:
+                    # load_pdb will append this protein to the list of structures
+                    new_pdb = self.load_pdb(pdb_id=pdb, mapped_chains=chain)
+                    new_pdb.add_chain_ids(chain)
+                    new_chain = new_pdb.chains.get_by_id(chain)
+
+                    # Store BLAST results within the chain
+                    new_chain.blast_results = blast_result
+
+        return new_pdbs
+
+    @property
+    def df_pdb_blast(self):
+        """Get a dataframe of PDB BLAST results"""
+
+        blast_results_pre_df = []
+
+        for p in self.get_experimental_structures():
+            for c in p.chains:
+                if hasattr(c, 'blast_results'):
+                    # Summary dataframe
+                    infodict = p.get_dict_with_chain(chain=c.id)['blast_results']
+                    infodict['pdb_id'] = p.id
+                    infodict['pdb_chain_id'] = c.id
+                    blast_results_pre_df.append(infodict)
+
+        cols = ['pdb_id', 'pdb_chain_id', 'hit_score', 'hit_evalue', 'hit_percent_similar',
+                'hit_percent_ident', 'hit_percent_gaps', 'hit_num_ident', 'hit_num_similar', 'hit_num_gaps']
+        df = pd.DataFrame.from_records(blast_results_pre_df, columns=cols).set_index('pdb_id')
+        return ssbio.utils.clean_df(df)
+
+    def map_uniprot_to_pdb(self, seq_ident_cutoff=0.0, outdir=None, force_rerun=False):
+        """"""
+        if not self.representative_sequence:
+            log.error('{}: no representative sequence set, cannot use best structures API'.format(self.id))
+            return None
+
+        # Check if a UniProt ID is attached to the representative sequence
+        uniprot_id = self.representative_sequence.uniprot
+        if not uniprot_id:
+            log.error('{}: no representative UniProt ID set, cannot use best structures API'.format(self.id))
+            return None
+
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        best_structures = ssbio.databases.pdb.best_structures(uniprot_id,
+                                                              outname='{}_best_structures'.format(custom_slugify(uniprot_id)),
+                                                              outdir=outdir,
+                                                              seq_ident_cutoff=seq_ident_cutoff,
+                                                              force_rerun=force_rerun)
+
+        new_pdbs = []
+        if best_structures:
+            rank = 1
+            for best_structure in best_structures:
+                currpdb = str(best_structure['pdb_id'].lower())
+                new_pdbs.append(currpdb)
+                currchain = str(best_structure['chain_id'])
+
+                # load_pdb will append this protein to the list
+                new_pdb = self.load_pdb(pdb_id=currpdb, mapped_chains=currchain)
+
+                # Also add this chain to the chains attribute so we can save the
+                # info we get from best_structures
+                new_pdb.add_chain_ids(currchain)
+
+                pdb_specific_keys = ['experimental_method', 'resolution']
+                chain_specific_keys = ['coverage', 'start', 'end', 'unp_start', 'unp_end']
+
+                new_pdb.update(best_structure, only_keys=pdb_specific_keys)
+                new_chain = new_pdb.chains.get_by_id(currchain)
+                new_chain.update(best_structure, only_keys=chain_specific_keys)
+                new_chain.update({'rank': rank})
+
+                rank += 1
+
+            log.debug('{}, {}: {} PDB/chain pairs mapped'.format(self.id, uniprot_id, len(best_structures)))
+        else:
+            log.debug('{}, {}: no PDB/chain pairs mapped'.format(self.id, uniprot_id))
+
+        return new_pdbs
+
+    @property
+    def df_pdb_ranking(self):
+        """Get a dataframe of UniProt -> best structure in PDB results"""
+
+        best_structures_pre_df = []
+
+        chain_specific_keys = ['coverage', 'start', 'end', 'unp_start', 'unp_end', 'rank']
+
+        for p in self.get_experimental_structures():
+            for c in p.chains:
+                if hasattr(c, 'rank'):
+                    # Summary dataframe
+                    infodict = p.get_dict_with_chain(chain=c.id, df_format=True, chain_keys=chain_specific_keys)
+                    infodict['pdb_id'] = p.id
+                    infodict['pdb_chain_id'] = c.id
+                    infodict['uniprot'] = self.representative_sequence.uniprot
+                    best_structures_pre_df.append(infodict)
+
+        cols = ['uniprot', 'pdb_id', 'pdb_chain_id', 'experimental_method', 'resolution', 'coverage',
+                'taxonomy_name', 'start', 'end', 'unp_start', 'unp_end', 'rank']
+        df = pd.DataFrame.from_records(best_structures_pre_df, columns=cols).set_index(['pdb_id', 'pdb_chain_id'])
+        return ssbio.utils.clean_df(df)
+
     def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, set_as_representative=False, force_rerun=False):
         """Load a PDB ID into the structures attribute.
 
@@ -404,10 +662,10 @@ class Protein(Object):
                 if mapped_chains:
                     pdb.add_mapped_chain_ids(mapped_chains)
                 if pdb_file:
-                    pdb.load_structure_file(pdb_file, file_type)
+                    pdb.load_structure_path(pdb_file, file_type)
 
         if not self.structures.has_id(pdb_id):
-            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_file=pdb_file, file_type=file_type, reference_seq=self.representative_sequence)
+            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_path=pdb_file, file_type=file_type, reference_seq=self.representative_sequence)
             if mapped_chains:
                 pdb.add_mapped_chain_ids(mapped_chains)
             self.structures.append(pdb)
@@ -417,12 +675,16 @@ class Protein(Object):
 
         return self.structures.get_by_id(pdb_id)
 
-    def load_itasser_folder(self, ident, itasser_folder, set_as_representative=False, create_dfs=False, force_rerun=False):
+    def load_itasser_folder(self, ident, itasser_folder, organize=False, outdir=None, organize_name=None,
+                            set_as_representative=False, create_dfs=False, force_rerun=False):
         """Load the results folder from I-TASSER, copy structure files over, and create summary dataframes.
 
         Args:
             ident: I-TASSER ID
             itasser_folder: Path to results folder
+            organize (bool): If select files from modeling should be copied to the Protein directory
+            outdir (str): Path to directory where files will be copied and organized to
+            organize_name (str): Basename of files to rename results to. If not provided, will use id attribute.
             set_as_representative: If this structure should be set as the representative structure
             create_dfs: If summary dataframes should be created
             parse: If the structure's 3D coordinates and chains should be parsed
@@ -432,13 +694,18 @@ class Protein(Object):
             ITASSERProp: StructProp object stored in the structures list.
 
         """
+        if organize:
+            if not outdir:
+                outdir = self.structure_dir
+                if not outdir:
+                    raise ValueError('Directory to copy results to must be specified')
 
         if self.structures.has_id(ident):
             if force_rerun:
                 existing = self.structures.get_by_id(ident)
                 self.structures.remove(existing)
             else:
-                log.warning('{}: already present in list of structures'.format(ident))
+                log.debug('{}: already present in list of structures'.format(ident))
                 itasser = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
@@ -448,9 +715,25 @@ class Protein(Object):
         if set_as_representative:
             self._representative_structure_setter(itasser)
 
+        if organize:
+            if itasser.model_file:
+                # The name of the actual pdb file will be $GENEID_model1.pdb
+                if not organize_name:
+                    new_itasser_name = self.id + '_model1'
+                else:
+                    new_itasser_name = organize_name
+
+                # Additional results will be stored in a subdirectory
+                dest_itasser_extra_dir = op.join(outdir, '{}_itasser'.format(new_itasser_name))
+                ssbio.utils.make_dir(dest_itasser_extra_dir)
+
+                # Copy the model1.pdb and also create summary dataframes
+                itasser.copy_results(copy_to_dir=outdir, rename_model_to=new_itasser_name, force_rerun=force_rerun)
+                itasser.save_dataframes(outdir=dest_itasser_extra_dir)
+
         return self.structures.get_by_id(ident)
 
-    def load_generic_structure(self, ident, structure_file=None, set_as_representative=False, force_rerun=False):
+    def load_generic_structure(self, ident, structure_file=None, is_experimental=False, set_as_representative=False, force_rerun=False):
         if self.structures.has_id(ident):
             if force_rerun:
                 existing = self.structures.get_by_id(ident)
@@ -460,14 +743,93 @@ class Protein(Object):
                 model = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            model = StructProp(ident=ident, structure_file=structure_file, reference_seq=self.representative_sequence,
-                               is_experimental=False)
+            model = StructProp(ident=ident, structure_path=structure_file, reference_seq=self.representative_sequence,
+                               is_experimental=is_experimental)
             self.structures.append(model)
 
         if set_as_representative:
             self._representative_structure_setter(model)
 
         return self.structures.get_by_id(ident)
+
+    @property
+    def df_homology_models(self):
+        """Get a dataframe of homology models"""
+
+        itasser_pre_df = []
+
+        df_cols = ['id', 'model_file', 'model_date', 'difficulty',
+                   'top_template_pdb', 'top_template_chain', 'c_score',
+                   'tm_score', 'tm_score_err', 'rmsd', 'rmsd_err',
+                   'top_bsite_site_num', 'top_bsite_c_score', 'top_bsite_cluster_size', 'top_bsite_algorithm',
+                   'top_bsite_pdb_template_id', 'top_bsite_pdb_template_chain', 'top_bsite_pdb_ligand',
+                   'top_bsite_binding_location_coords', 'top_bsite_c_score_method', 'top_bsite_binding_residues',
+                   'top_bsite_ligand_cluster_counts',
+                   'top_ec_pdb_template_id', 'top_ec_pdb_template_chain', 'top_ec_tm_score', 'top_ec_rmsd',
+                   'top_ec_seq_ident', 'top_ec_seq_coverage', 'top_ec_c_score', 'top_ec_ec_number',
+                   'top_ec_binding_residues',
+                   'top_go_mf_go_id', 'top_go_mf_go_term', 'top_go_mf_c_score', 'top_go_bp_go_id', 'top_go_bp_go_term',
+                   'top_go_bp_c_score', 'top_go_cc_go_id', 'top_go_cc_go_term', 'top_go_cc_c_score']
+
+        for p in self.get_homology_models():
+            # Summary dataframe
+            new_homology_dict = p.get_dict(df_format=True, only_keys=df_cols)
+            itasser_pre_df.append(new_homology_dict)
+
+        df = pd.DataFrame.from_records(itasser_pre_df, columns=df_cols).set_index('id')
+        return ssbio.utils.clean_df(df)
+
+    def pdb_downloader_and_metadata(self, outdir=None, pdb_file_type=None, force_rerun=False):
+        """Download experimental structures"""
+        if not outdir:
+            outdir = self.structure_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        if not pdb_file_type:
+            pdb_file_type = self.pdb_file_type
+
+        # Check if we have any PDBs
+        if self.num_structures_experimental == 0:
+            log.debug('{}: no structures available - nothing will be downloaded'.format(self.id))
+            return
+
+        downloaded_pdb_ids = []
+        # Download the PDBs
+        for s in self.get_experimental_structures():
+            log.debug('{}: downloading structure file from the PDB...'.format(s.id))
+            s.download_structure_file(outdir=outdir, file_type=pdb_file_type, force_rerun=force_rerun)
+            # Download the mmCIF header file to get additional information
+            if 'cif' not in pdb_file_type:
+                s.download_cif_header_file(outdir=outdir, force_rerun=force_rerun)
+            downloaded_pdb_ids.append(s.id)
+
+        return downloaded_pdb_ids
+
+    @property
+    def df_pdb_metadata(self):
+        """Get a dataframe of PDB metadata (PDBs have to be downloaded first)"""
+        if self.num_structures == 0:
+            log.error('No experimental PDB structures have been mapped to protein')
+            return pd.DataFrame()
+
+        pdb_pre_df = []
+
+        for p in self.get_experimental_structures():
+            if not p.structure_file:
+                log.error('{}: PDB file has not been downloaded, run "pdb_downloader_and_metadata" \
+                    to download all structures'.format(p.id))
+                continue
+
+            infodict = p.get_dict(df_format=True)
+            infodict['pdb_id'] = p.id
+            pdb_pre_df.append(infodict)
+
+        cols = ['pdb_id', 'pdb_title', 'description', 'experimental_method', 'mapped_chains',
+                'resolution', 'chemicals', 'date', 'taxonomy_name',
+                'structure_file']
+        df = pd.DataFrame.from_records(pdb_pre_df, columns=cols).set_index('pdb_id')
+        return ssbio.utils.clean_df(df)
 
     def _representative_structure_setter(self, struct_prop, keep_chain, new_id=None, clean=True,
                                          out_suffix='_clean', outdir=None):
@@ -488,7 +850,9 @@ class Protein(Object):
 
         """
         if not outdir:
-            outdir = os.getcwd()
+            outdir = self.structure_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
 
         if not new_id:
             new_id = struct_prop.id
@@ -500,7 +864,7 @@ class Protein(Object):
             final_pdb = struct_prop.structure_path
 
         self.representative_structure = StructProp(ident=new_id, chains=keep_chain, mapped_chains=keep_chain,
-                                                   structure_file=final_pdb, file_type='pdb',
+                                                   structure_path=final_pdb, file_type='pdb',
                                                    reference_seq=self.representative_sequence,
                                                    representative_chain=keep_chain)
 
@@ -524,7 +888,8 @@ class Protein(Object):
         # Also need to parse the clean structure and save its sequence..
         self.representative_structure.parse_structure()
 
-    def set_representative_structure(self, seq_outdir, struct_outdir, pdb_file_type, engine='needle', always_use_homology=False,
+    def set_representative_structure(self, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
+                                     engine='needle', always_use_homology=False,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True,
@@ -569,6 +934,19 @@ class Protein(Object):
             log.debug('{}: representative structure already set'.format(self.id))
             return self.representative_structure
 
+        if not pdb_file_type:
+            pdb_file_type = self.pdb_file_type
+
+        if not seq_outdir:
+            seq_outdir = self.sequence_dir
+            if not seq_outdir:
+                raise ValueError('Sequence output directory must be specified')
+
+        if not struct_outdir:
+            struct_outdir = self.structure_dir
+            if not struct_outdir:
+                raise ValueError('Structure output directory must be specified')
+
         has_homology = False
         has_pdb = False
         use_homology = False
@@ -608,7 +986,7 @@ class Protein(Object):
                     # Download the mmCIF header file to get additional information
                     if 'cif' not in pdb_file_type:
                         pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
-                except requests.exceptions.HTTPError or URLError:
+                except (requests.exceptions.HTTPError, URLError):
                     log.error('{}: structure file could not be downloaded'.format(pdb))
                     continue
                 pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
@@ -618,12 +996,17 @@ class Protein(Object):
                                                           allow_insertions=allow_insertions, allow_unresolved=allow_unresolved)
 
                 if best_chain:
-                    self._representative_structure_setter(struct_prop=pdb,
-                                                          new_id='{}-{}'.format(pdb.id, best_chain.id),
-                                                          clean=True,
-                                                          out_suffix='-{}_clean'.format(best_chain.id),
-                                                          keep_chain=best_chain.id,
-                                                          outdir=struct_outdir)
+                    try:
+                        self._representative_structure_setter(struct_prop=pdb,
+                                                              new_id='{}-{}'.format(pdb.id, best_chain.id),
+                                                              clean=True,
+                                                              out_suffix='-{}_clean'.format(best_chain.id),
+                                                              keep_chain=best_chain.id,
+                                                              outdir=struct_outdir)
+                    except:
+                        # TODO: inspect causes of these errors - most common is Biopython PDBParser error
+                        logging.exception("Unknown error with PDB ID {}".format(pdb.id))
+                        continue
                     log.debug('{}-{}: set as representative structure'.format(pdb.id, best_chain.id))
                     return self.representative_structure
             else:
@@ -655,12 +1038,17 @@ class Protein(Object):
                         best_chain_suffix = 'X'
                     else:
                         best_chain_suffix = best_chain.id
-                    self._representative_structure_setter(struct_prop=homology,
-                                                          new_id='{}-{}'.format(homology.id, best_chain_suffix),
-                                                          clean=True,
-                                                          out_suffix='-{}_clean'.format(best_chain_suffix),
-                                                          keep_chain=best_chain.id,
-                                                          outdir=struct_outdir)
+                    try:
+                        self._representative_structure_setter(struct_prop=homology,
+                                                              new_id='{}-{}'.format(homology.id, best_chain_suffix),
+                                                              clean=True,
+                                                              out_suffix='-{}_clean'.format(best_chain_suffix),
+                                                              keep_chain=best_chain.id,
+                                                              outdir=struct_outdir)
+                    except:
+                        # TODO: inspect causes of these errors - most common is Biopython PDBParser error
+                        logging.exception("Unknown error with homology model {}".format(homology.id))
+                        continue
                     log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain_suffix))
                     return self.representative_structure
 
@@ -698,7 +1086,7 @@ class Protein(Object):
             single_map_to_structure[new_key] = v
 
         if not grouped:
-            view = self.representative_structure.view_structure_and_highlight_residues(single_map_to_structure,
+            view = self.representative_structure.view_structure_and_highlight_residues_scaled(single_map_to_structure,
                                                                                        color=color, unique_colors=unique_colors,
                                                                                        structure_opacity=structure_opacity,
                                                                                        opacity_range=opacity_range,
@@ -715,7 +1103,7 @@ class Protein(Object):
                 new_key = tuple(y[1] for y in resnums_to_structure.values())
                 fingerprint_map_to_structure[new_key] = v
 
-            view = self.representative_structure.view_structure_and_highlight_residues(fingerprint_map_to_structure,
+            view = self.representative_structure.view_structure_and_highlight_residues_scaled(fingerprint_map_to_structure,
                                                                                        color=color, unique_colors=unique_colors,
                                                                                        opacity_range=opacity_range,
                                                                                        scale_range=scale_range,
@@ -737,10 +1125,10 @@ class Protein(Object):
         else:
             repstruct = self.representative_structure
             repchain = self.representative_structure.representative_chain
-        single, fingerprint = g.protein.representative_sequence.sequence_mutation_summary()
+        single, fingerprint = self.representative_sequence.sequence_mutation_summary()
         numstrains = len(self.sequences) - 1
 
-        d['Gene ID'] = g.id
+        d['Gene ID'] = self.id
         d['Number of sequences'] = len(self.sequences)
         d['Number of structures (total)'] = self.num_structures
         d['Number of structures (experimental)'] = self.num_structures_experimental
@@ -757,7 +1145,8 @@ class Protein(Object):
         d['Structure is experimental'] = repstruct.is_experimental
         # d['Structure origin'] = repstruct.taxonomy_name))
         # d['Structure description'] = repstruct.description))
-        d['Structure coverage of sequence'] = str(repstruct.reference_seq_top_coverage) + '%'
+        if repstruct.reference_seq_top_coverage:
+            d['Structure coverage of sequence'] = str(repstruct.reference_seq_top_coverage) + '%'
 
         # d['------ALIGNMENTS SUMMARY------')
         #     d['Number of sequence alignments'] = len(repseq.sequence_alignments)))
@@ -781,3 +1170,10 @@ class Protein(Object):
         d['Mutation groups that show up in more than 10% of strains'] = ';'.join(allfingerprints)
 
         return d
+
+    def __json_decode__(self, **attrs):
+        for k, v in attrs.items():
+            if k == 'sequences' or k == 'structures':
+                setattr(self, k, DictList(v))
+            else:
+                setattr(self, k, v)

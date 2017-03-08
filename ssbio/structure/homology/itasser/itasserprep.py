@@ -44,8 +44,11 @@ class ITASSERPrep():
         self.id = ident
         self.seq_str = seq_str
 
+        if not self.seq_str:
+            raise ValueError('{}: no sequence input'.format(self.id))
+
         if len(self.seq_str) < 10 or len(self.seq_str) > 1500:
-            log.warning('{}: I-TASSER modeling will not run as sequence length is not in the range [10, 1500]'.format(self.id))
+            log.warning('{}: I-TASSER modeling will not run as sequence length ({}) is not in the range [10, 1500]'.format(self.id, len(self.seq_str)))
 
         self.root_dir = root_dir
         if not op.exists(root_dir):

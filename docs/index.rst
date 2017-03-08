@@ -60,7 +60,7 @@ Contents
 
 .. toctree::
    :glob:
-   :maxdepth: 4
+   :maxdepth: 3
 
    getting_started
    structure

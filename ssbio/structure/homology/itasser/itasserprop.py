@@ -46,7 +46,7 @@ class ITASSERProp(StructProp):
             self.model_date = None
             self.model_file = None
         else:
-            self.load_structure_file(old_model_path, 'pdb')
+            self.load_structure_path(old_model_path, 'pdb')
             # Save model creation date
             self.model_date = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(old_model_path)))
             self.model_file = op.basename(self.structure_path)
@@ -139,7 +139,7 @@ class ITASSERProp(StructProp):
                                                   out_dir=copy_to_dir,
                                                   force_rerun=force_rerun)
             # Update the structure_path to be the copied, clean file
-            self.load_structure_file(new_model_path, 'pdb')
+            self.load_structure_path(new_model_path, 'pdb')
             self.model_file = op.basename(new_model_path)
 
             # Other modeling results - store in a new folder

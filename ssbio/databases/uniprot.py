@@ -28,9 +28,8 @@ class UniProtProp(SeqProp):
     """Class to parse through UniProt metadata all at once
     """
 
-    def __init__(self, uniprot_acc, sequence_file=None, metadata_file=None):
-
-        SeqProp.__init__(self, ident=uniprot_acc, sequence_file=sequence_file, metadata_file=metadata_file)
+    def __init__(self, uniprot_acc, sequence_path=None, metadata_path=None):
+        SeqProp.__init__(self, ident=uniprot_acc, sequence_path=sequence_path, metadata_path=metadata_path)
         self.ec_number = None
         self.entry_version = None
         self.pfam = None
@@ -42,30 +41,30 @@ class UniProtProp(SeqProp):
                 raise ValueError("Invalid UniProt ID!")
             self.uniprot = uniprot_acc
 
-        if metadata_file:
-            self.load_metadata_file(metadata_file)
+        if metadata_path:
+            self.load_metadata_file(metadata_path)
 
     def load_metadata_file(self, metadata_file):
         SeqProp.load_metadata_file(self, metadata_file)
-        self.update(parse_uniprot_txt_file(metadata_file))
+        self.update(parse_uniprot_txt_file(metadata_file), overwrite=True,
+                    only_keys=['description', 'kegg', 'refseq', 'ec_number', 'entry_version', 'gene_name',
+                               'pfam', 'pdbs', 'reviewed', 'seq_version'])
 
     def download_seq_file(self, outdir, force_rerun=False):
-        """Download and load the UniProt sequence file
-        """
+        """Download and load the UniProt sequence file"""
         uniprot_seq_file = download_uniprot_file(uniprot_id=self.id,
                                                  filetype='fasta',
                                                  outdir=outdir,
                                                  force_rerun=force_rerun)
 
-        self.load_seq_file(uniprot_seq_file)
+        self.load_sequence_path(uniprot_seq_file)
 
     def download_metadata_file(self, outdir, force_rerun=False):
-        """Download and load the UniProt sequence file
-        """
+        """Download and load the UniProt sequence file"""
         uniprot_metadata_file = download_uniprot_file(uniprot_id=self.id,
-                                                 filetype='txt',
-                                                 outdir=outdir,
-                                                 force_rerun=force_rerun)
+                                                      filetype='txt',
+                                                      outdir=outdir,
+                                                      force_rerun=force_rerun)
 
         self.load_metadata_file(uniprot_metadata_file)
 

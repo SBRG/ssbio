@@ -16,12 +16,3 @@ class TestATLAS(unittest.TestCase):
 
         # Prepare your ATLAS analysis
         self.atlas = ATLAS(atlas_name='atlas_test', base_gempro=my_gempro)
-
-    def test_copy_base_gempro(self):
-        self.atlas.copy_base_gempro('copied')
-        # atlas_strains should now have a GEMPRO with the id 'copied'
-        self.assertTrue(self.atlas.atlas_strains.has_id('copied'))
-        # The GEMPRO should also append 'copied' to the gene IDs
-        self.atlas.atlas_strains.get_by_id('copied').genes[0].id.endswith('_copied')
-        self.atlas.atlas_strains.get_by_id('copied').genes[0].protein.id.endswith('_copied')
-

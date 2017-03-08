@@ -9,9 +9,8 @@ class TestKEGG(unittest.TestCase):
     """
 
     def test_kegg_prop(self):
-        kg = KEGGProp(kegg_id='mtu:Rv0417',
-                      sequence_file='test_files/sequences/mtu-Rv0417.faa',
-                      metadata_file='test_files/sequences/mtu-Rv0417.kegg')
+        kg = KEGGProp(ident='mtu:Rv0417', sequence_path='test_files/sequences/mtu-Rv0417.faa',
+                      metadata_path='test_files/sequences/mtu-Rv0417.kegg')
 
         kg_keys = ['bigg','gene_name','id','kegg','metadata_file','metadata_path','pdbs','refseq',
                    'sequence_file','seq_len','sequence_path','taxonomy','uniprot']

@@ -496,8 +496,8 @@ class ATLAS(Object):
                 alignment_dir = op.join(self.atlas_seq_genes_dir, base_gene.id)
                 if not op.exists(alignment_dir):
                     os.mkdir(alignment_dir)
-                base_gene.protein.align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend,
-                                                                    outdir=alignment_dir, parse=True)
+                base_gene.protein.pairwise_align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend,
+                                                                             outdir=alignment_dir, parse=True)
 
     def align_orthologous_genes_multiple(self):
         """For each gene in the base strain, run a multiple alignment to all orthologous strain genes"""
@@ -717,7 +717,7 @@ class ATLAS(Object):
                     structure_type_suffix = 'HOM'
 
                 # Structure properties - calculated
-                mapped = g.protein.representative_structure.map_repseq_resnums_to_repchain_index(resnum)
+                mapped = g.protein.representative_structure._map_repseq_resnums_to_repchain_index(resnum)
                 if resnum in mapped:
                     repchain_index = mapped[resnum]
 

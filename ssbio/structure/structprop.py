@@ -8,7 +8,8 @@ import ssbio.structure.properties
 import ssbio.utils
 import logging
 import numpy as np
-import nglview as nv
+if ssbio.utils.is_ipynb():
+    import nglview as nv
 import seaborn as sns
 import ssbio.structure.utils.cleanpdb
 log = logging.getLogger(__name__)
@@ -17,14 +18,14 @@ log = logging.getLogger(__name__)
 class StructProp(Object):
     """Class for protein structural properties"""
 
-    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_file=None, file_type=None,
+    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
                  reference_seq=None, representative_chain=None, is_experimental=False):
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
 
         self.reference_seq = reference_seq
-        self.reference_seq_top_coverage = 0
+        self.reference_seq_top_coverage = None
 
         # chains is a DictList of ChainProp objects
         self.chains = DictList()
@@ -38,25 +39,46 @@ class StructProp(Object):
         self.mapped_chains = ssbio.utils.force_list(mapped_chains)
 
         self.file_type = file_type
-        self.structure_path = structure_file
-        if structure_file:
-            self.load_structure_file(structure_file, file_type)
+        self._structure_dir = None
+        self.structure_file = None
+        if structure_path:
+            self.load_structure_path(structure_path, file_type)
 
     @property
-    def structure_file(self):
-        if not self.structure_path:
-            return None
-        return op.basename(self.structure_path)
+    def structure_dir(self):
+        return self._structure_dir
 
-    def load_structure_file(self, structure_file, file_type):
+    @structure_dir.setter
+    def structure_dir(self, path):
+        if not op.exists(path):
+            raise ValueError('{}: folder does not exist'.format(path))
+
+        self._structure_dir = path
+
+    @property
+    def structure_path(self):
+        if self.structure_dir and self.structure_file:
+            path = op.join(self.structure_dir, self.structure_file)
+            if not op.exists(path):
+                raise ValueError('{}: file does not exist'.format(path))
+            return path
+        else:
+            if not self.structure_dir:
+                log.debug('{}: structure directory not set'.format(self.id))
+            if not self.structure_file:
+                log.debug('{}: structure file not available'.format(self.id))
+            return None
+
+    def load_structure_path(self, structure_path, file_type):
         """Load a structure file and provide pointers to its location
 
         Args:
-            structure_file: Path to structure file
+            structure_path: Path to structure file
             file_type: Type of structure file
         """
         self.file_type = file_type
-        self.structure_path = structure_file
+        self.structure_dir = op.dirname(structure_path)
+        self.structure_file = op.basename(structure_path)
 
     def parse_structure(self):
         """Read the 3D coordinates of a structure file and return it as a Biopython Structure object
@@ -454,7 +476,7 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
-    def map_repseq_resnums_to_repchain_index(self, resnums):
+    def _map_repseq_resnums_to_repchain_index(self, resnums):
         """Map a residue number in the reference_seq to an index in the representative_chain
 
         Use this to get the indices of the repchain to get structural properties at a specific residue number.
@@ -481,8 +503,8 @@ class StructProp(Object):
 
         return to_repchain_index
 
-    def map_repseq_resnums_to_structure_resnums(self, resnums):
-        """Map a residue number in the reference_seq to the actual structure file's residue number
+    def map_repseq_resnums_to_structure_resnums(self, resnums, chain=None):
+        """Map a residue number in the reference_seq to the actual structure file's residue number (for the representative chain
 
         Args:
             resnums (int, list): Residue numbers in the representative sequence
@@ -491,10 +513,15 @@ class StructProp(Object):
             dict: Mapping of resnums to structure residue IDs
 
         """
+        if chain:
+            chain = self.chains.get_by_id(chain)
+        else:
+            chain = self.representative_chain
+
         resnums = ssbio.utils.force_list(resnums)
 
-        mapping_to_repchain_index = self.map_repseq_resnums_to_repchain_index(resnums)
-        repchain_structure_mapping = self.representative_chain.seq_record.letter_annotations['structure_resnums']
+        mapping_to_repchain_index = self._map_repseq_resnums_to_repchain_index(resnums)
+        repchain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
 
         to_structure_resnums = {}
         for k, v in mapping_to_repchain_index.items():
@@ -662,3 +689,10 @@ class StructProp(Object):
                                         color=color, opacity=opacity_dict[x], scale=scale_dict[x])
 
         return view
+
+    def __json_decode__(self, **attrs):
+        for k, v in attrs.items():
+            if k == 'chains':
+                setattr(self, k, DictList(v))
+            else:
+                setattr(self, k, v)

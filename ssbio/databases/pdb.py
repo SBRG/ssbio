@@ -25,10 +25,10 @@ class PDBProp(StructProp):
     """Class to parse through PDB properties
     """
 
-    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_file=None, file_type=None,
+    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
                  reference_seq=None, representative_chain=None):
         StructProp.__init__(self, ident, description=description, chains=chains, mapped_chains=mapped_chains,
-                            structure_file=structure_file, file_type=file_type, reference_seq=reference_seq,
+                            structure_path=structure_path, file_type=file_type, reference_seq=reference_seq,
                             representative_chain=representative_chain, is_experimental=True)
         self.experimental_method = None
         self.resolution = None
@@ -40,7 +40,7 @@ class PDBProp(StructProp):
                                       outdir=outdir,
                                       force_rerun=force_rerun)
         log.debug('{}: downloaded {} file'.format(self.id, file_type))
-        self.load_structure_file(pdb_file, file_type)
+        self.load_structure_path(pdb_file, file_type)
 
         if 'cif' in file_type:
             self.update(parse_mmcif_header(pdb_file))
@@ -453,7 +453,7 @@ def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0.0, l
 
         hitdef = hit.find('Hit_def')
         if hitdef is not None:
-            info['hit_pdb'] = hitdef.text.split('|')[0].split(':')[0]
+            info['hit_pdb'] = hitdef.text.split('|')[0].split(':')[0].lower()
             info['hit_pdb_chains'] = hitdef.text.split('|')[0].split(':')[2].split(',')
 
         # One PDB can align to different parts of the sequence
@@ -498,22 +498,8 @@ def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0.0, l
     return hit_list
 
 
-def blast_pdb_df(seq, xml_outfile='', xml_outdir='', force_rerun=False, evalue=0.001, seq_ident_cutoff=0, link=False):
-    """Make a dataframe of BLAST results
-
-    Args: see blast_pdb
-
-    Returns:
-        Tuple of (original results, parsed results in Pandas DataFrame)
-
-    """
-    blast_results = blast_pdb(seq=seq,
-                              outfile=xml_outfile,
-                              outdir=xml_outdir,
-                              force_rerun=force_rerun,
-                              evalue=evalue,
-                              seq_ident_cutoff=seq_ident_cutoff,
-                              link=link)
+def blast_pdb_df(blast_results):
+    """Make a dataframe of BLAST results"""
     cols = ['hit_pdb', 'hit_pdb_chains', 'hit_evalue', 'hit_score', 'hit_num_ident', 'hit_percent_ident',
             'hit_num_similar', 'hit_percent_similar', 'hit_num_gaps', 'hit_percent_gaps']
     return pd.DataFrame.from_records(blast_results, columns=cols)

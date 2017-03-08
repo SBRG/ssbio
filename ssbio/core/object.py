@@ -1,13 +1,12 @@
 import os
-import os.path as op
 import ssbio.utils
 import pickle
 from copy import deepcopy
 import pandas as pd
 import ssbio.utils
+import ssbio.core.io
 import logging
 log = logging.getLogger(__name__)
-
 
 class Object(object):
     """Cobra core object with additional methods to update and get attributes"""
@@ -127,12 +126,12 @@ class Object(object):
                             df_dict[k] = ssbio.utils.force_string(deepcopy(v))
                         except TypeError:
                             log.warning('{}: excluding attribute from dict, cannot transform into string'.format(k))
+                    elif not v and not isinstance(v, int) and not isinstance(v, float):
+                        df_dict[k] = None
                     else:
                         df_dict[k] = deepcopy(v)
                 else:
                     df_dict[k] = deepcopy(v)
-            # else:
-            #     log.debug('{}: not copying attribute'.format(k))
         return df_dict
 
     def save_dataframes(self, outdir, prefix='df_'):
@@ -146,16 +145,21 @@ class Object(object):
         # Get list of attributes that start with "df_"
         dfs = list(filter(lambda x: x.startswith(prefix), dir(self)))
 
+        counter = 0
         for df in dfs:
             outpath = ssbio.utils.outfile_maker(inname=df, outext='.csv', outdir=outdir)
             my_df = getattr(self, df)
             if not isinstance(my_df, pd.DataFrame):
                 raise TypeError('{}: object is not a Pandas DataFrame'.format(df))
 
-            my_df.to_csv(outpath)
-            log.debug('{}: saved dataframe'.format(outpath))
+            if my_df.empty:
+                log.debug('{}: empty dataframe, not saving'.format(df))
+            else:
+                my_df.to_csv(outpath)
+                log.debug('{}: saved dataframe'.format(outpath))
+                counter += 1
 
-        log.debug('Saved {} dataframes at {}'.format(len(dfs), outdir))
+        log.debug('Saved {} dataframes at {}'.format(counter, outdir))
 
     def save_pickle(self, outname, protocol=2, outext='.pckl', outdir=None):
         """Save the object as a pickle file
@@ -179,3 +183,14 @@ class Object(object):
             pickle.dump(self, f, protocol=protocol)
 
         return outfile
+
+    def __json_encode__(self):
+        to_return = {}
+        # Don't save properties, methods in the JSON
+        for x in [a for a in dir(self) if not a.startswith('__') and not isinstance(getattr(type(self), a, None), property) and not callable(getattr(self,a))]:
+            to_return.update({x: getattr(self, x)})
+        return to_return
+
+    def save_json(self, outfile, compression=True):
+        """Save the object as a JSON file using json_tricks"""
+        ssbio.core.io.save_json(self, outfile, compression=compression)
