@@ -12,3 +12,5 @@ awesome-slugify
 ipywidgets
 lxml
 json_tricks
+seaborn
+matplotlib

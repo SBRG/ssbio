@@ -25,23 +25,27 @@ Installation
 Clone this repository to any location and then install it.
 
 **Cloning**
+
 .. code-block:: bash
 
     git clone https://github.com/SBRG/ssbio.git
 
 **Installation**
+
 .. code-block:: bash
 
     cd ssbio
-    python setup.py develop
+    python setup.py develop --user
 
 **Updating**
+
 .. code-block:: bash
 
     cd ssbio
     git pull
 
 **Uninstalling**
+
 .. code-block:: bash
 
     pip uninstall ssbio
@@ -50,18 +54,15 @@ Clone this repository to any location and then install it.
 Dependencies
 ------------
 
+See: [Software Installations](https://github.com/SBRG/ssbio/wiki/Software-Installations) for additional programs to install.
 
-Features
-============
--
--
 
 Citation
 ============
 
-Currently, use of this package can be cited by our 2016 paper in BMC Systems Biology[#]_, which details the GEM-PRO pipeline. The manuscript for the ``ssbio`` package itself is in preparation at this moment.
+Currently, use of this package can be cited by our 2016 paper in BMC Systems Biology [1]_, which details the GEM-PRO pipeline. The manuscript for the ``ssbio`` package itself is in preparation at this moment.
 
-.. [#] Brunk, E.*, Mih, N.*, Monk, J., Zhang, Z., O’Brien, E. J., Bliven, S. E., Bourne, P. E., Palsson, B. O. (2016). Systems biology of the structural proteome. BMC Systems Biology, 10(1), 26. http://doi.org/10.1186/s12918-016-0271-6. *Authors contributed equally.
+.. [1] Brunk, E.*, Mih, N.*, Monk, J., Zhang, Z., O’Brien, E. J., Bliven, S. E., Bourne, P. E., Palsson, B. O. (2016). Systems biology of the structural proteome. BMC Systems Biology, 10(1), 26. http://doi.org/10.1186/s12918-016-0271-6. *Authors contributed equally.
 
 
 Contents

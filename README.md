@@ -28,7 +28,7 @@ $ git clone https://github.com/SBRG/ssbio.git
 **Installation**
 ```bash
 $ cd ssbio
-$ python setup.py develop
+$ python setup.py develop --user
 ```
 
 **Updating**

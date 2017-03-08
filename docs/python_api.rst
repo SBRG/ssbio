@@ -1,6 +1,14 @@
 Python API
 ==========
 
-.. automethod:: ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping
-
 .. automodule:: ssbio.pipeline.gempro
+    :members:
+
+.. automodule:: ssbio.core.protein
+    :members:
+
+.. automodule:: ssbio.sequence.seqprop
+    :members:
+
+.. automodule:: ssbio.structure.structprop
+    :members:
