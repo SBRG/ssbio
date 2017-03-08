@@ -43,7 +43,8 @@ class Mock(object):
 
 MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
                 'glpk', 'gurobipy', 'gurobipy.GRB', 'cplex', 'pp', 'libsbml',
-                'cplex.exceptions', 'tabulate', 'argparse', 'numpy', 'pandas', 'nglview', 'matplotlib', 'numpy.linalg', 'biopython','Bio', 'Bio.PDB', 'Bio.PDB.PDBExceptions']
+                'cplex.exceptions', 'tabulate', 'argparse', 'numpy', 'pandas', 'nglview', 'matplotlib', 'numpy.linalg', 'biopython', 'bioservices', 'Bio', 'Bio.PDB', 'Bio.PDB.PDBExceptions', 'xmltodict', 'mmtf-python', 'ipywidgets', 'qgrid',
+                'lxml', 'json_tricks', 'tqdm']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 

@@ -34,7 +34,7 @@ setup(
                           'seaborn',
                           #'nglview',
                           'ipywidgets',
-                          'qgrid',
+                          # 'qgrid',
                           'lxml',
                           'json_tricks']
 )
