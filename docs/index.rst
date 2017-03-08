@@ -27,28 +27,14 @@ Installation
 Dependencies
 ------------
 
+
 Features
 ============
-- Easily map sequence and structure information to a COBRA model
-- Set a best
 -
-
-.. tip:: this is a tip!
-
-Here's a link to :func:`ssbio.pipeline.gempro.GEMPRO.manual_seq_mapping`
-test2
+-
 
 Citation
 ============
-``this is ccode``
-
-.. code-block:: python
-
-    dis is python code
-
-`namedlink`_
-
-.. _namedlink: https://github.com/mgaitan/sublime-rst-completion
 
 Currently, use of this package can be cited by our 2016 paper in BMC Systems Biology[#]_, which details the GEM-PRO pipeline. The manuscript for the ``ssbio`` package itself is in preparation at this moment.
 
