@@ -22,6 +22,29 @@ Example questions you can answer with this package:
 
 Installation
 ============
+Clone this repository to any location and then install it.
+
+**Cloning**
+.. code-block:: bash
+
+    git clone https://github.com/SBRG/ssbio.git
+
+**Installation**
+.. code-block:: bash
+
+    cd ssbio
+    python setup.py develop
+
+**Updating**
+.. code-block:: bash
+
+    cd ssbio
+    git pull
+
+**Uninstalling**
+.. code-block:: bash
+
+    pip uninstall ssbio
 
 
 Dependencies
