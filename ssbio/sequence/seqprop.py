@@ -323,7 +323,7 @@ class SeqProp(Object):
         """
         if len(self.sequence_alignments) == 0:
             log.error('{}: no sequence alignments'.format(self.id))
-            return
+            return {}, {}
 
         fingerprint_counter = defaultdict(list)
         single_counter = defaultdict(list)

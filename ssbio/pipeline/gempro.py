@@ -665,7 +665,7 @@ class GEMPRO(Object):
 
         log.info('{}/{}: number of genes with SCRATCH predictions loaded'.format(counter, len(self.genes)))
 
-    def get_tmhmm_predictions(self, tmhmm_results, custom_gene_mapping):
+    def get_tmhmm_predictions(self, tmhmm_results, custom_gene_mapping=None):
         """Parse TMHMM results and store in the representative sequences
 
         Args:
@@ -692,7 +692,7 @@ class GEMPRO(Object):
             else:
                 log.error("{}: missing TMHMM results".format(g.id))
 
-        log.info('[}/{}: number of genes with TMHMM predictions loaded'.format(counter, len(self.genes)))
+        log.info('{}/{}: number of genes with TMHMM predictions loaded'.format(counter, len(self.genes)))
 
     ### END SEQUENCE RELATED METHODS ###
     ####################################################################################################################
@@ -1104,6 +1104,9 @@ class GEMPRO(Object):
                     g.protein.representative_structure.get_residue_depths(outdir=g.protein.structure_dir)
                 except TypeError:
                     log.error('{}: MSMS SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
+                except:
+                    log.error(
+                        '{}: unknown MSMS error with {}'.format(g.id, g.protein.representative_structure))
 
     def get_disulfide_bridges(self):
         """Run Biopython's disulfide bridge finder and store calculations.

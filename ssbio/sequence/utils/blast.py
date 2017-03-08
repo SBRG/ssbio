@@ -179,19 +179,24 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, ou
     return outfile
 
 
-def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=80, bitscore_cutoff=0, outname='', outdir=''):
-    """Create the orthology matrix of the reference genes to the BBHs in all other_genomes.
+def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None,
+                            filter_condition='OR', outname='', outdir=''):
+    """Create an orthology matrix using best bidirectional BLAST hits (BBH) outputs.
 
     Args:
-        r_name (str): name of the reference genome
-        genome_to_bbh_files (dict): mapping of genome names to the BBH files
-        pid_cutoff (int): Min percent identity between BLAST hits to filter for in the range (0,100)
-        bitscore_cutoff: Min bitscore cutoff between BLAST hits to filter for
+        r_name (str): Name of the reference genome
+        genome_to_bbh_files (dict): Mapping of genome names to the BBH csv output from the
+            :func:`~ssbio.sequence.utils.blast.calculate_bbh` method
+        pid_cutoff (float): Minimum percent identity between BLAST hits to filter for in the range [0, 100]
+        bitscore_cutoff (float): Minimum bitscore allowed between BLAST hits
+        evalue_cutoff (float): Maximum E-value allowed between BLAST hits
+        filter_condition (str): 'OR' or 'AND', how to combine cutoff filters. 'OR' gives more results since it
+            is less stringent, as you will be filtering for hits with (>80% PID or >30 bitscore or <0.0001 evalue).
         outname: Name of output file of orthology matrix
         outdir: Path to output directory
 
     Returns:
-        Path to orthologous genes matrix.
+        str: Path to orthologous genes matrix.
 
     """
     if outname:
@@ -199,23 +204,38 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=80, bitscore
     else:
         outfile = op.join(outdir, '{}_orthology.csv'.format(r_name))
 
-    out = pd.DataFrame()
+    if not pid_cutoff and not bitscore_cutoff and not evalue_cutoff:
+        log.warning('No cutoffs supplied, insignificant hits may be reported')
 
+    if filter_condition not in ['OR', 'AND']:
+        raise ValueError('Invalid filter condition supplied, must be either "OR" or "AND"')
+
+    if not pid_cutoff:
+        pid_cutoff = 0
+    if not bitscore_cutoff:
+        bitscore_cutoff = 0
+    if not evalue_cutoff:
+        evalue_cutoff = float('Inf')
+
+    out = pd.DataFrame()
     for g_name, bbh_path in genome_to_bbh_files.items():
 
-        data = pd.read_csv(bbh_path, index_col=0)
+        df_bbh = pd.read_csv(bbh_path, index_col=0)
+        bidirectional = df_bbh[df_bbh.BBH == '<=>']
 
-        # TODO: adjust to use something else besides 80% PID or just allow what cutoff to use
-        data = data[(data.PID > pid_cutoff) & (data.BBH == '<=>')]
+        if filter_condition == 'OR':
+            data = bidirectional[(bidirectional.PID > pid_cutoff) | (bidirectional.eVal < evalue_cutoff) | (bidirectional.bitScore > bitscore_cutoff)]
+        elif filter_condition == 'AND':
+            data = bidirectional[(bidirectional.PID > pid_cutoff) & (bidirectional.eVal < evalue_cutoff) & (bidirectional.bitScore > bitscore_cutoff)]
+
         data.index = data.gene
-
         data2 = data[['subject']]
-        if len(out) == 0:
+        if out.empty:
             out = data2
-            out = out.rename(columns={'subject': g_name})  # ,'PID':g_name+'_PID'})
+            out = out.rename(columns={'subject': g_name})
         else:
             out = pd.merge(out, data2, left_index=True, right_index=True, how='outer')
-            out = out.rename(columns={'subject': g_name})  # ,'PID':g_name+'_PID'})
+            out = out.rename(columns={'subject': g_name})
 
     out.to_csv(outfile)
     log.debug('{} orthologous genes saved at {}'.format(r_name, outfile))

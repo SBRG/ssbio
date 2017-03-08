@@ -35,21 +35,6 @@ except ImportError:
 
 date = utils.Date()
 custom_slugify = Slugify(safe_chars='-_.')
-
-def __new__(cls, *args, **kwargs):
-    """Casting Gene objects into GenePro objects
-        This replaces any new instance of Genes with GenePros. Even when you load a model later
-        using COBRApy methods. Use with caution!
-    See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
-
-    Returns:
-        GenePro: a Gene object with a .protein attribute
-    """
-    if cls == Gene:
-        return object.__new__(GenePro)
-    return object.__new__(cls)
-Gene.__new__ = staticmethod(__new__)
-
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 log = logging.getLogger(__name__)
 
@@ -256,7 +241,7 @@ class ATLAS(Object):
         self.load_strain_ids_and_genomes(strains_to_fasta_file)
         log.info('Created {} new strain GEM-PROs, accessible at "atlas_strains"'.format(len(strains_to_fasta_file)))
 
-    def get_orthology_matrix(self, pid_cutoff=80, bitscore_cutoff=0,
+    def get_orthology_matrix(self, pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None, filter_condition='OR',
                              remove_strains_with_no_orthology=True,
                              remove_strains_with_no_differences=False,
                              remove_genes_not_in_base_model=True):
@@ -265,8 +250,11 @@ class ATLAS(Object):
         Runs run_makeblastdb, run_bidirectional_blast, and calculate_bbh for protein sequences.
 
         Args:
-            pid_cutoff (int): Min percent identity between BLAST hits to filter for in the range (0,100)
-            bitscore_cutoff: Min bitscore cutoff between BLAST hits to filter for
+            pid_cutoff (float): Minimum percent identity between BLAST hits to filter for in the range [0, 100]
+            bitscore_cutoff (float): Minimum bitscore allowed between BLAST hits
+            evalue_cutoff (float): Maximum E-value allowed between BLAST hits
+            filter_condition (str): 'OR' or 'AND', how to combine cutoff filters. 'OR' gives more results since it
+            is less stringent, as you will be filtering for hits with (>80% PID or >30 bitscore or <0.0001 evalue).
             remove_strains_with_no_orthology (bool): Remove strains which have no orthologous genes found
             remove_strains_with_no_differences (bool): Remove strains which have all the same genes as the base model.
                 Default is False because since orthology is found using a PID cutoff, all genes may be present but
@@ -306,6 +294,8 @@ class ATLAS(Object):
                                                                           genome_to_bbh_files=bbh_files,
                                                                           pid_cutoff=pid_cutoff,
                                                                           bitscore_cutoff=bitscore_cutoff,
+                                                                          evalue_cutoff=evalue_cutoff,
+                                                                          filter_condition=filter_condition,
                                                                           outname='{}_{}_orthology.csv'.format(self.base_strain_gempro.id, 'prot'),
                                                                           outdir=self.atlas_data_dir)
 
@@ -443,12 +433,6 @@ class ATLAS(Object):
             # Load sequences into the base and strain models
             self._load_strain_sequences(strain_model.id)
 
-            # TODO: SAVE FUNCTION FOR GEM-PROS!
-            # Save the strain specific file
-            # outfile = op.join(self.atlas_model_dir, '{}.json'.format(strain_model.id))
-            # cobra.io.save_json_model(strain_model, outfile)
-            # log.debug('{}: saved model at {}'.format(strain_model.id, outfile))
-
         log.info('Created {} new strain-specific models and loaded in sequences'.format(len(self.atlas_strains)))
 
     def _load_strain_sequences(self, strain_id):
@@ -511,7 +495,7 @@ class ATLAS(Object):
 
         """
         all_info = []
-        for g in self.base_strain_gempro.genes:
+        for g in self.base_strain_gempro.genes_with_a_representative_sequence:
             info = {}
             info['Gene_ID'] = g.id
 
@@ -522,7 +506,7 @@ class ATLAS(Object):
 
             # SeqProp
             rseq = p.representative_sequence
-            if rseq:
+            if rseq.seq_record:
                 info['RepSeq_sequence_length'] = rseq.seq_len
                 info['RepSeq_num_sequence_alignments'] = len(rseq.sequence_alignments)
                 info['RepSeq_num_structure_alignments'] = len(rseq.structure_alignments)
@@ -542,7 +526,9 @@ class ATLAS(Object):
                 all_percent_similarity = []
                 for aln in rseq.sequence_alignments:
                     # Gather the strain speicific stuff
-                    info[aln.annotations['b_seq'].split('_')[1]] = aln.annotations['percent_identity']
+                    if '{}_'.format(p.id) not in aln.annotations['b_seq']:
+                        continue
+                    info[aln.annotations['b_seq'].split('{}_'.format(p.id))[1]] = aln.annotations['percent_identity']
 
                     # Gather the percent identities/similarities
                     all_percent_identity.append(aln.annotations['percent_identity'])
@@ -609,19 +595,20 @@ class ATLAS(Object):
             # StructProp
             rstruct = p.representative_structure
             if rstruct:
-                info['RepStruct_ID'] = rstruct.id
-                info['RepStruct_is_experimental'] = rstruct.is_experimental
-                info['RepStruct_description'] = rstruct.description
-                info['RepStruct_repseq_coverage'] = rstruct.reference_seq_top_coverage
+                if rstruct.structure_file:
+                    info['RepStruct_ID'] = rstruct.id
+                    info['RepStruct_is_experimental'] = rstruct.is_experimental
+                    info['RepStruct_description'] = rstruct.description
+                    info['RepStruct_repseq_coverage'] = rstruct.reference_seq_top_coverage
 
-                # ChainProp
-                rchain = rstruct.representative_chain
-                info['RepChain_ID'] = rchain.id
+                    # ChainProp
+                    rchain = rstruct.representative_chain
+                    info['RepChain_ID'] = rchain.id
 
-                # ChainProp SeqRecord annotations
-                rchain_sr = rchain.seq_record
-                for annotation_name, annotation in rchain_sr.annotations.items():
-                    info['RepChain_' + annotation_name] = annotation
+                    # ChainProp SeqRecord annotations
+                    rchain_sr = rchain.seq_record
+                    for annotation_name, annotation in rchain_sr.annotations.items():
+                        info['RepChain_' + annotation_name] = annotation
 
             all_info.append(info)
 
