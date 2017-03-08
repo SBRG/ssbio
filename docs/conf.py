@@ -27,18 +27,25 @@ from recommonmark.parser import CommonMarkParser
 source_parsers = {'.md': CommonMarkParser, }
 source_suffix = ['.rst', '.md']
 
-import sys
-from unittest.mock import MagicMock
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        return
 
-class Mock(MagicMock):
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
     @classmethod
     def __getattr__(cls, name):
-            return MagicMock()
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        else:
+            return Mock()
 
 MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
                 'glpk', 'gurobipy', 'gurobipy.GRB', 'cplex', 'pp', 'libsbml',
                 'cplex.exceptions', 'tabulate', 'argparse', 'numpy', 'pandas', 'nglview', 'matplotlib']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = Mock()
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
