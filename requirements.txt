@@ -1,0 +1,14 @@
+cobra
+biopython>=1.68
+numpy
+tqdm
+pandas
+requests
+bioservices
+xmltodict
+six
+mmtf-python
+awesome-slugify
+ipywidgets
+lxml
+json_tricks

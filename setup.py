@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setup(
         name='ssbio',
         version='1.0.0a0',
@@ -19,22 +22,5 @@ setup(
                  'ssbio/databases/drugbank.py',
                  'ssbio/structure/properties/msms.py'],
         long_description=open('README.md').read(),
-        install_requires=['cobra',
-                          'biopython>=1.68',
-                          'numpy',
-                          'tqdm',
-                          'pandas',
-                          'requests',
-                          'bioservices',
-                          'xmltodict',
-                          'six',
-                          'mmtf-python',
-                          'ujson',
-                          'awesome-slugify',
-                          'seaborn',
-                          #'nglview',
-                          'ipywidgets',
-                          # 'qgrid',
-                          'lxml',
-                          'json_tricks']
+        install_requires=required
 )
