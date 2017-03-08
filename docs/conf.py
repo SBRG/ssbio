@@ -145,11 +145,11 @@ html_theme_options = {
     'display_version': False,
 }
 
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',
-    ],
-}
+# html_context = {
+#     'css_files': [
+#         '_static/theme_overrides.css',
+#     ],
+# }
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
