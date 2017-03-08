@@ -1,4 +1,4 @@
-[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/nmih/ssbio)
+[//]: [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/nmih/ssbio)
 
 ## ssbio
 This Python package provides a collection of tools for people with questions in the realm
@@ -17,43 +17,38 @@ of structural systems biology. The main goals of this package are to:
 - How can I compare the structural features of an entire proteome?
 - and more...
 
-## External programs to install
-```bash
-$ sudo apt-get install emboss
-$ sudo apt-get install dssp
-$ pip install nglview
-```
-
 ## Quick install
 Clone this repository to any location and then install it.
 
-Cloning
+**Cloning**
 ```bash
 $ git clone https://github.com/SBRG/ssbio.git
 ```
 
-Installation
+**Installation**
 ```bash
-$ pip uninstall ssbio  # Only if you have an old version installed
 $ cd ssbio
 $ python setup.py develop
 ```
 
-Updating
+**Updating**
 ```bash
 $ cd ssbio
 $ git pull
 ```
 
-Uninstalling
+**Uninstalling**
 ```bash
 pip uninstall ssbio
 ```
 
-## Dependencies
-ssbio heavily depends on Biopython, and for systems biology
-applications COBRApy. If analyses are done in a Jupyter notebook,
-Pandas DataFrames along with qgrid provide an easy way to look at
-data. tqdm helps keep track of progress. Escher and NGLview allow for
-interactive visualizations of metabolic maps and protein structures,
-respectively.
+### External programs to install
+See: [Software Installations](https://github.com/SBRG/ssbio/wiki/Software-Installations)
+
+[//]: ## Dependencies
+[//]: ssbio heavily depends on Biopython, and for systems biology
+[//]: applications COBRApy. If analyses are done in a Jupyter notebook,
+[//]: Pandas DataFrames along with qgrid provide an easy way to look at
+[//]: data. tqdm helps keep track of progress. Escher and NGLview allow for
+[//]: interactive visualizations of metabolic maps and protein structures,
+[//]: respectively.
