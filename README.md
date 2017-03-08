@@ -44,11 +44,3 @@ pip uninstall ssbio
 
 ### External programs to install
 See: [Software Installations](https://github.com/SBRG/ssbio/wiki/Software-Installations)
-
-[//]: ## Dependencies
-[//]: ssbio heavily depends on Biopython, and for systems biology
-[//]: applications COBRApy. If analyses are done in a Jupyter notebook,
-[//]: Pandas DataFrames along with qgrid provide an easy way to look at
-[//]: data. tqdm helps keep track of progress. Escher and NGLview allow for
-[//]: interactive visualizations of metabolic maps and protein structures,
-[//]: respectively.
