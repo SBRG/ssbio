@@ -47,8 +47,11 @@ MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
                 'nglview', 'matplotlib', 'numpy.linalg', 'biopython', 'bioservices',
                 'Bio', 'Bio.PDB', 'Bio.PDB.PDBExceptions', 'Bio.Seq', 'xmltodict', 'Bio.SeqRecord',
                 'Bio.SeqUtils.ProtParam', 'Bio.PDB.Polypeptide', 'Bio.SeqIO', 'Bio.PDB.MMCIF2Dict',
-                'mmtf-python', 'ipywidgets', 'qgrid', 'cobra', 'cobra.core',
+                'mmtf-python', 'ipywidgets', 'qgrid', 'cobra', 'cobra.core', 'Bio.Alphabet',
+                'Bio.SubsMat','Bio.Align','Bio.Emboss.Applications','Bio.PDB.Polypeptide','Bio.PDB.HSExposure','Bio.PDB.DSSP','Bio.PDB.PDBIO','Bio.PDB.PDBParser','Bio.PDB.mmtf',
                 'lxml', 'json_tricks', 'tqdm', 'json_tricks.np', 'json_tricks.nonp']
+
+
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
