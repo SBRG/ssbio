@@ -48,7 +48,7 @@ MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
                 'Bio', 'Bio.PDB', 'Bio.PDB.PDBExceptions', 'Bio.Seq', 'xmltodict', 'Bio.SeqRecord',
                 'Bio.SeqUtils.ProtParam', 'Bio.PDB.Polypeptide', 'Bio.SeqIO', 'Bio.PDB.MMCIF2Dict',
                 'mmtf-python', 'ipywidgets', 'qgrid', 'cobra', 'cobra.core', 'Bio.Alphabet',
-                'Bio.SubsMat','Bio.Align','Bio.Emboss.Applications','Bio.PDB.Polypeptide','Bio.PDB.HSExposure','Bio.PDB.DSSP','Bio.PDB.PDBIO','Bio.PDB.PDBParser','Bio.PDB.mmtf', 'Bio.PDB.MMCIFParser', 'matplotlib.colors',
+                'Bio.SubsMat','Bio.Align','Bio.Emboss.Applications','Bio.PDB.Polypeptide','Bio.PDB.HSExposure','Bio.PDB.DSSP','Bio.PDB.PDBIO','Bio.PDB.PDBParser','Bio.PDB.mmtf', 'Bio.PDB.MMCIFParser', 'matplotlib.colors', 'matplotlib.pyplot'
                 'lxml', 'json_tricks', 'tqdm', 'json_tricks.np', 'json_tricks.nonp']
 
 
