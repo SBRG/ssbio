@@ -58,7 +58,7 @@ See: `Software Installations <https://github.com/SBRG/ssbio/wiki/Software-Instal
 
 
 Citation
-============
+========
 
 Currently, use of this package can be cited by our 2016 paper in BMC Systems Biology [1]_, which details the GEM-PRO pipeline. The manuscript for the ``ssbio`` package itself is in preparation at this moment.
 
@@ -66,7 +66,7 @@ Currently, use of this package can be cited by our 2016 paper in BMC Systems Bio
 
 
 Contents
-============
+========
 
 .. toctree::
    :glob:
