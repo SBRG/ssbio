@@ -357,8 +357,11 @@ class GEMPRO(Object):
 
         # Save a dataframe of the file mapping info
         df = pd.DataFrame.from_records(kegg_pre_df, columns=df_cols).set_index('gene')
-
-        return ssbio.utils.clean_df(df)
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df)
 
     @property
     def missing_kegg_mapping(self):
@@ -474,7 +477,11 @@ class GEMPRO(Object):
                 uniprot_pre_df.append(uniprot_dict)
 
         df = pd.DataFrame.from_records(uniprot_pre_df, columns=df_cols).set_index('gene')
-        return ssbio.utils.clean_df(df)
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df)
 
     @property
     def missing_uniprot_mapping(self):
@@ -562,7 +569,11 @@ class GEMPRO(Object):
             seq_mapping_pre_df.append(gene_dict)
 
         df = pd.DataFrame.from_records(seq_mapping_pre_df, columns=df_cols).set_index('gene')
-        return ssbio.utils.clean_df(df)
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df)
 
     @property
     def missing_representative_sequence(self):
@@ -748,7 +759,11 @@ class GEMPRO(Object):
             if not protein_df.empty:
                 protein_df['gene'] = g.id
                 df = df.append(protein_df)
-        return ssbio.utils.clean_df(df.set_index('gene'))
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df.set_index('gene'))
 
     def blast_seqs_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, all_genes=False, display_link=False,
                           outdir=None, force_rerun=False):
@@ -799,7 +814,11 @@ class GEMPRO(Object):
             if not protein_df.empty:
                 protein_df['gene'] = g.id
                 df = df.append(protein_df)
-        return ssbio.utils.clean_df(df.set_index('gene'))
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df.set_index('gene'))
 
     def manual_homology_models(self, input_dict, outdir=None, clean=True, force_rerun=False):
         """Copy homology models to the GEM-PRO project.
@@ -905,7 +924,11 @@ class GEMPRO(Object):
             if not protein_df.empty:
                 protein_df['gene'] = g.id
                 df = df.append(protein_df)
-        return ssbio.utils.clean_df(df.set_index('gene'))
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df.set_index('gene'))
 
     def set_representative_structure(self, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
                                      engine='needle', always_use_homology=False,
@@ -974,7 +997,11 @@ class GEMPRO(Object):
             rep_struct_pre_df.append(repdict)
 
         df = pd.DataFrame.from_records(rep_struct_pre_df, columns=df_cols).set_index('gene')
-        return ssbio.utils.clean_df(df)
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df)
 
     @property
     def missing_representative_structure(self):
@@ -1069,7 +1096,11 @@ class GEMPRO(Object):
             protein_df = g.protein.df_pdb_metadata.copy().reset_index()
             protein_df['gene'] = g.id
             df = df.append(protein_df)
-        return ssbio.utils.clean_df(df.set_index('gene'))
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df.set_index('gene'))
 
     def get_dssp_annotations(self):
         """Run DSSP on all representative structures and store calculations.
