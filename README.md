@@ -17,6 +17,9 @@ of structural systems biology. The main goals of this package are to:
 - How can I compare the structural features of an entire proteome?
 - and more...
 
+## Documentation
+Read the documentation [here](http://ssbio.readthedocs.io/en/latest/).
+
 ## Quick install
 Clone this repository to any location and then install it.
 
