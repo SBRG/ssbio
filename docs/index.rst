@@ -54,7 +54,7 @@ Clone this repository to any location and then install it.
 Dependencies
 ------------
 
-See: [Software Installations](https://github.com/SBRG/ssbio/wiki/Software-Installations) for additional programs to install.
+See: `Software Installations <https://github.com/SBRG/ssbio/wiki/Software-Installations>`_ for additional programs to install.
 
 
 Citation
