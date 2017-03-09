@@ -32,6 +32,14 @@ Clone this repository to any location and then install it.
 
 **Installation**
 
+First install NGLview using pip:
+
+.. code-block:: bash
+
+    pip install nglview
+
+Then install ssbio:
+
 .. code-block:: bash
 
     cd ssbio

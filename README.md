@@ -25,19 +25,26 @@ Clone this repository to any location and then install it.
 
 **Cloning**
 ```bash
-$ git clone https://github.com/SBRG/ssbio.git
+git clone https://github.com/SBRG/ssbio.git
 ```
 
 **Installation**
+
+First install NGLview:
 ```bash
-$ cd ssbio
-$ python setup.py develop --user
+pip install nglview
+```
+
+Then install ssbio:
+```bash
+cd ssbio
+python setup.py develop --user
 ```
 
 **Updating**
 ```bash
-$ cd ssbio
-$ git pull
+cd ssbio
+git pull
 ```
 
 **Uninstalling**

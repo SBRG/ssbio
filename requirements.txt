@@ -9,7 +9,7 @@ xmltodict
 six
 mmtf-python
 awesome-slugify
-ipywidgets
+ipywidgets==5.0.0
 lxml
 json_tricks
 seaborn
