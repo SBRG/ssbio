@@ -164,7 +164,11 @@ def parse_mmcif_header(infile):
 
     """
     newdict = {}
-    mmdict = MMCIF2Dict(infile)
+    try:
+        mmdict = MMCIF2Dict(infile)
+    except ValueError as e:
+        log.exception(e)
+        return newdict
 
     chemical_ids_exclude = ['HOH']
     chemical_types_exclude = ['l-peptide linking','peptide linking']
