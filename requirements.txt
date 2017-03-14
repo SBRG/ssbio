@@ -11,7 +11,7 @@ mmtf-python
 awesome-slugify
 ipywidgets==5.2.2
 lxml
-json-tricks
+json-tricks>3.0
 seaborn
 matplotlib
 beautifulsoup4==4.5.3
