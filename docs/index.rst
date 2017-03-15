@@ -65,6 +65,12 @@ Dependencies
 See: `Software Installations <https://github.com/SBRG/ssbio/wiki/Software-Installations>`_ for additional programs to install.
 
 
+Tutorials
+=========
+
+Check out some Jupyter notebook tutorials at the protein_ and gempro_ pages.
+
+
 Citation
 ========
 
