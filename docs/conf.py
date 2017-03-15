@@ -43,7 +43,7 @@ class Mock(object):
 
 MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
                 'glpk', 'gurobipy', 'gurobipy.GRB', 'cplex', 'pp', 'libsbml',
-                'cplex.exceptions', 'tabulate', 'argparse', 'numpy', 'pandas',
+                'cplex.exceptions', 'tabulate', 'argparse', 'pandas',
                 'nglview', 'matplotlib', 'numpy.linalg', 'biopython', 'bioservices', 'seaborn',
                 'Bio', 'Bio.PDB', 'Bio.PDB.PDBExceptions', 'Bio.Seq', 'xmltodict', 'Bio.SeqRecord',
                 'Bio.SeqUtils.ProtParam', 'Bio.PDB.Polypeptide', 'Bio.SeqIO', 'Bio.PDB.MMCIF2Dict',

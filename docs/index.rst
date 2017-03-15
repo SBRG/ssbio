@@ -68,7 +68,7 @@ See: `Software Installations <https://github.com/SBRG/ssbio/wiki/Software-Instal
 Tutorials
 =========
 
-Check out some Jupyter notebook tutorials at the :ref:`protein` and :ref:`gempro` pages.
+Check out some Jupyter notebook tutorials at :ref:`protein` and :ref:`gempro`.
 
 
 Citation
