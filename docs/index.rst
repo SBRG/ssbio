@@ -79,7 +79,7 @@ Currently, use of this package can be cited by our 2016 paper in BMC Systems Bio
 .. [1] Brunk, E.*, Mih, N.*, Monk, J., Zhang, Z., O’Brien, E. J., Bliven, S. E., Bourne, P. E., Palsson, B. O. (2016). Systems biology of the structural proteome. BMC Systems Biology, 10(1), 26. http://doi.org/10.1186/s12918-016-0271-6. *Authors contributed equally.
 
 
-Contents
+Index
 ========
 
 .. toctree::
