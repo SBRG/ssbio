@@ -117,7 +117,7 @@ class GEMPRO(Object):
 
         # Or, load a GEM file
         elif gem_file_path and gem_file_type:
-            gem_manual = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type)
+            gem_manual = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type, pdb_file_type)
             self._load_cobra_model(gem_manual)
 
         # Or, load a list of gene IDs

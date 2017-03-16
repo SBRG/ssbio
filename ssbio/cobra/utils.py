@@ -58,7 +58,7 @@ class ModelPro(Model):
                 setattr(self, k, v)
 
 
-def model_loader(gem_file_path, gem_file_type):
+def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif'):
     """Consolidated function to load a GEM using COBRApy. Specify the file type being loaded.
 
     Args:
@@ -81,7 +81,11 @@ def model_loader(gem_file_path, gem_file_type):
     else:
         raise ValueError('File type must be in SBML, MATLAB, or JSON formats.')
 
-    return ModelPro(model)
+    modelpro = ModelPro(model)
+    for g in modelpro.genes:
+        g.protein.pdb_file_type = pdb_file_type
+
+    return modelpro
 
 
 def is_spontaneous(gene):
