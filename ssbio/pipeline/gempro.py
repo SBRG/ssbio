@@ -61,6 +61,7 @@ class GEMPRO(Object):
         * Allowing manual gene ID --> UniProt ID
 
     #. Consolidating sequence IDs and setting a representative sequence
+        * Currently these are set based on available PDB IDs
 
     #. Mapping of representative sequence --> structures
         * With UniProt --> ranking of PDB structures
@@ -72,8 +73,9 @@ class GEMPRO(Object):
         * Parsing I-TASSER runs
 
     #. Running QC/QA on structures and setting a representative structure
+        * Various cutoffs (mutations, insertions, deletions) can be set to filter structures
 
-    Each step may generate reports as a Pandas DataFrame and also output various logging messages.
+    Each step will also generate reports as Pandas DataFrames and also output various logging messages.
 
     Args:
         gem_name (str): The name of your GEM or just your project in general.
@@ -91,11 +93,6 @@ class GEMPRO(Object):
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
         description (str): Optional string to describe your project
-
-    Attributes:
-        genes (DictList): A DictList of GenePro objects
-        model (Model): A COBRApy Model object
-
 
     """
 
@@ -146,7 +143,7 @@ class GEMPRO(Object):
 
     @property
     def root_dir(self):
-        """str: Directory where GEM-PRO project folder is located"""
+        """str: Directory where GEM-PRO project folder (base_dir) is located"""
         return self._root_dir
 
     @root_dir.setter
@@ -695,8 +692,10 @@ class GEMPRO(Object):
             else:
                 g_id = g.id
 
-            if g.protein.representative_sequence.id in tmhmm_dict:
+            if g_id in tmhmm_dict:
                 log.debug('{}: loading TMHMM results'.format(g.id))
+                if not tmhmm_dict[g_id]:
+                    log.error("{}: missing TMHMM results".format(g.id))
                 g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g_id]['num_tm_helices']
                 g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g_id]['sequence'])
                 counter += 1
@@ -769,7 +768,7 @@ class GEMPRO(Object):
                           outdir=None, force_rerun=False):
         """BLAST each gene sequence to the PDB. Saves raw BLAST results (XML files).
 
-            Also creates a summary dataframe accessible by the attribute "df_pdb_blast".
+        Also creates a summary dataframe accessible by the attribute "df_pdb_blast".
 
         Args:
             seq_ident_cutoff (float, optional): Cutoff results based on percent coverage (in decimal form)
@@ -1105,9 +1104,7 @@ class GEMPRO(Object):
     def get_dssp_annotations(self):
         """Run DSSP on all representative structures and store calculations.
 
-        Stored in:
-            g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-dssp']
-
+        Stored in: `g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-dssp']`
         """
         for g in tqdm(self.genes):
             if g.protein.representative_structure:
@@ -1126,8 +1123,7 @@ class GEMPRO(Object):
     def get_msms_annotations(self):
         """Run MSMS on all representative structures and store calculations.
 
-        Stored in:
-            g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-msms']
+        Stored in: g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-msms']
         """
         for g in tqdm(self.genes):
             if g.protein.representative_structure:
@@ -1142,9 +1138,7 @@ class GEMPRO(Object):
     def get_disulfide_bridges(self):
         """Run Biopython's disulfide bridge finder and store calculations.
 
-        Stored in:
-            g.protein.representative_structure.representative_chain.seq_record.annotations['SSBOND-biopython']
-
+        Stored in: g.protein.representative_structure.representative_chain.seq_record.annotations['SSBOND-biopython']
         """
         for g in tqdm(self.genes):
             if g.protein.representative_structure:

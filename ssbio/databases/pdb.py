@@ -1,17 +1,17 @@
-import io
-import json
 import gzip
+import json
 import logging
 import os.path as op
+
 import pandas as pd
 import requests
-import ssbio.utils
-from ssbio.structure.structprop import StructProp
-import ssbio.structure.properties.complexes as cplx
-from io import BytesIO
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
 from six.moves.urllib.request import urlopen, urlretrieve
+
+import ssbio.structure.complexes as cplx
+import ssbio.utils
+from ssbio.structure.structprop import StructProp
 
 try:
     from StringIO import StringIO
@@ -191,7 +191,7 @@ def parse_mmcif_header(infile):
     if '_exptl.method' in mmdict:
         newdict['experimental_method'] = mmdict['_exptl.method']
     else:
-        log.debug('{}: No experimental method field'.format(infile))
+        log.debug('{}: no experimental method field'.format(infile))
 
     # TODO: refactor how to get resolutions based on experimental method
     if '_refine.ls_d_res_high' in mmdict:
@@ -203,7 +203,7 @@ def parse_mmcif_header(infile):
         except:
             newdict['resolution'] = float(mmdict['_em_3d_reconstruction.resolution'])
     else:
-        log.debug('{}: No resolution field'.format(infile))
+        log.debug('{}: no resolution field'.format(infile))
 
     if '_chem_comp.id' in mmdict:
         chemicals_filtered = ssbio.utils.filter_list_by_indices(mmdict['_chem_comp.id'],
@@ -213,12 +213,12 @@ def parse_mmcif_header(infile):
         chemicals_fitered = ssbio.utils.filter_list(chemicals_filtered, chemical_ids_exclude, case_sensitive=True)
         newdict['chemicals'] = chemicals_fitered
     else:
-        log.debug('{}: No chemical composition field'.format(infile))
+        log.debug('{}: no chemical composition field'.format(infile))
 
     if '_entity_src_gen.pdbx_gene_src_scientific_name' in mmdict:
         newdict['taxonomy_name'] = mmdict['_entity_src_gen.pdbx_gene_src_scientific_name']
     else:
-        log.debug('{}: No organism field'.format(infile))
+        log.debug('{}: no organism field'.format(infile))
 
     return newdict
 

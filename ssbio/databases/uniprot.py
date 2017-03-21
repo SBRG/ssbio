@@ -97,7 +97,7 @@ def is_valid_uniprot_id(instring):
 
 
 # TODO: method to blast UniProt to find a 100% sequence match
-def blast_uniprot(seq_str, seq_ident=1, evalue=0.0001, reviewed_only=True):
+def blast_uniprot(seq_str, seq_ident=1, evalue=0.0001, reviewed_only=True, organism=None):
     """BLAST the UniProt db to find what IDs match the sequence input
 
     Args:
@@ -112,7 +112,6 @@ def blast_uniprot(seq_str, seq_ident=1, evalue=0.0001, reviewed_only=True):
     pass
 
 
-# @cachetools.func.ttl_cache(maxsize=800, ttl=SEVEN_DAYS)
 def get_fasta(uniprot_id):
     """Get the protein sequence for a UniProt ID as a string.
 
@@ -131,7 +130,6 @@ def get_fasta(uniprot_id):
         return bsup.get_fasta_sequence(uniprot_id)
 
 
-# @cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
 def uniprot_reviewed_checker(uniprot_id):
     """Check if a single UniProt ID is reviewed or not.
 
@@ -159,7 +157,6 @@ def uniprot_reviewed_checker(uniprot_id):
     return uni_rev_dict_adder[uniprot_id]
 
 
-# @cachetools.func.ttl_cache(maxsize=128, ttl=SEVEN_DAYS)
 def uniprot_reviewed_checker_batch(uniprot_ids):
     """Batch check if uniprot IDs are reviewed or not
 
