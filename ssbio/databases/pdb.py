@@ -93,7 +93,10 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
     if file_type not in file_types:
         raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz')
 
-    if file_type.endswith('.gz') or file_type == 'mmtf':
+    if file_type == 'mmtf':
+        file_type = 'mmtf.gz'
+
+    if file_type.endswith('.gz'):
         gzipped = True
     else:
         gzipped = False
