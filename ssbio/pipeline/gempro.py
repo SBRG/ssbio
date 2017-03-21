@@ -377,15 +377,15 @@ class GEMPRO(Object):
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
                                      set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service.
-            Also download all metadata and sequences.
+        Also download all metadata and sequences.
 
         Args:
-            model_gene_source (str): the database source of your model gene IDs
-                See: http://www.uniprot.org/help/programmatic_access
+            model_gene_source (str): the database source of your model gene IDs.
+                See: http://www.uniprot.org/help/programmatic_access.
                 Common model gene sources are:
-                Ensembl Genomes - ENSEMBLGENOME_ID (i.e. E. coli b-numbers)
-                Entrez Gene (GeneID) - P_ENTREZGENEID
-                RefSeq Protein - P_REFSEQ_AC
+                    * Ensembl Genomes - ``ENSEMBLGENOME_ID`` (i.e. E. coli b-numbers)
+                    * Entrez Gene (GeneID) - ``P_ENTREZGENEID``
+                    * RefSeq Protein - ``P_REFSEQ_AC``
             custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,
                 custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
                 Dictionary keys must match model genes.
@@ -713,9 +713,9 @@ class GEMPRO(Object):
     def map_uniprot_to_pdb(self, seq_ident_cutoff=0.0, outdir=None, force_rerun=False):
         """Map UniProt IDs to a ranked list of PDB structures available.
 
-            Uses the "Best structures" API availble from https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
-            The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
-            if the same, resolution. Also creates a summary dataframe accessible by the attribute "df_pdb_ranking".
+        Uses the "Best structures" API availble from https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
+        The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
+        if the same, resolution. Also creates a summary dataframe accessible by the attribute "df_pdb_ranking".
 
         Args:
             seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
@@ -939,21 +939,21 @@ class GEMPRO(Object):
         """Set the representative protein structure for a gene.
 
         Each gene can have a combination of the following, which will be analyzed to set a representative structure.
-            - Homology model(s)
-            - Ranked PDBs
-            - BLASTed PDBs
+            * Homology model(s)
+            * Ranked PDBs
+            * BLASTed PDBs
 
         If the always_use_homology flag is true, homology models are always set as representative when they exist.
-            If there are multiple homology models, we rank by the percent sequence coverage.
+        If there are multiple homology models, we rank by the percent sequence coverage.
 
         Args:
             seq_outdir (str): Path to output directory of sequence alignment files, must be set if GEM-PRO directories
                 were not created initially
             struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories
                 were not created initially
-            pdb_file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - PDB structure file type that
-                should be downloaded
-            engine (str): "needle" or "biopython" - which pairwise sequence alignment engine should be used
+            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``,
+                ``mmtf.gz`` - PDB structure file type that should be downloaded
+            engine (str): ``needle`` or ``biopython`` - which pairwise sequence alignment engine should be used
                 needle is the standard EMBOSS tool to run pairwise alignments
                 biopython is Biopython's implementation of needle. Results can differ!
             always_use_homology (bool): If homology models should always be set as the representative structure
@@ -1020,7 +1020,10 @@ class GEMPRO(Object):
                 models to another location such as a supercomputer for running
             all_genes (bool): If all genes should be prepped, or only those without any mapped structures
             print_exec (bool): If the execution statement should be printed to run modelling
-            **kwargs: TODO - extra options for SLURM or Torque execution
+            **kwargs:
+
+        Todo:
+            * kwargs - extra options for SLURM or Torque execution
 
         """
         # TODO: kwargs for slurm/torque options
@@ -1105,7 +1108,13 @@ class GEMPRO(Object):
     def get_dssp_annotations(self):
         """Run DSSP on all representative structures and store calculations.
 
-        Stored in: `g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-dssp']`
+        Stored in::
+
+            a_gene.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-dssp']
+
+        Todo:
+            * Some errors arise from storing annotations for nonstandard amino acids, need to run DSSP separately for those
+
         """
         for g in tqdm(self.genes):
             if g.protein.representative_structure:
@@ -1124,7 +1133,10 @@ class GEMPRO(Object):
     def get_msms_annotations(self):
         """Run MSMS on all representative structures and store calculations.
 
-        Stored in: g.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-msms']
+        Stored in::
+
+            a_gene.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-msms']
+
         """
         for g in tqdm(self.genes):
             if g.protein.representative_structure:
@@ -1139,7 +1151,10 @@ class GEMPRO(Object):
     def get_disulfide_bridges(self):
         """Run Biopython's disulfide bridge finder and store calculations.
 
-        Stored in: g.protein.representative_structure.representative_chain.seq_record.annotations['SSBOND-biopython']
+        Stored in::
+
+            a_gene.protein.representative_structure.representative_chain.seq_record.annotations['SSBOND-biopython']
+
         """
         for g in tqdm(self.genes):
             if g.protein.representative_structure:
