@@ -13,6 +13,8 @@ from ssbio.databases.pdb import PDBProp
 import ssbio.databases.pdb
 from ssbio.structure.homology.itasser.itasserprop import ITASSERProp
 import ssbio.sequence.utils.fasta
+from Bio.PDB.PDBExceptions import PDBConstructionException
+
 import ssbio.sequence.utils.alignment
 import ssbio.utils
 import requests
@@ -35,8 +37,7 @@ class Protein(Object):
                                             'resolution','taxonomy_name']
 
     def __init__(self, ident, description=None, root_dir=None, pdb_file_type='cif'):
-        """
-        Initialize a Protein object.
+        """Initialize a Protein object.
 
         A Protein contains sequences, structures, and a single representative sequence and structure.
 
@@ -57,7 +58,7 @@ class Protein(Object):
 
     @property
     def root_dir(self):
-        """Directory where Protein project folder is located"""
+        """str: Directory where Protein project folder is located"""
         return self._root_dir
 
     @root_dir.setter
@@ -80,7 +81,7 @@ class Protein(Object):
 
     @property
     def protein_dir(self):
-        """Protein folder"""
+        """str: Protein folder"""
         if self.root_dir:
             # Add a _protein suffix to the folder if it has the same name as its root folder
             folder_name = self.id
@@ -93,7 +94,7 @@ class Protein(Object):
 
     @property
     def sequence_dir(self):
-        """Directory where sequence related files are stored"""
+        """str: Directory where sequence related files are stored"""
         if self.root_dir:
             return op.join(self.protein_dir, 'sequences')
         else:
@@ -102,7 +103,7 @@ class Protein(Object):
 
     @property
     def structure_dir(self):
-        """Directory where structure related files are stored"""
+        """str: Directory where structure related files are stored"""
         if self.root_dir:
             return op.join(self.protein_dir, 'structures')
         else:
@@ -111,25 +112,25 @@ class Protein(Object):
 
     @property
     def num_structures(self):
-        """Return the total number of structures"""
+        """int: Return the total number of structures"""
         return len(self.structures)
 
     @property
     def num_structures_experimental(self):
-        """Return the total number of experimental structures"""
+        """int: Return the total number of experimental structures"""
         return len(self.get_experimental_structures())
 
     @property
     def num_structures_homology(self):
-        """Return the total number of homology models"""
+        """int: Return the total number of homology models"""
         return len(self.get_homology_models())
 
     def get_experimental_structures(self):
-        """Return a DictList of all experimental structures in self.structures"""
+        """DictList: Return a DictList of all experimental structures in self.structures"""
         return DictList(x for x in self.structures if x.is_experimental)
 
     def get_homology_models(self):
-        """Return a DictList of all homology models in self.structures"""
+        """DictList: Return a DictList of all homology models in self.structures"""
         return DictList(x for x in self.structures if not x.is_experimental)
 
     def filter_sequences(self, seq_type):
@@ -151,7 +152,7 @@ class Protein(Object):
         Args:
             kegg_id (str): KEGG ID
             kegg_organism_code (str): KEGG organism code to prepend to the kegg_id if not part of it already.
-                Example: "eco:b1244", eco is the organism code
+                Example: ``eco:b1244``, eco is the organism code
             kegg_seq_file (str): Path to KEGG FASTA file
             kegg_metadata_file (str): Path to KEGG metadata file (raw KEGG format)
             set_as_representative (bool): If this KEGG ID should be set as the representative sequence
@@ -233,6 +234,7 @@ class Protein(Object):
             force_rerun:
 
         Returns:
+            UniProtProp:
 
         """
         if download:
@@ -286,7 +288,7 @@ class Protein(Object):
 
     def load_manual_sequence_file(self, ident, seq_file, copy_file=False, outdir=None, set_as_representative=False):
         """Load a manual sequence given as a FASTA file and optionally set it as the representative sequence.
-            Also store it in the sequences attribute.
+        Also store it in the sequences attribute.
 
         Args:
             ident:
@@ -315,7 +317,7 @@ class Protein(Object):
     def load_manual_sequence(self, seq, ident=None, write_fasta_file=False, outname=None, outdir=None,
                              set_as_representative=False, force_rewrite=False):
         """Load a manual sequence given as a string and optionally set it as the representative sequence.
-            Also store it in the sequences attribute.
+        Also store it in the sequences attribute.
 
         Args:
             seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
@@ -430,7 +432,6 @@ class Protein(Object):
     def pairwise_align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None,
                                                    engine='needle', parse=True, force_rerun=False):
         """Align all sequences in the sequences attribute to the representative sequence.
-
         Stores the alignments the representative_sequence.sequence_alignments DictList
 
         Args:
@@ -917,7 +918,8 @@ class Protein(Object):
 
         Returns:
             StructProp: Representative structure from the list of structures.
-                This is a not a map to the original structure, it is copied from its reference.
+
+            This is a not a map to the original structure, it is copied from its reference.
 
         """
         log.debug('{}: setting representative structure'.format(self.id))
@@ -982,14 +984,32 @@ class Protein(Object):
                 # Download the structure and parse it
                 # This will add all chains to the mapped_chains attribute if there are none
                 try:
-                    pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun)
+                    f = pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun)
                     # Download the mmCIF header file to get additional information
                     if 'cif' not in pdb_file_type:
                         pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
                 except (requests.exceptions.HTTPError, URLError):
                     log.error('{}: structure file could not be downloaded'.format(pdb))
                     continue
-                pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
+
+                # TODO: clean up these try/except things
+                try:
+                    pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
+                except PDBConstructionException:
+                    log.error('{}: unable to parse structure file. Falling back to mmCIF format for {}'.format(f, self.id))
+                    # Fall back to using mmCIF file if structure cannot be parsed
+                    try:
+                        pdb.download_structure_file(outdir=struct_outdir, file_type='cif',
+                                                    force_rerun=force_rerun)
+                        # Download the mmCIF header file to get additional information
+                        if 'cif' not in pdb_file_type:
+                            pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
+                    except (requests.exceptions.HTTPError, URLError):
+                        log.error('{}: structure file could not be downloaded'.format(pdb))
+                        continue
+                    pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False,
+                                                             force_rerun=force_rerun)
+
                 best_chain = pdb.sequence_quality_checker(seq_ident_cutoff=seq_ident_cutoff,
                                                           allow_missing_on_termini=allow_missing_on_termini,
                                                           allow_mutants=allow_mutants, allow_deletions=allow_deletions,
