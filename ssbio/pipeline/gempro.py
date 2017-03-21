@@ -291,7 +291,7 @@ class GEMPRO(Object):
                                   set_as_representative=False, force_rerun=False):
         """Map all genes in the model to KEGG IDs using the KEGG service.
 
-        This function does these things:
+        Steps:
             1. Download all metadata and sequence files in the sequences directory
             2. Creates a KEGGProp object in the protein.sequences attribute
             3. Returns a Pandas DataFrame of mapping results
@@ -376,7 +376,8 @@ class GEMPRO(Object):
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
                                      set_as_representative=False, force_rerun=False):
-        """Map all genes in the model to UniProt IDs using the UniProt mapping service. Also download all metadata and sequences.
+        """Map all genes in the model to UniProt IDs using the UniProt mapping service.
+            Also download all metadata and sequences.
 
         Args:
             model_gene_source (str): the database source of your model gene IDs
@@ -622,14 +623,14 @@ class GEMPRO(Object):
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
         """Run and parse SCRATCH results to predict secondary structure and solvent accessibility.
 
-            Annotations are stored in the gene protein's representative sequence at:
-                .seq_record.annotations and
-                .seq_record.letter_annotations
+        Annotations are stored in the gene protein's representative sequence at:
+            * .seq_record.annotations
+            * .seq_record.letter_annotations
 
         Args:
             path_to_scratch (str): Path to SCRATCH executable
             results_dir (str): Path to SCRATCH results folder, which will have the files (scratch.ss, scratch.ss8,
-            scratch.acc, scratch.acc20)
+                scratch.acc, scratch.acc20)
             scratch_basename (str): Basename of the SCRATCH results ('scratch' is default)
             exposed_buried_cutoff (int): Cutoff of exposed/buried for the acc20 predictions
             custom_gene_mapping (dict): Default parsing of SCRATCH output files is to look for the model gene IDs. If
