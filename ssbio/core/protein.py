@@ -36,7 +36,7 @@ class Protein(Object):
     _representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
                                             'resolution','taxonomy_name']
 
-    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='cif'):
+    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='mmtf'):
         """Initialize a Protein object.
 
         A Protein contains sequences, structures, and a single representative sequence and structure.
@@ -984,7 +984,7 @@ class Protein(Object):
                 # Download the structure and parse it
                 # This will add all chains to the mapped_chains attribute if there are none
                 try:
-                    f = pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun)
+                    pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun)
                     # Download the mmCIF header file to get additional information
                     if 'cif' not in pdb_file_type:
                         pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
@@ -996,7 +996,7 @@ class Protein(Object):
                 try:
                     pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
                 except PDBConstructionException:
-                    log.error('{}: unable to parse structure file. Falling back to mmCIF format for {}'.format(f, self.id))
+                    log.error('{}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(pdb, pdb_file_type))
                     # Fall back to using mmCIF file if structure cannot be parsed
                     try:
                         pdb.download_structure_file(outdir=struct_outdir, file_type='cif',

@@ -96,7 +96,7 @@ class GEMPRO(Object):
 
     """
 
-    def __init__(self, gem_name, pdb_file_type='cif', create_dirs=True, root_dir=None, genome_path=None,
+    def __init__(self, gem_name, pdb_file_type='mmtf', create_dirs=True, root_dir=None, genome_path=None,
                  gem=None,
                  gem_file_path=None, gem_file_type=None,
                  genes_list=None,
