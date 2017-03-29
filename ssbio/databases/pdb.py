@@ -26,9 +26,9 @@ class PDBProp(StructProp):
     """
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
-                 reference_seq=None, representative_chain=None):
+                 representative_chain=None):
         StructProp.__init__(self, ident, description=description, chains=chains, mapped_chains=mapped_chains,
-                            structure_path=structure_path, file_type=file_type, reference_seq=reference_seq,
+                            structure_path=structure_path, file_type=file_type,
                             representative_chain=representative_chain, is_experimental=True)
         self.experimental_method = None
         self.resolution = None
@@ -36,8 +36,7 @@ class PDBProp(StructProp):
         self.taxonomy_name = None
 
     def download_structure_file(self, outdir, file_type, force_rerun=False):
-        pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False,
-                                      outdir=outdir,
+        pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False, outdir=outdir,
                                       force_rerun=force_rerun)
         log.debug('{}: downloaded {} file'.format(self.id, file_type))
         self.load_structure_path(pdb_file, file_type)
@@ -129,6 +128,7 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
         if gzipped:
             outfile = ssbio.utils.gunzip_file(infile=outfile,
                                               outfile=outfile.strip('.gz'),
+                                              outdir=outdir,
                                               delete_original=True,
                                               force_rerun_flag=force_rerun)
 
@@ -248,8 +248,8 @@ def download_sifts_xml(pdb_id, outdir='', outfile=''):
 
     if not op.exists(outfile):
         response = urlopen(baseURL + filename)
-        with open(outfile, 'wb') as outfile:
-            outfile.write(gzip.decompress(response.read()))
+        with open(outfile, 'wb') as f:
+            f.write(gzip.decompress(response.read()))
 
     return outfile
 
@@ -258,15 +258,18 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
     """Map a UniProt residue number to its corresponding PDB residue number.
 
     This function requires that the SIFTS file be downloaded,
-    and also a chain ID (as different chains may have different mappings.
+    and also a chain ID (as different chains may have different mappings).
 
     Args:
-        uniprot_resnum: integer of the residue number you'd like to map
-        chain_id: string of the PDB chain to map to
-        sifts_file: path to the SIFTS XML file
+        uniprot_resnum (int): integer of the residue number you'd like to map
+        chain_id (str): string of the PDB chain to map to
+        sifts_file (str): Path to the SIFTS XML file
 
     Returns:
-        (mapped_resnum, is_observed) tuple - is_observed indicates if the 3D structure actually shows the residue
+        (tuple): tuple containing:
+
+            mapped_resnum (int): Mapped residue number
+            is_observed (bool): Indicates if the 3D structure actually shows the residue
 
     """
     # Load the xml with lxml
@@ -282,6 +285,7 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
     # Find the right chain (entities in the xml doc)
     ent = './/{http://www.ebi.ac.uk/pdbe/docs/sifts/eFamily.xsd}entity'
     for chain in root.findall(ent):
+        # TODO: IMPORTANT - entityId is not the chain ID!!! it is just in alphabetical order!
         if chain.attrib['entityId'] == chain_id:
             # Find the "crossRefDb" tag that has the attributes dbSource="UniProt" and  dbResNum="your_resnum_here"
             # Then match it to the crossRefDb dbResNum that has the attribute dbSource="PDBresnum"
