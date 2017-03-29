@@ -36,7 +36,7 @@ class Protein(Object):
     __representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
                                              'resolution','taxonomy_name']
 
-    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='mmtf'):
+    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='cif'):
         """Initialize a Protein object.
 
         A Protein contains sequences, structures, and a single representative sequence and structure.

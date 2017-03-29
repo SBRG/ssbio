@@ -11,7 +11,7 @@ class GenePro(Gene):
     """Extends the COBRAPy Gene object to add GEM-PRO annotations in the form of a Protein attribute
     """
 
-    def __init__(self, id, name='', functional=True, root_dir=None, pdb_file_type='mmtf'):
+    def __init__(self, id, name='', functional=True, root_dir=None, pdb_file_type='cif'):
         Gene.__init__(self, id=id, name=name, functional=functional)
         self.protein = Protein(ident=id, root_dir=root_dir, pdb_file_type=pdb_file_type)
 
