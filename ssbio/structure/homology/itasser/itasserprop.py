@@ -21,7 +21,7 @@ class ITASSERProp(StructProp):
     _coach_files_to_copy = ['Bsites.inf', 'EC.dat', 'GO_MF.dat', 'GO_BP.dat', 'GO_CC.dat']
 
     def __init__(self, ident, original_results_path, create_dfs=False,
-                 coach_results_folder='model1/coach', model_to_use='model1', reference_seq=None):
+                 coach_results_folder='model1/coach', model_to_use='model1'):
         """Initialize a class to collect I-TASSER modeling information and optionally copy results to a new directory.
 
         Args:
@@ -33,7 +33,7 @@ class ITASSERProp(StructProp):
         if not op.exists(original_results_path):
             raise OSError('{}: folder does not exist'.format(original_results_path))
 
-        StructProp.__init__(self, ident, is_experimental=False, reference_seq=reference_seq)
+        StructProp.__init__(self, ident, is_experimental=False)
 
         self.results_path = original_results_path
         self.model_to_use = model_to_use
