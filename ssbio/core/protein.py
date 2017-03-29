@@ -8,7 +8,7 @@ import ssbio.databases.uniprot
 from ssbio.sequence import SeqProp
 from ssbio.databases.kegg import KEGGProp
 from ssbio.databases.uniprot import UniProtProp
-from ssbio.structure import StructProp
+from ssbio.structure.structprop import StructProp
 from ssbio.databases.pdb import PDBProp
 import ssbio.databases.pdb
 from ssbio.structure.homology.itasser.itasserprop import ITASSERProp
@@ -31,10 +31,10 @@ log = logging.getLogger(__name__)
 class Protein(Object):
     """Basic definition of a protein"""
 
-    _representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs',
-                                           'sequence_path', 'metadata_path']
-    _representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
-                                            'resolution','taxonomy_name']
+    __representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs',
+                                            'sequence_path', 'metadata_path']
+    __representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
+                                             'resolution','taxonomy_name']
 
     def __init__(self, ident, description=None, root_dir=None, pdb_file_type='mmtf'):
         """Initialize a Protein object.
@@ -364,9 +364,9 @@ class Protein(Object):
     def _representative_sequence_setter(self, seq_prop):
         """Make a copy of a SeqProp object and store it as the representative. Only keep certain attributes"""
 
-        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=seq_prop.sequence_path,
-                                               seq=seq_prop.seq_record)
-        self.representative_sequence.update(seq_prop.get_dict(), only_keys=self._representative_sequence_attributes)
+        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=seq_prop.sequence_path) #,
+                                               # seq=seq_prop.seq_record)
+        self.representative_sequence.update(seq_prop.get_dict(), only_keys=self.__representative_sequence_attributes)
         if self.representative_sequence.seq_record:
             self.representative_sequence.seq_record.id = self.representative_sequence.id
         log.debug('{}: set as representative sequence'.format(seq_prop.id))
@@ -666,7 +666,7 @@ class Protein(Object):
                     pdb.load_structure_path(pdb_file, file_type)
 
         if not self.structures.has_id(pdb_id):
-            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_path=pdb_file, file_type=file_type, reference_seq=self.representative_sequence)
+            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_path=pdb_file, file_type=file_type)
             if mapped_chains:
                 pdb.add_mapped_chain_ids(mapped_chains)
             self.structures.append(pdb)
@@ -710,7 +710,7 @@ class Protein(Object):
                 itasser = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs, reference_seq=self.representative_sequence)
+            itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs)
             self.structures.append(itasser)
 
         if set_as_representative:
@@ -744,7 +744,7 @@ class Protein(Object):
                 model = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            model = StructProp(ident=ident, structure_path=structure_file, reference_seq=self.representative_sequence,
+            model = StructProp(ident=ident, structure_path=structure_file,
                                is_experimental=is_experimental)
             self.structures.append(model)
 
@@ -866,11 +866,10 @@ class Protein(Object):
 
         self.representative_structure = StructProp(ident=new_id, chains=keep_chain, mapped_chains=keep_chain,
                                                    structure_path=final_pdb, file_type='pdb',
-                                                   reference_seq=self.representative_sequence,
                                                    representative_chain=keep_chain)
 
         self.representative_structure.update(struct_prop.get_dict_with_chain(chain=keep_chain),
-                                             only_keys=self._representative_structure_attributes,
+                                             only_keys=self.__representative_structure_attributes,
                                              overwrite=True)
 
         # Save the original PDB ID as an extra attribute
@@ -880,11 +879,11 @@ class Protein(Object):
         # STORE REPRESENTATIVE CHAIN RESNUMS in the representative sequence seqrecord letter_annotations
         # Get the alignment
         alnid = '{}_{}'.format(self.representative_sequence.id, self.representative_structure.id)
-        aln = self.representative_structure.reference_seq.structure_alignments.get_by_id(alnid)
+        aln = self.representative_sequence.structure_alignments.get_by_id(alnid)
         # Get the mapping and store it in .seq_record.letter_annotations['repchain_resnums']
         aln_df = ssbio.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
         repchain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
-        self.representative_sequence.seq_record.letter_annotations['repchain_resnums'] = repchain_resnums
+        self.representative_sequence.letter_annotations['repchain_resnums'] = repchain_resnums
 
         # Also need to parse the clean structure and save its sequence..
         self.representative_structure.parse_structure()
@@ -989,12 +988,16 @@ class Protein(Object):
                     if 'cif' not in pdb_file_type:
                         pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
                 except (requests.exceptions.HTTPError, URLError):
-                    log.error('{}: structure file could not be downloaded'.format(pdb))
+                    log.error('{}: structure file could not be downloaded in {} format'.format(pdb, pdb_file_type))
                     continue
+                    # TODO: add try/except to download cif file as fallback like below?
 
                 # TODO: clean up these try/except things
                 try:
-                    pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False, force_rerun=force_rerun)
+                    pdb.align_seqprop_to_mapped_chains(seqprop=self.representative_sequence,
+                                                       outdir=seq_outdir,
+                                                       engine=engine,
+                                                       parse=False, force_rerun=force_rerun)
                 except PDBConstructionException:
                     log.error('{}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(pdb, pdb_file_type))
                     # Fall back to using mmCIF file if structure cannot be parsed
@@ -1007,10 +1010,12 @@ class Protein(Object):
                     except (requests.exceptions.HTTPError, URLError):
                         log.error('{}: structure file could not be downloaded'.format(pdb))
                         continue
-                    pdb.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False,
-                                                             force_rerun=force_rerun)
+                    pdb.align_seqprop_to_mapped_chains(seqprop=self.representative_sequence,
+                                                       outdir=seq_outdir, engine=engine, parse=False,
+                                                       force_rerun=force_rerun)
 
-                best_chain = pdb.sequence_quality_checker(seq_ident_cutoff=seq_ident_cutoff,
+                best_chain = pdb.sequence_quality_checker(reference_seq=self.representative_sequence,
+                                                          seq_ident_cutoff=seq_ident_cutoff,
                                                           allow_missing_on_termini=allow_missing_on_termini,
                                                           allow_mutants=allow_mutants, allow_deletions=allow_deletions,
                                                           allow_insertions=allow_insertions, allow_unresolved=allow_unresolved)
@@ -1028,7 +1033,10 @@ class Protein(Object):
                         logging.exception("Unknown error with PDB ID {}".format(pdb.id))
                         continue
                     log.debug('{}-{}: set as representative structure'.format(pdb.id, best_chain.id))
+                    pdb.reset_chain_seq_records()
                     return self.representative_structure
+                else:
+                    pdb.reset_chain_seq_records()
             else:
                 log.debug('{}: no experimental structures meet cutoffs'.format(self.id))
 
@@ -1044,9 +1052,11 @@ class Protein(Object):
                     log.debug('{}: no homology structure file'.format(self.id))
                     continue
 
-                homology.align_reference_seq_to_mapped_chains(outdir=seq_outdir, engine=engine, parse=False,
-                                                              force_rerun=force_rerun)
-                best_chain = homology.sequence_quality_checker(seq_ident_cutoff=seq_ident_cutoff,
+                homology.align_seqprop_to_mapped_chains(seqprop=self.representative_sequence,
+                                                        outdir=seq_outdir, engine=engine, parse=False,
+                                                        force_rerun=force_rerun)
+                best_chain = homology.sequence_quality_checker(reference_seq=self.representative_sequence,
+                                                               seq_ident_cutoff=seq_ident_cutoff,
                                                                allow_missing_on_termini=allow_missing_on_termini,
                                                                allow_mutants=allow_mutants,
                                                                allow_deletions=allow_deletions,
@@ -1070,7 +1080,10 @@ class Protein(Object):
                         logging.exception("Unknown error with homology model {}".format(homology.id))
                         continue
                     log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain_suffix))
+                    homology.reset_chain_seq_records()
                     return self.representative_structure
+                else:
+                    homology.reset_chain_seq_records()
 
         log.warning('{}: no structures meet quality checks'.format(self.id))
         return None
@@ -1098,7 +1111,8 @@ class Protein(Object):
         single_map_to_structure = {}
         for k, v in single_lens.items():
             resnum = int(k[1])
-            resnum_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(resnum)
+            resnum_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(self.representative_sequence,
+                                                                                                        resnum)
             if resnum not in resnum_to_structure:
                 log.warning('{}: residue is not available in structure {}'.format(resnum, self.representative_structure.id))
                 continue
@@ -1119,7 +1133,8 @@ class Protein(Object):
             fingerprint_map_to_structure = {}
             for k, v in fingerprint_lens.items():
                 k_list = [int(x[1]) for x in k]
-                resnums_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(k_list)
+                resnums_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(self.representative_sequence,
+                                                                                                             k_list)
                 new_key = tuple(y[1] for y in resnums_to_structure.values())
                 fingerprint_map_to_structure[new_key] = v
 
