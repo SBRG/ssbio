@@ -307,11 +307,13 @@ def gunzip_file(infile, outfile=None, outdir=None, delete_original=False, force_
 
     """
     if not outfile:
-        outfile = infile.strip('.gz')
+        outfile = infile.replace('.gz', '')
 
     if not outdir:
         outdir = ''
-    outfile = op.join(outdir, outfile)
+    else:
+        outdir = op.dirname(infile)
+    outfile = op.join(outdir, op.basename(outfile))
 
     if force_rerun(flag=force_rerun_flag, outfile=outfile):
         gz = gzip.open(infile, "rb")
@@ -330,6 +332,29 @@ def gunzip_file(infile, outfile=None, outdir=None, delete_original=False, force_
 
     return outfile
 
+
+def request_file(link, outfile, force_rerun_flag=False):
+    """Download a file given a URL if the outfile does not exist already.
+
+    Args:
+        link (str): Link to download file.
+        outfile (str): Path to output file, will make a new file if it does not exist. Will not download if it does
+            exist, unless force_rerun_flag is True.
+        force_rerun_flag (bool): Flag to force re-downloading of the file if it exists already.
+
+    Returns:
+        str: Path to downloaded file.
+
+    """
+    if force_rerun(flag=force_rerun_flag, outfile=outfile):
+        req = requests.get(link)
+        if req.status_code == 200:
+            with open(outfile, 'w') as f:
+                f.write(req.text)
+            log.debug('Loaded and saved {} to {}'.format(link, outfile))
+        else:
+            log.error('{}: request error {}'.format(link, req.status_code))
+    return outfile
 
 def request_json(link, outfile, outdir=None, force_rerun_flag=False):
     """Download a file in JSON format from a web request
