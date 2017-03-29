@@ -42,10 +42,10 @@ class UniProtProp(SeqProp):
             self.uniprot = uniprot_acc
 
         if metadata_path:
-            self.load_metadata_file(metadata_path)
+            self.load_metadata_path(metadata_path)
 
-    def load_metadata_file(self, metadata_file):
-        SeqProp.load_metadata_file(self, metadata_file)
+    def load_metadata_path(self, metadata_file):
+        SeqProp.load_metadata_path(self, metadata_file)
         self.update(parse_uniprot_txt_file(metadata_file), overwrite=True,
                     only_keys=['description', 'kegg', 'refseq', 'ec_number', 'entry_version', 'gene_name',
                                'pfam', 'pdbs', 'reviewed', 'seq_version'])
@@ -66,7 +66,7 @@ class UniProtProp(SeqProp):
                                                       outdir=outdir,
                                                       force_rerun=force_rerun)
 
-        self.load_metadata_file(uniprot_metadata_file)
+        self.load_metadata_path(uniprot_metadata_file)
 
     def ranking_score(self):
         """Provide a score for this UniProt ID based on reviewed (True=1, False=0) + number of PDBs

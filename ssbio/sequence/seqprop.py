@@ -17,72 +17,63 @@ log = logging.getLogger(__name__)
 
 
 class SeqProp(Object):
-    """Class for protein sequence properties.
-
-    SeqProp provides:
-    1. Attributes for mapping to other database identifiers
-        - .bigg: BiGG Models ID
-        - .kegg: KEGG ID
-        - .uniprot: UniProt ACC/ID
-        - .gene_name: Human readable gene name
-        - .pdbs: Mapped PDB IDs
-
-    2. Basic sequence attributes
-        - .seq_str: Sequence formatted as a string
-        - .seq_len: Length of the amino acid sequence
-
-    3. Pointers to filepaths
-        - .sequence_path: Full path to sequence file
-        - .metadata_path: Full path to metadata file
-
-    """
-
     def __init__(self, ident, sequence_path=None, metadata_path=None, seq=None, description="<unknown description>",
-                 write_fasta_file=False, outname=None, outdir=None, force_rewrite=False):
-        """Parses basic sequence properties like identifiers and sequence length.
+                 write_fasta_file=False, outfile=None, force_rewrite=False):
+        """Store basic protein sequence properties.
 
-            Provides paths to sequence and metadata files.
+        Takes as input a sequence FASTA file, sequence string, Biopython Seq or SeqRecord. You can also provide the
+        path to the metadata file if available (see UniProtProp and KEGGProp classes for parsers). If provided as a
+        string/Seq/SeqRecord object, you can also write them out as FASTA files.
 
         Args:
             ident (str): Identifier of the sequence
-            description:
-            sequence_path: Path to FASTA file of the sequence
-            metadata_path: Path to metadata file of the sequence
+            sequence_path (str): Path to FASTA file of the sequence
+            metadata_path (str): Path to metadata file of the sequence
             seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
-            write_fasta_file:
+            description (str): Optional description of the sequence
+            write_fasta_file (bool): If a FASTA file of the sequence should be written
             outname:
             outdir:
             force_rewrite:
         """
+
         Object.__init__(self, id=ident, description=description)
 
+        # Database identifiers
         self.bigg = None
         self.kegg = None
         self.refseq = None
         self.uniprot = None
         self.gene_name = None
         self.pdbs = None
-        self.seq_record = None
 
+        # Sequence information
+        self._seq_record = None
+        if seq:
+            # Load sequence if not provided as a file
+            self.seq_record = ssbio.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
+
+        # File information
         self._sequence_dir = None
         self.sequence_file = None
         if sequence_path:
             self.load_sequence_path(sequence_path)
-
         self._metadata_dir = None
         self.metadata_file = None
         if metadata_path:
-            self.load_metadata_file(metadata_path)
-
-        if seq:
-            self.seq_record = ssbio.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
-
+            self.load_metadata_path(metadata_path)
         if write_fasta_file:
-            self.write_fasta_file(outname=outname, outdir=outdir, force_rerun=force_rewrite)
+            if not outfile:
+                raise ValueError('Output path must be specified if you want to write a FASTA file.')
+            self.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
 
         # Store AlignIO objects of this sequence to others in alignments
         self.sequence_alignments = DictList()
         self.structure_alignments = DictList()
+
+        # Copy SeqRecord annotations and letter annotations for JSON saving capabilities
+        self.annotations = {}
+        self.letter_annotations = {}
 
     @property
     def sequence_dir(self):
@@ -108,6 +99,25 @@ class SeqProp(Object):
             if not self.sequence_file:
                 log.debug('{}: sequence file not available'.format(self.id))
             return None
+
+    @property
+    def seq_record(self):
+        # The SeqRecord object is not kept in memory unless explicitly set, so when saving as a json we only save a
+        # pointer to the file
+        if not self.sequence_path:
+            return self._seq_record
+            # log.error('{}: sequence file not available'.format(self.id))
+            # return None
+
+
+        return SeqIO.read(open(self.sequence_path), 'fasta')
+
+    @seq_record.setter
+    def seq_record(self, sr):
+        # Copy SeqRecord annotations and letter annotations for JSON saving capabilities
+        self.annotations = sr.annotations
+        self.letter_annotations = sr.letter_annotations
+        self._seq_record = sr
 
     @property
     def metadata_dir(self):
@@ -165,9 +175,8 @@ class SeqProp(Object):
         """
         self.sequence_dir = op.dirname(sequence_path)
         self.sequence_file = op.basename(sequence_path)
-        self.seq_record = SeqIO.read(open(sequence_path), 'fasta')
 
-    def load_metadata_file(self, metadata_path):
+    def load_metadata_path(self, metadata_path):
         """Load a metadata file and provide pointers to its location
 
         Args:
@@ -177,21 +186,22 @@ class SeqProp(Object):
         self.metadata_dir = op.dirname(metadata_path)
         self.metadata_file = op.basename(metadata_path)
 
-    def write_fasta_file(self, outname=None, outdir=None, force_rerun=False):
-        """Write a FASTA file for the sequence
+    def write_fasta_file(self, outfile, force_rerun=False):
+        """Write a FASTA file for the protein sequence.
 
         Args:
-            outname: Name of the FASTA file (without extension)
-            outdir: Path to directory to output file to
-            force_rerun: If file should be overwritten if existing
+            outfile (str): Path to new FASTA file to be written to
+            force_rerun (bool): If an existing file should be overwritten
 
         """
-        if not outname:
-            outname = self.id
+        outdir, outname, outext = ssbio.utils.split_folder_and_path(outfile)
         sequence_path = ssbio.sequence.utils.fasta.write_fasta_file(self.seq_record,
                                                                     outname=outname,
                                                                     outdir=outdir,
+                                                                    outext=outext,
                                                                     force_rerun=force_rerun)
+        # Unset the SeqRecord as it will now be dynamically loaded from the file
+        self.seq_record = None
         self.load_sequence_path(sequence_path)
 
     def equal_to(self, seq_prop):
@@ -239,7 +249,7 @@ class SeqProp(Object):
                 being equal to the protein sequence length
 
         """
-        self.seq_record.letter_annotations[annotation_name] = letter_annotation
+        self.letter_annotations[annotation_name] = letter_annotation
         log.debug('{}: loaded letter_annotations and saved as "{}"'.format(self.id, annotation_name))
 
     def get_biopython_pepstats(self):
@@ -252,7 +262,7 @@ class SeqProp(Object):
         except KeyError as e:
             log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
             return
-        self.seq_record.annotations.update(pepstats)
+        self.annotations.update(pepstats)
 
     def get_emboss_pepstats(self):
         """Run the EMBOSS pepstats program on the protein sequence.
@@ -262,7 +272,7 @@ class SeqProp(Object):
         """
         outfile = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
         pepstats = ssbio.sequence.properties.residues.emboss_pepstats_parser(outfile)
-        self.seq_record.annotations.update(pepstats)
+        self.annotations.update(pepstats)
 
     def blast_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
                   outdir=None, force_rerun=False):

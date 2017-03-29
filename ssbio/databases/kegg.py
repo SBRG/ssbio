@@ -21,10 +21,10 @@ class KEGGProp(SeqProp):
             self.kegg = kegg_id
 
         if metadata_path:
-            self.load_metadata_file(metadata_path)
+            self.load_metadata_path(metadata_path)
 
-    def load_metadata_file(self, metadata_path):
-        SeqProp.load_metadata_file(self, metadata_path)
+    def load_metadata_path(self, metadata_path):
+        SeqProp.load_metadata_path(self, metadata_path)
         self.update(parse_kegg_gene_metadata(metadata_path), overwrite=True)
 
     def download_seq_file(self, outdir, force_rerun=False):
@@ -41,7 +41,7 @@ class KEGGProp(SeqProp):
                                                          outdir=outdir,
                                                          force_rerun=force_rerun)
         if kegg_metadata_file:
-            self.load_metadata_file(kegg_metadata_file)
+            self.load_metadata_path(kegg_metadata_file)
         else:
             log.warning('{}: no metadata file available'.format(self.id))
 
