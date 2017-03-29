@@ -1,4 +1,4 @@
-cobra
+cobra>=0.5.11
 biopython>=1.68
 numpy
 tqdm
