@@ -66,6 +66,8 @@ class CleanPDB(PDB.Select):
 
     def accept_residue(self, residue):
         hetfield, resseq, icode = residue.get_id()
+        if hetfield == '':
+            hetfield = ' '
         # If you want to remove residues that are not normal, remove them
         if self.remove_res_hetero and hetfield[0] != ' ':
             return False
