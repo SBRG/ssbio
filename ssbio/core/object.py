@@ -180,7 +180,7 @@ class Object(object):
     def __json_encode__(self):
         to_return = {}
         # Don't save properties, methods in the JSON
-        for x in [a for a in dir(self) if not a.startswith('__') and not isinstance(getattr(type(self), a, None), property) and not callable(getattr(self,a))]:
+        for x in [a for a in dir(self) if not a.startswith('__') and not a.startswith('_{}__'.format(type(self).__name__)) and not isinstance(getattr(type(self), a, None), property) and not callable(getattr(self,a))]:
             to_return.update({x: getattr(self, x)})
         return to_return
 
