@@ -989,7 +989,7 @@ class GEMPRO(Object):
     @property
     def df_representative_structures(self):
         rep_struct_pre_df = []
-        df_cols = ['gene', 'id', 'is_experimental', 'reference_seq', 'reference_seq_top_coverage']
+        df_cols = ['gene', 'id', 'is_experimental', 'reference_seq_top_coverage', 'structure_file']
 
         for g in self.genes_with_a_representative_structure:
             repdict = g.protein.representative_structure.get_dict(df_format=True, only_keys=df_cols)
