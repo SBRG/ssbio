@@ -19,14 +19,14 @@ class StructProp(Object):
     """Class for protein structural properties"""
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
-                 reference_seq=None, representative_chain=None, is_experimental=False):
+                 representative_chain=None, is_experimental=False):
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
 
-        self.reference_seq = reference_seq
         self.reference_seq_top_coverage = None
 
+        # Chain information
         # chains is a DictList of ChainProp objects
         self.chains = DictList()
         if chains:
@@ -38,6 +38,7 @@ class StructProp(Object):
         # mapped_chains is an ordered list of mapped chain IDs which would come from BLAST or the best_structures API
         self.mapped_chains = ssbio.utils.force_list(mapped_chains)
 
+        # File information
         self.file_type = file_type
         self._structure_dir = None
         self.structure_file = None
@@ -179,12 +180,7 @@ class StructProp(Object):
                 log.debug('{}: added to chains list'.format(c))
 
     def get_structure_seqs(self, model):
-        """Store chain sequences in the corresponding ChainProp objects in the chains attribute
-
-        Returns:
-            DictList: All chain sequences as a DictList of SeqRecords
-
-        """
+        """Store chain sequences in the corresponding ChainProp objects in the chains attribute."""
         # Don't overwrite existing ChainProp objects
         dont_overwrite = []
         chains = list(model.get_chains())
@@ -206,11 +202,15 @@ class StructProp(Object):
             my_chain = self.chains.get_by_id(seq_record.id)
             my_chain.seq_record = seq_record
 
-    def align_reference_seq_to_mapped_chains(self, outdir=None, engine='needle', parse=True, force_rerun=False,
-                                             **kwargs):
+    def reset_chain_seq_records(self):
+        for x in self.chains:
+            x.reset_seq_record()
+
+    def align_seqprop_to_mapped_chains(self, seqprop, outdir=None, engine='needle', parse=True, force_rerun=False,
+                                       **kwargs):
         """Run and store alignments of the reference sequence to chains in mapped_chains.
 
-        Alignments are stored in the reference_seq.structure_alignments attribute.
+        Alignments are stored in the seqprop.structure_alignments attribute.
 
         Args:
             outdir (str): Directory to output sequence alignment files (only if running with needle)
@@ -221,30 +221,27 @@ class StructProp(Object):
         """
         # TODO: **kwargs for alignment options
 
-        if not self.reference_seq:
-            raise ValueError('{}: reference sequence not set'.format(self.id))
-
         # Parse the structure so chain sequences are stored
         my_structure = self.parse_structure()
 
         for chain_id in self.mapped_chains:
             structure_id = '{}-{}'.format(self.id, chain_id)
-            aln_id = '{}_{}'.format(self.reference_seq.id, structure_id)
+            aln_id = '{}_{}'.format(seqprop.id, structure_id)
             outfile = '{}.needle'.format(aln_id)
 
-            if self.reference_seq.structure_alignments.has_id(aln_id):
+            if seqprop.structure_alignments.has_id(aln_id):
                 log.debug('{}: alignment already completed'.format(chain_id))
                 continue
 
-            log.debug('{}: aligning to reference sequence {}'.format(structure_id, self.reference_seq.id))
+            log.debug('{}: aligning to reference sequence {}'.format(structure_id, seqprop.id))
 
             chain_prop = self.chains.get_by_id(chain_id)
             chain_seq_record = chain_prop.seq_record
             if not chain_seq_record:
                 raise ValueError('{}: chain sequence not parsed'.format(chain_id))
 
-            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.reference_seq.seq_str,
-                                                                             a_seq_id=self.reference_seq.id,
+            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=seqprop.seq_str,
+                                                                             a_seq_id=seqprop.id,
                                                                              b_seq=chain_seq_record,
                                                                              b_seq_id=structure_id,
                                                                              engine=engine,
@@ -254,7 +251,7 @@ class StructProp(Object):
 
             # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
             aln.id = aln_id
-            aln.annotations['a_seq'] = self.reference_seq.id
+            aln.annotations['a_seq'] = seqprop.id
             aln.annotations['b_seq'] = structure_id
             aln.annotations['structure_id'] = self.id
             aln.annotations['chain_id'] = chain_id
@@ -266,9 +263,9 @@ class StructProp(Object):
                 aln.annotations['deletions'] = ssbio.sequence.utils.alignment.get_deletions(aln_df)
                 aln.annotations['insertions'] = ssbio.sequence.utils.alignment.get_insertions(aln_df)
 
-            self.reference_seq.structure_alignments.append(aln)
+            seqprop.structure_alignments.append(aln)
 
-    def sequence_quality_checker(self, seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+    def sequence_quality_checker(self, reference_seq, seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                  allow_mutants=True, allow_deletions=False,
                                  allow_insertions=False, allow_unresolved=True):
         """Set the representative chain based on sequence quality checks to the reference sequence.
@@ -287,8 +284,12 @@ class StructProp(Object):
             ChainProp: the best chain, if any
 
         """
-        for alignment in self.reference_seq.structure_alignments:
-            chain_id = alignment.annotations['chain_id']
+        for chain_id in self.mapped_chains:
+            try:
+                alignment = reference_seq.structure_alignments.get_by_id('{}_{}-{}'.format(reference_seq.id, self.id, chain_id))
+            except KeyError:
+                log.error('{}_{}-{}: structure alignment not found'.format(reference_seq.id, self.id, chain_id))
+                continue
 
             # Compare representative sequence to structure sequence using the alignment
             found_good_chain = ssbio.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
@@ -476,7 +477,7 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
-    def _map_repseq_resnums_to_repchain_index(self, resnums):
+    def _map_repseq_resnums_to_repchain_index(self, reference_seq, resnums):
         """Map a residue number in the reference_seq to an index in the representative_chain
 
         Use this to get the indices of the repchain to get structural properties at a specific residue number.
@@ -490,7 +491,7 @@ class StructProp(Object):
         """
         resnums = ssbio.utils.force_list(resnums)
 
-        repchain_resnum_mapping = self.reference_seq.seq_record.letter_annotations['repchain_resnums']
+        repchain_resnum_mapping = reference_seq.seq_record.letter_annotations['repchain_resnums']
 
         to_repchain_index = {}
         for x in resnums:
@@ -503,7 +504,7 @@ class StructProp(Object):
 
         return to_repchain_index
 
-    def map_repseq_resnums_to_structure_resnums(self, resnums, chain=None):
+    def map_repseq_resnums_to_structure_resnums(self, reference_seq, resnums, chain=None):
         """Map a residue number in the reference_seq to the actual structure file's residue number (for the representative chain
 
         Args:
@@ -520,7 +521,7 @@ class StructProp(Object):
 
         resnums = ssbio.utils.force_list(resnums)
 
-        mapping_to_repchain_index = self._map_repseq_resnums_to_repchain_index(resnums)
+        mapping_to_repchain_index = self._map_repseq_resnums_to_repchain_index(reference_seq, resnums)
         repchain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
 
         to_structure_resnums = {}
@@ -534,7 +535,7 @@ class StructProp(Object):
 
         return to_structure_resnums
 
-    def view_structure(self, opacity=1.0, gui=False):
+    def view_structure(self, opacity=1.0, recolor=True, gui=False):
         """Use NGLviewer to display a structure in a Jupyter notebook
 
         Args:
@@ -550,8 +551,12 @@ class StructProp(Object):
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
         view = nv.show_structure_file(self.structure_path, gui=gui)
-        view.clear_representations()
-        view.add_cartoon(selection='protein', color='silver', opacity=opacity)
+
+        if recolor:
+            view.clear_representations()
+            view.add_cartoon(selection='protein', color='silver', opacity=opacity)
+        # else:
+            # view.add_cartoon(selection='protein', opacity=opacity)
         return view
 
     def view_structure_and_highlight_residues(self, structure_resnums, chain=None, color='red',

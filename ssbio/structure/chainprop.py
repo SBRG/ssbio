@@ -14,3 +14,6 @@ class ChainProp(Object):
 
         if not self.description:
             self.description = 'Chain {} from PDB parent {}'.format(self.id, self.pdb_parent)
+
+    def reset_seq_record(self):
+        self.seq_record = None
