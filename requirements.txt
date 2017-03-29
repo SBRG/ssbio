@@ -3,7 +3,7 @@ biopython>=1.68
 numpy
 tqdm
 pandas
-requests
+requests>=2.13.0
 bioservices
 xmltodict
 six
