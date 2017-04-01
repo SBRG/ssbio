@@ -1,9 +1,12 @@
 from __future__ import print_function
+
 import getpass
+import logging
 import os
 import os.path as op
-from ssbio.sequence.utils import fasta as fasta
-import logging
+
+from ssbio.protein.sequence.utils import fasta as fasta
+
 log = logging.getLogger(__name__)
 
 class ITASSERPrep():

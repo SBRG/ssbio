@@ -1,10 +1,13 @@
 import argparse
+import logging
+
 import pandas as pd
 from Bio import PDB
 from tqdm import tqdm
+
 import ssbio.utils
-from ssbio.structure.utils.structureio import StructureIO
-import logging
+from ssbio.protein.structure.utils.structureio import StructureIO
+
 log = logging.getLogger(__name__)
 
 

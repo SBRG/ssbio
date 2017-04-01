@@ -1,13 +1,15 @@
-import ssbio.utils
-import pandas as pd
+import logging
 from collections import defaultdict
+
+import pandas as pd
 from Bio import PDB
+from Bio.PDB.DSSP import dssp_dict_from_pdb_file
+from Bio.PDB.DSSP import residue_max_acc
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
-from Bio.PDB.DSSP import residue_max_acc
-from Bio.PDB.DSSP import dssp_dict_from_pdb_file
-from ssbio.structure.utils.structureio import StructureIO
-import logging
+
+import ssbio.utils
+
 log = logging.getLogger(__name__)
 
 

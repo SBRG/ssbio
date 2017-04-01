@@ -1,7 +1,7 @@
 import logging
 import os.path as op
 
-import ssbio.sequence.utils.fasta
+import ssbio.protein.sequence.utils.fasta
 import ssbio.utils
 
 log = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class SCRATCH():
         self.project_name = project_name
         self.seq_file = seq_file
         if seq_str:
-            self.seq_file = ssbio.sequence.utils.fasta.write_seq_as_temp_fasta(seq_str)
+            self.seq_file = ssbio.protein.sequence.utils.fasta.write_seq_as_temp_fasta(seq_str)
 
     def run_scratch(self, path_to_scratch, num_cores=1, outname=None, outdir=None, force_rerun=False):
         """Run SCRATCH on the sequence_file that was loaded into the class.
@@ -66,7 +66,7 @@ class SCRATCH():
                 C: the rest
 
         """
-        return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_sspro)
+        return ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_sspro)
 
     def sspro_summary(self):
         """Parse the SSpro output file and return a summary of secondary structure composition.
@@ -83,7 +83,7 @@ class SCRATCH():
         """
         summary = {}
 
-        records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_sspro)
+        records = ssbio.protein.sequence.utils.fasta.load_fasta_file(self.out_sspro)
         for r in records:
             seq_summary = {}
             seq_summary['percent_H-sspro'] = r.seq.count('H')/float(len(r))
@@ -97,7 +97,7 @@ class SCRATCH():
     def sspro8_results(self):
         """Parse the SSpro8 output file and return a dict of secondary structure compositions.
         """
-        return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_sspro8)
+        return ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_sspro8)
 
     def sspro8_summary(self):
         """Parse the SSpro8 output file and return a summary of secondary structure composition.
@@ -119,7 +119,7 @@ class SCRATCH():
         """
         summary = {}
 
-        records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_sspro8)
+        records = ssbio.protein.sequence.utils.fasta.load_fasta_file(self.out_sspro8)
         for r in records:
             seq_summary = {}
             seq_summary['percent_H-sspro8'] = r.seq.count('H') / float(len(r))
@@ -138,7 +138,7 @@ class SCRATCH():
     def accpro_results(self):
         """Parse the ACCpro output file and return a dict of secondary structure compositions.
         """
-        return ssbio.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_accpro)
+        return ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(self.out_accpro)
 
     def accpro_summary(self):
         """Parse the ACCpro output file and return a summary of percent exposed/buried residues.
@@ -152,7 +152,7 @@ class SCRATCH():
         """
         summary = {}
 
-        records = ssbio.sequence.utils.fasta.load_fasta_file(self.out_accpro)
+        records = ssbio.protein.sequence.utils.fasta.load_fasta_file(self.out_accpro)
         for r in records:
             seq_summary = {}
             seq_summary['percent_exposed-accpro'] = r.seq.count('e') / float(len(r))

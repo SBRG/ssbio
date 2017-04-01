@@ -3,11 +3,13 @@ import os
 import os.path as op
 import shutil
 import time
+
 import pandas as pd
+from ssbio.protein.structure.utils.cleanpdb import CleanPDB
+from ssbio.protein.structure.utils.structureio import StructureIO
+
 import ssbio.utils
-from ssbio.structure.structprop import StructProp
-from ssbio.structure.utils.structureio import StructureIO
-from ssbio.structure.utils.cleanpdb import CleanPDB
+from ssbio.protein.structure.structprop import StructProp
 
 log = logging.getLogger(__name__)
 

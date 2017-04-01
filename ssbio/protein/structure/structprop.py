@@ -1,17 +1,20 @@
-from ssbio.core.object import Object
-from ssbio.structure.chainprop import ChainProp
-import ssbio.sequence.utils.alignment
-import os.path as op
-from ssbio.structure.utils.structureio import StructureIO
-from cobra.core import DictList
-import ssbio.structure.properties
-import ssbio.utils
 import logging
+import os.path as op
+
 import numpy as np
+import ssbio.protein.structure.properties
+from cobra.core import DictList
+from ssbio.protein.structure.utils.structureio import StructureIO
+
+import ssbio.protein.sequence.utils.alignment
+import ssbio.utils
+from ssbio.core.object import Object
+from ssbio.protein.structure.chainprop import ChainProp
+
 if ssbio.utils.is_ipynb():
     import nglview as nv
 import seaborn as sns
-import ssbio.structure.utils.cleanpdb
+import ssbio.protein.structure.utils.cleanpdb
 log = logging.getLogger(__name__)
 
 
@@ -134,15 +137,15 @@ class StructProp(Object):
             log.error('{}: no structure file, unable to clean'.format(self.id))
             return None
 
-        clean_pdb_file = ssbio.structure.utils.cleanpdb.clean_pdb(self.structure_path, out_suffix=out_suffix,
-                                                                  outdir=outdir, force_rerun=force_rerun,
-                                                                  remove_atom_alt=remove_atom_alt,
-                                                                  remove_atom_hydrogen=remove_atom_hydrogen,
-                                                                  keep_atom_alt_id=keep_atom_alt_id,
-                                                                  add_atom_occ=add_atom_occ,
-                                                                  remove_res_hetero=remove_res_hetero,
-                                                                  add_chain_id_if_empty=add_chain_id_if_empty,
-                                                                  keep_chains=keep_chains)
+        clean_pdb_file = ssbio.protein.structure.utils.cleanpdb.clean_pdb(self.structure_path, out_suffix=out_suffix,
+                                                                          outdir=outdir, force_rerun=force_rerun,
+                                                                          remove_atom_alt=remove_atom_alt,
+                                                                          remove_atom_hydrogen=remove_atom_hydrogen,
+                                                                          keep_atom_alt_id=keep_atom_alt_id,
+                                                                          add_atom_occ=add_atom_occ,
+                                                                          remove_res_hetero=remove_res_hetero,
+                                                                          add_chain_id_if_empty=add_chain_id_if_empty,
+                                                                          keep_chains=keep_chains)
 
         return clean_pdb_file
 
@@ -193,7 +196,7 @@ class StructProp(Object):
             return
 
         # Returns the structures sequences with Xs added
-        structure_seqs = ssbio.structure.properties.residues.get_structure_seqrecords(model)
+        structure_seqs = ssbio.protein.structure.properties.residues.get_structure_seqrecords(model)
         log.debug('{}: gathered chain sequences'.format(self.id))
 
         # Associate with ChainProps
@@ -240,14 +243,14 @@ class StructProp(Object):
             if not chain_seq_record:
                 raise ValueError('{}: chain sequence not parsed'.format(chain_id))
 
-            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=seqprop.seq_str,
-                                                                             a_seq_id=seqprop.id,
-                                                                             b_seq=chain_seq_record,
-                                                                             b_seq_id=structure_id,
-                                                                             engine=engine,
-                                                                             outdir=outdir,
-                                                                             outfile=outfile,
-                                                                             force_rerun=force_rerun)
+            aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=seqprop.seq_str,
+                                                                                     a_seq_id=seqprop.id,
+                                                                                     b_seq=chain_seq_record,
+                                                                                     b_seq_id=structure_id,
+                                                                                     engine=engine,
+                                                                                     outdir=outdir,
+                                                                                     outfile=outfile,
+                                                                                     force_rerun=force_rerun)
 
             # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
             aln.id = aln_id
@@ -257,11 +260,11 @@ class StructProp(Object):
             aln.annotations['chain_id'] = chain_id
 
             if parse:
-                aln_df = ssbio.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
-                                                                         b_aln_seq=str(list(aln)[1].seq))
-                aln.annotations['mutations'] = ssbio.sequence.utils.alignment.get_mutations(aln_df)
-                aln.annotations['deletions'] = ssbio.sequence.utils.alignment.get_deletions(aln_df)
-                aln.annotations['insertions'] = ssbio.sequence.utils.alignment.get_insertions(aln_df)
+                aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
+                                                                                 b_aln_seq=str(list(aln)[1].seq))
+                aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
+                aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
+                aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
 
             seqprop.structure_alignments.append(aln)
 
@@ -292,14 +295,14 @@ class StructProp(Object):
                 continue
 
             # Compare representative sequence to structure sequence using the alignment
-            found_good_chain = ssbio.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
-                                                                        structure_seq_aln=alignment[1],
-                                                                        seq_ident_cutoff=seq_ident_cutoff,
-                                                                        allow_missing_on_termini=allow_missing_on_termini,
-                                                                        allow_mutants=allow_mutants,
-                                                                        allow_deletions=allow_deletions,
-                                                                        allow_insertions=allow_insertions,
-                                                                        allow_unresolved=allow_unresolved)
+            found_good_chain = ssbio.protein.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
+                                                                                           structure_seq_aln=alignment[1],
+                                                                                           seq_ident_cutoff=seq_ident_cutoff,
+                                                                                           allow_missing_on_termini=allow_missing_on_termini,
+                                                                                           allow_mutants=allow_mutants,
+                                                                                           allow_deletions=allow_deletions,
+                                                                                           allow_insertions=allow_insertions,
+                                                                                           allow_unresolved=allow_unresolved)
 
             # If found_good_pdb = True, set as representative chain
             # If not, move on to the next potential chain
@@ -367,8 +370,8 @@ class StructProp(Object):
             log.error('{}: unable to open structure to find S-S bridges'.format(self.id))
             return
 
-        disulfide_bridges = ssbio.structure.properties.residues.search_ss_bonds(parsed.first_model,
-                                                                                threshold=threshold)
+        disulfide_bridges = ssbio.protein.structure.properties.residues.search_ss_bonds(parsed.first_model,
+                                                                                        threshold=threshold)
         if not disulfide_bridges:
             log.debug('{}: no disulfide bridges'.format(self.id))
 
@@ -386,9 +389,9 @@ class StructProp(Object):
             return
 
         log.debug('{}: running MSMS'.format(self.id))
-        msms_results = ssbio.structure.properties.msms.get_msms_df(model=parsed.first_model,
-                                                        pdb_file=self.structure_path,
-                                                        outdir=outdir, force_rerun=force_rerun)
+        msms_results = ssbio.protein.structure.properties.msms.get_msms_df(model=parsed.first_model,
+                                                                           pdb_file=self.structure_path,
+                                                                           outdir=outdir, force_rerun=force_rerun)
         if msms_results.empty:
             log.error('{}: unable to run MSMS'.format(self.id))
             return
@@ -403,13 +406,13 @@ class StructProp(Object):
             chain_seq = chain_prop.seq_record
 
             # Making sure the X's are filled in
-            res_depths = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                           new_seq=res_depths,
-                                                                           fill_with=float('Inf'))
+            res_depths = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                              new_seq=res_depths,
+                                                                                              fill_with=float('Inf'))
 
-            ca_depths = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                          new_seq=ca_depths,
-                                                                          fill_with=float('Inf'))
+            ca_depths = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                             new_seq=ca_depths,
+                                                                                             fill_with=float('Inf'))
 
             chain_prop.seq_record.letter_annotations['RES_DEPTH-msms'] = res_depths
             chain_prop.seq_record.letter_annotations['CA_DEPTH-msms'] = ca_depths
@@ -429,17 +432,17 @@ class StructProp(Object):
             return
 
         log.debug('{}: running DSSP'.format(self.id))
-        dssp_results = ssbio.structure.properties.dssp.get_dssp_df(model=parsed.first_model,
-                                                                   pdb_file=self.structure_path,
-                                                                   outdir=outdir,
-                                                                   force_rerun=force_rerun)
+        dssp_results = ssbio.protein.structure.properties.dssp.get_dssp_df(model=parsed.first_model,
+                                                                           pdb_file=self.structure_path,
+                                                                           outdir=outdir,
+                                                                           force_rerun=force_rerun)
 
         if dssp_results.empty:
             log.error('{}: unable to run DSSP'.format(self.id))
             return
 
         chains = dssp_results.chain.unique()
-        dssp_summary = ssbio.structure.properties.dssp.secondary_structure_summary(dssp_results)
+        dssp_summary = ssbio.protein.structure.properties.dssp.secondary_structure_summary(dssp_results)
 
         for chain in chains:
             ss = dssp_results[dssp_results.chain == chain].ss.tolist()
@@ -452,21 +455,21 @@ class StructProp(Object):
             chain_seq = chain_prop.seq_record
 
             # Making sure the X's are filled in
-            ss = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                              new_seq=ss,
-                                                                              fill_with='-')
-            exposure_rsa = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                             new_seq=exposure_rsa,
-                                                                             fill_with=float('Inf'))
-            exposure_asa = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                             new_seq=exposure_asa,
-                                                                             fill_with=float('Inf'))
-            phi = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                    new_seq=phi,
-                                                                    fill_with=float('Inf'))
-            psi = ssbio.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                    new_seq=psi,
-                                                                    fill_with=float('Inf'))
+            ss = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                      new_seq=ss,
+                                                                                      fill_with='-')
+            exposure_rsa = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                                new_seq=exposure_rsa,
+                                                                                                fill_with=float('Inf'))
+            exposure_asa = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                                new_seq=exposure_asa,
+                                                                                                fill_with=float('Inf'))
+            phi = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                       new_seq=phi,
+                                                                                       fill_with=float('Inf'))
+            psi = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                       new_seq=psi,
+                                                                                       fill_with=float('Inf'))
 
             chain_prop.seq_record.annotations.update(dssp_summary[chain])
 

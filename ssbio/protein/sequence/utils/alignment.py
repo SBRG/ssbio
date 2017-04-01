@@ -1,19 +1,20 @@
+import logging
 import os.path as op
-import pandas as pd
-import numpy as np
-import ssbio.utils
-from itertools import groupby, count
-from collections import defaultdict
-import ssbio.sequence.utils
 import subprocess
 import tempfile
+from collections import defaultdict
+from itertools import count, groupby
+
+import numpy as np
+import pandas as pd
 from Bio import AlignIO
 from Bio import pairwise2
-from Bio.SubsMat import MatrixInfo as matlist
 from Bio.Align import MultipleSeqAlignment
-from Bio.Emboss.Applications import NeedleCommandline
+from Bio.SubsMat import MatrixInfo as matlist
 
-import logging
+import ssbio.protein.sequence.utils
+import ssbio.utils
+
 log = logging.getLogger(__name__)
 
 # quiet the SettingWithCopyWarning when converting dtypes in get_deletions/mutations methods
@@ -65,8 +66,8 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
     if not b_seq_id:
         b_seq_id = 'b_seq'
 
-    a_seq = ssbio.sequence.utils.cast_to_str(a_seq)
-    b_seq = ssbio.sequence.utils.cast_to_str(b_seq)
+    a_seq = ssbio.protein.sequence.utils.cast_to_str(a_seq)
+    b_seq = ssbio.protein.sequence.utils.cast_to_str(b_seq)
 
     if engine == 'biopython':
         # TODO: allow different matrices? needle uses blosum62 by default, how to change that?
@@ -77,8 +78,8 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
         alignments = pairwise2.align.globaldx(a_seq, b_seq, blosum62)  # TODO: add gap penalties
         best_alignment = alignments[0]
 
-        a = ssbio.sequence.utils.cast_to_seq_record(best_alignment[0], id=a_seq_id)
-        b = ssbio.sequence.utils.cast_to_seq_record(best_alignment[1], id=b_seq_id)
+        a = ssbio.protein.sequence.utils.cast_to_seq_record(best_alignment[0], id=a_seq_id)
+        b = ssbio.protein.sequence.utils.cast_to_seq_record(best_alignment[1], id=b_seq_id)
         alignment = MultipleSeqAlignment([a, b], annotations={"score": best_alignment[2],
                                                               "start": best_alignment[3],
                                                               "end"  : best_alignment[4]})
@@ -149,8 +150,8 @@ def run_needle_alignment(seq_a, seq_b, gapopen=10, gapextend=0.5,
 
     # Check if the outfile already exists, if so just return the filename
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        seq_a = ssbio.sequence.utils.cast_to_str(seq_a)
-        seq_b = ssbio.sequence.utils.cast_to_str(seq_b)
+        seq_a = ssbio.protein.sequence.utils.cast_to_str(seq_a)
+        seq_b = ssbio.protein.sequence.utils.cast_to_str(seq_b)
 
         cmd = 'needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile, seq_a, seq_b, gapopen, gapextend)
         command = subprocess.Popen(cmd,
@@ -263,8 +264,8 @@ def get_alignment_df(a_aln_seq, b_aln_seq, a_seq_id=None, b_seq_id=None):
     if not b_seq_id:
         b_seq_id = 'b_seq'
 
-    a_aln_seq = ssbio.sequence.utils.cast_to_str(a_aln_seq)
-    b_aln_seq = ssbio.sequence.utils.cast_to_str(b_aln_seq)
+    a_aln_seq = ssbio.protein.sequence.utils.cast_to_str(a_aln_seq)
+    b_aln_seq = ssbio.protein.sequence.utils.cast_to_str(b_aln_seq)
 
     a_idx = 1
     b_idx = 1

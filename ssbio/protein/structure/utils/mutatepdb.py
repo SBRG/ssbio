@@ -6,8 +6,9 @@ from Bio import PDB
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import aa3
 from Bio.PDB.Polypeptide import one_to_three
-from ssbio.structure.utils.cleanpdb import CleanPDB
-from ssbio.structure.utils.structureio import StructureIO
+
+from ssbio.protein.structure.utils.cleanpdb import CleanPDB
+from ssbio.protein.structure.utils.structureio import StructureIO
 
 
 class MutatePDB(PDB.Select):

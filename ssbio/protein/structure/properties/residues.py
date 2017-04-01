@@ -1,13 +1,16 @@
-from Bio.SeqRecord import SeqRecord
-from Bio.Seq import Seq
+import logging
+from collections import defaultdict
+from copy import deepcopy
+
 from Bio.Alphabet import IUPAC
 from Bio.PDB import Polypeptide
 from Bio.PDB.HSExposure import ExposureCN, HSExposureCA, HSExposureCB
-from ssbio.structure.utils.structureio import StructureIO
-import ssbio.sequence.utils
-from copy import deepcopy
-from collections import defaultdict
-import logging
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+
+import ssbio.protein.sequence.utils
+from ssbio.protein.structure.utils.structureio import StructureIO
+
 log = logging.getLogger(__name__)
 
 
@@ -243,7 +246,7 @@ def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X'):
     if not isinstance(new_seq, str) and not isinstance(new_seq, tuple) and not isinstance(new_seq, list):
         raise ValueError('Invalid sequence provided, must be string, tuple, or list')
 
-    orig_seq = ssbio.sequence.utils.cast_to_str(orig_seq)
+    orig_seq = ssbio.protein.sequence.utils.cast_to_str(orig_seq)
     new_thing = deepcopy(new_seq)
     if isinstance(new_seq, tuple):
         new_thing = list(new_thing)

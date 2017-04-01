@@ -1,12 +1,11 @@
 import glob
 import logging
 import os
-import os.path as op
 
 import numpy as np
 import pandas as pd
 
-import ssbio.sequence.utils.alignment
+import ssbio.protein.sequence.utils.alignment
 from ssbio.utils import percentage_to_float
 
 log = logging.getLogger(__name__)
@@ -40,11 +39,11 @@ def sequence_checker(reference_seq_aln, structure_seq_aln,
     if len(reference_seq_aln) != len(structure_seq_aln):
         raise ValueError('Sequence lengths not equal - was an alignment run?')
 
-    reference_seq_aln = ssbio.sequence.utils.cast_to_str(reference_seq_aln)
-    structure_seq_aln = ssbio.sequence.utils.cast_to_str(structure_seq_aln)
+    reference_seq_aln = ssbio.protein.sequence.utils.cast_to_str(reference_seq_aln)
+    structure_seq_aln = ssbio.protein.sequence.utils.cast_to_str(structure_seq_aln)
 
     # Check percent identity cutoff
-    stats_percent_ident = ssbio.sequence.utils.alignment.get_percent_identity(reference_seq_aln, structure_seq_aln)
+    stats_percent_ident = ssbio.protein.sequence.utils.alignment.get_percent_identity(reference_seq_aln, structure_seq_aln)
     log.debug('{}: percent identity'.format(stats_percent_ident))
     if stats_percent_ident < seq_ident_cutoff:
         log.debug('Alignment does not meet percent identity cutoff')
@@ -53,8 +52,8 @@ def sequence_checker(reference_seq_aln, structure_seq_aln,
         log.debug('Alignment meets percent identity cutoff')
 
     # Parse the alignment results
-    aln_df = ssbio.sequence.utils.alignment.get_alignment_df(a_aln_seq=reference_seq_aln,
-                                                             b_aln_seq=structure_seq_aln)
+    aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=reference_seq_aln,
+                                                                     b_aln_seq=structure_seq_aln)
 
     # Get cutoff stuff ready
     ref_seq_len = len(reference_seq_aln.replace('-', ''))
@@ -72,7 +71,7 @@ def sequence_checker(reference_seq_aln, structure_seq_aln,
     # Check everything
     if not allow_deletions:
         # Get indices of the deletions
-        deletions = ssbio.sequence.utils.alignment.get_deletions(aln_df)
+        deletions = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
         # If there are no deletions, that's great
         if len(deletions) == 0:
             log.debug('No deletion regions')
@@ -94,7 +93,7 @@ def sequence_checker(reference_seq_aln, structure_seq_aln,
 
     if not allow_insertions:
         # Get indices of the insertions
-        insertions = ssbio.sequence.utils.alignment.get_insertions(aln_df)
+        insertions = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
         # If there are no insertions, that's great
         if len(insertions) == 0:
             log.debug('No insertion regions')
@@ -115,7 +114,7 @@ def sequence_checker(reference_seq_aln, structure_seq_aln,
 
     if not allow_mutants:
         # Get indices of the mutants
-        mutations_full = ssbio.sequence.utils.alignment.get_mutations(aln_df)
+        mutations_full = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
         mutations = [x[1] for x in mutations_full]
         # If there are no mutants, that's great
         if len(mutations) == 0:
@@ -137,7 +136,7 @@ def sequence_checker(reference_seq_aln, structure_seq_aln,
 
     if not allow_unresolved:
         # Get indices of the unresolved residues
-        unresolved = ssbio.sequence.utils.alignment.get_unresolved(aln_df)
+        unresolved = ssbio.protein.sequence.utils.alignment.get_unresolved(aln_df)
         # If there are no unresolved, that's great
         if len(unresolved) == 0:
             log.debug('No unresolved mutations')

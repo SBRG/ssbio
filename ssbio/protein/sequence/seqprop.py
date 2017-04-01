@@ -1,17 +1,18 @@
-from ssbio.core.object import Object
-from os import path as op
-from Bio import SeqIO
-import ssbio.utils
-import ssbio.sequence.utils
-import ssbio.sequence.utils.fasta
-import ssbio.sequence.properties.residues
-import ssbio.databases.pdb
-from cobra.core import DictList
-from copy import deepcopy
-from collections import defaultdict
 import logging
-from slugify import Slugify
+from collections import defaultdict
+from copy import deepcopy
+from os import path as op
 import requests
+from Bio import SeqIO
+from cobra.core import DictList
+from slugify import Slugify
+import ssbio.protein.sequence.properties.residues
+import ssbio.protein.sequence.utils
+import ssbio.protein.sequence.utils.fasta
+import ssbio.databases.pdb
+import ssbio.utils
+from ssbio.core.object import Object
+
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class SeqProp(Object):
         self._seq_record = None
         if seq:
             # Load sequence if not provided as a file
-            self.seq_record = ssbio.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
+            self.seq_record = ssbio.protein.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
 
         # File information
         self._sequence_dir = None
@@ -115,8 +116,9 @@ class SeqProp(Object):
     @seq_record.setter
     def seq_record(self, sr):
         # Copy SeqRecord annotations and letter annotations for JSON saving capabilities
-        self.annotations = sr.annotations
-        self.letter_annotations = sr.letter_annotations
+        if sr:
+            self.annotations = sr.annotations
+            self.letter_annotations = sr.letter_annotations
         self._seq_record = sr
 
     @property
@@ -149,7 +151,7 @@ class SeqProp(Object):
         """Get the sequence formatted as a string"""
         if not self.seq_record:
             return None
-        return ssbio.sequence.utils.cast_to_str(self.seq_record)
+        return ssbio.protein.sequence.utils.cast_to_str(self.seq_record)
 
     @property
     def seq_len(self):
@@ -195,11 +197,11 @@ class SeqProp(Object):
 
         """
         outdir, outname, outext = ssbio.utils.split_folder_and_path(outfile)
-        sequence_path = ssbio.sequence.utils.fasta.write_fasta_file(self.seq_record,
-                                                                    outname=outname,
-                                                                    outdir=outdir,
-                                                                    outext=outext,
-                                                                    force_rerun=force_rerun)
+        sequence_path = ssbio.protein.sequence.utils.fasta.write_fasta_file(self.seq_record,
+                                                                            outname=outname,
+                                                                            outdir=outdir,
+                                                                            outext=outext,
+                                                                            force_rerun=force_rerun)
         # Unset the SeqRecord as it will now be dynamically loaded from the file
         self.seq_record = None
         self.load_sequence_path(sequence_path)
@@ -238,7 +240,7 @@ class SeqProp(Object):
         if not self.sequence_path:
             log.error('Sequence file not available')
             return False
-        return ssbio.sequence.utils.fasta.fasta_files_equal(self.sequence_path, seq_file)
+        return ssbio.protein.sequence.utils.fasta.fasta_files_equal(self.sequence_path, seq_file)
 
     def load_letter_annotations(self, annotation_name, letter_annotation):
         """Add per-residue annotations to the seq_record.letter_annotations attribute
@@ -258,7 +260,7 @@ class SeqProp(Object):
         Stores statistics in the seq_record.annotations attribute.
         """
         try:
-            pepstats = ssbio.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
+            pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
         except KeyError as e:
             log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
             return
@@ -270,8 +272,8 @@ class SeqProp(Object):
         Stores statistics in the seq_record.annotations attribute.
         Saves a .pepstats file of the results where the sequence file is located.
         """
-        outfile = ssbio.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
-        pepstats = ssbio.sequence.properties.residues.emboss_pepstats_parser(outfile)
+        outfile = ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
+        pepstats = ssbio.protein.sequence.properties.residues.emboss_pepstats_parser(outfile)
         self.annotations.update(pepstats)
 
     def blast_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,

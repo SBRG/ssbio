@@ -87,3 +87,74 @@ def parse_tmhmm_long(tmhmm_results):
                 infodict[gene]['sequence'] = tm_seq
 
     return infodict
+
+
+def label_TM_tmhmm_residue_numbers_and_leaflets(tmhmm_seq):
+    """Determine the residue numbers of the TM-helix residues that cross the membrane and label them by leaflet.
+
+    Args:
+        tmhmm_seq: g.protein.representative_sequence.seq_record.letter_annotations['TM-tmhmm']
+
+    Returns:
+        leaflet_dict: a dictionary with leaflet_variable : [residue list] where the variable is inside or outside
+        TM_boundary dict: outputs a dictionar with : TM helix number : [TM helix residue start , TM helix residue end]
+
+    TODO:
+        untested method!
+    """
+
+    TM_number_dict = {}
+    T_index = []
+    T_residue = []
+
+    residue_count = 1
+    for residue_label in tmhmm_seq:
+        if residue_label == 'T':
+            T_residue.append(residue_count)
+
+        residue_count = residue_count + 1
+    TM_number_dict.update({'T_residue': T_residue})
+
+    # finding the TM boundaries
+    T_residue_list = TM_number_dict['T_residue']
+
+    count = 0
+    max_count = len(T_residue_list) - 1
+    TM_helix_count = 0
+    TM_boundary_dict = {}
+
+    while count <= max_count:
+        # first residue = TM start
+        if count == 0:
+            TM_start = T_residue_list[count]
+            count = count + 1
+            continue
+        # Last residue = TM end
+        elif count == max_count:
+            TM_end = T_residue_list[count]
+            TM_helix_count = TM_helix_count + 1
+            TM_boundary_dict.update({'TM_helix_' + str(TM_helix_count): [TM_start, TM_end]})
+            break
+        # middle residues need to be start or end
+        elif T_residue_list[count] != T_residue_list[count + 1] - 1:
+            TM_end = T_residue_list[count]
+            TM_helix_count = TM_helix_count + 1
+            TM_boundary_dict.update({'TM_helix_' + str(TM_helix_count): [TM_start, TM_end]})
+            # new TM_start
+            TM_start = T_residue_list[count + 1]
+        count = count + 1
+    # assign leaflet to proper TM residues O or I
+    leaflet_dict = {}
+    for leaflet in ['O', 'I']:
+        leaflet_list = []
+        for TM_helix, TM_residues in TM_boundary_dict.iteritems():
+            for residue_num in TM_residues:
+                tmhmm_seq_index = residue_num - 1
+                previous_residue = tmhmm_seq_index - 1
+                next_residue = tmhmm_seq_index + 1
+                # identify if the previous or next residue closest to the TM helix start/end is the proper leaflet
+                if tmhmm_seq[previous_residue] == leaflet or tmhmm_seq[next_residue] == leaflet:
+                    leaflet_list.append(residue_num)
+        leaflet_dict.update({'tmhmm_leaflet_' + leaflet: leaflet_list})
+
+    return TM_boundary_dict, leaflet_dict

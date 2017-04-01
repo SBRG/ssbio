@@ -1,8 +1,11 @@
-from Bio.SeqUtils.ProtParam import ProteinAnalysis
-from Bio.PDB.Polypeptide import one_to_three
-import ssbio.utils
-import ssbio.sequence.utils
 import logging
+
+from Bio.PDB.Polypeptide import one_to_three
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
+
+import ssbio.protein.sequence.utils
+import ssbio.utils
+
 log = logging.getLogger(__name__)
 
 
@@ -42,7 +45,7 @@ def biopython_protein_analysis(inseq):
 
     """
 
-    inseq = ssbio.sequence.utils.cast_to_str(inseq)
+    inseq = ssbio.protein.sequence.utils.cast_to_str(inseq)
 
     analysed_seq = ProteinAnalysis(inseq)
 
