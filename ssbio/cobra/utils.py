@@ -1,9 +1,9 @@
 import re
 import os.path as op
+import cobra.io.json
 from cobra.io import load_matlab_model
 from cobra.io import read_sbml_model
 from cobra.io import load_json_model
-import cobra.io.json
 from cobra.core import Model
 from cobra.core import Gene
 from cobra.core import DictList
@@ -100,6 +100,23 @@ def is_spontaneous(gene):
     else:
         return False
 
+
+def filter_out_spontaneous_genes(genes):
+    """Return the DictList of genes that are not spontaneous in a model.
+
+    Args:
+        model: COBRApy Model object
+
+    Returns:
+        DictList: genes excluding ones that are spontaneous
+
+    """
+    new_genes = DictList()
+    for gene in genes:
+        if not is_spontaneous(gene):
+            new_genes.append(gene)
+
+    return new_genes
 
 def true_num_genes(model):
     """Return the number of genes in a model ignoring spontaneously labeled genes
