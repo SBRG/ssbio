@@ -172,10 +172,7 @@ class Object(object):
             str: Path to pickle file
 
         """
-        with open(outfile, 'wb') as f:
-            pickle.dump(self, f, protocol=protocol)
-
-        return outfile
+        ssbio.core.io.save_pickle(self, outfile, protocol)
 
     def __json_encode__(self):
         to_return = {}
