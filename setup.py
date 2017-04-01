@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
         name='ssbio',
-        version='1.0.0a0',
+        version='0.9.0',
         author='Nathan Mih',
         author_email='nmih@ucsd.edu',
         license='MIT',
