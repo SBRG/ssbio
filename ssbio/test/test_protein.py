@@ -1,12 +1,15 @@
-import unittest
 import os.path as op
+import unittest
+
+from ssbio.protein.structure.structprop import StructProp
+
 from ssbio.core.protein import Protein
-from ssbio.sequence import SeqProp
-from ssbio.structure import StructProp
 from ssbio.databases.kegg import KEGGProp
-from ssbio.databases.uniprot import UniProtProp
 from ssbio.databases.pdb import PDBProp
-from ssbio.structure.homology.itasser.itasserprop import ITASSERProp
+from ssbio.databases.uniprot import UniProtProp
+from ssbio.protein.sequence.seqprop import SeqProp
+from ssbio.protein.structure.homology.itasser.itasserprop import ITASSERProp
+
 
 class TestProtein(unittest.TestCase):
     """Unit tests for Protein"""
@@ -48,7 +51,7 @@ class TestProtein(unittest.TestCase):
 
     def test_load_manual_sequence(self):
         new_manual = self.prot.load_manual_sequence(ident='tester2', seq='ALALALAL', outdir='test_files/out/')
-        self.assertTrue(self.prot.sequences.has_id('tester'))
+        self.assertTrue(self.prot.sequences.has_id('tester2'))
         self.assertTrue(isinstance(new_manual, SeqProp))
 
     def test_set_representative_sequence(self):

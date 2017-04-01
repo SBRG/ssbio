@@ -2,9 +2,9 @@ import os.path as op
 import tempfile
 import unittest
 
-from ssbio.structure.utils.cleanpdb import CleanPDB
-from ssbio.structure.utils.mutatepdb import MutatePDB
-from ssbio.structure.utils.structureio import StructureIO
+from ssbio.protein.structure.utils.cleanpdb import CleanPDB
+from ssbio.protein.structure.utils.mutatepdb import MutatePDB
+from ssbio.protein.structure.utils.structureio import StructureIO
 
 
 class TestMutatePDB(unittest.TestCase):

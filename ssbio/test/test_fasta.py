@@ -1,8 +1,9 @@
+import filecmp
 import os
 import os.path as op
 import unittest
-import filecmp
-import ssbio.sequence.utils.fasta as fasta
+
+import ssbio.protein.sequence.utils.fasta as fasta
 
 
 class TestFasta(unittest.TestCase):

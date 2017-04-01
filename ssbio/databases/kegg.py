@@ -1,11 +1,13 @@
 import io
+import logging
 import os.path as op
 from collections import defaultdict
+
 from bioservices import KEGG
-import ssbio.utils
-from ssbio.sequence.seqprop import SeqProp
-import logging
 from slugify import Slugify
+
+import ssbio.utils
+from ssbio.protein.sequence.seqprop import SeqProp
 
 log = logging.getLogger(__name__)
 custom_slugify = Slugify(safe_chars='-_')

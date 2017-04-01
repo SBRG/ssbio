@@ -45,6 +45,8 @@ class TestGEMPRO(unittest.TestCase):
         self.kegg_will_not_map = ['b1417', 'b2092']
         self.uniprot_will_not_map = ['b1417', 'b2092']
 
+        print(self.base_dir)
+
     def test_add_genes_by_id(self):
         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
         for x in add_these:
@@ -71,7 +73,7 @@ class TestGEMPRO(unittest.TestCase):
         self.assertEqual(len(self.my_gempro.model.reactions), 77)
         self.assertEqual(len(self.my_gempro.model.metabolites), 63)
         # genes should be removed from model
-        self.assertEqual(len(self.my_gempro.model.genes), 15)
+        self.assertEqual(len(self.my_gempro.genes), 15)
 
     def test_gene_info(self):
         # Test that self.genes is a DictList and contains GenePro objects

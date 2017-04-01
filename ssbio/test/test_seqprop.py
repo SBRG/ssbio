@@ -1,6 +1,8 @@
-import unittest
 import os.path as op
-from ssbio.sequence import SeqProp
+import unittest
+
+from ssbio.protein.sequence.seqprop import SeqProp
+
 
 class TestSeqProp(unittest.TestCase):
     """Unit tests for SeqProp"""
@@ -36,6 +38,6 @@ class TestSeqProp(unittest.TestCase):
         self.assertEqual(self.sp.num_pdbs, 2)
 
     def test_write_fasta_file(self):
-        self.sp.write_fasta_file(outname='P0ABP8_new', outdir='test_files/out/', force_rerun=True)
+        self.sp.write_fasta_file(outfile='test_files/out/P0ABP8_new.faa', force_rerun=True)
         self.assertTrue(op.exists('test_files/out/P0ABP8_new.faa'))
         self.assertEqual(self.sp.sequence_file, 'P0ABP8_new.faa')

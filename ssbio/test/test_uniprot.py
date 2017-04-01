@@ -9,7 +9,7 @@ class TestUniProt(unittest.TestCase):
     """
 
     def test_uniprotprop(self):
-        up = UniProtProp(ident='P0ABP8', sequence_path='test_files/sequences/P0ABP8.fasta',
+        up = UniProtProp(uniprot_acc='P0ABP8', sequence_path='test_files/sequences/P0ABP8.fasta',
                          metadata_path='test_files/sequences/P0ABP8.txt')
 
         up_keys = ['bigg','description','ec_number','entry_version','gene_name','id','kegg',

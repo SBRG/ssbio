@@ -1,7 +1,9 @@
-import unittest
 import os.path as op
-import ssbio.sequence.utils.alignment
+import unittest
+
 from Bio.Align import MultipleSeqAlignment
+
+import ssbio.protein.sequence.utils.alignment
 
 
 class TestAlignment(unittest.TestCase):
@@ -13,9 +15,9 @@ class TestAlignment(unittest.TestCase):
         muts_id = 'b_test'
         muts = 'MSPRVGVTLSGRYRLQRLIATGGMGQVWEAVDNRLGRRVARRVAASSSAS'
 
-        alignment = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq_id=base_id, a_seq=base,
-                                                       b_seq_id=muts_id, b_seq=muts,
-                                                       engine='biopython')
+        alignment = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq_id=base_id, a_seq=base,
+                                                                                       b_seq_id=muts_id, b_seq=muts,
+                                                                                       engine='biopython')
         self.assertTrue(isinstance(alignment, MultipleSeqAlignment))
         self.assertEqual(alignment[0].id, base_id)
         self.assertEqual(alignment[0].seq, 'MSPRVGVTLSGRYRLQRLIATGGMGQVWEAVDNRLGRRVAV--VA-SASA-')
@@ -23,9 +25,9 @@ class TestAlignment(unittest.TestCase):
         self.assertEqual(alignment[1].seq, 'MSPRVGVTLSGRYRLQRLIATGGMGQVWEAVDNRLGRRVA-RRVAASSSAS')
         self.assertEqual(alignment.annotations, {'end': 51, 'percent_identity': 88.23529411764706, 'score': 224.0, 'start': 0})
 
-        alignment2 = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq_id=base_id, a_seq=base,
-                                                        b_seq_id=muts_id, b_seq=muts,
-                                                        engine='needle', force_rerun=True)
+        alignment2 = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq_id=base_id, a_seq=base,
+                                                                                        b_seq_id=muts_id, b_seq=muts,
+                                                                                        engine='needle', force_rerun=True)
         self.assertTrue(isinstance(alignment2, MultipleSeqAlignment))
         self.assertEqual(alignment2[0].id, base_id)
         self.assertEqual(alignment2[0].seq, 'MSPRVGVTLSGRYRLQRLIATGGMGQVWEAVDNRLGRRVA--VVASASA-')
@@ -43,11 +45,11 @@ class TestAlignment(unittest.TestCase):
         infile_b = op.join(working_dir, '1gn3_A.faa')
         test_outfile = op.join(working_dir, 'P9WGE7_1gn3_A_align.txt')
 
-        outfile = ssbio.sequence.utils.alignment.run_needle_alignment_on_files(id_a='P9WGE7', faa_a=infile_a,
-                                                                               id_b='1gn3_A', faa_b=infile_b,
-                                                                               outdir=outdir,
-                                                                               outfile='test_alignment.txt',
-                                                                               force_rerun=True)
+        outfile = ssbio.protein.sequence.utils.alignment.run_needle_alignment_on_files(id_a='P9WGE7', faa_a=infile_a,
+                                                                                       id_b='1gn3_A', faa_b=infile_b,
+                                                                                       outdir=outdir,
+                                                                                       outfile='test_alignment.txt',
+                                                                                       force_rerun=True)
 
         # test if the file content is correct
         # ignore the first 12 lines because it is dated
@@ -96,7 +98,7 @@ class TestAlignment(unittest.TestCase):
 
         outfile = op.join(outdir, 'test_alignment2.txt')
 
-        outpath = ssbio.sequence.utils.alignment.run_needle_alignment(seq_a=str1, seq_b=str2, outfile=outfile)
+        outpath = ssbio.protein.sequence.utils.alignment.run_needle_alignment(seq_a=str1, seq_b=str2, outfile=outfile)
 
         # test if the result is the same
         # ignore the first 12 lines because it is dated

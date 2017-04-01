@@ -1,12 +1,14 @@
 import os.path as op
 import re
 import warnings
+
 import bioservices
 import pandas as pd
 import requests
 from dateutil.parser import parse as dateparse
+
 import ssbio.utils
-from ssbio.sequence.seqprop import SeqProp
+from ssbio.protein.sequence.seqprop import SeqProp
 
 try:
     from StringIO import StringIO

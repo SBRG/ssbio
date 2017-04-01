@@ -2,35 +2,35 @@ import logging
 import os
 import os.path as op
 import shutil
-import sys
 from copy import copy
-import numpy as np
+
 import pandas as pd
 import requests
+import ssbio.protein.structure.properties.msms
+import ssbio.protein.structure.properties.quality
+import ssbio.protein.structure.properties.residues
 from Bio import SeqIO
 from Bio.PDB.PDBExceptions import PDBException
 from bioservices import KEGG
 from bioservices import UniProt
 from cobra.core import DictList
-from ssbio.databases.kegg import KEGGProp
-from ssbio.databases.uniprot import UniProtProp
 from slugify import Slugify
+from six.moves.urllib.error import HTTPError
+
 import ssbio.cobra.utils
 import ssbio.databases.kegg
 import ssbio.databases.pdb
 import ssbio.databases.uniprot
-import ssbio.sequence.properties.residues
-import ssbio.sequence.properties.tmhmm
-import ssbio.sequence.utils.fasta
-import ssbio.structure.properties.msms
-import ssbio.structure.properties.quality
-import ssbio.structure.properties.residues
+import ssbio.protein.sequence.properties.residues
+import ssbio.protein.sequence.properties.tmhmm
+import ssbio.protein.sequence.utils.fasta
 from ssbio import utils
 from ssbio.core.genepro import GenePro
 from ssbio.core.object import Object
-from ssbio.sequence.properties.scratch import SCRATCH
-from ssbio.sequence.seqprop import SeqProp
-from ssbio.structure.homology.itasser.itasserprep import ITASSERPrep
+from ssbio.databases.kegg import KEGGProp
+from ssbio.databases.uniprot import UniProtProp
+from ssbio.protein.sequence.properties.scratch import SCRATCH
+from ssbio.protein.structure.homology.itasser.itasserprep import ITASSERPrep
 
 if utils.is_ipynb():
     from tqdm import tqdm_notebook as tqdm
@@ -236,7 +236,7 @@ class GEMPRO(Object):
     def genes_with_a_representative_sequence(self):
         """Return a DictList of all genes with a representative sequence"""
         tmp = DictList(x for x in self.genes if x.protein.representative_sequence)
-        return DictList(y for y in tmp if y.protein.representative_sequence.seq_record)
+        return DictList(y for y in tmp if y.protein.representative_sequence.sequence_file)
 
     @property
     def genes_with_a_representative_structure(self):
@@ -246,7 +246,7 @@ class GEMPRO(Object):
 
     @property
     def genes(self):
-        return self._genes
+        return ssbio.cobra.utils.filter_out_spontaneous_genes(self._genes)
 
     @genes.setter
     def genes(self, genes_list):
@@ -420,7 +420,7 @@ class GEMPRO(Object):
                         uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
                                                               set_as_representative=set_as_representative,
                                                               force_rerun=force_rerun)
-                    except requests.HTTPError as e:
+                    except HTTPError as e:
                         print(e)
                         log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
                         continue
@@ -530,7 +530,7 @@ class GEMPRO(Object):
 
         log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
 
-    def set_representative_sequence(self):
+    def set_representative_sequence(self, force_rerun=False):
         """Combine information from KEGG, UniProt, and manual mappings. Saves a DataFrame of results.
 
             Manual mappings override all existing mappings. UniProt mappings override KEGG mappings except
@@ -543,7 +543,7 @@ class GEMPRO(Object):
         sequence_missing = []
         successfully_mapped_counter = 0
         for g in tqdm(self.genes):
-            repseq = g.protein.set_representative_sequence()
+            repseq = g.protein.set_representative_sequence(force_rerun=force_rerun)
 
             if not repseq:
                 sequence_missing.append(g.id)
@@ -684,7 +684,7 @@ class GEMPRO(Object):
                 gene IDs to result file IDs. Dictionary keys must match model genes.
 
         """
-        tmhmm_dict = ssbio.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
+        tmhmm_dict = ssbio.protein.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
 
         counter = 0
         for g in tqdm(self.genes_with_a_representative_sequence):
@@ -785,7 +785,7 @@ class GEMPRO(Object):
 
         for g in tqdm(self.genes):
             # If all_genes=False, BLAST only genes without a uniprot -> pdb mapping
-            if g.protein.num_structures > 0 and not all_genes:
+            if g.protein.num_structures > 0 and not all_genes and not force_rerun:
                 log.debug('{}: skipping BLAST, {} structures already mapped and all_genes flag is False'.format(g.id,
                                                                                                                 g.protein.num_structures))
                 continue

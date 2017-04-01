@@ -1,7 +1,8 @@
 import os.path as op
 import unittest
-from ssbio.structure.utils.cleanpdb import CleanPDB
-from ssbio.structure.utils.structureio import StructureIO
+
+from ssbio.protein.structure.utils.cleanpdb import CleanPDB
+from ssbio.protein.structure.utils.structureio import StructureIO
 
 
 class TestCleanPDB(unittest.TestCase):

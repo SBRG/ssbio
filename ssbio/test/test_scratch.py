@@ -1,6 +1,6 @@
 import unittest
 
-from ssbio.sequence.properties.scratch import SCRATCH
+from ssbio.protein.sequence.properties.scratch import SCRATCH
 
 
 class TestSCRATCH(unittest.TestCase):

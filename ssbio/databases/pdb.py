@@ -5,13 +5,13 @@ import os.path as op
 
 import pandas as pd
 import requests
+import ssbio.protein.structure.complexes as cplx
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
 from six.moves.urllib.request import urlopen, urlretrieve
 
-import ssbio.structure.complexes as cplx
 import ssbio.utils
-from ssbio.structure.structprop import StructProp
+from ssbio.protein.structure.structprop import StructProp
 
 try:
     from StringIO import StringIO
@@ -429,11 +429,7 @@ def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0.0, l
     parser = etree.XMLParser(ns_clean=True)
 
     outfile = op.join(outdir, outfile)
-    if outfile and op.exists(outfile) and not force_rerun:
-        # Parse the existing XML file
-        tree = etree.parse(outfile, parser)
-        log.debug('{}: Loaded existing BLAST XML results'.format(outfile))
-    else:
+    if ssbio.utils.force_rerun(force_rerun, outfile):
         # Load the BLAST XML results if force_rerun=True
         page = 'http://www.rcsb.org/pdb/rest/getBlastPDB1?sequence={}&eCutOff={}&maskLowComplexity=yes&matrix=BLOSUM62&outputFormat=XML'.format(
                         seq, evalue)
@@ -452,6 +448,9 @@ def blast_pdb(seq, outfile='', outdir='', evalue=0.0001, seq_ident_cutoff=0.0, l
         else:
             log.error('BLAST request timed out')
             return []
+    else:
+        tree = etree.parse(outfile, parser)
+        log.debug('{}: Loaded existing BLAST XML results'.format(outfile))
 
     # Get length of original sequence to calculate percentages
     len_orig = float(len(seq))

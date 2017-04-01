@@ -1,6 +1,6 @@
 import unittest
 
-import ssbio.sequence.properties.thermostability
+import ssbio.protein.sequence.properties.thermostability
 
 
 class TestThermostability(unittest.TestCase):
