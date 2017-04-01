@@ -356,6 +356,7 @@ def request_file(link, outfile, force_rerun_flag=False):
             log.error('{}: request error {}'.format(link, req.status_code))
     return outfile
 
+
 def request_json(link, outfile, outdir=None, force_rerun_flag=False):
     """Download a file in JSON format from a web request
 
