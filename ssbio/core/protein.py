@@ -1,29 +1,29 @@
-import shutil
-import pandas as pd
-from cobra.core import DictList
-from collections import OrderedDict
-from ssbio.core.object import Object
-import ssbio.databases.kegg
-import ssbio.databases.uniprot
-from ssbio.sequence import SeqProp
-from ssbio.databases.kegg import KEGGProp
-from ssbio.databases.uniprot import UniProtProp
-from ssbio.structure.structprop import StructProp
-from ssbio.databases.pdb import PDBProp
-import ssbio.databases.pdb
-from ssbio.structure.homology.itasser.itasserprop import ITASSERProp
-import ssbio.sequence.utils.fasta
-from Bio.PDB.PDBExceptions import PDBConstructionException
-
-import ssbio.sequence.utils.alignment
-import ssbio.utils
-import requests
-import os.path as op
-from six.moves.urllib.error import URLError
-from Bio.Seq import Seq
-import ssbio.structure.properties.quality
-from slugify import Slugify
 import logging
+import os.path as op
+import shutil
+from collections import OrderedDict
+
+import pandas as pd
+import requests
+from Bio.PDB.PDBExceptions import PDBConstructionException
+from Bio.Seq import Seq
+from cobra.core import DictList
+from six.moves.urllib.error import URLError
+from slugify import Slugify
+
+import ssbio.databases.pdb
+import ssbio.protein.sequence.utils.alignment
+import ssbio.protein.sequence.utils.fasta
+import ssbio.protein.structure.properties.quality
+import ssbio.utils
+from ssbio.core.object import Object
+from ssbio.databases.kegg import KEGGProp
+from ssbio.databases.pdb import PDBProp
+from ssbio.databases.uniprot import UniProtProp
+from ssbio.protein.sequence.seqprop import SeqProp
+from ssbio.protein.structure.homology.itasser.itasserprop import ITASSERProp
+from ssbio.protein.structure.structprop import StructProp
+
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
@@ -352,6 +352,8 @@ class Protein(Object):
         if not outname:
             outname = ident
 
+
+
         manual_sequence = SeqProp(ident=ident, seq=seq, write_fasta_file=write_fasta_file,
                                   outname=outname, outdir=outdir, force_rewrite=force_rewrite)
         self.sequences.append(manual_sequence)
@@ -371,7 +373,7 @@ class Protein(Object):
             self.representative_sequence.seq_record.id = self.representative_sequence.id
         log.debug('{}: set as representative sequence'.format(seq_prop.id))
 
-    def set_representative_sequence(self):
+    def set_representative_sequence(self, force_rerun=False):
         """Consolidate sequences that were loaded and set a single representative sequence."""
 
         if len(self.sequences) == 0:
@@ -387,7 +389,7 @@ class Protein(Object):
         uniprot_mappings = self.filter_sequences(UniProtProp)
 
         # If a representative sequence has already been set, nothing needs to be done
-        if self.representative_sequence:
+        if self.representative_sequence and not force_rerun:
             log.debug('{}: representative sequence already set'.format(self.id))
 
         # If there is a KEGG annotation and no UniProt annotations, set KEGG as representative
@@ -470,26 +472,26 @@ class Protein(Object):
             if seq.id == self.representative_sequence.id:
                 continue
 
-            aln = ssbio.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
-                                                                             a_seq_id=self.id,
-                                                                             b_seq=seq.seq_str,
-                                                                             b_seq_id=seq.id,
-                                                                             gapopen=gapopen, gapextend=gapextend,
-                                                                             engine=engine,
-                                                                             outdir=outdir,
-                                                                             outfile=outfile,
-                                                                             force_rerun=force_rerun)
+            aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
+                                                                                     a_seq_id=self.id,
+                                                                                     b_seq=seq.seq_str,
+                                                                                     b_seq_id=seq.id,
+                                                                                     gapopen=gapopen, gapextend=gapextend,
+                                                                                     engine=engine,
+                                                                                     outdir=outdir,
+                                                                                     outfile=outfile,
+                                                                                     force_rerun=force_rerun)
             # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
             aln.id = aln_id
             aln.annotations['a_seq'] = self.representative_sequence.id
             aln.annotations['b_seq'] = seq.id
 
             if parse:
-                aln_df = ssbio.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
-                                                                         b_aln_seq=str(list(aln)[1].seq))
-                aln.annotations['mutations'] = ssbio.sequence.utils.alignment.get_mutations(aln_df)
-                aln.annotations['deletions'] = ssbio.sequence.utils.alignment.get_deletions(aln_df)
-                aln.annotations['insertions'] = ssbio.sequence.utils.alignment.get_insertions(aln_df)
+                aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
+                                                                                 b_aln_seq=str(list(aln)[1].seq))
+                aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
+                aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
+                aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
 
             self.representative_sequence.sequence_alignments.append(aln)
 
@@ -881,7 +883,7 @@ class Protein(Object):
         alnid = '{}_{}'.format(self.representative_sequence.id, self.representative_structure.id)
         aln = self.representative_sequence.structure_alignments.get_by_id(alnid)
         # Get the mapping and store it in .seq_record.letter_annotations['repchain_resnums']
-        aln_df = ssbio.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
+        aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
         repchain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
         self.representative_sequence.letter_annotations['repchain_resnums'] = repchain_resnums
 
