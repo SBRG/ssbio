@@ -61,7 +61,7 @@ def run_fatcat_all_by_all(list_of_structure_paths, fatcat_sh, outdir='', silent=
         tm_score_matrix[structure_ids[pdb2], structure_ids[pdb1]] = parse_fatcat(fatcat_file)['tm_score']
 
     # Convert to dataframe with filenames
-    filenames = [op.basename(x) for x in list_of_structure_paths]
+    filenames = [op.splitext(op.basename(x))[0] for x in list_of_structure_paths]
     tm_score_matrix_annotated = pd.DataFrame(data=tm_score_matrix, columns=filenames, index=filenames)
 
     return tm_score_matrix_annotated
