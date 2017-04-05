@@ -2,14 +2,17 @@ import logging
 import os.path as op
 
 import numpy as np
-import ssbio.protein.structure.properties
 from cobra.core import DictList
-from ssbio.protein.structure.utils.structureio import StructureIO
 
 import ssbio.protein.sequence.utils.alignment
+import ssbio.protein.structure.properties.dssp
+import ssbio.protein.structure.properties.msms
+import ssbio.protein.structure.properties.residues
+import ssbio.protein.structure.properties.quality
 import ssbio.utils
 from ssbio.core.object import Object
 from ssbio.protein.structure.chainprop import ChainProp
+from ssbio.protein.structure.utils.structureio import StructureIO
 
 if ssbio.utils.is_ipynb():
     import nglview as nv
@@ -19,14 +22,25 @@ log = logging.getLogger(__name__)
 
 
 class StructProp(Object):
-    """Class for protein structural properties"""
+    """Class for protein structural properties."""
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
                  representative_chain=None, is_experimental=False):
+        """Initialize a StructProp object.
+        
+        Args:
+            ident (str): Unique identifier for this structure 
+            description (str): Optional human-readable description
+            chains (DictList): A DictList of ChainProp objects 
+            mapped_chains (list): A simple list of chain IDs (str) to indicate what chains should be analyzed 
+            structure_path (str): Path to structure file 
+            file_type (str): File type of structure file
+            representative_chain (str): Chain ID which "best" represents a gene 
+            is_experimental (bool): Flag to indicate if structure is an experimental or computatational model
+        """
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
-
         self.reference_seq_top_coverage = None
 
         # Chain information
@@ -34,7 +48,7 @@ class StructProp(Object):
         self.chains = DictList()
         if chains:
             self.add_chain_ids(chains)
-        # representative_chain is a pointer to the chain in self.chains that matches reference_seq
+        # representative_chain is a pointer to the chain in self.chains that matches a reference seq
         self.representative_chain = None
         if representative_chain:
             self.representative_chain = self.chains.get_by_id(representative_chain)
@@ -80,6 +94,8 @@ class StructProp(Object):
             structure_path: Path to structure file
             file_type: Type of structure file
         """
+        if not file_type:
+            raise ValueError('File type must be specified')
         self.file_type = file_type
         self.structure_dir = op.dirname(structure_path)
         self.structure_file = op.basename(structure_path)
@@ -90,7 +106,7 @@ class StructProp(Object):
         Also create ChainProp objects in the chains attribute
 
         Returns:
-            Structure: Biopython structure object
+            Structure: Biopython Structure object
 
         """
         if not self.structure_path:
@@ -211,15 +227,17 @@ class StructProp(Object):
 
     def align_seqprop_to_mapped_chains(self, seqprop, outdir=None, engine='needle', parse=True, force_rerun=False,
                                        **kwargs):
-        """Run and store alignments of the reference sequence to chains in mapped_chains.
+        """Run and store alignments of a SeqProp to chains in the ``mapped_chains`` attribute.
 
-        Alignments are stored in the seqprop.structure_alignments attribute.
+        Alignments are stored in the SeqProp.structure_alignments attribute, with the IDs formatted
+        as <SeqProp_ID>_<StructProp_ID>-<Chain_ID>.
 
         Args:
+            seqprop (SeqProp): SeqProp object
             outdir (str): Directory to output sequence alignment files (only if running with needle)
             engine (str): Which pairwise alignment tool to use ("needle" or "biopython")
             parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
-            force_rerun:
+            force_rerun (bool): If alignments should be rerun
             **kwargs: Other alignment options
         """
         # TODO: **kwargs for alignment options
@@ -271,9 +289,10 @@ class StructProp(Object):
     def sequence_quality_checker(self, reference_seq, seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                  allow_mutants=True, allow_deletions=False,
                                  allow_insertions=False, allow_unresolved=True):
-        """Set the representative chain based on sequence quality checks to the reference sequence.
+        """Set and return the representative chain based on sequence quality checks to a reference sequence.
 
         Args:
+            reference_seq (SeqProp): SeqProp object to compare to chain sequences
             seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
             allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
                 when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
@@ -363,8 +382,7 @@ class StructProp(Object):
         return final_dict
 
     def get_disulfide_bridges(self, threshold=3.0):
-        """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp.
-        """
+        """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp."""
         parsed = self.parse_structure()
         if not parsed:
             log.error('{}: unable to open structure to find S-S bridges'.format(self.id))
@@ -373,12 +391,12 @@ class StructProp(Object):
         disulfide_bridges = ssbio.protein.structure.properties.residues.search_ss_bonds(parsed.first_model,
                                                                                         threshold=threshold)
         if not disulfide_bridges:
-            log.debug('{}: no disulfide bridges'.format(self.id))
+            log.debug('{}: no disulfide bridges found'.format(self.id))
 
         for chain, bridges in disulfide_bridges.items():
             self.representative_chain.seq_record.annotations['SSBOND-biopython'] = disulfide_bridges[self.representative_chain.id]
             log.debug('{}: found {} disulfide bridges'.format(chain, len(bridges)))
-            log.debug('{}: stored disulfide bridges in seq_record letter_annotations'.format(chain))
+            log.debug('{}: stored disulfide bridges in the chain\'s seq_record letter_annotations'.format(chain))
 
     def get_residue_depths(self, outdir, force_rerun=False):
         """Run MSMS on this structure and store the residue depths/ca depths in the corresponding ChainProp SeqRecords
