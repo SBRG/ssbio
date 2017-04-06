@@ -1,12 +1,12 @@
+numpy
+pandas
+tqdm
+six
+requests>=2.13.0
 cobra>=0.5.11
 biopython>=1.68
-numpy
-tqdm
-pandas
-requests>=2.13.0
 bioservices
 xmltodict
-six
 mmtf-python
 awesome-slugify
 ipywidgets==5.2.2
