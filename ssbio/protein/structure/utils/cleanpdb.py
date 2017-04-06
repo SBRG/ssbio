@@ -17,7 +17,7 @@ class CleanPDB(PDB.Select):
     """Selection rules to clean a PDB file
 
     These rules aim to:
-    - Add missing chains to a PDB file
+    - Add missing chain identifiers to a PDB file
     - Select a single chain if noted
     - Remove alternate atom locations
     - Add atom occupancies
