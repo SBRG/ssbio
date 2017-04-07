@@ -4,7 +4,7 @@ tqdm
 six
 requests>=2.13.0
 cobra>=0.5.11
-biopython>=1.68
+biopython>=1.69
 bioservices
 xmltodict
 mmtf-python
