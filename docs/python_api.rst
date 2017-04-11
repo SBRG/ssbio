@@ -9,8 +9,8 @@ Python API
 .. automodule:: ssbio.core.protein
     :members:
 
-.. automodule:: ssbio.sequence.seqprop
+.. automodule:: ssbio.protein.sequence.seqprop
     :members:
 
-.. automodule:: ssbio.structure.structprop
+.. automodule:: ssbio.protein.structure.structprop
     :members:
