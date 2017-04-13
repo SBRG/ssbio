@@ -251,7 +251,7 @@ class Protein(Object):
                 self.sequences.remove(existing)
             # Otherwise just get that KEGG object
             else:
-                log.debug('{}: KEGG ID already present in list of sequences'.format(uniprot_id))
+                log.debug('{}: UniProt ID already present in list of sequences'.format(uniprot_id))
                 uniprot_prop = self.sequences.get_by_id(uniprot_id)
 
         if not self.sequences.has_id(uniprot_id):
@@ -572,6 +572,10 @@ class Protein(Object):
             log.error('{}: no representative UniProt ID set, cannot use best structures API'.format(self.id))
             return None
 
+        if '-' in uniprot_id:
+            log.debug('{}: "-" detected in UniProt ID, isoform specific sequences are ignored with best structures API'.format(self.id))
+            uniprot_id = uniprot_id.split('-')[0]
+
         if not outdir:
             outdir = self.sequence_dir
             if not outdir:
@@ -736,7 +740,8 @@ class Protein(Object):
 
         return self.structures.get_by_id(ident)
 
-    def load_generic_structure(self, ident, structure_file=None, is_experimental=False, set_as_representative=False, force_rerun=False):
+    def load_generic_structure(self, ident, structure_file=None, file_type=None, is_experimental=False,
+                               set_as_representative=False, force_rerun=False):
         if self.structures.has_id(ident):
             if force_rerun:
                 existing = self.structures.get_by_id(ident)
@@ -746,7 +751,7 @@ class Protein(Object):
                 model = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            model = StructProp(ident=ident, structure_path=structure_file,
+            model = StructProp(ident=ident, structure_path=structure_file, file_type=file_type,
                                is_experimental=is_experimental)
             self.structures.append(model)
 
