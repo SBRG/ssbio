@@ -382,31 +382,32 @@ def old_parse_uniprot_txt_file(infile):
                 accs = [w.replace(";", "") for w in words]
                 entry['accs'].extend(accs)
             if tag == "DR":
-                if 'PDB' in words[0]:
-                    if 'pdb' not in entry:
-                        entry['pdb'] = words[1][:-1]
-                    if 'pdbs' not in entry:
-                        entry['pdbs'] = []
-                    entry['pdbs'].append(words[1][:-1])
-                if 'RefSeq' in words[0]:
-                    if 'refseq' not in entry:
-                        entry['refseq'] = []
-                    ids = [w[:-1] for w in words[1:]]
-                    entry['refseq'].extend(ids)
-                if 'KEGG' in words[0]:
-                    if 'kegg' not in entry:
-                        entry['kegg'] = []
-                    ids = [w[:-1] for w in words[1:]]
-                    ids = filter(lambda w: len(w) > 1, ids)
-                    entry['kegg'].extend(ids)
-                if 'GO' in words[0]:
-                    if 'go' not in entry:
-                        entry['go'] = []
-                    entry['go'].append(' '.join(words[1:]))
-                if 'Pfam' in words[0]:
-                    if 'pfam' not in entry:
-                        entry['pfam'] = []
-                    entry['pfam'].append(words[1][:-1])
+                if len(words) > 0:
+                    if 'PDB' in words[0]:
+                        if 'pdb' not in entry:
+                            entry['pdb'] = words[1][:-1]
+                        if 'pdbs' not in entry:
+                            entry['pdbs'] = []
+                        entry['pdbs'].append(words[1][:-1])
+                    if 'RefSeq' in words[0]:
+                        if 'refseq' not in entry:
+                            entry['refseq'] = []
+                        ids = [w[:-1] for w in words[1:]]
+                        entry['refseq'].extend(ids)
+                    if 'KEGG' in words[0]:
+                        if 'kegg' not in entry:
+                            entry['kegg'] = []
+                        ids = [w[:-1] for w in words[1:]]
+                        ids = filter(lambda w: len(w) > 1, ids)
+                        entry['kegg'].extend(ids)
+                    if 'GO' in words[0]:
+                        if 'go' not in entry:
+                            entry['go'] = []
+                        entry['go'].append(' '.join(words[1:]))
+                    if 'Pfam' in words[0]:
+                        if 'pfam' not in entry:
+                            entry['pfam'] = []
+                        entry['pfam'].append(words[1][:-1])
             if tag == "GN":
                 if 'gene' not in entry and len(words) > 0:
                     pieces = words[0].split("=")

@@ -80,8 +80,8 @@ class GEMPRO(Object):
     Args:
         gem_name (str): The name of your GEM or just your project in general.
             This will be the name of the main folder that is created in root_dir.
-        pdb_file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - Choose a file type for
-            files downloaded from the PDB
+        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
+            choose a file type for files downloaded from the PDB
         create_dirs (bool): If GEM-PRO directories should be created - if not,
             most mapping functions need an output directory specified.
         root_dir (str): Path to where the folder named gem_name will be created.
@@ -89,7 +89,7 @@ class GEMPRO(Object):
         genome_path (str): Simple reference link to the genome FASTA file (CDS)
         gem (Model): COBRApy Model object
         gem_file_path (str): Path to GEM file
-        gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' formats
+        gem_file_type (str): GEM model type - ``sbml`` (or ``xml``), ``mat``, or ``json`` formats
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
         description (str): Optional string to describe your project
@@ -101,9 +101,11 @@ class GEMPRO(Object):
                  gem_file_path=None, gem_file_type=None,
                  genes_list=None,
                  genes_and_sequences=None,
-                 description=None):
+                 description=None,
+                 custom_spont_id=None):
         Object.__init__(self, id=gem_name, description=description)
 
+        self.custom_spont_id = custom_spont_id
         self.pdb_file_type = pdb_file_type
         self.genome_path = genome_path
 
@@ -143,7 +145,7 @@ class GEMPRO(Object):
 
     @property
     def root_dir(self):
-        """str: Directory where GEM-PRO project folder (base_dir) is located"""
+        """str: Directory where GEM-PRO project folder ``base_dir`` is located"""
         return self._root_dir
 
     @root_dir.setter
@@ -205,7 +207,7 @@ class GEMPRO(Object):
         """Load a COBRApy Model object into the GEM-PRO project.
 
         Args:
-            model (Model): COBRApy Model object
+            model (Model): COBRApy ``Model`` object
 
         """
         self.model = model
@@ -213,40 +215,41 @@ class GEMPRO(Object):
         log.info('{}: loaded model'.format(model.id))
         log.info('{}: number of reactions'.format(len(self.model.reactions)))
         log.info('{}: number of reactions linked to a gene'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
-        log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.cobra.utils.true_num_genes(self.model)))
+        log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.cobra.utils.true_num_genes(self.model,
+                                                                                                       custom_spont_id=self.custom_spont_id)))
         log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
         log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
 
     @property
     def genes_with_structures(self):
-        """Return a DictList of all genes with any available protein structures"""
+        """DictList: All genes with any available protein structures"""
         return DictList(x for x in self.genes if x.protein.num_structures > 0)
 
     @property
     def genes_with_experimental_structures(self):
-        """Return a DictList of all genes that have at least one experimental structure"""
+        """DictList: All genes that have at least one experimental structure"""
         return DictList(x for x in self.genes_with_structures if x.protein.num_structures_experimental > 0)
 
     @property
     def genes_with_homology_models(self):
-        """Return a DictList of all genes that have at least one homology model"""
+        """DictList: All genes that have at least one homology model"""
         return DictList(x for x in self.genes_with_structures if x.protein.num_structures_homology > 0)
 
     @property
     def genes_with_a_representative_sequence(self):
-        """Return a DictList of all genes with a representative sequence"""
+        """DictList: All genes with a representative sequence"""
         tmp = DictList(x for x in self.genes if x.protein.representative_sequence)
         return DictList(y for y in tmp if y.protein.representative_sequence.sequence_file)
 
     @property
     def genes_with_a_representative_structure(self):
-        """Return a DictList of all genes with a representative protein structure"""
+        """DictList: All genes with a representative protein structure"""
         tmp = DictList(x for x in self.genes if x.protein.representative_structure)
         return DictList(y for y in tmp if y.protein.representative_structure.structure_file)
 
     @property
     def genes(self):
-        return ssbio.cobra.utils.filter_out_spontaneous_genes(self._genes)
+        return ssbio.cobra.utils.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
 
     @genes.setter
     def genes(self, genes_list):
@@ -435,18 +438,22 @@ class GEMPRO(Object):
         """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
+        
+        Input a dictionary of::
+            
+            {
+                <gene_id1>: <uniprot_id1>,
+                <gene_id2>: <uniprot_id2>,
+            }
 
         Args:
-            gene_to_uniprot_dict: Dictionary of mappings with key:value pairs:
-                <gene_id1>:<uniprot_id1>,
-                <gene_id2>:<uniprot_id2>,
-                ...
+            gene_to_uniprot_dict: Dictionary of mappings as shown above
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
             set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences
 
         """
-        for g, u in gene_to_uniprot_dict.items():
+        for g, u in tqdm(gene_to_uniprot_dict.items()):
             g = str(g)
             gene = self.genes.get_by_id(g)
 
@@ -611,8 +618,8 @@ class GEMPRO(Object):
 
     def get_sequence_properties(self):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
-
-        Annotations are stored in the gene protein's representative sequence at .seq_record.annotations
+        Annotations are stored in the gene protein's representative sequence at:
+        ``.seq_record.annotations``
 
         """
         for g in tqdm(self.genes_with_a_representative_sequence):
@@ -621,11 +628,10 @@ class GEMPRO(Object):
 
     def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', num_cores=1,
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
-        """Run and parse SCRATCH results to predict secondary structure and solvent accessibility.
-
+        """Run and parse ``SCRATCH`` results to predict secondary structure and solvent accessibility.
         Annotations are stored in the gene protein's representative sequence at:
-            * .seq_record.annotations
-            * .seq_record.letter_annotations
+            * ``.seq_record.annotations``
+            * ``.seq_record.letter_annotations``
 
         Args:
             path_to_scratch (str): Path to SCRATCH executable
@@ -715,7 +721,7 @@ class GEMPRO(Object):
 
         Uses the "Best structures" API availble from https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
         The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
-        if the same, resolution. Also creates a summary dataframe accessible by the attribute "df_pdb_ranking".
+        if the same, resolution.
 
         Args:
             seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
@@ -730,6 +736,9 @@ class GEMPRO(Object):
         for g in self.genes_with_a_representative_sequence:
             uniprot_id = g.protein.representative_sequence.uniprot
             if uniprot_id:
+                # TODO: add warning or something for isoform ids?
+                if '-' in uniprot_id:
+                    uniprot_id = uniprot_id.split('-')[0]
                 all_representative_uniprots.append(uniprot_id)
         log.info('Mapping UniProt IDs --> PDB IDs...')
         uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
@@ -739,6 +748,8 @@ class GEMPRO(Object):
         for g in tqdm(self.genes_with_a_representative_sequence):
             uniprot_id = g.protein.representative_sequence.uniprot
             if uniprot_id:
+                if '-' in uniprot_id:
+                    uniprot_id = uniprot_id.split('-')[0]
                 if uniprot_id in uniprots_to_pdbs:
                     best_structures = g.protein.map_uniprot_to_pdb(seq_ident_cutoff=seq_ident_cutoff, outdir=outdir, force_rerun=force_rerun)
                     if best_structures:
@@ -820,17 +831,27 @@ class GEMPRO(Object):
         else:
             return ssbio.utils.clean_df(df.set_index('gene'))
 
-    def manual_homology_models(self, input_dict, outdir=None, clean=True, force_rerun=False):
+    def get_manual_homology_models(self, input_dict, outdir=None, clean=True, force_rerun=False):
         """Copy homology models to the GEM-PRO project.
 
+        Requires an input of a dictionary formatted like so::
+        
+            {
+                model_gene: {
+                                homology_model_id1: {
+                                                        'model_file': '/path/to/homology/model.pdb',
+                                                        'file_type': 'pdb'
+                                                        'additional_info': info_value
+                                                    },
+                                homology_model_id2: {   
+                                                        'model_file': '/path/to/homology/model.pdb'
+                                                        'file_type': 'pdb'
+                                                    }
+                            }
+            }
+
         Args:
-            input_dict: Dictionary of dictionaries of gene names to homology model IDs and information. Input a dict of:
-                {model_gene: {homology_model_id1: {'model_file': '/path/to/homology/model',
-                                                   'file_type': 'pdb'},
-                              homology_model_id2: {'model_file': '/path/to/homology/model'
-                                                   'file_type': 'pdb'}
-                             },
-                }
+            input_dict (dict): Dictionary of dictionaries of gene names to homology model IDs and other information
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
             clean (bool): If homology files should be cleaned and saved as a new PDB file
@@ -856,7 +877,8 @@ class GEMPRO(Object):
                 if 'model_file' not in hdict or 'file_type' not in hdict:
                     raise KeyError('"model_file" and "file_type" must be keys in the manual input dictionary.')
 
-                new_homology = g.protein.load_generic_structure(hid, hdict['model_file'])
+                new_homology = g.protein.load_generic_structure(ident=hid, structure_file=hdict['model_file'],
+                                                                file_type=hdict['file_type'])
 
                 if clean:
                     new_homology.load_structure_path(new_homology.clean_structure(outdir=outdir, force_rerun=force_rerun),
@@ -867,7 +889,7 @@ class GEMPRO(Object):
                         shutil.copy2(hdict['model_file'], outdir)
                         new_homology.load_structure_path(op.join(outdir, hdict['model_file']), hdict['file_type'])
 
-                # TODO: need to handle other info in the provided dictionary, if any
+                # TODO: need to better handle other info in the provided dictionary, if any
                 new_homology.update(hdict)
 
                 log.debug('{}: updated homology model information and copied model file.'.format(g.id))
@@ -937,13 +959,12 @@ class GEMPRO(Object):
                                      allow_insertions=False, allow_unresolved=True,
                                      force_rerun=False):
         """Set the representative protein structure for a gene.
-
         Each gene can have a combination of the following, which will be analyzed to set a representative structure.
             * Homology model(s)
             * Ranked PDBs
             * BLASTed PDBs
 
-        If the always_use_homology flag is true, homology models are always set as representative when they exist.
+        If the ``always_use_homology`` flag is true, homology models are always set as representative when they exist.
         If there are multiple homology models, we rank by the percent sequence coverage.
 
         Args:
@@ -1012,8 +1033,8 @@ class GEMPRO(Object):
         """Prepare to run I-TASSER homology modeling for genes without structures, or all genes.
 
         Args:
-            itasser_installation (str): Path to I-TASSER folder, i.e. '~/software/I-TASSER4.4'
-            itlib_folder (str): Path to ITLIB folder, i.e. '~/software/ITLIB'
+            itasser_installation (str): Path to I-TASSER folder, i.e. ``~/software/I-TASSER4.4``
+            itlib_folder (str): Path to ITLIB folder, i.e. ``~/software/ITLIB``
             runtype: How you will be running I-TASSER - local, slurm, or torque
             create_in_dir (str): Local directory where folders will be created
             execute_from_dir (str): Optional path to execution directory - use this if you are copying the homology
@@ -1067,8 +1088,6 @@ class GEMPRO(Object):
     def pdb_downloader_and_metadata(self, outdir=None, pdb_file_type=None, force_rerun=False):
         """Download all structures which have been mapped to our genes.
 
-        Obtains the PDB file and mmCIF header and creates a metadata table "df_pdb_metadata".
-
         Args:
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
@@ -1093,6 +1112,7 @@ class GEMPRO(Object):
 
     @property
     def df_pdb_metadata(self):
+        """DataFrame: Parse PDB file headers and create a metadata table"""
         df = pd.DataFrame()
         for g in self.genes_with_experimental_structures:
             # Get per protein DataFrame
@@ -1107,10 +1127,8 @@ class GEMPRO(Object):
 
     def get_dssp_annotations(self):
         """Run DSSP on all representative structures and store calculations.
-
-        Stored in::
-
-            a_gene.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-dssp']
+        Annotations are stored in the gene protein’s representative sequence at:
+        ``seq_record.letter_annotations['*-dssp']``
 
         Todo:
             * Some errors arise from storing annotations for nonstandard amino acids, need to run DSSP separately for those
@@ -1132,10 +1150,8 @@ class GEMPRO(Object):
 
     def get_msms_annotations(self):
         """Run MSMS on all representative structures and store calculations.
-
-        Stored in::
-
-            a_gene.protein.representative_structure.representative_chain.seq_record.letter_annotations['*-msms']
+        Annotations are stored in the gene protein’s representative sequence at:
+        ``seq_record.letter_annotations['*-msms']``
 
         """
         for g in tqdm(self.genes):
@@ -1149,11 +1165,9 @@ class GEMPRO(Object):
                         '{}: unknown MSMS error with {}'.format(g.id, g.protein.representative_structure))
 
     def get_disulfide_bridges(self):
-        """Run Biopython's disulfide bridge finder and store calculations.
-
-        Stored in::
-
-            a_gene.protein.representative_structure.representative_chain.seq_record.annotations['SSBOND-biopython']
+        """Run Biopython's disulfide bridge finder and store found bridges.
+        Annotations are stored in the gene protein’s representative sequence at:
+        ``seq_record.annotations['SSBOND-biopython']``
 
         """
         for g in tqdm(self.genes):

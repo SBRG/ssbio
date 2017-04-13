@@ -145,7 +145,7 @@ def clean_df(df, fill_nan=True, drop_empty_columns=True):
         df = df.fillna(value=np.nan)
     if drop_empty_columns:
         df = df.dropna(axis=1, how='all')
-    return df
+    return df.sort_index()
 
 
 def deprecated(func):
