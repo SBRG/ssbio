@@ -88,7 +88,7 @@ def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif'):
     return modelpro
 
 
-def is_spontaneous(gene):
+def is_spontaneous(gene, custom_id=None):
     """Input a COBRApy Gene object and check if the ID matches a spontaneous ID regex.
 
     :param gene:
@@ -97,11 +97,13 @@ def is_spontaneous(gene):
     spont = re.compile("[Ss](_|)0001")
     if spont.match(gene.id):
         return True
+    elif gene.id == custom_id:
+        return True
     else:
         return False
 
 
-def filter_out_spontaneous_genes(genes):
+def filter_out_spontaneous_genes(genes, custom_spont_id=None):
     """Return the DictList of genes that are not spontaneous in a model.
 
     Args:
@@ -113,12 +115,12 @@ def filter_out_spontaneous_genes(genes):
     """
     new_genes = DictList()
     for gene in genes:
-        if not is_spontaneous(gene):
+        if not is_spontaneous(gene, custom_id=custom_spont_id):
             new_genes.append(gene)
 
     return new_genes
 
-def true_num_genes(model):
+def true_num_genes(model, custom_spont_id=None):
     """Return the number of genes in a model ignoring spontaneously labeled genes
 
     :param model: COBRApy Model object
@@ -126,29 +128,29 @@ def true_num_genes(model):
     """
     true_num = 0
     for gene in model.genes:
-        if not is_spontaneous(gene):
+        if not is_spontaneous(gene, custom_id=custom_spont_id):
             true_num += 1
     return true_num
 
 
-def true_num_reactions(model):
+def true_num_reactions(model, custom_spont_id=None):
     true_num = 0
     for rxn in model.reactions:
         if len(rxn.genes) == 0:
             continue
-        if len(rxn.genes) == 1 and is_spontaneous(list(rxn.genes)[0]):
+        if len(rxn.genes) == 1 and is_spontaneous(list(rxn.genes)[0], custom_id=custom_spont_id):
             continue
         else:
             true_num += 1
     return true_num
 
 
-def adj_num_reactions(model, missing_genes):
+def adj_num_reactions(model, missing_genes, custom_spont_id=None):
     adj_num = 0
     for rxn in model.reactions:
         if len(rxn.genes) == 0:
             continue
-        if len(rxn.genes) == 1 and (is_spontaneous(list(rxn.genes)[0]) or list(rxn.genes)[0] in missing_genes):
+        if len(rxn.genes) == 1 and (is_spontaneous(list(rxn.genes)[0], custom_id=custom_spont_id) or list(rxn.genes)[0] in missing_genes):
             continue
         else:
             adj_num += 1
