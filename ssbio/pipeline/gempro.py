@@ -478,7 +478,7 @@ class GEMPRO(Object):
             uniprot_mappings = g.protein.filter_sequences(UniProtProp)
             for uniprot_prop in uniprot_mappings:
                 uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
-                uniprot_dict['gene'] = g
+                uniprot_dict['gene'] = g.id
                 uniprot_pre_df.append(uniprot_dict)
 
         df = pd.DataFrame.from_records(uniprot_pre_df, columns=df_cols).set_index('gene')
