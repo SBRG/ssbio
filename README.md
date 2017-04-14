@@ -21,14 +21,6 @@ of structural systems biology. The main goals of this package are to:
 Read the documentation [here](http://ssbio.readthedocs.io/en/latest/).
 
 ## Quick install
-Clone this repository to any location and then install it.
-
-**Cloning**
-```bash
-git clone https://github.com/SBRG/ssbio.git
-```
-
-**Installation**
 
 First install NGLview:
 ```bash
@@ -37,14 +29,12 @@ pip install nglview
 
 Then install ssbio:
 ```bash
-cd ssbio
-python setup.py develop --user
+pip install ssbio
 ```
 
 **Updating**
 ```bash
-cd ssbio
-git pull
+pip install ssbio --upgrade
 ```
 
 **Uninstalling**
