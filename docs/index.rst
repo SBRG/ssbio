@@ -22,15 +22,6 @@ Example questions you can answer with this package:
 
 Installation
 ============
-Clone this repository to any location and then install it.
-
-**Cloning**
-
-.. code-block:: bash
-
-    git clone https://github.com/SBRG/ssbio.git
-
-**Installation**
 
 First install NGLview using pip:
 
@@ -42,15 +33,13 @@ Then install ssbio:
 
 .. code-block:: bash
 
-    cd ssbio
-    python setup.py develop --user
+    pip install ssbio
 
 **Updating**
 
 .. code-block:: bash
 
-    cd ssbio
-    git pull
+    pip install ssbio --upgrade
 
 **Uninstalling**
 
