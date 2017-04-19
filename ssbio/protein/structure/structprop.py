@@ -2,6 +2,7 @@ import logging
 import os.path as op
 
 import numpy as np
+import pandas as pd
 from cobra.core import DictList
 
 import ssbio.protein.sequence.utils.alignment
@@ -109,6 +110,7 @@ class StructProp(Object):
             Structure: Biopython Structure object
 
         """
+        # TODO: perhaps add option to parse into ProDy object?
         if not self.structure_path:
             log.error('{}: no structure file, unable to parse'.format(self.id))
             return None
@@ -256,10 +258,16 @@ class StructProp(Object):
 
             log.debug('{}: aligning to reference sequence {}'.format(structure_id, seqprop.id))
 
-            chain_prop = self.chains.get_by_id(chain_id)
-            chain_seq_record = chain_prop.seq_record
+            if self.chains.has_id(chain_id):
+                chain_prop = self.chains.get_by_id(chain_id)
+                chain_seq_record = chain_prop.seq_record
+            else:
+                log.warning('{}: chain not present in structure file'.format(chain_id))
+                continue
+
             if not chain_seq_record:
-                raise ValueError('{}: chain sequence not parsed'.format(chain_id))
+                log.warning('{}: chain sequence not available, was structure parsed?'.format(chain_id))
+                continue
 
             aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=seqprop.seq_str,
                                                                                      a_seq_id=seqprop.id,
@@ -333,6 +341,56 @@ class StructProp(Object):
         else:
             log.debug('{}: no chains meet quality checks'.format(self.id))
             return None
+
+    def map_seqprop_resnums_to_mapped_chains(self, seqprop, resnums):
+        """Map a list of residue numbers present in a sequence to their corresponding structure residue numbers.
+        
+        The method align_seqprop_to_mapped_chains needs to be run before this to store the alignments in memory.
+        
+        Args:
+            seqprop (SeqProp): SeqProp object
+            resnums (int, list): Residue number(s) 
+
+        Returns:
+            dict: Mapping of chain IDs and their residue numbers which match the residue numbers that were input.
+
+        """
+        mapping_dict = {}
+
+        for chain_id in self.mapped_chains:
+            # Get the alignment for a chain
+            structure_id = '{}-{}'.format(self.id, chain_id)
+            aln_id = '{}_{}'.format(seqprop.id, structure_id)
+            aln = seqprop.structure_alignments.get_by_id(aln_id)
+
+            # Get the mapping to chain index
+            aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
+            chain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
+
+            # Now map the resnums to this chain
+            resnums = ssbio.utils.force_list(resnums)
+            to_chain_index = {}
+            for x in resnums:
+                ix = chain_resnums[x - 1] - 1
+                if np.isnan(ix):
+                    log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
+                else:
+                    to_chain_index[x] = int(ix)
+
+            chain = self.chains.get_by_id(chain_id)
+            chain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
+            to_structure_resnums = {}
+            for k, v in to_chain_index.items():
+                rn = chain_structure_mapping[v]
+                if rn[1] == float('Inf'):
+                    log.warning(
+                        '{}-{}, {}: structure file does not contain coordinates for this residue'.format(self.id, chain_id, k))
+                else:
+                    to_structure_resnums[k] = rn
+
+            mapping_dict[chain_id] = to_structure_resnums
+
+        return mapping_dict
 
     def get_dict_with_chain(self, chain, only_keys=None, chain_keys=None, exclude_attributes=None, df_format=False):
         """get_dict method which incorporates attributes found in a specific chain. Does not overwrite any attributes
