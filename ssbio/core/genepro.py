@@ -67,5 +67,11 @@ class GenePro(Gene):
             if k not in attrs:
                 setattr(self, k, v)
         for k, v in attrs.items():
+            if k == 'root_dir':
+                if op.exists(v):
+                    setattr(self, k, v)
+                else:
+                    log.debug('Directory does not exist, files will not be mapped')
+                    continue
             if k != 'protein' or k != 'id':
                 setattr(self, k, v)
