@@ -239,7 +239,7 @@ class GEMPRO(Object):
     def genes_with_a_representative_sequence(self):
         """DictList: All genes with a representative sequence"""
         tmp = DictList(x for x in self.genes if x.protein.representative_sequence)
-        return DictList(y for y in tmp if y.protein.representative_sequence.sequence_file)
+        return DictList(y for y in tmp if y.protein.representative_sequence.sequence_file or y.protein.representative_sequence.metadata_file)
 
     @property
     def genes_with_a_representative_structure(self):
@@ -428,7 +428,7 @@ class GEMPRO(Object):
                         log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
                         continue
 
-                    if uniprot_prop.sequence_file:
+                    if uniprot_prop.sequence_file or uniprot_prop.metadata_file:
                         successfully_mapped_counter += 1
 
         log.info('{}/{}: number of genes mapped to UniProt'.format(successfully_mapped_counter, len(self.genes)))
@@ -496,7 +496,7 @@ class GEMPRO(Object):
 
             no_sequence_file_available = True
             for u in ups:
-                if u.sequence_file:
+                if u.sequence_file or u.metadata_file:
                     no_sequence_file_available = False
                     break
             if no_sequence_file_available:

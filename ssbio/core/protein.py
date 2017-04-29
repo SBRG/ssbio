@@ -220,14 +220,14 @@ class Protein(Object):
 
         return self.sequences.get_by_id(kegg_id)
 
-    def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_metadata_file=None,
+    def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None,
                      set_as_representative=False, download=False, outdir=None, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
 
         Args:
             uniprot_id:
             uniprot_seq_file:
-            uniprot_metadata_file:
+            uniprot_xml_file:
             set_as_representative:
             download:
             outdir:
@@ -255,10 +255,10 @@ class Protein(Object):
                 uniprot_prop = self.sequences.get_by_id(uniprot_id)
 
         if not self.sequences.has_id(uniprot_id):
-            uniprot_prop = UniProtProp(uniprot_id, uniprot_seq_file, uniprot_metadata_file)
+            uniprot_prop = UniProtProp(uniprot_id, uniprot_seq_file, uniprot_xml_file)
             if download:
-                uniprot_prop.download_seq_file(outdir, force_rerun)
-                uniprot_prop.download_metadata_file(outdir, force_rerun)
+                uniprot_prop.download_metadata_file(outdir=outdir, file_type='xml', force_rerun=force_rerun)
+                uniprot_prop.download_seq_file(outdir=outdir, force_rerun=force_rerun)
 
             # Also check if UniProt sequence matches a potentially set representative sequence
             if self.representative_sequence:
@@ -366,8 +366,8 @@ class Protein(Object):
     def _representative_sequence_setter(self, seq_prop):
         """Make a copy of a SeqProp object and store it as the representative. Only keep certain attributes"""
 
-        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=seq_prop.sequence_path) #,
-                                               # seq=seq_prop.seq_record)
+        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=seq_prop.sequence_path, metadata_path=seq_prop.metadata_path,
+                                               seq=seq_prop.seq_record)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self.__representative_sequence_attributes)
         if self.representative_sequence.seq_record:
             self.representative_sequence.seq_record.id = self.representative_sequence.id
@@ -394,7 +394,8 @@ class Protein(Object):
 
         # If there is a KEGG annotation and no UniProt annotations, set KEGG as representative
         elif len(kegg_mappings) > 0 and len(uniprot_mappings) == 0:
-            self._representative_sequence_setter(kegg_to_use)
+            # self._representative_sequence_setter(kegg_to_use)
+            self.representative_sequence = kegg_to_use
             log.debug('{}: representative sequence set from KEGG ID {}'.format(self.id, kegg_to_use.id))
 
         # If there are UniProt annotations and no KEGG annotations, set UniProt as representative
@@ -408,14 +409,16 @@ class Protein(Object):
             best_u_id = sorted_by_second[0][0]
 
             best_u = uniprot_mappings.get_by_id(best_u_id)
-            self._representative_sequence_setter(best_u)
+            self.representative_sequence = best_u
+            # self._representative_sequence_setter(best_u)
             log.debug('{}: representative sequence set from UniProt ID {}'.format(self.id, best_u_id))
 
         # If there are both UniProt and KEGG annotations...
         elif len(kegg_mappings) > 0 and len(uniprot_mappings) > 0:
             # Use KEGG if the mapped UniProt is unique, and it has PDBs
             if kegg_to_use.num_pdbs > 0 and not uniprot_mappings.has_id(kegg_to_use.uniprot):
-                self._representative_sequence_setter(kegg_to_use)
+                # self._representative_sequence_setter(kegg_to_use)
+                self.representative_sequence = kegg_to_use
                 log.debug('{}: representative sequence set from KEGG ID {}'.format(self.id, kegg_to_use.id))
             else:
                 # If there are multiple uniprots rank them by the sum of reviewed (bool) + num_pdbs
@@ -426,7 +429,8 @@ class Protein(Object):
                 best_u_id = sorted_by_second[0][0]
 
                 best_u = uniprot_mappings.get_by_id(best_u_id)
-                self._representative_sequence_setter(best_u)
+                # self._representative_sequence_setter(best_u)
+                self.representative_sequence = best_u
                 log.debug('{}: Representative sequence set from UniProt ID {}'.format(self.id, best_u_id))
 
         return self.representative_sequence
@@ -1094,6 +1098,9 @@ class Protein(Object):
 
         log.warning('{}: no structures meet quality checks'.format(self.id))
         return None
+
+    def get_residue_properties(self, residues, representative_only=True):
+        pass
 
     def view_all_mutations(self, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
                            opacity_range=(0.8,1), scale_range=(1,5), gui=False):

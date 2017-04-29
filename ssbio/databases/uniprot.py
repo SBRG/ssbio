@@ -1,12 +1,10 @@
 import os.path as op
 import re
 import warnings
-
 import bioservices
 import pandas as pd
 import requests
 from dateutil.parser import parse as dateparse
-
 import ssbio.utils
 from ssbio.protein.sequence.seqprop import SeqProp
 
@@ -15,14 +13,10 @@ try:
 except ImportError:
     from io import StringIO
 from six.moves.urllib.request import urlretrieve
+from Bio import SeqIO
 
 import logging
 log = logging.getLogger(__name__)
-
-
-# import cachetools
-# SEVEN_DAYS = 60 * 60 * 24 * 7
-
 bsup = bioservices.uniprot.UniProt()
 
 
@@ -30,27 +24,51 @@ class UniProtProp(SeqProp):
     """Class to parse through UniProt metadata all at once
     """
 
-    def __init__(self, uniprot_acc, sequence_path=None, metadata_path=None):
+    def __init__(self, uniprot_acc, sequence_path=None, xml_path=None, txt_path=None):
+        if not is_valid_uniprot_id(uniprot_acc):
+            raise ValueError("Invalid UniProt ID!")
+
+        if xml_path:
+            metadata_path = xml_path
+            self.file_type = 'xml'
+        elif txt_path:
+            metadata_path = txt_path
+            self.file_type = 'txt'
+        else:
+            metadata_path = None
+            self.file_type = None
+
         SeqProp.__init__(self, ident=uniprot_acc, sequence_path=sequence_path, metadata_path=metadata_path)
+        self.uniprot = uniprot_acc
         self.ec_number = None
         self.entry_version = None
         self.pfam = None
         self.reviewed = False
         self.seq_version = None
+        self.reviewed = False
 
-        if uniprot_acc:
-            if not is_valid_uniprot_id(uniprot_acc):
-                raise ValueError("Invalid UniProt ID!")
-            self.uniprot = uniprot_acc
+    @property
+    def seq_record(self):
+        # The SeqRecord object is not kept in memory unless explicitly set, so when saving as a json we only save a
+        # pointer to the file
+        if self.sequence_path:
+            seq_record = SeqIO.read(open(self.sequence_path), 'fasta')
+        elif self.metadata_path:
+            if self.file_type == 'xml':
+                with open(self.metadata_path) as handle:
+                    seq_record = SeqIO.read(handle, "uniprot-xml")
+            elif self.file_type == 'txt':
+                with open(self.metadata_path) as handle:
+                    seq_record = SeqIO.read(handle, "swiss")
+        else:
+            seq_record = self._seq_record
 
-        if metadata_path:
-            self.load_metadata_path(metadata_path)
+        if seq_record:
+            seq_record.letter_annotations = self.letter_annotations
+            seq_record.annotations = self.annotations
+            seq_record.features = self.features
 
-    def load_metadata_path(self, metadata_file):
-        SeqProp.load_metadata_path(self, metadata_file)
-        self.update(parse_uniprot_txt_file(metadata_file), overwrite=True,
-                    only_keys=['description', 'kegg', 'refseq', 'ec_number', 'entry_version', 'gene_name',
-                               'pfam', 'pdbs', 'reviewed', 'seq_version'])
+        return seq_record
 
     def download_seq_file(self, outdir, force_rerun=False):
         """Download and load the UniProt sequence file"""
@@ -61,14 +79,43 @@ class UniProtProp(SeqProp):
 
         self.load_sequence_path(uniprot_seq_file)
 
-    def download_metadata_file(self, outdir, force_rerun=False):
-        """Download and load the UniProt sequence file"""
+    def download_metadata_file(self, outdir, file_type='xml', force_rerun=False):
+        """Download and load the UniProt metadata file"""
         uniprot_metadata_file = download_uniprot_file(uniprot_id=self.id,
-                                                      filetype='txt',
+                                                      filetype=file_type,
                                                       outdir=outdir,
                                                       force_rerun=force_rerun)
-
+        self.file_type = file_type
         self.load_metadata_path(uniprot_metadata_file)
+        self.sequence_dir = self.metadata_dir
+
+    def load_metadata_path(self, metadata_path):
+        """Load a metadata file and provide pointers to its location
+
+        Args:
+            metadata_path: Path to metadata file
+
+        """
+        if not op.dirname(metadata_path):
+            self.metadata_dir = '.'
+        else:
+            self.metadata_dir = op.dirname(metadata_path)
+        self.metadata_file = op.basename(metadata_path)
+
+        # TODO: need to rethink the flow here...
+        # Additionally load in metadata from xml or txt files
+        if self.file_type == 'xml':
+            with open(self.metadata_path) as handle:
+                seq_record = SeqIO.read(handle, "uniprot-xml")
+        elif self.file_type == 'txt':
+            with open(self.metadata_path) as handle:
+                seq_record = SeqIO.read(handle, "swiss")
+        self.update(seq_record.__dict__, overwrite=True, only_keys=['description'])
+        # TODO: need to parse the dbxrefs for Pfam, refseq, kegg, pdb, and what about "reviewed"?
+        self.update(seq_record.annotations, overwrite=True, only_keys=['gene_name_primary', 'modified', 'sequence_modified'])
+        self.annotations = seq_record.annotations
+        self.letter_annotations = seq_record.letter_annotations
+        self.features = seq_record.features
 
     def ranking_score(self):
         """Provide a score for this UniProt ID based on reviewed (True=1, False=0) + number of PDBs
@@ -451,70 +498,3 @@ def old_parse_uniprot_txt_file(infile):
                     del descriptions[i]
 
     return metadata_by_seqid
-
-
-# def uniprot_metadata_batch(uniprot_ids, outdir=None):
-#     '''
-#     Input: UniProt ID or IDs
-#     Output: dictionary of metadata associated with the UniProt IDs
-#     '''
-#     # TODO: not working as of 2016-05-08 - seems to be a limit on the url requests
-#     counter = 1
-#
-#     # if isinstance(uniprot_ids, str):
-#     #     uniprot_ids = [uniprot_ids]
-#     #     single = True
-#     # else:
-#     #     single = False
-#     uniprot_ids = utils.force_list(uniprot_ids)
-#
-#     uniprot_metadata_raw = bs_unip.retrieve(uniprot_ids, frmt='txt')
-#     uniprot_metadata_final = {}
-#
-#     for uniprot_id in tqdm(uniprot_ids):
-#
-#         uniprot_metadata_dict = {}
-#
-#         if single:
-#             metadata = parse_uniprot_txt_file(uniprot_metadata_raw)
-#         else:
-#             metadata = parse_uniprot_txt_file(
-#                 uniprot_metadata_raw[uniprot_ids.index(uniprot_id)])
-#
-#         metadata_key = list(metadata.keys())[0]
-#
-#         uniprot_metadata_dict['u_uniprot_acc'] = uniprot_id
-#         uniprot_metadata_dict['u_seq'] = metadata[metadata_key]['sequence']
-#         uniprot_metadata_dict['u_seq_len'] = len(
-#             str(metadata[metadata_key]['sequence']))
-#         uniprot_metadata_dict['u_reviewed'] = metadata[
-#             metadata_key]['is_reviewed']
-#         uniprot_metadata_dict['u_seq_version'] = metadata[
-#             metadata_key]['sequence_version']
-#         uniprot_metadata_dict['u_entry_version'] = metadata[
-#             metadata_key]['entry_version']
-#         if 'gene' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_gene_name'] = metadata[
-#                 metadata_key]['gene']
-#         if 'description' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_description'] = metadata[
-#                 metadata_key]['description']
-#         if 'refseq' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_refseq'] = metadata[
-#                 metadata_key]['refseq']
-#         if 'kegg' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_kegg_id'] = metadata[
-#                 metadata_key]['kegg']
-#         if 'go' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_go'] = metadata[metadata_key]['go']
-#         if 'ec' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_ec_number'] = metadata[
-#                 metadata_key]['ec']
-#         if 'pfam' in metadata[metadata_key]:
-#             uniprot_metadata_dict['u_pfam'] = metadata[
-#                 metadata_key]['pfam']
-#
-#         uniprot_metadata_final[uniprot_id] = uniprot_metadata_dict
-#     return uniprot_metadata_final
-
-

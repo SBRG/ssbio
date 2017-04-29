@@ -12,6 +12,7 @@ import ssbio.protein.sequence.utils.fasta
 import ssbio.databases.pdb
 import ssbio.utils
 from ssbio.core.object import Object
+from BCBio import GFF
 
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ class SeqProp(Object):
 
         Takes as input a sequence FASTA file, sequence string, Biopython Seq or SeqRecord. You can also provide the
         path to the metadata file if available (see UniProtProp and KEGGProp classes for parsers). If provided as a
-        string/Seq/SeqRecord object, you can also write them out as FASTA files.
+        string/Seq/SeqRecord object, you can also set write_fasta_file to write them out as FASTA files.
 
         Args:
             ident (str): Identifier of the sequence
@@ -33,9 +34,8 @@ class SeqProp(Object):
             seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
             description (str): Optional description of the sequence
             write_fasta_file (bool): If a FASTA file of the sequence should be written
-            outname:
-            outdir:
-            force_rewrite:
+            outfile (str): Path to output file if write_fasta_file is True
+            force_rewrite (bool): If existing outfile should be overwritten
         """
 
         Object.__init__(self, id=ident, description=description)
@@ -49,6 +49,7 @@ class SeqProp(Object):
         self.pdbs = None
 
         # Sequence information
+        # SeqRecord is read directly from a provided file and not kept in memory
         self._seq_record = None
         if seq:
             # Load sequence if not provided as a file
@@ -72,9 +73,10 @@ class SeqProp(Object):
         self.sequence_alignments = DictList()
         self.structure_alignments = DictList()
 
-        # Copy SeqRecord annotations and letter annotations for JSON saving capabilities
+        # Copy SeqRecord annotations, letter annotations, and features for JSON saving capabilities
         self.annotations = {}
         self.letter_annotations = {}
+        self.features = []
 
     @property
     def sequence_dir(self):
@@ -110,8 +112,12 @@ class SeqProp(Object):
             # log.error('{}: sequence file not available'.format(self.id))
             # return None
 
+        sr = SeqIO.read(open(self.sequence_path), 'fasta')
+        sr.annotations = self.annotations
+        sr.letter_annotations = self.letter_annotations
+        sr.features = self.features
 
-        return SeqIO.read(open(self.sequence_path), 'fasta')
+        return sr
 
     @seq_record.setter
     def seq_record(self, sr):
@@ -119,6 +125,7 @@ class SeqProp(Object):
         if sr:
             self.annotations = sr.annotations
             self.letter_annotations = sr.letter_annotations
+            self.features = sr.features
         self._seq_record = sr
 
     @property
@@ -185,8 +192,25 @@ class SeqProp(Object):
             metadata_path: Path to metadata file
 
         """
-        self.metadata_dir = op.dirname(metadata_path)
+        if not op.dirname(metadata_path):
+            self.metadata_dir = '.'
+        else:
+            self.metadata_dir = op.dirname(metadata_path)
         self.metadata_file = op.basename(metadata_path)
+
+    def load_feature_file(self, gff_path):
+        """Load a GFF file and store features 
+        
+        Args:
+            gff_path: Path to GFF file.
+
+        """
+        with open(gff_path) as handle:
+            feats = list(GFF.parse(handle))
+            if len(feats) > 1:
+                log.warning('Too many sequences in GFF')
+            else:
+                self.features = feats[0].features
 
     def write_fasta_file(self, outfile, force_rerun=False):
         """Write a FASTA file for the protein sequence.
@@ -243,7 +267,7 @@ class SeqProp(Object):
         return ssbio.protein.sequence.utils.fasta.fasta_files_equal(self.sequence_path, seq_file)
 
     def load_letter_annotations(self, annotation_name, letter_annotation):
-        """Add per-residue annotations to the seq_record.letter_annotations attribute
+        """Add per-residue annotations to the letter_annotations attribute
 
         Args:
             annotation_name: Name of the key that will be used to access this annotation

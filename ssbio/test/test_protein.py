@@ -28,7 +28,7 @@ class TestProtein(unittest.TestCase):
     def test_load_uniprot(self):
         new_uniprot = self.prot.load_uniprot('P0ABP8',
                                              uniprot_seq_file='test_files/sequences/P0ABP8.fasta',
-                                             uniprot_metadata_file='test_files/sequences/P0ABP8.txt')
+                                             uniprot_xml_file='test_files/sequences/P0ABP8.txt')
         self.assertTrue(self.prot.sequences.has_id('P0ABP8'))
         self.assertTrue(isinstance(new_uniprot, UniProtProp))
 
@@ -68,7 +68,7 @@ class TestProtein(unittest.TestCase):
     def test_load_pdb(self):
         new_uniprot = self.prot.load_uniprot('P0ABP8',
                                              uniprot_seq_file='test_files/sequences/P0ABP8.fasta',
-                                             uniprot_metadata_file='test_files/sequences/P0ABP8.txt',
+                                             uniprot_xml_file='test_files/sequences/P0ABP8.txt',
                                              set_as_representative=True)
 
         newpdb = self.prot.load_pdb('1ecp', pdb_file='test_files/structures/1ecp.pdb', file_type='pdb')

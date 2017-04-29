@@ -22,8 +22,6 @@ class TestUniProt(unittest.TestCase):
 
         self.assertEqual(up.bigg, None)
         self.assertEqual(up.description, ['Inosine phosphorylase', 'PNP', 'Purine nucleoside phosphorylase DeoD-type'])
-        self.assertEqual(up.ec_number, ['2.4.2.1'])
-        self.assertEqual(up.entry_version, '2016-11-02')
         self.assertEqual(up.gene_name, 'deoD')
         self.assertEqual(up.id, 'P0ABP8')
         six.assertCountEqual(self, up.kegg, ['ecj:JW4347', 'eco:b4384'])
@@ -31,12 +29,10 @@ class TestUniProt(unittest.TestCase):
         six.assertCountEqual(self, up.pdbs,
                         ['1OUM', '4TTA', '4TS3', '1OTY', '1K9S', '3OOE', '1OVG', '3ONV', '3UT6', '1OV6', '4TTJ', '1OTX',
                          '1OU4', '3OOH', '4TS9', '1A69', '3OPV', '1ECP', '4TTI'])
-        self.assertEqual(up.pfam, ['PF01048'])
         six.assertCountEqual(self, up.refseq, ['NP_418801.1', 'NC_000913.3', 'WP_000224877.1', 'NZ_LN832404.1'])
         self.assertEqual(up.reviewed, True)
         self.assertEqual(up.sequence_file, 'P0ABP8.fasta')
         self.assertEqual(up.seq_len, 239)
-        self.assertEqual(up.seq_version, '2007-01-23')
         self.assertEqual(up.uniprot, 'P0ABP8')
 
     def test_uniprot_valid_id(self):
