@@ -2,8 +2,7 @@ from cobra.core import Gene
 from ssbio.core.protein import Protein
 import os.path as op
 import ssbio.utils
-import cobra.io.json
-from json_tricks.np import dumps, loads
+import cobra.io.dict
 import logging
 log = logging.getLogger(__name__)
 
@@ -48,12 +47,12 @@ class GenePro(Gene):
         self.protein = Protein(self.id)
 
     def __json_encode__(self):
-        reqd_attribs = cobra.io.json._REQUIRED_GENE_ATTRIBUTES
-        optn_attribs = cobra.io.json._OPTIONAL_GENE_ATTRIBUTES
+        reqd_attribs = cobra.io.dict._REQUIRED_GENE_ATTRIBUTES
+        optn_attribs = cobra.io.dict._OPTIONAL_GENE_ATTRIBUTES
         optn_attribs.update({'root_dir': None})
         new_gene = {key: str(getattr(self, key))
                     for key in reqd_attribs}
-        cobra.io.json._update_optional(self, new_gene, optn_attribs)
+        cobra.io.dict._update_optional(self, new_gene, optn_attribs)
 
         # Protein
         new_gene['protein'] = self.protein
@@ -63,7 +62,7 @@ class GenePro(Gene):
     def __json_decode__(self, **attrs):
         Gene.__init__(self, id=attrs['id'])
         self.protein = attrs['protein']
-        for k, v in cobra.io.json._OPTIONAL_GENE_ATTRIBUTES.items():
+        for k, v in cobra.io.dict._OPTIONAL_GENE_ATTRIBUTES.items():
             if k not in attrs:
                 setattr(self, k, v)
         for k, v in attrs.items():

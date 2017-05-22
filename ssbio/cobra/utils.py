@@ -1,6 +1,6 @@
 import re
 import os.path as op
-import cobra.io.json
+import cobra.io.dict
 from cobra.io import load_matlab_model
 from cobra.io import read_sbml_model
 from cobra.io import load_json_model
@@ -29,14 +29,14 @@ class ModelPro(Model):
     def __json_encode__(self):
         """convert the model to a dict"""
         obj = dict(
-                reactions=[cobra.io.json.reaction_to_dict(reaction) for reaction in self.reactions],
+                reactions=[cobra.io.dict.reaction_to_dict(reaction) for reaction in self.reactions],
                 metabolites=[
-                    cobra.io.json.metabolite_to_dict(metabolite) for metabolite in self.metabolites
+                    cobra.io.dict.metabolite_to_dict(metabolite) for metabolite in self.metabolites
                     ],
                 genes = self.genes,
                 id=self.id,
         )
-        cobra.io.json._update_optional(self, obj, cobra.io.json._OPTIONAL_MODEL_ATTRIBUTES)
+        cobra.io.dict._update_optional(self, obj, cobra.io.dict._OPTIONAL_MODEL_ATTRIBUTES)
         # add in the JSON version
         obj["version"] = 1
         return obj
@@ -47,11 +47,11 @@ class ModelPro(Model):
         if 'reactions' not in attrs:
             raise Exception('JSON object has no reactions attribute. Cannot load.')
         self.add_metabolites(
-                [cobra.io.json.metabolite_from_dict(metabolite) for metabolite in attrs['metabolites']]
+                [cobra.io.dict.metabolite_from_dict(metabolite) for metabolite in attrs['metabolites']]
         )
         self.genes = DictList(attrs['genes'])
         self.add_reactions(
-                [cobra.io.json.reaction_from_dict(reaction, self) for reaction in attrs['reactions']]
+                [cobra.io.dict.reaction_from_dict(reaction, self) for reaction in attrs['reactions']]
         )
         for k, v in attrs.items():
             if k in {'id', 'name', 'notes', 'compartments', 'annotation'}:
