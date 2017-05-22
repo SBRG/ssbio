@@ -1,7 +1,7 @@
 .. _structure:
 
 *******************
-The Structure Class
+The StructProp Class
 *******************
 
 Introduction
