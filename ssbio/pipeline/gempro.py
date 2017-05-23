@@ -1127,7 +1127,7 @@ class GEMPRO(Object):
 
     def get_dssp_annotations(self):
         """Run DSSP on all representative structures and store calculations.
-        Annotations are stored in the gene protein’s representative sequence at:
+        Annotations are stored in the gene protein's representative sequence at:
         ``seq_record.letter_annotations['*-dssp']``
 
         Todo:
@@ -1150,7 +1150,7 @@ class GEMPRO(Object):
 
     def get_msms_annotations(self):
         """Run MSMS on all representative structures and store calculations.
-        Annotations are stored in the gene protein’s representative sequence at:
+        Annotations are stored in the gene protein's representative sequence at:
         ``seq_record.letter_annotations['*-msms']``
 
         """
@@ -1166,7 +1166,7 @@ class GEMPRO(Object):
 
     def get_disulfide_bridges(self):
         """Run Biopython's disulfide bridge finder and store found bridges.
-        Annotations are stored in the gene protein’s representative sequence at:
+        Annotations are stored in the gene protein's representative sequence at:
         ``seq_record.annotations['SSBOND-biopython']``
 
         """

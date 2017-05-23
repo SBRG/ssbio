@@ -7,6 +7,7 @@ from Bio.PDB.DSSP import dssp_dict_from_pdb_file
 from Bio.PDB.DSSP import residue_max_acc
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
+from six import iteritems
 
 import ssbio.utils
 
@@ -161,7 +162,7 @@ def secondary_structure_summary(dssp_df):
         counts = chain_df.ss.value_counts()
         total = float(len(chain_df))
 
-        for ss, count in counts.items():
+        for ss, count in iteritems(counts):
             if ss == '-':
                 expoinfo['percent_C-dssp'] = count/total
             if ss == 'H':
