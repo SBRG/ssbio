@@ -2,7 +2,7 @@ import gzip
 import json
 import logging
 import os.path as op
-
+import zlib
 import pandas as pd
 import requests
 import ssbio.protein.structure.complexes as cplx
@@ -66,6 +66,16 @@ class PDBProp(StructProp):
             pisa_xmls[self.id] = existing_pisa_multimer_xml
         pisa_dict = cplx.parse_pisa_multimers_xml(pisa_xmls[self.id], download_structures=True,
                                                   outdir=outdir)
+
+    def __json_encode__(self):
+        # TODO: investigate why saving with # does not work!
+        to_return = {}
+        for x in self.__dict__.keys():
+            if x == 'pdb_title' or x == 'description':
+                sanitized = ssbio.utils.force_string(getattr(self, x)).replace('#', '-')
+            else:
+                to_return.update({x: getattr(self, x)})
+        return to_return
 
 
 def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
@@ -139,6 +149,36 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
     return outfile
 
 
+def download_biological_assemblies(pdb_id, outdir):
+    """Downloads biological assembly file from:
+    `ftp://ftp.wwpdb.org/pub/pdb/data/biounit/coordinates/divided/`
+
+    Args:
+        outdir (str): Output directory of the decompressed assembly
+
+    """
+
+    # TODO: not tested yet
+    if not op.exists(outdir):
+        raise ValueError('{}: output directory does not exist'.format(outdir))
+
+    folder = pdb_id[1:3]
+    server = 'ftp://ftp.wwpdb.org/pub/pdb/data/biounit/coordinates/divided/{}/'.format(folder)
+    html_folder = urlopen(server).readlines()
+    for line in html_folder:
+        if pdb_id in str(line).strip():
+            file_name = '%s' % (pdb_id + str(line).strip().split(pdb_id)[1].split('\r\n')[0])
+            outfile_name = file_name.replace('.', '_')
+            outfile_name = outfile_name.replace('_gz', '.pdb')
+            f = urlopen(op.join(server, file_name))
+            decompressed_data = zlib.decompress(f.read(), 16 + zlib.MAX_WBITS)
+            with open(op.join(outdir, outfile_name), 'wb') as f:
+                f.write(decompressed_data)
+                f.close()
+            log.debug('{}: downloaded biological assembly')
+            return op.join(outdir, outfile_name)
+
+
 def parse_pdb_header(infile):
     """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
 
@@ -204,7 +244,10 @@ def parse_mmcif_header(infile):
             else:
                 newdict['resolution'] = float(mmdict['_refine.ls_d_res_high'])
         except:
-            newdict['resolution'] = float(mmdict['_em_3d_reconstruction.resolution'])
+            try:
+                newdict['resolution'] = float(mmdict['_em_3d_reconstruction.resolution'])
+            except:
+                log.debug('{}: no resolution field'.format(infile))
     else:
         log.debug('{}: no resolution field'.format(infile))
 

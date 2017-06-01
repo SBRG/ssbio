@@ -26,7 +26,7 @@ class UniProtProp(SeqProp):
 
     def __init__(self, uniprot_acc, sequence_path=None, xml_path=None, txt_path=None):
         if not is_valid_uniprot_id(uniprot_acc):
-            raise ValueError("Invalid UniProt ID!")
+            raise ValueError("{}: invalid UniProt ID!".format(uniprot_acc))
 
         if xml_path:
             metadata_path = xml_path
@@ -79,17 +79,17 @@ class UniProtProp(SeqProp):
 
         self.load_sequence_path(uniprot_seq_file)
 
-    def download_metadata_file(self, outdir, file_type='xml', force_rerun=False):
+    def download_metadata_file(self, outdir, file_type='xml', simple_parse=False, force_rerun=False):
         """Download and load the UniProt metadata file"""
         uniprot_metadata_file = download_uniprot_file(uniprot_id=self.id,
                                                       filetype=file_type,
                                                       outdir=outdir,
                                                       force_rerun=force_rerun)
         self.file_type = file_type
-        self.load_metadata_path(uniprot_metadata_file)
+        self.load_metadata_path(metadata_path=uniprot_metadata_file, simple_parse=simple_parse)
         self.sequence_dir = self.metadata_dir
 
-    def load_metadata_path(self, metadata_path):
+    def load_metadata_path(self, metadata_path, simple_parse=False):
         """Load a metadata file and provide pointers to its location
 
         Args:
@@ -102,20 +102,27 @@ class UniProtProp(SeqProp):
             self.metadata_dir = op.dirname(metadata_path)
         self.metadata_file = op.basename(metadata_path)
 
-        # TODO: need to rethink the flow here...
-        # Additionally load in metadata from xml or txt files
-        if self.file_type == 'xml':
-            with open(self.metadata_path) as handle:
-                seq_record = SeqIO.read(handle, "uniprot-xml")
-        elif self.file_type == 'txt':
-            with open(self.metadata_path) as handle:
-                seq_record = SeqIO.read(handle, "swiss")
-        self.update(seq_record.__dict__, overwrite=True, only_keys=['description'])
-        # TODO: need to parse the dbxrefs for Pfam, refseq, kegg, pdb, and what about "reviewed"?
-        self.update(seq_record.annotations, overwrite=True, only_keys=['gene_name_primary', 'modified', 'sequence_modified'])
-        self.annotations = seq_record.annotations
-        self.letter_annotations = seq_record.letter_annotations
-        self.features = seq_record.features
+        if simple_parse:
+            self.update(parse_uniprot_txt_file(metadata_path), overwrite=True,
+                        only_keys=['description', 'kegg', 'refseq', 'ec_number', 'entry_version', 'gene_name',
+                                   'pfam', 'pdbs', 'reviewed', 'seq_version'])
+
+        else:
+            # TODO: need to rethink the flow here...
+            # Additionally load in metadata from xml or txt files
+            if self.file_type == 'xml':
+                with open(self.metadata_path) as handle:
+                    seq_record = SeqIO.read(handle, "uniprot-xml")
+            elif self.file_type == 'txt':
+                with open(self.metadata_path) as handle:
+                    seq_record = SeqIO.read(handle, "swiss")
+            self.update(seq_record.__dict__, overwrite=True, only_keys=['description'])
+            # TODO: need to parse the dbxrefs for Pfam, refseq, kegg, pdb, and what about "reviewed"?
+            self.update(seq_record.annotations, overwrite=True,
+                        only_keys=['gene_name_primary', 'modified', 'sequence_modified'])
+            self.annotations = seq_record.annotations
+            self.letter_annotations = seq_record.letter_annotations
+            self.features = seq_record.features
 
     def ranking_score(self):
         """Provide a score for this UniProt ID based on reviewed (True=1, False=0) + number of PDBs
@@ -125,6 +132,17 @@ class UniProtProp(SeqProp):
 
         """
         return self.reviewed + self.num_pdbs
+
+    def __json_encode__(self):
+        # TODO: investigate why saving with # does not work!
+        # Recon3D problem genes: testers = ['1588.2', '6819.1', '27233.1', '2264.1']
+        to_return = {}
+        for x in self.__dict__.keys():
+            if x == 'description':
+                sanitized = ssbio.utils.force_string(getattr(self, x)).replace('#', '-')
+            else:
+                to_return.update({x: getattr(self, x)})
+        return to_return
 
 
 def is_valid_uniprot_id(instring):
@@ -171,9 +189,6 @@ def get_fasta(uniprot_id):
         str: String of the protein (amino acid) sequence
 
     """
-    if not is_valid_uniprot_id(uniprot_id):
-        raise ValueError("Invalid UniProt ID!")
-
     # Silencing the "Will be moved to Biokit" message
     with ssbio.utils.suppress_stdout():
         return bsup.get_fasta_sequence(uniprot_id)
@@ -189,8 +204,6 @@ def uniprot_reviewed_checker(uniprot_id):
         bool: If the entry is reviewed
 
     """
-    if not is_valid_uniprot_id(uniprot_id):
-        raise ValueError("Invalid UniProt ID!")
 
     query_string = 'id:' + uniprot_id
 
@@ -271,9 +284,6 @@ def uniprot_ec(uniprot_id):
     Returns:
 
     """
-    if not is_valid_uniprot_id(uniprot_id):
-        raise ValueError('Invalid UniProt ID')
-
     r = requests.post('http://www.uniprot.org/uniprot/?query=%s&columns=ec&format=tab' % uniprot_id)
     ec = r.content.decode('utf-8').splitlines()[1]
 
@@ -294,8 +304,6 @@ def uniprot_sites(uniprot_id):
     Returns:
 
     """
-    if not is_valid_uniprot_id(uniprot_id):
-        raise ValueError('Invalid UniProt ID')
 
     r = requests.post('http://www.uniprot.org/uniprot/%s.gff' % uniprot_id)
     gff = StringIO(r.content.decode('utf-8'))
@@ -323,8 +331,6 @@ def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
         str: Absolute path to file
 
     """
-    if not is_valid_uniprot_id(uniprot_id):
-        raise ValueError('Invalid UniProt ID')
 
     my_file = '{}.{}'.format(uniprot_id, filetype)
     url = 'http://www.uniprot.org/uniprot/{}'.format(my_file)
