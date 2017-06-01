@@ -49,10 +49,12 @@ class GenePro(Gene):
     def __json_encode__(self):
         reqd_attribs = cobra.io.dict._REQUIRED_GENE_ATTRIBUTES
         optn_attribs = cobra.io.dict._OPTIONAL_GENE_ATTRIBUTES
+        ordered_optn_attribs = cobra.io.dict._ORDERED_OPTIONAL_GENE_KEYS
         optn_attribs.update({'root_dir': None})
+        ordered_optn_attribs.append('root_dir')
         new_gene = {key: str(getattr(self, key))
                     for key in reqd_attribs}
-        cobra.io.dict._update_optional(self, new_gene, optn_attribs)
+        cobra.io.dict._update_optional(self, new_gene, optn_attribs, ordered_optn_attribs)
 
         # Protein
         new_gene['protein'] = self.protein
@@ -61,16 +63,16 @@ class GenePro(Gene):
 
     def __json_decode__(self, **attrs):
         Gene.__init__(self, id=attrs['id'])
-        self.protein = attrs['protein']
-        for k, v in cobra.io.dict._OPTIONAL_GENE_ATTRIBUTES.items():
-            if k not in attrs:
-                setattr(self, k, v)
+
         for k, v in attrs.items():
+            # print(k)
             if k == 'root_dir':
                 if op.exists(v):
                     setattr(self, k, v)
                 else:
                     log.debug('Directory does not exist, files will not be mapped')
                     continue
-            if k != 'protein' or k != 'id':
+            if k != 'protein' and k != 'id':
                 setattr(self, k, v)
+
+        self.protein = attrs['protein']

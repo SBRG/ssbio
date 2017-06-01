@@ -36,7 +36,7 @@ class ModelPro(Model):
                 genes = self.genes,
                 id=self.id,
         )
-        cobra.io.dict._update_optional(self, obj, cobra.io.dict._OPTIONAL_MODEL_ATTRIBUTES)
+        cobra.io.dict._update_optional(self, obj, cobra.io.dict._OPTIONAL_MODEL_ATTRIBUTES, cobra.io.dict._ORDERED_OPTIONAL_MODEL_KEYS)
         # add in the JSON version
         obj["version"] = 1
         return obj
