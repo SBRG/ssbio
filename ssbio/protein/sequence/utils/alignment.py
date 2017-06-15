@@ -41,16 +41,18 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
     """Run a global pairwise sequence alignment between two sequence strings.
 
     Args:
-        a_seq:
-        b_seq:
-        engine (str): 'biopython' or 'needle'
-        a_seq_id:
-        b_seq_id:
-        gapopen:
-        gapextend:
-        outfile:
-        outdir:
-        force_rerun:
+        a_seq (str, Seq, SeqRecord): Reference sequence
+        b_seq (str, Seq, SeqRecord): Sequence to be aligned to reference
+        engine (str): `biopython` or `needle` - which pairwise alignment program to use
+        a_seq_id (str): Reference sequence ID. If not set, is "a_seq"
+        b_seq_id (str): Sequence to be aligned ID. If not set, is "b_seq"
+        gapopen (int): Only for `needle` - Gap open penalty is the score taken away when a gap is created
+        gapextend (float): Only for `needle` - Gap extension penalty is added to the standard gap penalty for each 
+            base or residue in the gap
+        outfile (str): Only for `needle` - name of output file. If not set, is {id_a}_{id_b}_align.txt
+        outdir (str): Only for `needle` - Path to output directory. Default is the current directory.
+        force_rerun (bool): Only for `needle` - Default False, set to True if you want to rerun the alignment 
+            if outfile exists.
 
     Returns:
         MultipleSeqAlignment: Biopython object to represent an alignment
@@ -91,6 +93,9 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
         alignment_file = run_needle_alignment(seq_a=a_seq, seq_b=b_seq, gapopen=gapopen, gapextend=gapextend,
                                               outdir=outdir, outfile=outfile, force_rerun=force_rerun)
         log.debug('Needle alignment at {}'.format(alignment_file))
+
+        if not op.exists(alignment_file):
+            raise ValueError('{}: needle alignment file does not exist'.format(alignment_file))
 
         # Use AlignIO to parse the needle alignment, alignments[0] is the first alignment (the only one in pairwise)
         alignments = list(AlignIO.parse(alignment_file, "emboss"))
@@ -138,6 +143,8 @@ def run_needle_alignment(seq_a, seq_b, gapopen=10, gapextend=0.5,
         str: Raw alignment result of the needle alignment in srspair format.
 
     """
+    # TODO: check if needle is installed and raise error if not
+
     if not outdir:
         outdir = ''
 
