@@ -17,8 +17,39 @@ from BCBio import GFF
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
+"""seqprop.py
+
+Todo:
+    * Include methods to read and write GFF files so features don't need to be stored in memory
+    
+"""
+
 
 class SeqProp(Object):
+    """Generic class to store information on a protein sequence.
+
+    The main utilities of this class are to:
+    
+    #. Provide database identifier mappings as top level attributes
+    #. Manipulate a sequence as a Biopython SeqRecord
+    #. Calculate, store, and access sequence features and annotations
+    #. File I/O (sequence and feature files)
+    
+    Attributes:
+        bigg (str): BiGG ID for this protein
+        kegg (str): KEGG ID for this protein
+        refseq (str): RefSeq ID for this protein
+        uniprot (str): UniProt ID for this protein
+        gene_name (str): Gene name encoding this protein
+        pdbs (list): List of PDB IDs mapped to this protein
+        seq_record (SeqRecord): Biopython ``SeqRecord`` representation of sequence
+        sequence_file (str): Path to FASTA file
+        metadata_file (str): Path to generic metadata file
+        annotations (dict): Freeform dictionary of annotations, copied from any SeqRecord ``annotations``
+        letter_annotations (dict): Per-residue annotations, copied from any SeqRecord ``letter_annotations``
+        features (list): Sequence features, copied from any SeqRecord ``features``
+    
+    """
     def __init__(self, ident, sequence_path=None, metadata_path=None, seq=None, description="<unknown description>",
                  write_fasta_file=False, outfile=None, force_rewrite=False):
         """Store basic protein sequence properties.
@@ -69,11 +100,13 @@ class SeqProp(Object):
                 raise ValueError('Output path must be specified if you want to write a FASTA file.')
             self.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
 
-        # Store AlignIO objects of this sequence to others in alignments
-        self.sequence_alignments = DictList()
-        self.structure_alignments = DictList()
+        # Alignments
+        # Stores AlignIO objects of this sequence to others
+        # self.sequence_alignments = DictList()
+        # self.structure_alignments = DictList()
 
-        # Copy SeqRecord annotations, letter annotations, and features for JSON saving capabilities
+        # Annotations and features
+        # Copy SeqRecord annotations, letter annotations, and features from the SeqRecord for JSON saving capabilities
         self.annotations = {}
         self.letter_annotations = {}
         self.features = []
@@ -321,8 +354,8 @@ class SeqProp(Object):
                                                           seq_ident_cutoff=seq_ident_cutoff,
                                                           link=display_link)
         except requests.ConnectionError as e:
+            log.error('{}: BLAST request timed out'.format(self.id))
             print(e)
-            log.error('{}: BLAST request timed out'.format(seq_prop.id))
             return None
 
         return blast_results
@@ -335,48 +368,6 @@ class SeqProp(Object):
 
         """
         pass
-
-    def sequence_mutation_summary(self):
-        """Summarize all mutations found in the sequence_alignments attribute.
-
-        Returns 2 dictionaries, single_counter and fingerprint_counter.
-
-        single_counter:
-            Dictionary of {point mutation: list of genes/strains}
-            Example: {('A', 24, 'V'): ['Strain1', 'Strain2', 'Strain4'],
-                      ('R', 33, 'T'): ['Strain2']}
-            Here, we report which genes/strains have the single point mutation.
-
-        fingerprint_counter:
-            Dictionary of {mutation group: list of genes/strains}
-            Example: {(('A', 24, 'V'), ('R', 33, 'T')): ['Strain2'],
-                      (('A', 24, 'V')): ['Strain1', 'Strain4']}
-            Here, we report which genes/strains have the specific combinations (or "fingerprints") of point mutations
-
-        Returns:
-            dict, dict: single_counter, fingerprint_counter
-
-        """
-        if len(self.sequence_alignments) == 0:
-            log.error('{}: no sequence alignments'.format(self.id))
-            return {}, {}
-
-        fingerprint_counter = defaultdict(list)
-        single_counter = defaultdict(list)
-
-        for alignment in self.sequence_alignments:
-            other_sequence = alignment.annotations['b_seq']
-            mutations = alignment.annotations['mutations']
-
-            if mutations:
-                # Turn this list of mutations into a tuple so it can be a dictionary key
-                mutations = tuple(tuple(x) for x in mutations)
-                fingerprint_counter[mutations].append(other_sequence)
-
-                for m in mutations:
-                    single_counter[m].append(other_sequence)
-
-        return dict(single_counter), dict(fingerprint_counter)
 
     def get_dict(self, only_keys=None, exclude_attributes=None, df_format=False):
         """Get a copy of all attributes as a dictionary, including object properties
@@ -422,10 +413,3 @@ class SeqProp(Object):
                 else:
                     my_dict[k] = v
         return my_dict
-
-    def __json_decode__(self, **attrs):
-        for k, v in attrs.items():
-            if k == 'sequence_alignments' or k == 'structure_alignments':
-                setattr(self, k, DictList(v))
-            else:
-                setattr(self, k, v)
