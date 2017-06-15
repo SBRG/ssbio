@@ -1,11 +1,13 @@
 import logging
 import os.path as op
 import shutil
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import pandas as pd
+import numpy as np
 import requests
 from Bio.PDB.PDBExceptions import PDBConstructionException
+from Bio.PDB.PDBExceptions import PDBException
 from Bio.Seq import Seq
 from cobra.core import DictList
 from six.moves.urllib.error import URLError
@@ -22,14 +24,49 @@ from ssbio.databases.pdb import PDBProp
 from ssbio.databases.uniprot import UniProtProp
 from ssbio.protein.sequence.seqprop import SeqProp
 from ssbio.protein.structure.homology.itasser.itasserprop import ITASSERProp
+from ssbio.protein.structure.homology.itasser.itasserprep import ITASSERPrep
 from ssbio.protein.structure.structprop import StructProp
 
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
+"""protein.py
+
+Todo:
+    * Implement structural alignment objects
+
+"""
 
 class Protein(Object):
-    """Basic definition of a protein"""
+    """Generic class to store information on a protein, which may consist of multiple sequences and structures.
+
+    The main utilities of this class are to:
+    
+    #. Load, parse, and store multiple sources of the same or similar (ie. from different strains) protein sequences 
+        as ``SeqProp`` objects
+    #. Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` objects
+    #. Calculate, store, and access sequence alignments to stored sequences or structures
+    #. Provide summaries of alignments
+    #. Map between residue numbers of sequences and structures
+
+    Attributes:
+        id (str): Unique identifier for this protein
+        description (str): Optional description for this protein
+        sequences (DictList): Path to FASTA file
+        structures (DictList): Path to generic metadata file
+        representative_sequence (SeqProp): Sequence set to represent this protein
+        representative_structure (StructProp): Structure set to represent this protein, cleaned and monomeric
+        representative_chain (str): Chain ID in the representative structure which best represents a sequence
+        representative_chain_seq_coverage (float): Percent identity of sequence coverage for the representative chain
+        sequence_alignments (DictList): Pairwise or multiple sequence alignments stored as 
+            ``Bio.Align.MultipleSeqAlignment`` objects
+        structure_alignments (DictList): Pairwise or multiple structure alignments - incomplete implementation
+        root_dir (str): Path to where the folder named by this protein's ID will be created.
+            Default is current working directory.
+        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
+            choose a file type for files downloaded from the PDB
+    
+    """
 
     __representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs',
                                             'sequence_path', 'metadata_path']
@@ -44,14 +81,26 @@ class Protein(Object):
         Args:
             ident (str): Unique identifier for this protein
             description (str): Optional description for this protein
-            root_dir:
-            pdb_file_type:
+            root_dir (str): Path to where the folder named by this protein's ID will be created.
+                Default is current working directory.
+            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
+            choose a file type for files downloaded from the PDB
         """
         Object.__init__(self, id=ident, description=description)
+
+        # Sequences
         self.sequences = DictList()
-        self.structures = DictList()
         self.representative_sequence = None
+
+        # Structures
+        self.structures = DictList()
         self.representative_structure = None
+        self.representative_chain = None
+        self.representative_chain_seq_coverage = 0
+
+        # Alignments
+        self.sequence_alignments = DictList()
+        self.structure_alignments = DictList()
 
         self.root_dir = root_dir
         self.pdb_file_type = pdb_file_type
@@ -76,8 +125,15 @@ class Protein(Object):
                 seq.sequence_dir = self.sequence_dir
                 seq.metadata_dir = self.sequence_dir
 
+            if self.representative_sequence:
+                self.representative_sequence.sequence_dir = self.sequence_dir
+                self.representative_sequence.metadata_dir = self.sequence_dir
+
             for struct in self.structures:
-                struct.root_dir = self.structure_dir
+                struct.structure_dir = self.structure_dir
+
+            if self.representative_structure:
+                self.representative_structure.structure_dir = self.structure_dir
 
     @property
     def protein_dir(self):
@@ -109,6 +165,35 @@ class Protein(Object):
         else:
             log.debug('Root directory not set')
             return None
+
+    @property
+    def protein_statistics(self):
+        """Get a dictionary of basic statistics describing this protein"""
+        d = {}
+
+        d['id'] = self.id
+        d['sequences'] = [x.id for x in self.sequences]
+        d['num_sequences'] = self.num_sequences
+        if self.representative_sequence:
+            d['representative_sequence'] = self.representative_sequence.id
+        d['num_structures'] = self.num_structures
+        d['experimental_structures'] = [x.id for x in self.get_experimental_structures()]
+        d['num_experimental_structures'] = self.num_structures_experimental
+        d['homology_models'] = [x.id for x in self.get_homology_models()]
+        d['num_homology_models'] = self.num_structures_homology
+        if self.representative_structure:
+            d['representative_structure'] = self.representative_structure.id
+            d['representative_chain'] = self.representative_chain
+            d['representative_chain_seq_coverage'] = self.representative_chain_seq_coverage
+        d['num_sequence_alignments'] = len(self.sequence_alignments)
+        d['num_structure_alignments'] = len(self.structure_alignments)
+
+        return d
+
+    @property
+    def num_sequences(self):
+        """int: Return the total number of sequences"""
+        return len(self.sequences)
 
     @property
     def num_structures(self):
@@ -221,7 +306,8 @@ class Protein(Object):
         return self.sequences.get_by_id(kegg_id)
 
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None,
-                     set_as_representative=False, download=False, outdir=None, force_rerun=False):
+                     set_as_representative=False, download=False, download_metadata_file_type='xml', simple_parse=False,
+                     outdir=None, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
 
         Args:
@@ -257,7 +343,8 @@ class Protein(Object):
         if not self.sequences.has_id(uniprot_id):
             uniprot_prop = UniProtProp(uniprot_id, uniprot_seq_file, uniprot_xml_file)
             if download:
-                uniprot_prop.download_metadata_file(outdir=outdir, file_type='xml', force_rerun=force_rerun)
+                uniprot_prop.download_metadata_file(outdir=outdir, file_type=download_metadata_file_type,
+                                                    simple_parse=simple_parse, force_rerun=force_rerun)
                 uniprot_prop.download_seq_file(outdir=outdir, force_rerun=force_rerun)
 
             # Also check if UniProt sequence matches a potentially set representative sequence
@@ -352,10 +439,8 @@ class Protein(Object):
         if not outname:
             outname = ident
 
-
-
         manual_sequence = SeqProp(ident=ident, seq=seq, write_fasta_file=write_fasta_file,
-                                  outname=outname, outdir=outdir, force_rewrite=force_rewrite)
+                                  outfile=op.join(outdir, '{}.faa'.format(outname)), force_rewrite=force_rewrite)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -438,7 +523,7 @@ class Protein(Object):
     def pairwise_align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None,
                                                    engine='needle', parse=True, force_rerun=False):
         """Align all sequences in the sequences attribute to the representative sequence.
-        Stores the alignments the representative_sequence.sequence_alignments DictList
+        Stores the alignments the ``sequence_alignments`` DictList
 
         Args:
             gapopen:
@@ -464,7 +549,7 @@ class Protein(Object):
                 log.error('{}: no representative sequence set, skipping gene'.format(self.id))
                 continue
 
-            if self.representative_sequence.sequence_alignments.has_id(aln_id):
+            if self.sequence_alignments.has_id(aln_id):
                 log.debug('{}: alignment already completed'.format(seq.id))
                 continue
 
@@ -493,11 +578,79 @@ class Protein(Object):
             if parse:
                 aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
                                                                                  b_aln_seq=str(list(aln)[1].seq))
+                aln.annotations['ssbio_type'] = 'seqalign'
                 aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
                 aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
                 aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
 
-            self.representative_sequence.sequence_alignments.append(aln)
+            self.sequence_alignments.append(aln)
+
+    def get_sequence_properties(self, representative_only=True):
+        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
+        Annotations are stored in the protein's respective seqprop objects at:
+        ``.seq_record.annotations``
+        
+        Args:
+            representative_only (bool): If analysis should only be run on the representative sequence
+
+        """
+        if self.representative_sequence:
+            self.representative_sequence.get_biopython_pepstats()
+            self.representative_sequence.get_emboss_pepstats()
+        else:
+            log.warning('{}: no representative sequence set, cannot get sequence properties'.format(self.id))
+
+        if not representative_only:
+            for s in self.sequences:
+                s.get_biopython_pepstats()
+                s.get_emboss_pepstats()
+
+    def prep_itasser_modeling(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
+                            execute_from_dir=None, print_exec=False, **kwargs):
+        """Prepare to run I-TASSER homology modeling for a sequence.
+
+        Args:
+            itasser_installation (str): Path to I-TASSER folder, i.e. ``~/software/I-TASSER4.4``
+            itlib_folder (str): Path to ITLIB folder, i.e. ``~/software/ITLIB``
+            runtype: How you will be running I-TASSER - local, slurm, or torque
+            create_in_dir (str): Local directory where folders will be created
+            execute_from_dir (str): Optional path to execution directory - use this if you are copying the homology
+                models to another location such as a supercomputer for running
+            all_genes (bool): If all genes should be prepped, or only those without any mapped structures
+            print_exec (bool): If the execution statement should be printed to run modelling
+            **kwargs:
+
+        Todo:
+            * kwargs - extra options for SLURM or Torque execution
+
+        """
+        # TODO: kwargs for slurm/torque options
+
+        if not create_in_dir:
+            if not self.structure_dir:
+                raise ValueError('Output directory must be specified')
+            self.homology_models_dir = op.join(self.structure_dir, 'homology_models')
+        else:
+            self.homology_models_dir = create_in_dir
+
+        ssbio.utils.make_dir(self.homology_models_dir)
+
+        if not execute_from_dir:
+            execute_from_dir = self.homology_models_dir
+
+        repseq = self.representative_sequence
+
+        if 'walltime' in kwargs:
+            ITASSERPrep(ident=self.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
+                        itasser_path=itasser_installation, itlib_path=itlib_folder,
+                        runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir,
+                        walltime=kwargs['walltime'])
+        else:
+            ITASSERPrep(ident=self.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
+                        itasser_path=itasser_installation, itlib_path=itlib_folder,
+                        runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir)
+
+        log.info('Prepared I-TASSER modeling folder {}'.format(self.homology_models_dir))
 
     def blast_representative_sequence_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
                                              outdir=None, force_rerun=False):
@@ -740,7 +893,8 @@ class Protein(Object):
 
                 # Copy the model1.pdb and also create summary dataframes
                 itasser.copy_results(copy_to_dir=outdir, rename_model_to=new_itasser_name, force_rerun=force_rerun)
-                itasser.save_dataframes(outdir=dest_itasser_extra_dir)
+                if create_dfs:
+                    itasser.save_dataframes(outdir=dest_itasser_extra_dir)
 
         return self.structures.get_by_id(ident)
 
@@ -843,14 +997,278 @@ class Protein(Object):
         df = pd.DataFrame.from_records(pdb_pre_df, columns=cols).set_index('pdb_id')
         return ssbio.utils.clean_df(df)
 
-    def _representative_structure_setter(self, struct_prop, keep_chain, new_id=None, clean=True,
+    def align_seqprop_to_structprop(self, seqprop, structprop, chains=None, outdir=None,
+                                    engine='needle', parse=True, force_rerun=False,
+                                    **kwargs):
+        """Run and store alignments of a SeqProp to chains in the ``mapped_chains`` attribute of a StructProp.
+
+        Alignments are stored in the sequence_alignments attribute, with the IDs formatted
+            as <SeqProp_ID>_<StructProp_ID>-<Chain_ID>. Although it is more intuitive to align to individual 
+            ChainProps, StructProps should be loaded as little as possible to reduce run times.
+
+        Args:
+            seqprop (SeqProp): SeqProp object with a loaded sequence
+            structprop (StructProp): StructProp object with a loaded structure
+            chains (str, list): Chain ID or IDs to map to. If not specified, ``mapped_chains`` attribute is inspected
+                for chains. If no chains there, all chains will be aligned to.
+            outdir (str): Directory to output sequence alignment files (only if running with needle)
+            engine (str): Which pairwise alignment tool to use ("needle" or "biopython")
+            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
+            force_rerun (bool): If alignments should be rerun
+            **kwargs: Other alignment options
+            
+        """
+        # TODO: **kwargs for alignment options
+
+        # Parse the structure so chain sequences are stored
+        my_structure = structprop.parse_structure()
+
+        if chains:
+            chains_to_align_to = ssbio.utils.force_list(chains)
+        elif structprop.mapped_chains:
+            chains_to_align_to = structprop.mapped_chains
+        else:
+            log.warning('{}-{}: no chains specified in structure to align to, all chains will be aligned to'.format(seqprop.id,
+                                                                                                                    structprop.id))
+            chains_to_align_to = structprop.chains.list_attr('id')
+
+        for chain_id in chains_to_align_to:
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
+            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+            outfile = '{}.needle'.format(aln_id)
+
+            if self.sequence_alignments.has_id(aln_id) and not force_rerun:
+                log.debug('{}: alignment already completed, skipping'.format(aln_id))
+                continue
+
+            log.debug('{}: running pairwise alignment to structure {}, chain {}'.format(seqprop.id,
+                                                                                        structprop.id,
+                                                                                        chain_id))
+
+            # Check if the chain ID actually exists
+            if structprop.chains.has_id(chain_id):
+                chain_prop = structprop.chains.get_by_id(chain_id)
+                chain_seq_record = chain_prop.seq_record
+            else:
+                log.error('{}: chain not present in structure file!'.format(full_structure_id))
+                continue
+
+            # Check if the chain sequence was parsed
+            if not chain_seq_record:
+                log.error('{}: chain sequence not available, was structure parsed?'.format(full_structure_id))
+                continue
+
+            # Run the pairwise alignment
+            try:
+                aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=seqprop.seq_record,
+                                                                                         a_seq_id=seqprop.id,
+                                                                                         b_seq=chain_seq_record,
+                                                                                         b_seq_id=full_structure_id,
+                                                                                         engine=engine,
+                                                                                         outdir=outdir,
+                                                                                         outfile=outfile,
+                                                                                         force_rerun=force_rerun)
+            except ValueError:
+                log.error('{}: alignment failed to run, unable to check structure'.format(full_structure_id))
+                continue
+
+            # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
+            aln.id = aln_id
+            # Add annotations to keep track of what was aligned
+            aln.annotations['a_seq'] = seqprop.id
+            aln.annotations['b_seq'] = full_structure_id
+            aln.annotations['structure_id'] = structprop.id
+            aln.annotations['chain_id'] = chain_id
+            aln.annotations['ssbio_type'] = 'structalign'
+
+            # Optionally parse for locations of mutations, deletions, and insertions
+            # Store mapping to chain index as letter annotations in the sequence
+            # Store locations in the alignment's annotations
+            if parse:
+                aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
+                                                                                 b_aln_seq=str(list(aln)[1].seq))
+
+                chain_indices = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
+                seqprop.letter_annotations['{}_chain_index'.format(aln_id)] = chain_indices
+
+                aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
+                aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
+                aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
+
+            if force_rerun:
+                self.sequence_alignments.remove(aln.id)
+            self.sequence_alignments.append(aln)
+
+    def find_representative_chain(self, seqprop, structprop, chains_to_check=None,
+                                  seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+                                  allow_mutants=True, allow_deletions=False,
+                                  allow_insertions=False, allow_unresolved=True):
+        """Set and return the representative chain based on sequence quality checks to a reference sequence.
+
+        Args:
+            seqprop (SeqProp): SeqProp object to compare to chain sequences
+            structprop (StructProp): StructProp object with chains to compare to in the ``mapped_chains`` attribute. If
+                there are none present, ``chains_to_check`` can be specified, otherwise all chains are checked.
+            chains_to_check (str, list): Chain ID or IDs to check for sequence coverage quality
+            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
+            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
+                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
+                5 to 95 will be checked for modifications.
+            allow_mutants (bool): If mutations should be allowed or checked for
+            allow_deletions (bool): If deletions should be allowed or checked for
+            allow_insertions (bool): If insertions should be allowed or checked for
+            allow_unresolved (bool): If unresolved residues should be allowed or checked for
+
+        Returns:
+            str: the best chain ID, if any
+
+        """
+        if chains_to_check:
+            chains_to_check = ssbio.utils.force_list(chains_to_check)
+        elif structprop.mapped_chains:
+            chains_to_check = structprop.mapped_chains
+        else:
+            log.warning('{}-{}: no chains specified in structure to align to, all chains will be checked'.format(seqprop.id,
+                                                                                                                 structprop.id))
+            chains_to_check = structprop.chains.list_attr('id')
+
+        for chain_id in chains_to_check:
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
+            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+
+            if self.sequence_alignments.has_id(aln_id):
+                alignment = self.sequence_alignments.get_by_id(aln_id)
+            else:
+                log.error('{}: structure alignment not found, please run the alignment first'.format(aln_id))
+                continue
+
+            # Compare sequence to structure's sequence using the alignment
+            found_good_chain = ssbio.protein.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
+                                                                                           structure_seq_aln=alignment[1],
+                                                                                           seq_ident_cutoff=seq_ident_cutoff,
+                                                                                           allow_missing_on_termini=allow_missing_on_termini,
+                                                                                           allow_mutants=allow_mutants,
+                                                                                           allow_deletions=allow_deletions,
+                                                                                           allow_insertions=allow_insertions,
+                                                                                           allow_unresolved=allow_unresolved)
+
+            # If found_good_chain = True, return chain ID
+            # If not, move on to the next potential chain
+            if found_good_chain:
+                self.representative_chain = chain_id
+                self.representative_chain_seq_coverage = alignment.annotations['percent_identity']
+                return chain_id
+        else:
+            log.debug('{}: no chains meet quality checks'.format(structprop.id))
+            return None
+
+    def map_seqprop_resnums_to_structprop_chain_index(self, resnums, seqprop=None, structprop=None, chain_id=None,
+                                                      use_representatives=False):
+        """Map a residue number in the seqprop to the mapping index in the structprop/chain_id
+
+        Use this to get the indices of the chain to then get structure residue number.
+
+        Args:
+            resnums (int, list): Residue numbers in the sequence
+            seqprop (SeqProp): SeqProp object
+            structprop (StructProp): StructProp object
+            chain_id (str): Chain ID to map to index
+            use_representatives (bool): If representative sequence/structure/chain should be used in mapping
+
+        Returns:
+            dict: Mapping of resnums to indices
+
+        """
+        resnums = ssbio.utils.force_list(resnums)
+
+        if use_representatives:
+            seqprop = self.representative_sequence
+            structprop = self.representative_structure
+            chain_id = self.representative_chain
+        else:
+            if not seqprop or not structprop or not chain_id:
+                raise ValueError('Please specify sequence, structure, and chain ID')
+
+        if use_representatives:
+            full_structure_id = structprop.id
+        else:
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
+
+        aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+
+        access_key = '{}_chain_index'.format(aln_id)
+        if access_key not in seqprop.letter_annotations:
+            raise KeyError('{}: structure mapping not available in sequence letter annotations. Was alignment parsed? \
+                           Run ``align_seqprop_to_structprop`` with ``parse=True``.'.format(aln_id))
+        chain_index_mapping = seqprop.letter_annotations[access_key]
+
+        resnum_to_chain_index = {}
+        for x in resnums:
+            ix = chain_index_mapping[x - 1] - 1
+
+            if np.isnan(ix):
+                log.warning('{}-{}, {}: no equivalent residue found in structure sequence'.format(structprop.id,
+                                                                                                  chain_id,
+                                                                                                  x))
+            else:
+                resnum_to_chain_index[x] = int(ix)
+
+        return resnum_to_chain_index
+
+    def map_seqprop_resnums_to_structprop_resnums(self, resnums, seqprop=None, structprop=None, chain_id=None,
+                                                  use_representatives=False):
+        """Map a residue number in the seqprop to the structure's residue number for a specified chain.
+
+        Args:
+            resnums (int, list): Residue numbers in the sequence
+            seqprop (SeqProp): SeqProp object
+            structprop (StructProp): StructProp object
+            chain_id (str): Chain ID to map to
+
+        Returns:
+            dict: Mapping of resnums to structure residue IDs
+
+        """
+        resnums = ssbio.utils.force_list(resnums)
+
+        if use_representatives:
+            seqprop = self.representative_sequence
+            structprop = self.representative_structure
+            chain_id = self.representative_chain
+        else:
+            if not seqprop or not structprop or not chain_id:
+                raise ValueError('Please specify sequence, structure, and chain ID')
+
+        mapping_to_repchain_index = self.map_seqprop_resnums_to_structprop_chain_index(resnums=resnums,
+                                                                                       seqprop=seqprop,
+                                                                                       structprop=structprop,
+                                                                                       chain_id=chain_id,
+                                                                                       use_representatives=use_representatives)
+
+        chain = structprop.chains.get_by_id(chain_id)
+        chain_structure_resnum_mapping = chain.seq_record.letter_annotations['structure_resnums']
+
+        final_mapping = {}
+        for k, v in mapping_to_repchain_index.items():
+            rn = chain_structure_resnum_mapping[v]
+
+            if rn == float('Inf'):
+                log.warning('{}-{}, {}: structure file does not contain coordinates for this residue'.format(structprop.id,
+                                                                                                             chain_id,
+                                                                                                             k))
+            else:
+                final_mapping[k] = rn
+
+        return final_mapping
+
+    def _representative_structure_setter(self, structprop, keep_chain, new_id=None, clean=True,
                                          out_suffix='_clean', outdir=None):
         """Set the representative structure by 1) cleaning it and 2) copying over attributes of the original structure.
 
         The structure is copied because the chains stored may change, and cleaning it makes a new PDB file.
 
         Args:
-            struct_prop (StructProp): StructProp object to set as representative
+            structprop (StructProp): StructProp object to set as representative
             keep_chain (str, list): List of chains to keep
             new_id (str): New ID to call this structure, for example 1abc-D to represent PDB 1abc, chain D
             clean (bool): If the PDB file should be cleaned (see ssbio.structure.utils.cleanpdb)
@@ -867,40 +1285,34 @@ class Protein(Object):
                 raise ValueError('Output directory must be specified')
 
         if not new_id:
-            new_id = struct_prop.id
+            new_id = structprop.id
 
         # If the structure is to be cleaned, and which chain to keep
         if clean:
-            final_pdb = struct_prop.clean_structure(outdir=outdir, out_suffix=out_suffix, keep_chains=keep_chain)
+            final_pdb = structprop.clean_structure(outdir=outdir, out_suffix=out_suffix, keep_chains=keep_chain)
         else:
-            final_pdb = struct_prop.structure_path
+            final_pdb = structprop.structure_path
 
         self.representative_structure = StructProp(ident=new_id, chains=keep_chain, mapped_chains=keep_chain,
                                                    structure_path=final_pdb, file_type='pdb',
                                                    representative_chain=keep_chain)
 
-        self.representative_structure.update(struct_prop.get_dict_with_chain(chain=keep_chain),
+        self.representative_structure.update(structprop.get_dict_with_chain(chain=keep_chain),
                                              only_keys=self.__representative_structure_attributes,
                                              overwrite=True)
 
         # Save the original PDB ID as an extra attribute
-        if struct_prop.is_experimental:
-            self.representative_structure.original_pdb_id = struct_prop.id
-
-        # STORE REPRESENTATIVE CHAIN RESNUMS in the representative sequence seqrecord letter_annotations
-        # Get the alignment
-        alnid = '{}_{}'.format(self.representative_sequence.id, self.representative_structure.id)
-        aln = self.representative_sequence.structure_alignments.get_by_id(alnid)
-        # Get the mapping and store it in .seq_record.letter_annotations['repchain_resnums']
-        aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
-        repchain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
-        self.representative_sequence.letter_annotations['repchain_resnums'] = repchain_resnums
+        if structprop.is_experimental:
+            self.representative_structure.original_pdb_id = structprop.id
 
         # Also need to parse the clean structure and save its sequence..
         self.representative_structure.parse_structure()
 
+        # And finally add it to the list of structures
+        self.structures.append(self.representative_structure)
+
     def set_representative_structure(self, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
-                                     engine='needle', always_use_homology=False,
+                                     engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True,
@@ -916,6 +1328,7 @@ class Protein(Object):
                 needle is the standard EMBOSS tool to run pairwise alignments
                 biopython is Biopython's implementation of needle. Results can differ!
             always_use_homology (bool): If homology models should always be set as the representative structure
+            rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
             seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
             allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
                 when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
@@ -987,8 +1400,8 @@ class Protein(Object):
 
         if use_pdb:
             # Put PDBs through QC/QA
-            log.debug('{}: checking quality of experimental structures'.format(self.id))
             all_pdbs = self.get_experimental_structures()
+            log.debug('{}: checking quality of {} experimental structures'.format(self.id, len(all_pdbs)))
 
             for pdb in all_pdbs:
                 # Download the structure and parse it
@@ -1003,12 +1416,18 @@ class Protein(Object):
                     continue
                     # TODO: add try/except to download cif file as fallback like below?
 
+                if rez_cutoff and pdb.resolution:
+                    if pdb.resolution > rez_cutoff:
+                        log.debug('{}: structure does not meet experimental resolution cutoff'.format(pdb, pdb_file_type))
+                        continue
                 # TODO: clean up these try/except things
                 try:
-                    pdb.align_seqprop_to_mapped_chains(seqprop=self.representative_sequence,
-                                                       outdir=seq_outdir,
-                                                       engine=engine,
-                                                       parse=False, force_rerun=force_rerun)
+                    self.align_seqprop_to_structprop(seqprop=self.representative_sequence,
+                                                     structprop=pdb,
+                                                     outdir=seq_outdir,
+                                                     engine=engine,
+                                                     parse=True,
+                                                     force_rerun=force_rerun)
                 except PDBConstructionException:
                     log.error('{}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(pdb, pdb_file_type))
                     # Fall back to using mmCIF file if structure cannot be parsed
@@ -1021,29 +1440,33 @@ class Protein(Object):
                     except (requests.exceptions.HTTPError, URLError):
                         log.error('{}: structure file could not be downloaded'.format(pdb))
                         continue
-                    pdb.align_seqprop_to_mapped_chains(seqprop=self.representative_sequence,
-                                                       outdir=seq_outdir, engine=engine, parse=False,
-                                                       force_rerun=force_rerun)
+                    self.align_seqprop_to_structprop(seqprop=self.representative_sequence,
+                                                     structprop=pdb,
+                                                     outdir=seq_outdir,
+                                                     engine=engine,
+                                                     parse=True,
+                                                     force_rerun=force_rerun)
 
-                best_chain = pdb.sequence_quality_checker(reference_seq=self.representative_sequence,
-                                                          seq_ident_cutoff=seq_ident_cutoff,
-                                                          allow_missing_on_termini=allow_missing_on_termini,
-                                                          allow_mutants=allow_mutants, allow_deletions=allow_deletions,
-                                                          allow_insertions=allow_insertions, allow_unresolved=allow_unresolved)
+                best_chain = self.find_representative_chain(seqprop=self.representative_sequence,
+                                                            structprop=pdb,
+                                                            seq_ident_cutoff=seq_ident_cutoff,
+                                                            allow_missing_on_termini=allow_missing_on_termini,
+                                                            allow_mutants=allow_mutants, allow_deletions=allow_deletions,
+                                                            allow_insertions=allow_insertions, allow_unresolved=allow_unresolved)
 
                 if best_chain:
                     try:
-                        self._representative_structure_setter(struct_prop=pdb,
-                                                              new_id='{}-{}'.format(pdb.id, best_chain.id),
+                        self._representative_structure_setter(structprop=pdb,
+                                                              new_id='{}-{}'.format(pdb.id, best_chain),
                                                               clean=True,
-                                                              out_suffix='-{}_clean'.format(best_chain.id),
-                                                              keep_chain=best_chain.id,
+                                                              out_suffix='-{}_clean'.format(best_chain),
+                                                              keep_chain=best_chain,
                                                               outdir=struct_outdir)
                     except:
                         # TODO: inspect causes of these errors - most common is Biopython PDBParser error
                         logging.exception("Unknown error with PDB ID {}".format(pdb.id))
                         continue
-                    log.debug('{}-{}: set as representative structure'.format(pdb.id, best_chain.id))
+                    log.debug('{}-{}: set as representative structure'.format(pdb.id, best_chain))
                     pdb.reset_chain_seq_records()
                     return self.representative_structure
                 else:
@@ -1063,34 +1486,37 @@ class Protein(Object):
                     log.debug('{}: no homology structure file'.format(self.id))
                     continue
 
-                homology.align_seqprop_to_mapped_chains(seqprop=self.representative_sequence,
-                                                        outdir=seq_outdir, engine=engine, parse=False,
-                                                        force_rerun=force_rerun)
-                best_chain = homology.sequence_quality_checker(reference_seq=self.representative_sequence,
-                                                               seq_ident_cutoff=seq_ident_cutoff,
-                                                               allow_missing_on_termini=allow_missing_on_termini,
-                                                               allow_mutants=allow_mutants,
-                                                               allow_deletions=allow_deletions,
-                                                               allow_insertions=allow_insertions,
-                                                               allow_unresolved=allow_unresolved)
+                self.align_seqprop_to_structprop(seqprop=self.representative_sequence,
+                                                 structprop=homology,
+                                                 outdir=seq_outdir,
+                                                 engine=engine,
+                                                 parse=True,
+                                                 force_rerun=force_rerun)
+                best_chain = self.find_representative_chain(seqprop=self.representative_sequence,
+                                                            structprop=homology,
+                                                            seq_ident_cutoff=seq_ident_cutoff,
+                                                            allow_missing_on_termini=allow_missing_on_termini,
+                                                            allow_mutants=allow_mutants,
+                                                            allow_deletions=allow_deletions,
+                                                            allow_insertions=allow_insertions,
+                                                            allow_unresolved=allow_unresolved)
 
                 if best_chain:
-                    if not best_chain.id.strip():
-                        best_chain_suffix = 'X'
-                    else:
-                        best_chain_suffix = best_chain.id
+                    # If chain ID is empty (some homology models are like that), use ID "X"
+                    if not best_chain.strip():
+                        best_chain = 'X'
                     try:
-                        self._representative_structure_setter(struct_prop=homology,
-                                                              new_id='{}-{}'.format(homology.id, best_chain_suffix),
+                        self._representative_structure_setter(structprop=homology,
+                                                              new_id='{}-{}'.format(homology.id, best_chain),
                                                               clean=True,
-                                                              out_suffix='-{}_clean'.format(best_chain_suffix),
-                                                              keep_chain=best_chain.id,
+                                                              out_suffix='-{}_clean'.format(best_chain),
+                                                              keep_chain=best_chain,
                                                               outdir=struct_outdir)
                     except:
                         # TODO: inspect causes of these errors - most common is Biopython PDBParser error
                         logging.exception("Unknown error with homology model {}".format(homology.id))
                         continue
-                    log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain_suffix))
+                    log.debug('{}-{}: set as representative structure'.format(homology.id, best_chain))
                     homology.reset_chain_seq_records()
                     return self.representative_structure
                 else:
@@ -1099,8 +1525,192 @@ class Protein(Object):
         log.warning('{}: no structures meet quality checks'.format(self.id))
         return None
 
-    def get_residue_properties(self, residues, representative_only=True):
-        pass
+    def get_dssp_annotations(self, representative_only=True, force_rerun=False):
+        """Run DSSP on structures and store calculations.
+        Annotations are stored in the protein structure's chain sequence at:
+        ``seq_record.letter_annotations['*-dssp']``
+
+        Todo:
+            * Some errors arise from storing annotations for nonstandard amino acids, need to run DSSP separately for those
+            
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        """
+        if representative_only:
+            if self.representative_structure:
+                try:
+                    self.representative_structure.get_dssp_annotations(outdir=self.structure_dir, force_rerun=force_rerun)
+                except PDBException as e:
+                    log.error('{}: Biopython error, issue matching sequences with {}'.format(self.id, self.representative_structure))
+                    print(e)
+                except TypeError as e:
+                    log.error('{}: Biopython error, DSSP SeqRecord length mismatch with {}'.format(self.id, self.representative_structure))
+                    print(e)
+                except Exception as e:
+                    log.error('{}: DSSP failed to run on {}'.format(self.id, self.representative_structure))
+                    print(e)
+            else:
+                log.warning('{}: no representative structure set, cannot run DSSP'.format(self.id))
+        else:
+            for s in self.structures:
+                try:
+                    s.get_dssp_annotations(outdir=self.structure_dir)
+                except PDBException as e:
+                    log.error('{}: Biopython error, issue matching sequences with {}'.format(self.id, s.id))
+                    print(e)
+                except TypeError as e:
+                    log.error('{}: Biopython error, DSSP SeqRecord length mismatch with {}'.format(self.id, s.id))
+                    print(e)
+                except Exception as e:
+                    log.error('{}: DSSP failed to run on {}'.format(self.id, s.id))
+                    print(e)
+
+    def get_msms_annotations(self, representative_only=True, force_rerun=False):
+        """Run MSMS on structures and store calculations.
+        Annotations are stored in the protein structure's chain sequence at:
+        ``seq_record.letter_annotations['*-msms']``
+        
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        """
+        if representative_only:
+            if self.representative_structure:
+                try:
+                    self.representative_structure.get_residue_depths(outdir=self.structure_dir, force_rerun=force_rerun)
+                except TypeError:
+                    log.error('{}: MSMS SeqRecord length mismatch with {}'.format(self.id, self.representative_structure))
+                except:
+                    log.error('{}: unknown MSMS error with {}'.format(self.id, self.representative_structure))
+            else:
+                log.warning('{}: no representative structure set, cannot run MSMS'.format(self.id))
+        else:
+            for s in self.structures:
+                try:
+                    s.get_residue_depths(outdir=self.structure_dir)
+                except TypeError:
+                    log.error('{}: MSMS SeqRecord length mismatch with {}'.format(self.id, s.id))
+                except Exception as e:
+                    log.error('{}: unknown MSMS error with {}'.format(self.id, s.id))
+                    print(e)
+
+    def get_freesasa_annotations(self, include_hetatms=False, representative_only=True, force_rerun=False):
+        """Run freesasa on structures and store calculations.
+        Annotations are stored in the protein structure's chain sequence at:
+        ``seq_record.letter_annotations['*-freesasa']``
+
+        Args:
+            include_hetatms (bool): If HETATMs should be included in calculations. Defaults to ``False``.
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        """
+        if representative_only:
+            if self.representative_structure:
+                try:
+                    self.representative_structure.get_freesasa_annotations(outdir=self.structure_dir,
+                                                                           include_hetatms=include_hetatms,
+                                                                           force_rerun=force_rerun)
+                except TypeError:
+                    log.error('{}: freesasa SeqRecord length mismatch with {}'.format(self.id, self.representative_structure))
+                except:
+                    log.error('{}: unknown freesasa error with {}'.format(self.id, self.representative_structure))
+            else:
+                log.warning('{}: no representative structure set, cannot run freesasa'.format(self.id))
+        else:
+            for s in self.structures:
+                try:
+                    s.get_freesasa_annotations(outdir=self.structure_dir, include_hetatms=include_hetatms)
+                except TypeError:
+                    log.error('{}: freesasa SeqRecord length mismatch with {}'.format(self.id, s.id))
+                except Exception as e:
+                    log.error('{}: unknown freesasa error with {}'.format(self.id, s.id))
+                    print(e)
+
+    def get_disulfide_bridges(self, representative_only=True):
+        """Run Biopython's disulfide bridge finder and store found bridges.
+        Annotations are stored in the protein structure's chain sequence at:
+        ``seq_record.annotations['SSBOND-biopython']``
+        
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+
+        """
+        if representative_only:
+            if self.representative_structure:
+                try:
+                    self.representative_structure.get_disulfide_bridges()
+                except KeyError:
+                    log.error('{}: unable to run disulfide bridge finder on {}'.format(self.id, self.representative_structure))
+            else:
+                log.warning('{}: no representative structure set, cannot run disulfide bridge finder'.format(self.id))
+        else:
+            for s in self.structures:
+                try:
+                    s.get_disulfide_bridges()
+                except KeyError:
+                    log.error('{}: unable to run disulfide bridge finder on {}'.format(self.id, s.id))
+
+    def sequence_mutation_summary(self, sequence_ids=None, alignment_type=None):
+        """Summarize all mutations found in the sequence_alignments attribute.
+
+        Returns 2 dictionaries, single_counter and fingerprint_counter.
+
+        single_counter:
+            Dictionary of {point mutation: list of genes/strains}
+            Example: {('A', 24, 'V'): ['Strain1', 'Strain2', 'Strain4'],
+                      ('R', 33, 'T'): ['Strain2']}
+            Here, we report which genes/strains have the single point mutation.
+
+        fingerprint_counter:
+            Dictionary of {mutation group: list of genes/strains}
+            Example: {(('A', 24, 'V'), ('R', 33, 'T')): ['Strain2'],
+                      (('A', 24, 'V')): ['Strain1', 'Strain4']}
+            Here, we report which genes/strains have the specific combinations (or "fingerprints") of point mutations
+            
+        Args:
+            sequence_ids (str, list): Specified alignment ID or IDs to use
+            alignment_type (str): Specified alignment type contained in the ``annotation`` field of an alignment object
+
+        Returns:
+            dict, dict: single_counter, fingerprint_counter
+
+        """
+        if sequence_ids:
+            ssbio.utils.force_list(sequence_ids)
+
+        if len(self.sequence_alignments) == 0:
+            log.error('{}: no sequence alignments'.format(self.id))
+            return {}, {}
+
+        fingerprint_counter = defaultdict(list)
+        single_counter = defaultdict(list)
+
+        for alignment in self.sequence_alignments:
+            # Ignore alignments if a list of identifiers is provided
+            if sequence_ids:
+                if alignment.id not in sequence_ids:
+                    continue
+            # Ignore alignments if type is specified
+            if alignment_type:
+                if alignment.annotations['ssbio_type'] != alignment_type:
+                    continue
+
+            other_sequence = alignment.annotations['b_seq']
+            mutations = alignment.annotations['mutations']
+
+            if mutations:
+                # Turn this list of mutations into a tuple so it can be a dictionary key
+                mutations = tuple(tuple(x) for x in mutations)
+                fingerprint_counter[mutations].append(other_sequence)
+
+                for m in mutations:
+                    single_counter[m].append(other_sequence)
+
+        return dict(single_counter), dict(fingerprint_counter)
 
     def view_all_mutations(self, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
                            opacity_range=(0.8,1), scale_range=(1,5), gui=False):
@@ -1119,18 +1729,17 @@ class Protein(Object):
             NGLviewer object
 
         """
-        single, fingerprint = self.representative_sequence.sequence_mutation_summary()
+        single, fingerprint = self.sequence_mutation_summary()
 
         single_lens = {k: len(v) for k, v in single.items()}
         single_map_to_structure = {}
         for k, v in single_lens.items():
             resnum = int(k[1])
-            resnum_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(self.representative_sequence,
-                                                                                                        resnum)
+            resnum_to_structure = self.map_seqprop_resnums_to_structprop_resnums(resnums=resnum, use_representatives=True)
             if resnum not in resnum_to_structure:
                 log.warning('{}: residue is not available in structure {}'.format(resnum, self.representative_structure.id))
                 continue
-            new_key = resnum_to_structure[resnum][1]
+            new_key = resnum_to_structure[resnum]
             single_map_to_structure[new_key] = v
 
         if not grouped:
@@ -1147,9 +1756,8 @@ class Protein(Object):
             fingerprint_map_to_structure = {}
             for k, v in fingerprint_lens.items():
                 k_list = [int(x[1]) for x in k]
-                resnums_to_structure = self.representative_structure.map_repseq_resnums_to_structure_resnums(self.representative_sequence,
-                                                                                                             k_list)
-                new_key = tuple(y[1] for y in resnums_to_structure.values())
+                resnums_to_structure = self.map_seqprop_resnums_to_structprop_resnums(resnums=k_list, use_representatives=True)
+                new_key = tuple(y for y in resnums_to_structure.values())
                 fingerprint_map_to_structure[new_key] = v
 
             view = self.representative_structure.view_structure_and_highlight_residues_scaled(fingerprint_map_to_structure,
@@ -1222,7 +1830,8 @@ class Protein(Object):
 
     def __json_decode__(self, **attrs):
         for k, v in attrs.items():
-            if k == 'sequences' or k == 'structures':
+            # print(k)
+            if k == 'sequences' or k == 'structures' or k == 'sequence_alignments' or k == 'structure_alignments':
                 setattr(self, k, DictList(v))
             else:
                 setattr(self, k, v)

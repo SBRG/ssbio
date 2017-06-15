@@ -4,12 +4,13 @@ import os.path as op
 import numpy as np
 import pandas as pd
 from cobra.core import DictList
-
+from collections import defaultdict
 import ssbio.protein.sequence.utils.alignment
 import ssbio.protein.structure.properties.dssp
 import ssbio.protein.structure.properties.msms
 import ssbio.protein.structure.properties.residues
 import ssbio.protein.structure.properties.quality
+import ssbio.protein.structure.properties.freesasa as fs
 import ssbio.utils
 from ssbio.core.object import Object
 from ssbio.protein.structure.chainprop import ChainProp
@@ -42,6 +43,8 @@ class StructProp(Object):
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
+
+        # TODO: DEPRECATED!
         self.reference_seq_top_coverage = None
 
         # Chain information
@@ -116,7 +119,7 @@ class StructProp(Object):
             return None
         else:
             # Add Biopython structure object
-            structure = StructureIO(self.structure_path)
+            structure = StructureIO(self.structure_path, self.file_type)
 
             # Add all chains to self.chains as ChainProp objects
             structure_chains = [x.id for x in structure.first_model.child_list]
@@ -227,170 +230,65 @@ class StructProp(Object):
         for x in self.chains:
             x.reset_seq_record()
 
-    def align_seqprop_to_mapped_chains(self, seqprop, outdir=None, engine='needle', parse=True, force_rerun=False,
-                                       **kwargs):
-        """Run and store alignments of a SeqProp to chains in the ``mapped_chains`` attribute.
-
-        Alignments are stored in the SeqProp.structure_alignments attribute, with the IDs formatted
-        as <SeqProp_ID>_<StructProp_ID>-<Chain_ID>.
-
-        Args:
-            seqprop (SeqProp): SeqProp object
-            outdir (str): Directory to output sequence alignment files (only if running with needle)
-            engine (str): Which pairwise alignment tool to use ("needle" or "biopython")
-            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
-            force_rerun (bool): If alignments should be rerun
-            **kwargs: Other alignment options
-        """
-        # TODO: **kwargs for alignment options
-
-        # Parse the structure so chain sequences are stored
-        my_structure = self.parse_structure()
-
-        for chain_id in self.mapped_chains:
-            structure_id = '{}-{}'.format(self.id, chain_id)
-            aln_id = '{}_{}'.format(seqprop.id, structure_id)
-            outfile = '{}.needle'.format(aln_id)
-
-            if seqprop.structure_alignments.has_id(aln_id):
-                log.debug('{}: alignment already completed'.format(chain_id))
-                continue
-
-            log.debug('{}: aligning to reference sequence {}'.format(structure_id, seqprop.id))
-
-            if self.chains.has_id(chain_id):
-                chain_prop = self.chains.get_by_id(chain_id)
-                chain_seq_record = chain_prop.seq_record
-            else:
-                log.warning('{}: chain not present in structure file'.format(chain_id))
-                continue
-
-            if not chain_seq_record:
-                log.warning('{}: chain sequence not available, was structure parsed?'.format(chain_id))
-                continue
-
-            aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=seqprop.seq_str,
-                                                                                     a_seq_id=seqprop.id,
-                                                                                     b_seq=chain_seq_record,
-                                                                                     b_seq_id=structure_id,
-                                                                                     engine=engine,
-                                                                                     outdir=outdir,
-                                                                                     outfile=outfile,
-                                                                                     force_rerun=force_rerun)
-
-            # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
-            aln.id = aln_id
-            aln.annotations['a_seq'] = seqprop.id
-            aln.annotations['b_seq'] = structure_id
-            aln.annotations['structure_id'] = self.id
-            aln.annotations['chain_id'] = chain_id
-
-            if parse:
-                aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
-                                                                                 b_aln_seq=str(list(aln)[1].seq))
-                aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
-                aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
-                aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
-
-            seqprop.structure_alignments.append(aln)
-
-    def sequence_quality_checker(self, reference_seq, seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
-                                 allow_mutants=True, allow_deletions=False,
-                                 allow_insertions=False, allow_unresolved=True):
-        """Set and return the representative chain based on sequence quality checks to a reference sequence.
-
-        Args:
-            reference_seq (SeqProp): SeqProp object to compare to chain sequences
-            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
-            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
-                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
-                5 to 95 will be checked for modifications.
-            allow_mutants (bool): If mutations should be allowed or checked for
-            allow_deletions (bool): If deletions should be allowed or checked for
-            allow_insertions (bool): If insertions should be allowed or checked for
-            allow_unresolved (bool): If unresolved residues should be allowed or checked for
-
-        Returns:
-            ChainProp: the best chain, if any
-
-        """
-        for chain_id in self.mapped_chains:
-            try:
-                alignment = reference_seq.structure_alignments.get_by_id('{}_{}-{}'.format(reference_seq.id, self.id, chain_id))
-            except KeyError:
-                log.error('{}_{}-{}: structure alignment not found'.format(reference_seq.id, self.id, chain_id))
-                continue
-
-            # Compare representative sequence to structure sequence using the alignment
-            found_good_chain = ssbio.protein.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
-                                                                                           structure_seq_aln=alignment[1],
-                                                                                           seq_ident_cutoff=seq_ident_cutoff,
-                                                                                           allow_missing_on_termini=allow_missing_on_termini,
-                                                                                           allow_mutants=allow_mutants,
-                                                                                           allow_deletions=allow_deletions,
-                                                                                           allow_insertions=allow_insertions,
-                                                                                           allow_unresolved=allow_unresolved)
-
-            # If found_good_pdb = True, set as representative chain
-            # If not, move on to the next potential chain
-            if found_good_chain:
-                self.representative_chain = self.chains.get_by_id(chain_id)
-                self.reference_seq_top_coverage = alignment.annotations['percent_identity']
-                log.debug('{}: chain {} set as representative'.format(self.id, chain_id))
-                return self.representative_chain
-        else:
-            log.debug('{}: no chains meet quality checks'.format(self.id))
-            return None
-
-    def map_seqprop_resnums_to_mapped_chains(self, seqprop, resnums):
-        """Map a list of residue numbers present in a sequence to their corresponding structure residue numbers.
-        
-        The method align_seqprop_to_mapped_chains needs to be run before this to store the alignments in memory.
-        
-        Args:
-            seqprop (SeqProp): SeqProp object
-            resnums (int, list): Residue number(s) 
-
-        Returns:
-            dict: Mapping of chain IDs and their residue numbers which match the residue numbers that were input.
-
-        """
-        mapping_dict = {}
-
-        for chain_id in self.mapped_chains:
-            # Get the alignment for a chain
-            structure_id = '{}-{}'.format(self.id, chain_id)
-            aln_id = '{}_{}'.format(seqprop.id, structure_id)
-            aln = seqprop.structure_alignments.get_by_id(aln_id)
-
-            # Get the mapping to chain index
-            aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
-            chain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
-
-            # Now map the resnums to this chain
-            resnums = ssbio.utils.force_list(resnums)
-            to_chain_index = {}
-            for x in resnums:
-                ix = chain_resnums[x - 1] - 1
-                if np.isnan(ix):
-                    log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
-                else:
-                    to_chain_index[x] = int(ix)
-
-            chain = self.chains.get_by_id(chain_id)
-            chain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
-            to_structure_resnums = {}
-            for k, v in to_chain_index.items():
-                rn = chain_structure_mapping[v]
-                if rn[1] == float('Inf'):
-                    log.warning(
-                        '{}-{}, {}: structure file does not contain coordinates for this residue'.format(self.id, chain_id, k))
-                else:
-                    to_structure_resnums[k] = rn
-
-            mapping_dict[chain_id] = to_structure_resnums
-
-        return mapping_dict
+    # ################################################################################################################
+    # ################################################################################################################
+    # ################################################################################################################
+    #
+    #
+    #
+    # def map_seqprop_resnums_to_mapped_chains(self, seqprop, resnums):
+    #     """Map a list of residue numbers present in a sequence to their corresponding structure residue numbers.
+    #
+    #     The method align_seqprop_to_structprop needs to be run before this to store the alignments in memory.
+    #
+    #     Args:
+    #         seqprop (SeqProp): SeqProp object
+    #         resnums (int, list): Residue number(s)
+    #
+    #     Returns:
+    #         dict: Mapping of chain IDs and their residue numbers which match the residue numbers that were input.
+    #
+    #     """
+    #     mapping_dict = {}
+    #
+    #     for chain_id in self.mapped_chains:
+    #         # Get the alignment for a chain
+    #         structure_id = '{}-{}'.format(self.id, chain_id)
+    #         aln_id = '{}_{}'.format(seqprop.id, structure_id)
+    #         aln = seqprop.structure_alignments.get_by_id(aln_id)
+    #
+    #         # Get the mapping to chain index
+    #         aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
+    #         chain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
+    #
+    #         # Now map the resnums to this chain
+    #         resnums = ssbio.utils.force_list(resnums)
+    #         to_chain_index = {}
+    #         for x in resnums:
+    #             ix = chain_resnums[x - 1] - 1
+    #             if np.isnan(ix):
+    #                 log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
+    #             else:
+    #                 to_chain_index[x] = int(ix)
+    #
+    #         chain = self.chains.get_by_id(chain_id)
+    #         chain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
+    #         to_structure_resnums = {}
+    #         for k, v in to_chain_index.items():
+    #             rn = chain_structure_mapping[v]
+    #             if rn[1] == float('Inf'):
+    #                 log.warning(
+    #                     '{}-{}, {}: structure file does not contain coordinates for this residue'.format(self.id, chain_id, k))
+    #             else:
+    #                 to_structure_resnums[k] = rn
+    #
+    #         mapping_dict[chain_id] = to_structure_resnums
+    #
+    #     return mapping_dict
+    #
+    # ################################################################################################################
+    # ################################################################################################################
+    # ################################################################################################################
 
     def get_dict_with_chain(self, chain, only_keys=None, chain_keys=None, exclude_attributes=None, df_format=False):
         """get_dict method which incorporates attributes found in a specific chain. Does not overwrite any attributes
@@ -452,47 +350,9 @@ class StructProp(Object):
             log.debug('{}: no disulfide bridges found'.format(self.id))
 
         for chain, bridges in disulfide_bridges.items():
-            self.representative_chain.seq_record.annotations['SSBOND-biopython'] = disulfide_bridges[self.representative_chain.id]
+            self.chains.get_by_id(chain).seq_record.annotations['SSBOND-biopython'] = disulfide_bridges[chain]
             log.debug('{}: found {} disulfide bridges'.format(chain, len(bridges)))
             log.debug('{}: stored disulfide bridges in the chain\'s seq_record letter_annotations'.format(chain))
-
-    def get_residue_depths(self, outdir, force_rerun=False):
-        """Run MSMS on this structure and store the residue depths/ca depths in the corresponding ChainProp SeqRecords
-        """
-        parsed = self.parse_structure()
-        if not parsed:
-            log.error('{}: unable to open structure to run MSMS'.format(self.id))
-            return
-
-        log.debug('{}: running MSMS'.format(self.id))
-        msms_results = ssbio.protein.structure.properties.msms.get_msms_df(model=parsed.first_model,
-                                                                           pdb_file=self.structure_path,
-                                                                           outdir=outdir, force_rerun=force_rerun)
-        if msms_results.empty:
-            log.error('{}: unable to run MSMS'.format(self.id))
-            return
-
-        chains = msms_results.chain.unique()
-
-        for chain in chains:
-            res_depths = msms_results[msms_results.chain == chain].res_depth.tolist()
-            ca_depths = msms_results[msms_results.chain == chain].ca_depth.tolist()
-
-            chain_prop = self.chains.get_by_id(chain)
-            chain_seq = chain_prop.seq_record
-
-            # Making sure the X's are filled in
-            res_depths = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                                              new_seq=res_depths,
-                                                                                              fill_with=float('Inf'))
-
-            ca_depths = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
-                                                                                             new_seq=ca_depths,
-                                                                                             fill_with=float('Inf'))
-
-            chain_prop.seq_record.letter_annotations['RES_DEPTH-msms'] = res_depths
-            chain_prop.seq_record.letter_annotations['CA_DEPTH-msms'] = ca_depths
-            log.debug('{}: stored residue depths in chain seq_record letter_annotations'.format(chain))
 
     def get_dssp_annotations(self, outdir, force_rerun=False):
         """Run DSSP on this structure and store the DSSP annotations in the corresponding ChainProp SeqRecords
@@ -556,63 +416,117 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
-    def _map_repseq_resnums_to_repchain_index(self, reference_seq, resnums):
-        """Map a residue number in the reference_seq to an index in the representative_chain
-
-        Use this to get the indices of the repchain to get structural properties at a specific residue number.
-
-        Args:
-            resnums (int, list): Residue numbers in the representative sequence
-
-        Returns:
-            dict: Mapping of resnums to indices
-
+    def get_residue_depths(self, outdir, force_rerun=False):
+        """Run MSMS on this structure and store the residue depths/ca depths in the corresponding ChainProp SeqRecords
         """
-        resnums = ssbio.utils.force_list(resnums)
+        # TODO: rename to get_msms_annotations
+        if self.file_type != 'pdb':
+            log.error('{}: unable to run MSMS with "{}" file type. Please change file type to "pdb"'.format(self.id,
+                                                                                                            self.file_type))
+            return
 
-        repchain_resnum_mapping = reference_seq.seq_record.letter_annotations['repchain_resnums']
+        parsed = self.parse_structure()
+        if not parsed:
+            log.error('{}: unable to open structure to run MSMS'.format(self.id))
+            return
 
-        to_repchain_index = {}
-        for x in resnums:
-            ix = repchain_resnum_mapping[x - 1] - 1
+        log.debug('{}: running MSMS'.format(self.id))
+        msms_results = ssbio.protein.structure.properties.msms.get_msms_df(model=parsed.first_model,
+                                                                           pdb_file=self.structure_path,
+                                                                           outdir=outdir, force_rerun=force_rerun)
+        if msms_results.empty:
+            log.error('{}: unable to run MSMS'.format(self.id))
+            return
 
-            if np.isnan(ix):
-                log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
-            else:
-                to_repchain_index[x] = int(ix)
+        chains = msms_results.chain.unique()
 
-        return to_repchain_index
+        for chain in chains:
+            res_depths = msms_results[msms_results.chain == chain].res_depth.tolist()
+            ca_depths = msms_results[msms_results.chain == chain].ca_depth.tolist()
 
-    def map_repseq_resnums_to_structure_resnums(self, reference_seq, resnums, chain=None):
-        """Map a residue number in the reference_seq to the actual structure file's residue number (for the representative chain
+            chain_prop = self.chains.get_by_id(chain)
+            chain_seq = chain_prop.seq_record
 
-        Args:
-            resnums (int, list): Residue numbers in the representative sequence
+            # Making sure the X's are filled in
+            res_depths = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                              new_seq=res_depths,
+                                                                                              fill_with=float('Inf'))
 
-        Returns:
-            dict: Mapping of resnums to structure residue IDs
+            ca_depths = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain_seq,
+                                                                                             new_seq=ca_depths,
+                                                                                             fill_with=float('Inf'))
 
+            chain_prop.seq_record.letter_annotations['RES_DEPTH-msms'] = res_depths
+            chain_prop.seq_record.letter_annotations['CA_DEPTH-msms'] = ca_depths
+            log.debug('{}: stored residue depths in chain seq_record letter_annotations'.format(chain))
+
+    def get_freesasa_annotations(self, outdir, include_hetatms=False, force_rerun=False):
+        """Run freesasa on this structure and store the calculated properties in the corresponding ChainProp SeqRecords
         """
-        if chain:
-            chain = self.chains.get_by_id(chain)
+        if self.file_type != 'pdb':
+            log.error('{}: unable to run freesasa with "{}" file type. Please change file type to "pdb"'.format(self.id,
+                                                                                                                self.file_type))
+            return
+
+        # Parse the structure to store chain sequences
+        parsed = self.parse_structure()
+        if not parsed:
+            log.error('{}: unable to open structure to run freesasa'.format(self.id))
+            return
+
+        # Set outfile name
+        log.debug('{}: running freesasa'.format(self.id))
+        if include_hetatms:
+            outfile = '{}.freesasa_het.rsa'.format(self.id)
         else:
-            chain = self.representative_chain
+            outfile = '{}.freesasa_nohet.rsa'.format(self.id)
 
-        resnums = ssbio.utils.force_list(resnums)
+        # Run freesasa
+        result = fs.run_freesasa(infile=self.structure_path,
+                                 outfile=outfile,
+                                 include_hetatms=include_hetatms,
+                                 outdir=outdir,
+                                 force_rerun=force_rerun)
 
-        mapping_to_repchain_index = self._map_repseq_resnums_to_repchain_index(reference_seq, resnums)
-        repchain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
+        # Parse results
+        result_parsed = fs.parse_rsa_data(result)
+        prop_dict = defaultdict(lambda: defaultdict(list))
+        for k, v in result_parsed.items():
+            chain = k[0]
+            for prop, calc in v.items():
+                prop_dict[chain][prop].append(calc)
 
-        to_structure_resnums = {}
-        for k, v in mapping_to_repchain_index.items():
-            rn = repchain_structure_mapping[v]
+        # Reorganize and store results
+        all_props = ['all_atoms_abs', 'all_atoms_rel', 'side_chain_abs', 'side_chain_rel', 'main_chain_abs',
+                     'main_chain_rel', 'non_polar_abs', 'non_polar_rel', 'all_polar_abs', 'all_polar_rel']
+        all_props_renamed = {'all_atoms_abs' : 'ASA_ALL-freesasa',
+                             'all_atoms_rel' : 'RSA_ALL-freesasa',
+                             'all_polar_abs' : 'ASA_POLAR-freesasa',
+                             'all_polar_rel' : 'RSA_POLAR-freesasa',
+                             'main_chain_abs': 'ASA_BACKBONE-freesasa',
+                             'main_chain_rel': 'RSA_BACKBONE-freesasa',
+                             'non_polar_abs' : 'ASA_NONPOLAR-freesasa',
+                             'non_polar_rel' : 'RSA_NONPOLAR-freesasa',
+                             'side_chain_abs': 'ASA_RESIDUE-freesasa',
+                             'side_chain_rel': 'RSA_RESIDUE-freesasa'}
 
-            if rn[1] == float('Inf'):
-                log.warning('{}, {}: structure file does not contain coordinates for this residue'.format(self.id, k))
-            else:
-                to_structure_resnums[k] = rn
+        ## Rename dictionary keys based on if HETATMs were included
+        if include_hetatms:
+            suffix = '_het'
+        else:
+            suffix = '_nohet'
 
-        return to_structure_resnums
+        for k, v in all_props_renamed.items():
+            all_props_renamed[k] = v + suffix
+
+        for chain in self.chains:
+            for prop in all_props:
+                prop_list = ssbio.protein.structure.properties.residues.match_structure_sequence(orig_seq=chain.seq_record,
+                                                                                                 new_seq=prop_dict[chain.id][prop],
+                                                                                                 fill_with=float('Inf'),
+                                                                                                 ignore_excess=True)
+                chain.seq_record.letter_annotations[all_props_renamed[prop]] = prop_list
+            log.debug('{}: stored freesasa calculations in chain seq_record letter_annotations'.format(chain))
 
     def view_structure(self, opacity=1.0, recolor=True, gui=False):
         """Use NGLviewer to display a structure in a Jupyter notebook
@@ -625,7 +539,6 @@ class StructProp(Object):
             NGLviewer object
 
         """
-        # TODO: test other ways we can manipulate the view object
 
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
@@ -634,8 +547,6 @@ class StructProp(Object):
         if recolor:
             view.clear_representations()
             view.add_cartoon(selection='protein', color='silver', opacity=opacity)
-        # else:
-            # view.add_cartoon(selection='protein', opacity=opacity)
         return view
 
     def view_structure_and_highlight_residues(self, structure_resnums, chain=None, color='red',
@@ -643,10 +554,10 @@ class StructProp(Object):
         """Input a residue number or numbers to view on the structure.
 
         Args:
-            structure_resnums (int, list): Residue number(s) to highlight
+            structure_resnums (int, list): Residue number(s) to highlight, structure numbering
             chain (str, list): Chain ID or IDs of which residues are a part of. If not provided, all chains in the
-                mapped_chains attribute will be used. PLEASE NOTE: if that is also empty, all residues in all chains
-                matching the residue numbers will be shown.
+                mapped_chains attribute will be used. IMPORTANT: if that is also empty, all residues in all chains
+                matching the residue numbers will be shown, which may not always be correct.
             color (str): Color to highlight with
             structure_opacity (float): Opacity of the protein structure cartoon representation
             gui (bool): If the NGLview GUI should show up
@@ -700,8 +611,8 @@ class StructProp(Object):
             to scale residues by counts (useful to view mutations).
 
         Args:
-            structure_resnums (int, list, dict): Residue number(s) to highlight, or
-                a dictionary of residue number to frequency count
+            structure_resnums (int, list, dict): Residue number(s) to highlight, or a dictionary of residue number to
+                frequency count
             chain (str, list): Chain ID or IDs of which residues are a part of. If not provided, all chains in the
                 mapped_chains attribute will be used. PLEASE NOTE: if that is also empty, all residues in all chains
                 matching the residue numbers will be shown.

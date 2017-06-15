@@ -378,6 +378,7 @@ class GEMPRO(Object):
         return list(set(kegg_missing))
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
+                                     download_metadata_file_type='xml', simple_parse=False,
                                      set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service.
         Also download all metadata and sequences.
@@ -422,10 +423,12 @@ class GEMPRO(Object):
                     try:
                         uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
                                                               set_as_representative=set_as_representative,
+                                                              download_metadata_file_type=download_metadata_file_type,
+                                                              simple_parse=simple_parse,
                                                               force_rerun=force_rerun)
                     except HTTPError as e:
-                        print(e)
                         log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
+                        print(e)
                         continue
 
                     if uniprot_prop.sequence_file or uniprot_prop.metadata_file:
@@ -434,7 +437,8 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes mapped to UniProt'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> UniProt. See the "df_uniprot_metadata" attribute for a summary dataframe.')
 
-    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, set_as_representative=True):
+    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, download_metadata_file_type='xml',
+                               simple_parse=False, set_as_representative=True):
         """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
@@ -460,10 +464,12 @@ class GEMPRO(Object):
             try:
                 uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
                                                          outdir=outdir, download=True,
+                                                         download_metadata_file_type=download_metadata_file_type,
+                                                         simple_parse=simple_parse,
                                                          set_as_representative=set_as_representative)
-            except requests.HTTPError as e:
-                print(e)
+            except HTTPError as e:
                 log.error('{}, {}: unable to complete web request'.format(g, u))
+                print(e)
                 continue
 
         log.info('Completed manual ID mapping --> UniProt. See the "df_uniprot_metadata" attribute for a summary dataframe.')
@@ -616,15 +622,14 @@ class GEMPRO(Object):
         self.genome_path = outfile
         return self.genome_path
 
-    def get_sequence_properties(self):
+    def get_sequence_properties(self, representatives_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
-        Annotations are stored in the gene protein's representative sequence at:
+        Annotations are stored in the protein's sequence at:
         ``.seq_record.annotations``
 
         """
-        for g in tqdm(self.genes_with_a_representative_sequence):
-            g.protein.representative_sequence.get_biopython_pepstats()
-            g.protein.representative_sequence.get_emboss_pepstats()
+        for g in tqdm(self.genes):
+            g.protein.get_sequence_properties(representative_only=representatives_only)
 
     def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', num_cores=1,
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
@@ -681,7 +686,14 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes with SCRATCH predictions loaded'.format(counter, len(self.genes)))
 
     def get_tmhmm_predictions(self, tmhmm_results, custom_gene_mapping=None):
-        """Parse TMHMM results and store in the representative sequences
+        """Parse TMHMM results and store in the representative sequences.
+        
+        This is a basic function to parse pre-run TMHMM results. Run TMHMM from the 
+        web service (http://www.cbs.dtu.dk/services/TMHMM/) by doing the following:
+            1. Write all representative sequences in the GEM-PRO using the function ``write_representative_sequences_file``
+            2. Upload the file to ``http://www.cbs.dtu.dk/services/TMHMM/`` and choose "Extensive, no graphics" as the output
+            3. Copy and paste the results (ignoring the top header and above "HELP with output formats") into a file and save it
+            4. Run this function on that file
 
         Args:
             tmhmm_results (str): Path to TMHMM results (long format)
@@ -690,6 +702,7 @@ class GEMPRO(Object):
                 gene IDs to result file IDs. Dictionary keys must match model genes.
 
         """
+        # TODO: refactor to Protein class
         tmhmm_dict = ssbio.protein.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
 
         counter = 0
@@ -953,7 +966,7 @@ class GEMPRO(Object):
             return ssbio.utils.clean_df(df.set_index('gene'))
 
     def set_representative_structure(self, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
-                                     engine='needle', always_use_homology=False,
+                                     engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True,
@@ -978,6 +991,7 @@ class GEMPRO(Object):
                 needle is the standard EMBOSS tool to run pairwise alignments
                 biopython is Biopython's implementation of needle. Results can differ!
             always_use_homology (bool): If homology models should always be set as the representative structure
+            rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
             seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
             allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
                 when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
@@ -994,6 +1008,7 @@ class GEMPRO(Object):
                                                                struct_outdir=struct_outdir,
                                                                pdb_file_type=pdb_file_type,
                                                                engine=engine,
+                                                               rez_cutoff=rez_cutoff,
                                                                seq_ident_cutoff=seq_ident_cutoff,
                                                                always_use_homology=always_use_homology,
                                                                allow_missing_on_termini=allow_missing_on_termini,
@@ -1010,7 +1025,7 @@ class GEMPRO(Object):
     @property
     def df_representative_structures(self):
         rep_struct_pre_df = []
-        df_cols = ['gene', 'id', 'is_experimental', 'reference_seq_top_coverage', 'structure_file']
+        df_cols = ['gene', 'id', 'is_experimental', 'file_type', 'structure_file']
 
         for g in self.genes_with_a_representative_structure:
             repdict = g.protein.representative_structure.get_dict(df_format=True, only_keys=df_cols)
@@ -1063,23 +1078,16 @@ class GEMPRO(Object):
 
         counter = 0
         for g in self.genes_with_a_representative_sequence:
-            repseq = g.protein.representative_sequence
-
-            # TODO: refactor to Protein class
-            # Skip homology modeling if there is a structure set
             repstruct = g.protein.representative_structure
             if repstruct and not all_genes:
                 log.debug('{}: representative structure set, skipping homology modeling'.format(g.id))
                 continue
-            if 'walltime' in kwargs:
-                ITASSERPrep(ident=g.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
-                            itasser_path=itasser_installation, itlib_path=itlib_folder,
-                            runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir,
-                            walltime=kwargs['walltime'])
-            else:
-                ITASSERPrep(ident=g.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
-                            itasser_path=itasser_installation, itlib_path=itlib_folder,
-                            runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir)
+
+            g.protein.prep_itasser_modeling(itasser_installation=itasser_installation,
+                                            itlib_folder=itlib_folder, runtype=runtype,
+                                            create_in_dir=create_in_dir,
+                                            execute_from_dir=execute_from_dir,
+                                            print_exec=print_exec, **kwargs)
             counter += 1
 
         log.info('Prepared I-TASSER modeling folders for {} genes in folder {}'.format(counter,
@@ -1125,57 +1133,68 @@ class GEMPRO(Object):
         else:
             return ssbio.utils.clean_df(df.set_index('gene'))
 
-    def get_dssp_annotations(self):
-        """Run DSSP on all representative structures and store calculations.
-        Annotations are stored in the gene protein's representative sequence at:
+    @property
+    def df_proteins(self):
+        """DataFrame: Get a summary dataframe of all proteins in the model"""
+        pre_df = []
+        df_cols = ['gene', 'id', 'sequences', 'num_sequences', 'representative_sequence', 'num_structures',
+                   'experimental_structures', 'num_experimental_structures',
+                   'homology_models', 'num_homology_models',
+                   'representative_structure', 'representative_chain', 'representative_chain_seq_coverage',
+                   'num_sequence_alignments', 'num_structure_alignments']
+
+        for g in self.genes:
+            # Get per protein DataFrame
+            protein_dict = g.protein.protein_statistics
+            protein_dict['gene'] = g.id
+            pre_df.append(protein_dict)
+
+        df = pd.DataFrame.from_records(pre_df, columns=df_cols).set_index('gene')
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df)
+
+    def get_dssp_annotations(self, representatives_only=True, force_rerun=False):
+        """Run DSSP on all protein structures and store calculations.
+        Annotations are stored in each protein structure's chain sequence at:
         ``seq_record.letter_annotations['*-dssp']``
-
-        Todo:
-            * Some errors arise from storing annotations for nonstandard amino acids, need to run DSSP separately for those
-
+        
         """
         for g in tqdm(self.genes):
-            if g.protein.representative_structure:
-                try:
-                    g.protein.representative_structure.get_dssp_annotations(outdir=g.protein.structure_dir)
-                except PDBException as e:
-                    print(e)
-                    log.error('{}: Biopython error, issue matching sequences with {}'.format(g.id, g.protein.representative_structure))
-                except TypeError as e:
-                    print(e)
-                    log.error('{}: Biopython error, DSSP SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
-                except Exception as e:
-                    print(e)
-                    log.error('{}: DSSP failed to run on {}'.format(g.id, g.protein.representative_structure))
+            g.protein.get_dssp_annotations(representative_only=representatives_only, force_rerun=force_rerun)
 
-    def get_msms_annotations(self):
-        """Run MSMS on all representative structures and store calculations.
-        Annotations are stored in the gene protein's representative sequence at:
+    def get_msms_annotations(self, representatives_only=True, force_rerun=False):
+        """Run MSMS on all protein structures and store calculations.
+        Annotations are stored in each protein structure's chain sequence at:
         ``seq_record.letter_annotations['*-msms']``
 
         """
         for g in tqdm(self.genes):
-            if g.protein.representative_structure:
-                try:
-                    g.protein.representative_structure.get_residue_depths(outdir=g.protein.structure_dir)
-                except TypeError:
-                    log.error('{}: MSMS SeqRecord length mismatch with {}'.format(g.id, g.protein.representative_structure))
-                except:
-                    log.error(
-                        '{}: unknown MSMS error with {}'.format(g.id, g.protein.representative_structure))
+            g.protein.get_msms_annotations(representative_only=representatives_only, force_rerun=force_rerun)
 
-    def get_disulfide_bridges(self):
+    def get_freesasa_annotations(self, include_hetatms=False, representatives_only=True, force_rerun=False):
+        """Run freesasa on all protein structures and store calculations.
+        Annotations are stored in each protein structure's chain sequence at:
+        ``seq_record.letter_annotations['*-freesasa']``
+
+        """
+        for g in tqdm(self.genes):
+            g.protein.get_freesasa_annotations(include_hetatms=include_hetatms,
+                                               representative_only=representatives_only,
+                                               force_rerun=force_rerun)
+
+
+    def get_disulfide_bridges(self, representatives_only=True):
         """Run Biopython's disulfide bridge finder and store found bridges.
-        Annotations are stored in the gene protein's representative sequence at:
+        Annotations are stored in each protein structure's chain sequence at:
         ``seq_record.annotations['SSBOND-biopython']``
 
         """
         for g in tqdm(self.genes):
-            if g.protein.representative_structure:
-                try:
-                    g.protein.representative_structure.get_disulfide_bridges()
-                except KeyError:
-                    log.error('{}: unable to run disulfide bridge finder on {}'.format(g.id, g.protein.representative_structure))
+            g.protein.get_disulfide_bridges(representative_only=representatives_only)
+
 
     ### END STRUCTURE RELATED METHODS ###
     ####################################################################################################################
