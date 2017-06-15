@@ -147,7 +147,7 @@ def label_TM_tmhmm_residue_numbers_and_leaflets(tmhmm_seq):
     leaflet_dict = {}
     for leaflet in ['O', 'I']:
         leaflet_list = []
-        for TM_helix, TM_residues in TM_boundary_dict.iteritems():
+        for TM_helix, TM_residues in TM_boundary_dict.items():
             for residue_num in TM_residues:
                 tmhmm_seq_index = residue_num - 1
                 previous_residue = tmhmm_seq_index - 1
