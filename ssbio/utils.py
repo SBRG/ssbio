@@ -773,6 +773,29 @@ def percentage_to_float(x):
     return float(x.strip('%')) / 100
 
 
+def conv_to_float(indata, inf_str=''):
+    """Try to convert an arbitrary string to a float. Specify what will be replaced with "Inf".
+    
+    Args:
+        indata (str): String which contains a float
+        inf_str (str): If string contains something other than a float, and you want to replace it with float("Inf"), 
+            specify that string here.
+
+    Returns:
+        float: Converted string representation
+
+    """
+    if indata.strip() == inf_str:
+        outdata = float('Inf')
+    else:
+        try:
+            outdata = float(indata)
+        except:
+            raise ValueError('Unable to convert {} to float'.format(indata))
+
+    return outdata
+
+
 def make_dir(path):
     """Make a directory if it does not already exist
 

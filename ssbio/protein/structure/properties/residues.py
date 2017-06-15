@@ -68,6 +68,67 @@ def search_ss_bonds(model, threshold=3.0):
     return infodict
 
 
+def resname_in_proximity(resname, model, chains, resnums, threshold=5):
+    """Search within the proximity of a defined list of residue numbers and their chains for any specifed residue name.
+
+    Args:
+        resname (str): Residue name to search for in proximity of specified chains + resnums
+        model: Biopython Model object
+        chains (str, list): Chain ID or IDs to check
+        resnums (int, list): Residue numbers within the chain to check
+        threshold (float): Cutoff in Angstroms for returning True if a RESNAME is near
+
+    Returns:
+        bool: True if a RESNAME is within the threshold cutoff
+
+    """
+    residues = [r for r in model.get_residues() if r.get_resname() == resname]
+
+    chains = ssbio.utils.force_list(chains)
+    resnums = ssbio.utils.force_list(resnums)
+
+    for chain in chains:
+        for resnum in resnums:
+            my_residue_last_atom = model[chain][resnum].child_list[-1]
+            for rz in residues:
+                distance = rz.child_list[-1] - my_residue_last_atom
+                if distance < threshold:
+                    # print(resnum, rz, distance)
+                    return True
+
+    return False
+
+
+def list_resnames_in_proximity(model, chains, resnums, threshold=5):
+    """Search within the proximity of a defined list of residue numbers and their chains and return a list of all resnames.
+
+    Args:
+        model: Biopython Model object
+        chains (str, list): Chain ID or IDs to check
+        resnums (int, list): Residue numbers within the chain to check
+        threshold (float): Cutoff in Angstroms for returning True if a RESNAME is near
+
+    Returns:
+        list: True if a RESNAME is within the threshold cutoff
+
+    """
+    residues = [r for r in model.get_residues() if r.get_resname() == resname]
+
+    chains = ssbio.utils.force_list(chains)
+    resnums = ssbio.utils.force_list(resnums)
+
+    for chain in chains:
+        for resnum in resnums:
+            my_residue_last_atom = model[chain][resnum].child_list[-1]
+            for rz in residues:
+                distance = rz.child_list[-1] - my_residue_last_atom
+                if distance < threshold:
+                    # print(resnum, rz, distance)
+                    return True
+
+    return False
+
+
 def get_structure_seqrecords(model):
     """Get a dictionary of a PDB file's sequences.
 
@@ -109,17 +170,17 @@ def get_structure_seqrecords(model):
                 if end_tracker != (tracker + 1):
                     if res_icode != ' ':
                         chain_seq += res_aa_one
-                        chain_resnums.append(res_id)
+                        chain_resnums.append(res_num)
                         tracker = end_tracker + 1
                         continue
                     else:
                         multiplier = (end_tracker - tracker - 1)
                         chain_seq += 'X' * multiplier
                         # Residue numbers for unresolved or nonstandard residues are Infinite
-                        chain_resnums.extend([(' ', float("Inf"), ' ')] * multiplier)
+                        chain_resnums.extend([float("Inf")] * multiplier)
 
                 chain_seq += res_aa_one
-                chain_resnums.append(res_id)
+                chain_resnums.append(res_num)
                 tracker = end_tracker
 
             else:
@@ -196,7 +257,7 @@ def get_structure_seqs(pdb_file, file_type):
     return structure_seqs
 
 
-def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X'):
+def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X', ignore_excess=False):
     """Correct a sequence to match inserted X's in a structure sequence
 
     This is useful for mapping a sequence obtained from structural tools like MSMS or DSSP
@@ -231,6 +292,7 @@ def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X'):
         new_seq (str, tuple, list): Sequence to fill in
         match (str): What to match
         fill_with: What to fill in when matches are found
+        ignore_excess (bool): If excess sequence on the tail end of new_seq should be ignored
 
     Returns:
         str, tuple, list: new_seq which will match the length of orig_seq
@@ -240,8 +302,11 @@ def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X'):
         log.debug('Lengths already equal, nothing to fill in')
         return new_seq
 
-    if len(orig_seq) < len(new_seq):
-        raise ValueError('Original sequence has a length less than the sequence provided to match to')
+    if not ignore_excess:
+        if len(orig_seq) < len(new_seq):
+            raise ValueError('Original sequence has a length less than the sequence provided to match to')
+    else:
+        log.debug('New sequence will be truncated to length of original sequence - information may be lost!')
 
     if not isinstance(new_seq, str) and not isinstance(new_seq, tuple) and not isinstance(new_seq, list):
         raise ValueError('Invalid sequence provided, must be string, tuple, or list')
@@ -257,6 +322,8 @@ def match_structure_sequence(orig_seq, new_seq, match='X', fill_with='X'):
                 new_thing = new_thing[:i] + fill_with + new_thing[i:]
             if isinstance(new_thing, list):
                 new_thing.insert(i, fill_with)
+
+    new_thing = new_thing[:len(orig_seq)]
 
     if isinstance(new_seq, tuple):
         new_thing = tuple(new_thing)

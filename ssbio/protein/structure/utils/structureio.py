@@ -35,16 +35,22 @@ class StructureIO(PDBIO):
     Also adds some logging methods.
     """
 
-    def __init__(self, structure_file):
+    def __init__(self, structure_file, file_type=None):
         PDBIO.__init__(self)
 
-        dirname, filename_without_extension, file_type = ssbio.utils.split_folder_and_path(structure_file)
+        dirname, filename_without_extension, file_type2 = ssbio.utils.split_folder_and_path(structure_file)
         self.structure_file = structure_file
 
         # Unzip the file if it is zipped
         if file_type == '.gz':
             unzipped = ssbio.utils.gunzip_file(structure_file, outdir=dirname)
-            dirname, filename_without_extension, file_type = ssbio.utils.split_folder_and_path(unzipped)
+            dirname, filename_without_extension, file_type2 = ssbio.utils.split_folder_and_path(unzipped)
+
+        if not file_type:
+            file_type = file_type2
+        else:
+            if '.' not in file_type:
+                file_type = '.{}'.format(file_type)
 
         if file_type in ['.pdb', '.ent', '.mmcif', '.cif', '.mmtf']:
             # Load the structure
