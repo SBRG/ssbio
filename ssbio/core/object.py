@@ -1,6 +1,4 @@
-import os
 import ssbio.utils
-import pickle
 from copy import deepcopy
 import pandas as pd
 import ssbio.utils
@@ -14,6 +12,7 @@ class Object(object):
     def __init__(self, id=None, description=None):
         self.id = id
         self.description = description
+        self.notes = {}
 
     def __str__(self):
         return str(self.id)
