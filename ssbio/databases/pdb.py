@@ -131,7 +131,7 @@ def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=Fal
             mmtf_api = '1.0'
             download_link = 'http://mmtf.rcsb.org/v{}/full/{}.mmtf.gz'.format(mmtf_api, pdb_id)
         else:
-            download_link = 'https://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
+            download_link = 'http://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
 
         urlretrieve(download_link, outfile)
 
