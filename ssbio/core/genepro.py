@@ -63,6 +63,7 @@ class GenePro(Gene):
 
     def __json_decode__(self, **attrs):
         Gene.__init__(self, id=attrs['id'])
+        self.protein = attrs['protein']
 
         for k, v in attrs.items():
             # print(k)
@@ -72,7 +73,5 @@ class GenePro(Gene):
                 else:
                     log.debug('Directory does not exist, files will not be mapped')
                     continue
-            if k != 'protein' and k != 'id':
+            if k not in ['protein', 'id', 'root_dir']:
                 setattr(self, k, v)
-
-        self.protein = attrs['protein']
