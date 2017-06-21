@@ -24,18 +24,20 @@ class CleanPDB(PDB.Select):
     - Add B (temperature) factors (default Biopython behavior)
     """
 
-    def __init__(self, remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
-                 remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
+    def __init__(self, remove_atom_alt=True, keep_atom_alt_id='A', remove_atom_hydrogen=True, add_atom_occ=True,
+                 remove_res_hetero=True, keep_chemicals=None, add_chain_id_if_empty='X', keep_chains=None):
         """Initialize the parameters which indicate what cleaning will occur
 
         Args:
-            remove_atom_alt: Remove alternate positions
-            remove_atom_hydrogen: Remove hydrogen atoms
-            keep_atom_alt_id: If removing alternate positions, which alternate ID to keep
-            add_atom_occ: Add atom occupancy fields if not present
-            remove_res_hetero: Remove all HETATMs
-            add_chain_id_if_empty: Add a chain ID if not present
-            keep_chains: Keep only these chains
+            remove_atom_alt (bool): Remove alternate positions
+            keep_atom_alt_id (str): If removing alternate positions, which alternate ID to keep
+            remove_atom_hydrogen (bool): Remove hydrogen atoms
+            add_atom_occ (bool): Add atom occupancy fields if not present
+            remove_res_hetero (bool): Remove all HETATMs
+            keep_chemicals (str, list): If removing HETATMs, keep specified chemical names
+            add_chain_id_if_empty (str): Add a chain ID if not present
+            keep_chains (str, list): Keep only these chains
+            
         """
         self.remove_atom_alt = remove_atom_alt
         self.remove_atom_hydrogen = remove_atom_hydrogen
@@ -47,6 +49,10 @@ class CleanPDB(PDB.Select):
             self.keep_chains = []
         else:
             self.keep_chains = ssbio.utils.force_list(keep_chains)
+        if not keep_chemicals:
+            self.keep_chemicals = []
+        else:
+            self.keep_chemicals = ssbio.utils.force_list(keep_chemicals)
 
     def accept_chain(self, chain):
         # If the chain does not have an ID, add one to it and keep it
@@ -69,7 +75,7 @@ class CleanPDB(PDB.Select):
         if hetfield == '':
             hetfield = ' '
         # If you want to remove residues that are not normal, remove them
-        if self.remove_res_hetero and hetfield[0] != ' ':
+        if self.remove_res_hetero and hetfield[0] != ' ' and residue.resname not in self.keep_chemicals:
             return False
         else:
             return True
@@ -91,22 +97,23 @@ class CleanPDB(PDB.Select):
             return True
 
 def clean_pdb(pdb_file, out_suffix='_clean', outdir=None, force_rerun=False,
-              remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
-              remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
+              remove_atom_alt=True, keep_atom_alt_id='A', remove_atom_hydrogen=True, add_atom_occ=True,
+              remove_res_hetero=True, keep_chemicals=None, add_chain_id_if_empty='X', keep_chains=None):
     """Clean a PDB file.
 
     Args:
-        pdb_file: Path to input PDB file
-        out_suffix: Suffix to append to original filename
-        outdir: Path to output directory
-        force_rerun: If structure should be re-cleaned if a clean file exists already
-        remove_atom_alt: Remove alternate positions
-        remove_atom_hydrogen: Remove hydrogen atoms
-        keep_atom_alt_id: If removing alternate positions, which alternate ID to keep
-        add_atom_occ: Add atom occupancy fields if not present
-        remove_res_hetero: Remove all HETATMs
-        add_chain_id_if_empty: Add a chain ID if not present
-        keep_chains: Keep only these chains
+        pdb_file (str): Path to input PDB file
+        out_suffix (str): Suffix to append to original filename
+        outdir (str): Path to output directory
+        force_rerun (bool): If structure should be re-cleaned if a clean file exists already
+        remove_atom_alt (bool): Remove alternate positions
+        keep_atom_alt_id (str): If removing alternate positions, which alternate ID to keep
+        remove_atom_hydrogen (bool): Remove hydrogen atoms
+        add_atom_occ (bool): Add atom occupancy fields if not present
+        remove_res_hetero (bool): Remove all HETATMs
+        keep_chemicals (str, list): If removing HETATMs, keep specified chemical names
+        add_chain_id_if_empty (str): Add a chain ID if not present
+        keep_chains (str, list): Keep only these chains
 
     Returns:
         str: Path to cleaned PDB file
@@ -125,7 +132,8 @@ def clean_pdb(pdb_file, out_suffix='_clean', outdir=None, force_rerun=False,
                               add_atom_occ=add_atom_occ,
                               remove_res_hetero=remove_res_hetero,
                               add_chain_id_if_empty=add_chain_id_if_empty,
-                              keep_chains=keep_chains)
+                              keep_chains=keep_chains,
+                              keep_chemicals=keep_chemicals)
 
         my_clean_pdb = my_pdb.write_pdb(out_suffix=out_suffix,
                                         out_dir=outdir,
