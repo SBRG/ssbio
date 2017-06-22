@@ -99,36 +99,6 @@ def resname_in_proximity(resname, model, chains, resnums, threshold=5):
     return False
 
 
-def list_resnames_in_proximity(model, chains, resnums, threshold=5):
-    """Search within the proximity of a defined list of residue numbers and their chains and return a list of all resnames.
-
-    Args:
-        model: Biopython Model object
-        chains (str, list): Chain ID or IDs to check
-        resnums (int, list): Residue numbers within the chain to check
-        threshold (float): Cutoff in Angstroms for returning True if a RESNAME is near
-
-    Returns:
-        list: True if a RESNAME is within the threshold cutoff
-
-    """
-    residues = [r for r in model.get_residues() if r.get_resname() == resname]
-
-    chains = ssbio.utils.force_list(chains)
-    resnums = ssbio.utils.force_list(resnums)
-
-    for chain in chains:
-        for resnum in resnums:
-            my_residue_last_atom = model[chain][resnum].child_list[-1]
-            for rz in residues:
-                distance = rz.child_list[-1] - my_residue_last_atom
-                if distance < threshold:
-                    # print(resnum, rz, distance)
-                    return True
-
-    return False
-
-
 def get_structure_seqrecords(model):
     """Get a dictionary of a PDB file's sequences.
 
