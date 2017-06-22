@@ -40,11 +40,13 @@ def run_freesasa(infile, outfile, include_hetatms=True, outdir=None, force_rerun
     return outfile
 
 
-def parse_rsa_data(rsa_outfile):
+def parse_rsa_data(rsa_outfile, ignore_hets=True):
     """Process a NACCESS or freesasa RSA output file. Adapted from Biopython NACCESS modele.
     
     Args:
-        rsa_outfile: Path to RSA output file
+        rsa_outfile (str): Path to RSA output file
+        ignore_hets (bool): If HETATMs should be excluded from the final dictionary. This is extremely important
+            when loading this information into a ChainProp's SeqRecord, since this will throw off the sequence matching.
 
     Returns:
         dict: Per-residue dictionary of RSA values
@@ -71,6 +73,10 @@ def parse_rsa_data(rsa_outfile):
                 non_polar_rel = line[62:67].strip()
                 all_polar_abs = line[68:74].strip()
                 all_polar_rel = line[75:80].strip()
+
+                if all_atoms_rel =='N/A' and main_chain_rel =='N/A' and all_polar_rel =='N/A' and non_polar_rel =='N/A' and side_chain_rel =='N/A' and ignore_hets:
+                    continue
+
                 naccess_rel_dict[(chain_id, res_id)] = {
                     'res_name'      : res_name,
                     'all_atoms_abs' : ssbio.utils.conv_to_float(all_atoms_abs, inf_str='N/A'),
