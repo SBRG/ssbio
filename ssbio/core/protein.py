@@ -1261,7 +1261,7 @@ class Protein(Object):
 
         return final_mapping
 
-    def _representative_structure_setter(self, structprop, keep_chain, new_id=None, clean=True,
+    def _representative_structure_setter(self, structprop, keep_chain, new_id=None, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None):
         """Set the representative structure by 1) cleaning it and 2) copying over attributes of the original structure.
 
@@ -1272,6 +1272,7 @@ class Protein(Object):
             keep_chain (str, list): List of chains to keep
             new_id (str): New ID to call this structure, for example 1abc-D to represent PDB 1abc, chain D
             clean (bool): If the PDB file should be cleaned (see ssbio.structure.utils.cleanpdb)
+            keep_chemicals (str, list): Keep specified chemical names
             out_suffix (str): Suffix to append to clean PDB file
             outdir (str): Path to output directory
 
@@ -1289,7 +1290,8 @@ class Protein(Object):
 
         # If the structure is to be cleaned, and which chain to keep
         if clean:
-            final_pdb = structprop.clean_structure(outdir=outdir, out_suffix=out_suffix, keep_chains=keep_chain)
+            final_pdb = structprop.clean_structure(outdir=outdir, out_suffix=out_suffix,
+                                                   keep_chemicals=keep_chemicals, keep_chains=keep_chain)
         else:
             final_pdb = structprop.structure_path
 
@@ -1315,7 +1317,8 @@ class Protein(Object):
                                      engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
-                                     allow_insertions=False, allow_unresolved=True,
+                                     allow_insertions=False, allow_unresolved=True, clean=True,
+                                     keep_chemicals=None,
                                      force_rerun=False):
         """Set a representative structure from a structure in self.structures
 
@@ -1337,6 +1340,8 @@ class Protein(Object):
             allow_deletions (bool): If deletions should be allowed or checked for
             allow_insertions (bool): If insertions should be allowed or checked for
             allow_unresolved (bool): If unresolved residues should be allowed or checked for
+            clean (bool): If structure should be cleaned
+            keep_chemicals (str, list): Keep specified chemical names if structure is to be cleaned
             force_rerun (bool): If sequence to structure alignment should be rerun
 
         Returns:
@@ -1458,9 +1463,10 @@ class Protein(Object):
                     try:
                         self._representative_structure_setter(structprop=pdb,
                                                               new_id='{}-{}'.format(pdb.id, best_chain),
-                                                              clean=True,
+                                                              clean=clean,
                                                               out_suffix='-{}_clean'.format(best_chain),
                                                               keep_chain=best_chain,
+                                                              keep_chemicals=keep_chemicals,
                                                               outdir=struct_outdir)
                     except:
                         # TODO: inspect causes of these errors - most common is Biopython PDBParser error

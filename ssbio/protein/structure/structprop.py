@@ -133,22 +133,22 @@ class StructProp(Object):
             return structure
 
     def clean_structure(self, out_suffix='_clean', outdir=None, force_rerun=False,
-                        remove_atom_alt=True, remove_atom_hydrogen=True, keep_atom_alt_id='A', add_atom_occ=True,
-                        remove_res_hetero=True, add_chain_id_if_empty='X', keep_chains=None):
+                        remove_atom_alt=True, keep_atom_alt_id='A',remove_atom_hydrogen=True,  add_atom_occ=True,
+                        remove_res_hetero=True, keep_chemicals=None, add_chain_id_if_empty='X', keep_chains=None):
         """Clean the structure file associated with this structure, and save it as a new file. Returns the file path.
 
         Args:
-            out_suffix: Suffix to append to original filename
-            outdir: Path to output directory
-            force_rerun: If structure should be re-cleaned if a clean file exists already
-            remove_atom_alt: Remove alternate positions
-            remove_atom_hydrogen: Remove hydrogen atoms
-            keep_atom_alt_id: If removing alternate positions, which alternate ID to keep
-            add_atom_occ: Add atom occupancy fields if not present
-            remove_res_hetero: Remove all HETATMs
-            add_chain_id_if_empty: Add a chain ID if not present
-            keep_chains: Keep only these chains
-
+            out_suffix (str): Suffix to append to original filename
+            outdir (str): Path to output directory
+            force_rerun (bool): If structure should be re-cleaned if a clean file exists already
+            remove_atom_alt (bool): Remove alternate positions
+            keep_atom_alt_id (str): If removing alternate positions, which alternate ID to keep
+            remove_atom_hydrogen (bool): Remove hydrogen atoms
+            add_atom_occ (bool): Add atom occupancy fields if not present
+            remove_res_hetero (bool): Remove all HETATMs
+            keep_chemicals (str, list): If removing HETATMs, keep specified chemical names
+            add_chain_id_if_empty (str): Add a chain ID if not present
+            keep_chains (str, list): Keep only these chains
         Returns:
             str: Path to cleaned PDB file
 
@@ -165,6 +165,7 @@ class StructProp(Object):
                                                                           keep_atom_alt_id=keep_atom_alt_id,
                                                                           add_atom_occ=add_atom_occ,
                                                                           remove_res_hetero=remove_res_hetero,
+                                                                          keep_chemicals=keep_chemicals,
                                                                           add_chain_id_if_empty=add_chain_id_if_empty,
                                                                           keep_chains=keep_chains)
 
