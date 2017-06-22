@@ -75,7 +75,7 @@ class CleanPDB(PDB.Select):
         if hetfield == '':
             hetfield = ' '
         # If you want to remove residues that are not normal, remove them
-        if self.remove_res_hetero and hetfield[0] != ' ' and residue.resname not in self.keep_chemicals:
+        if self.remove_res_hetero and hetfield[0] != ' ' and residue.resname.strip() not in self.keep_chemicals:
             return False
         else:
             return True
