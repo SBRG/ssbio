@@ -1085,7 +1085,7 @@ class GEMPRO(Object):
 
             g.protein.prep_itasser_modeling(itasser_installation=itasser_installation,
                                             itlib_folder=itlib_folder, runtype=runtype,
-                                            create_in_dir=create_in_dir,
+                                            create_in_dir=self.homology_models_dir,
                                             execute_from_dir=execute_from_dir,
                                             print_exec=print_exec, **kwargs)
             counter += 1

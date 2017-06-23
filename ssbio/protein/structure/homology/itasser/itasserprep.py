@@ -14,10 +14,9 @@ class ITASSERPrep():
     """
 
     def __init__(self, ident, seq_str, root_dir, itasser_path, itlib_path,
-                 execute_dir=None, light='true', runtype='local', print_exec=False,
-                 binding_site_pred=False, ec_pred=False, go_pred=False, project_id=None,
-                 slurm_email='', slurm_username='', walltime='48:00:00',
-                 slurm_queue='shared'):
+                 execute_dir=None, light=True, runtype='local', print_exec=False,
+                 binding_site_pred=False, ec_pred=False, go_pred=False, walltime='72:00:00', queue='regular',
+                 slurm_project_id=None, slurm_email='', slurm_username='', slurm_memory='8GB'):
         """Create the I-TASSER folder and also an executable script to run I-TASSER
 
         Args:
@@ -35,10 +34,11 @@ class ITASSERPrep():
             ec_pred: If EC number predictions should be run
             go_pred: If GO term predictions should be run
             walltime: SLURM or Torque walltime
-            project_id: NERSC specific - SLURM project ID
-            slurm_email: NERSC specific - SLURM email
-            slurm_username: NERSC specific - SLURM username
-            slurm_queue: NERSC specific - SLURM queue to use
+            queue: SLURM or Torque queue
+            slurm_project_id: SLURM project ID
+            slurm_email: SLURM email
+            slurm_username: SLURM username
+            slurm_memory: Amount of memory to allocate to this run
         """
 
         if runtype.lower() not in ['local', 'torque', 'slurm']:
@@ -65,6 +65,10 @@ class ITASSERPrep():
 
         self.print_exec = print_exec
         self.runtype = runtype
+        if light:
+            light = 'true'
+        else:
+            light = 'false'
         self.light = light
 
         self.model_exists = op.exists(op.join(self.execute_dir, 'model1.pdb'))
@@ -78,18 +82,18 @@ class ITASSERPrep():
             additional_options += '-GO true '
         self.additional_options = additional_options
 
-        if runtype == 'local' or runtype == 'torque':
-            self.walltime = walltime
+        self.queue = queue
+        self.walltime = walltime
 
+        if runtype == 'local' or runtype == 'torque':
             self.prep_script_local(itasser_loc=itasser_path,
                                    itlib_loc=itlib_path)
 
         if runtype == 'slurm':
             self.slurm_email = slurm_email
             self.slurm_username = slurm_username
-            self.walltime = walltime
-            self.slurm_queue = slurm_queue
-            self.project_id = project_id
+            self.slurm_project_id = slurm_project_id
+            self.slurm_memory = slurm_memory
 
             self.prep_script_slurm(itasser_loc=itasser_path,
                                    itlib_loc=itlib_path)
@@ -122,6 +126,7 @@ class ITASSERPrep():
                    'usrname': getpass.getuser(),
                    'java_home': java_home,
                    'additional_options': self.additional_options,
+                   'queue': self.queue,
                    'walltime': self.walltime,
                    'light': self.light}
 
@@ -130,7 +135,7 @@ class ITASSERPrep():
 
         if self.runtype == 'torque':
             script.write('#PBS -l walltime={i[walltime]}\n'.format(i=itasser))
-            script.write('#PBS -q regular\n')
+            script.write('#PBS -q {i[queue]}\n'.format(i=itasser))
             script.write('#PBS -N {i[seqname]}\n'.format(i=itasser))
             script.write('#PBS -o {i[seqname]}.out\n'.format(i=itasser))
             script.write('#PBS -e {i[seqname]}.err\n'.format(i=itasser))
@@ -175,18 +180,19 @@ class ITASSERPrep():
                    'java_home': java_home,
                    'light': self.light,
                    'additional_options': self.additional_options,
-                   'project_id':self.project_id,
+                   'slurm_project_id': self.slurm_project_id,
                    'walltime': self.walltime,
-                   'slurm_queue': self.slurm_queue,
-                   'slurm_email': self.slurm_email}
+                   'queue': self.queue,
+                   'slurm_email': self.slurm_email,
+                   'slurm_memory': self.slurm_memory}
 
         slurm = open(outfile, 'w')
 
         slurm.write('#!/bin/bash -l\n')
-        slurm.write('#SBATCH -p shared\n')
-        slurm.write('#SBATCH -A {i[project_id]}\n'.format(i=itasser))
+        slurm.write('#SBATCH -p {i[queue]}\n'.format(i=itasser))
+        slurm.write('#SBATCH -A {i[slurm_project_id]}\n'.format(i=itasser))
         slurm.write('#SBATCH -t {i[walltime]}\n'.format(i=itasser))
-        slurm.write('#SBATCH --mem=8GB\n')
+        slurm.write('#SBATCH --mem={i[slurm_memory]}\n'.format(i=itasser))
         slurm.write('#SBATCH -J {i[seqname]}\n'.format(i=itasser))
         slurm.write('#SBATCH --mail-user {i[slurm_email]}\n'.format(i=itasser))
         slurm.write('#SBATCH -o {i[seqname]}.out\n'.format(i=itasser))

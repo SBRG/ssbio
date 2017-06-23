@@ -640,17 +640,34 @@ class Protein(Object):
 
         repseq = self.representative_sequence
 
-        if 'walltime' in kwargs:
-            ITASSERPrep(ident=self.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
-                        itasser_path=itasser_installation, itlib_path=itlib_folder,
-                        runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir,
-                        walltime=kwargs['walltime'])
-        else:
-            ITASSERPrep(ident=self.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
-                        itasser_path=itasser_installation, itlib_path=itlib_folder,
-                        runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir)
+        itasser_kwargs = {'light': True,
+                          'binding_site_pred': False,
+                          'ec_pred': False,
+                          'go_pred': False,
+                          'walltime': '72:00:00',
+                          'queue': 'regular',
+                          'slurm_project_id': None,
+                          'slurm_email': '',
+                          'slurm_username': '',
+                          'slurm_memory': '8GB'}
 
-        log.info('Prepared I-TASSER modeling folder {}'.format(self.homology_models_dir))
+        if kwargs:
+            itasser_kwargs.update(kwargs)
+
+        ITASSERPrep(ident=self.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
+                    itasser_path=itasser_installation, itlib_path=itlib_folder,
+                    runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir,
+                    light=itasser_kwargs['light'],
+                    binding_site_pred=itasser_kwargs['binding_site_pred'],
+                    ec_pred=itasser_kwargs['ec_pred'],
+                    go_pred=itasser_kwargs['go_pred'],
+                    walltime=itasser_kwargs['walltime'],
+                    queue=itasser_kwargs['queue'],
+                    slurm_project_id=itasser_kwargs['slurm_project_id'],
+                    slurm_email=itasser_kwargs['slurm_email'],
+                    slurm_username=itasser_kwargs['slurm_username'])
+
+        log.debug('Prepared I-TASSER modeling folder {}'.format(self.homology_models_dir))
 
     def blast_representative_sequence_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
                                              outdir=None, force_rerun=False):
