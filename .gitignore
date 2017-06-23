@@ -88,6 +88,5 @@ fabric.properties
 docs/_build/
 docs/_build_html/
 
-# Test ouputs
+# Test outputs
 ssbio/test/test_files/out/
-/ssbio/pipeline/atlas.py
