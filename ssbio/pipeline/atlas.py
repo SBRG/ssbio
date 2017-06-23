@@ -1,26 +1,27 @@
+import logging
 import os
 import os.path as op
+import sys
+
 import cobra.flux_analysis
 import cobra.manipulation
+import numpy as np
 import pandas as pd
-import ssbio.sequence.utils.blast
+from Bio import SeqIO
+from cobra.core import DictList
+from slugify import Slugify
+
 import ssbio.cobra.utils
 import ssbio.databases.ncbi
 import ssbio.databases.patric
-import ssbio.sequence.utils.fasta
-from ssbio.core.object import Object
+import ssbio.protein.sequence.properties.residues
+import ssbio.protein.sequence.utils.alignment
+import ssbio.protein.sequence.utils.blast
+import ssbio.protein.sequence.utils.fasta
 from ssbio import utils
-import ssbio.sequence.utils.alignment
+from ssbio.core.object import Object
 from ssbio.pipeline.gempro import GEMPRO
-from Bio import SeqIO
-import sys
-import logging
-from slugify import Slugify
-from cobra.core import DictList
-from cobra.core import Gene
-from ssbio.core.genepro import GenePro
-import numpy as np
-import ssbio.sequence.properties.residues
+
 try:
     from StringIO import StringIO
 except ImportError:
@@ -278,26 +279,26 @@ class ATLAS(Object):
 
             # Run bidirectional BLAST
             log.debug('{} vs {}: Running bidirectional BLAST'.format(self.base_strain_gempro.id, strain_model.id))
-            r_vs_g, g_vs_r = ssbio.sequence.utils.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
-                                                                                dbtype='prot',
-                                                                                outdir=self.atlas_seq_genomes_dir)
+            r_vs_g, g_vs_r = ssbio.protein.sequence.utils.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
+                                                                                        dbtype='prot',
+                                                                                        outdir=self.atlas_seq_genomes_dir)
 
             # Using the BLAST files, find the BBH
             log.debug('{} vs {}: Finding BBHs'.format(self.base_strain_gempro.id, strain_model.id))
-            bbh = ssbio.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
-                                                           outdir=self.atlas_seq_genomes_dir)
+            bbh = ssbio.protein.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
+                                                                   outdir=self.atlas_seq_genomes_dir)
             bbh_files[strain_model.id] = bbh
 
         # Make the orthologous genes matrix
         log.debug('Creating orthology matrix')
-        ortho_matrix = ssbio.sequence.utils.blast.create_orthology_matrix(r_name=self.base_strain_gempro.id,
-                                                                          genome_to_bbh_files=bbh_files,
-                                                                          pid_cutoff=pid_cutoff,
-                                                                          bitscore_cutoff=bitscore_cutoff,
-                                                                          evalue_cutoff=evalue_cutoff,
-                                                                          filter_condition=filter_condition,
-                                                                          outname='{}_{}_orthology.csv'.format(self.base_strain_gempro.id, 'prot'),
-                                                                          outdir=self.atlas_data_dir)
+        ortho_matrix = ssbio.protein.sequence.utils.blast.create_orthology_matrix(r_name=self.base_strain_gempro.id,
+                                                                                  genome_to_bbh_files=bbh_files,
+                                                                                  pid_cutoff=pid_cutoff,
+                                                                                  bitscore_cutoff=bitscore_cutoff,
+                                                                                  evalue_cutoff=evalue_cutoff,
+                                                                                  filter_condition=filter_condition,
+                                                                                  outname='{}_{}_orthology.csv'.format(self.base_strain_gempro.id, 'prot'),
+                                                                                  outdir=self.atlas_data_dir)
 
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
@@ -681,13 +682,13 @@ class ATLAS(Object):
             to_append['at_disulfide_bridge'] = False
 
             # Residue properties
-            origres_props = ssbio.sequence.properties.residues.residue_biochemical_definition(orig_res)
-            mutres_props = ssbio.sequence.properties.residues.residue_biochemical_definition(mutated_res)
+            origres_props = ssbio.protein.sequence.properties.residues.residue_biochemical_definition(orig_res)
+            mutres_props = ssbio.protein.sequence.properties.residues.residue_biochemical_definition(mutated_res)
             to_append['base_residue_prop'] = origres_props
             to_append['strain_residue_prop'] = mutres_props
 
             # Grantham score - score a mutation based on biochemical properties
-            grantham_s, grantham_txt = ssbio.sequence.properties.residues.grantham_score(orig_res, mutated_res)
+            grantham_s, grantham_txt = ssbio.protein.sequence.properties.residues.grantham_score(orig_res, mutated_res)
             to_append['grantham_score'] = grantham_s
             to_append['grantham_annotation'] = grantham_txt
 
@@ -704,6 +705,7 @@ class ATLAS(Object):
                     structure_type_suffix = 'HOM'
 
                 # Structure properties - calculated
+                # TODO: refactor to use reference_seq
                 mapped = g.protein.representative_structure._map_repseq_resnums_to_repchain_index(resnum)
                 if resnum in mapped:
                     repchain_index = mapped[resnum]
@@ -719,7 +721,7 @@ class ATLAS(Object):
                     # At disulfide bond?
                     repchain_annotations = g.protein.representative_structure.representative_chain.seq_record.annotations
                     if 'SSBOND-biopython' in repchain_annotations:
-                        structure_resnum = g.protein.representative_structure.map_repseq_resnums_to_structure_resnums(
+                        structure_resnum = g.protein.representative_structure.map_repseq_resnums_to_structure_resnums(g.protein.representative_sequence,
                             resnum)
                         if resnum in structure_resnum:
                             ssbonds = repchain_annotations['SSBOND-biopython']

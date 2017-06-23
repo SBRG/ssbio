@@ -90,3 +90,4 @@ docs/_build_html/
 
 # Test ouputs
 ssbio/test/test_files/out/
+/ssbio/pipeline/atlas.py
