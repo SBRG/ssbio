@@ -134,7 +134,8 @@ class StructProp(Object):
 
     def clean_structure(self, out_suffix='_clean', outdir=None, force_rerun=False,
                         remove_atom_alt=True, keep_atom_alt_id='A',remove_atom_hydrogen=True,  add_atom_occ=True,
-                        remove_res_hetero=True, keep_chemicals=None, add_chain_id_if_empty='X', keep_chains=None):
+                        remove_res_hetero=True, keep_chemicals=None, keep_res_only=None,
+                        add_chain_id_if_empty='X', keep_chains=None):
         """Clean the structure file associated with this structure, and save it as a new file. Returns the file path.
 
         Args:
@@ -147,6 +148,7 @@ class StructProp(Object):
             add_atom_occ (bool): Add atom occupancy fields if not present
             remove_res_hetero (bool): Remove all HETATMs
             keep_chemicals (str, list): If removing HETATMs, keep specified chemical names
+            keep_res_only (str, list): Keep ONLY specified resnames, deletes everything else!
             add_chain_id_if_empty (str): Add a chain ID if not present
             keep_chains (str, list): Keep only these chains
         Returns:
@@ -166,6 +168,7 @@ class StructProp(Object):
                                                                           add_atom_occ=add_atom_occ,
                                                                           remove_res_hetero=remove_res_hetero,
                                                                           keep_chemicals=keep_chemicals,
+                                                                          keep_res_only=keep_res_only,
                                                                           add_chain_id_if_empty=add_chain_id_if_empty,
                                                                           keep_chains=keep_chains)
 

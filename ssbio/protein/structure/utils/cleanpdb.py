@@ -25,7 +25,7 @@ class CleanPDB(PDB.Select):
     """
 
     def __init__(self, remove_atom_alt=True, keep_atom_alt_id='A', remove_atom_hydrogen=True, add_atom_occ=True,
-                 remove_res_hetero=True, keep_chemicals=None, add_chain_id_if_empty='X', keep_chains=None):
+                 remove_res_hetero=True, keep_chemicals=None, keep_res_only=None, add_chain_id_if_empty='X', keep_chains=None):
         """Initialize the parameters which indicate what cleaning will occur
 
         Args:
@@ -35,6 +35,7 @@ class CleanPDB(PDB.Select):
             add_atom_occ (bool): Add atom occupancy fields if not present
             remove_res_hetero (bool): Remove all HETATMs
             keep_chemicals (str, list): If removing HETATMs, keep specified chemical names
+            keep_res_only (str, list): Keep ONLY specified resnames, deletes everything else!
             add_chain_id_if_empty (str): Add a chain ID if not present
             keep_chains (str, list): Keep only these chains
             
@@ -53,6 +54,10 @@ class CleanPDB(PDB.Select):
             self.keep_chemicals = []
         else:
             self.keep_chemicals = ssbio.utils.force_list(keep_chemicals)
+        if not keep_res_only:
+            self.keep_res_only = []
+        else:
+            self.keep_res_only = ssbio.utils.force_list(keep_res_only)
 
     def accept_chain(self, chain):
         # If the chain does not have an ID, add one to it and keep it
@@ -74,6 +79,11 @@ class CleanPDB(PDB.Select):
         hetfield, resseq, icode = residue.get_id()
         if hetfield == '':
             hetfield = ' '
+        if self.keep_res_only:
+            if residue.resname.strip() in self.keep_res_only:
+                return True
+            else:
+                return False
         # If you want to remove residues that are not normal, remove them
         if self.remove_res_hetero and hetfield[0] != ' ' and residue.resname.strip() not in self.keep_chemicals:
             return False
@@ -98,7 +108,8 @@ class CleanPDB(PDB.Select):
 
 def clean_pdb(pdb_file, out_suffix='_clean', outdir=None, force_rerun=False,
               remove_atom_alt=True, keep_atom_alt_id='A', remove_atom_hydrogen=True, add_atom_occ=True,
-              remove_res_hetero=True, keep_chemicals=None, add_chain_id_if_empty='X', keep_chains=None):
+              remove_res_hetero=True, keep_chemicals=None, keep_res_only=None,
+              add_chain_id_if_empty='X', keep_chains=None):
     """Clean a PDB file.
 
     Args:
@@ -112,6 +123,7 @@ def clean_pdb(pdb_file, out_suffix='_clean', outdir=None, force_rerun=False,
         add_atom_occ (bool): Add atom occupancy fields if not present
         remove_res_hetero (bool): Remove all HETATMs
         keep_chemicals (str, list): If removing HETATMs, keep specified chemical names
+        keep_res_only (str, list): Keep ONLY specified resnames, deletes everything else!
         add_chain_id_if_empty (str): Add a chain ID if not present
         keep_chains (str, list): Keep only these chains
 
@@ -131,6 +143,7 @@ def clean_pdb(pdb_file, out_suffix='_clean', outdir=None, force_rerun=False,
                               keep_atom_alt_id=keep_atom_alt_id,
                               add_atom_occ=add_atom_occ,
                               remove_res_hetero=remove_res_hetero,
+                              keep_res_only=keep_res_only,
                               add_chain_id_if_empty=add_chain_id_if_empty,
                               keep_chains=keep_chains,
                               keep_chemicals=keep_chemicals)
