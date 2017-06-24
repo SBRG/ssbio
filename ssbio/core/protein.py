@@ -644,12 +644,8 @@ class Protein(Object):
                           'binding_site_pred': False,
                           'ec_pred': False,
                           'go_pred': False,
-                          'walltime': '72:00:00',
-                          'queue': 'regular',
-                          'slurm_project_id': None,
-                          'slurm_email': '',
-                          'slurm_username': '',
-                          'slurm_memory': '8GB'}
+                          'job_scheduler_header': None,
+                          'additional_options': None}
 
         if kwargs:
             itasser_kwargs.update(kwargs)
@@ -661,11 +657,8 @@ class Protein(Object):
                     binding_site_pred=itasser_kwargs['binding_site_pred'],
                     ec_pred=itasser_kwargs['ec_pred'],
                     go_pred=itasser_kwargs['go_pred'],
-                    walltime=itasser_kwargs['walltime'],
-                    queue=itasser_kwargs['queue'],
-                    slurm_project_id=itasser_kwargs['slurm_project_id'],
-                    slurm_email=itasser_kwargs['slurm_email'],
-                    slurm_username=itasser_kwargs['slurm_username'])
+                    job_scheduler_header=itasser_kwargs['job_scheduler_header'],
+                    additional_options=itasser_kwargs['additional_options'])
 
         log.debug('Prepared I-TASSER modeling folder {}'.format(self.homology_models_dir))
 

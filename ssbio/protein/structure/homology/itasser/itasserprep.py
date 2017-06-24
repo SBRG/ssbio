@@ -14,9 +14,9 @@ class ITASSERPrep():
     """
 
     def __init__(self, ident, seq_str, root_dir, itasser_path, itlib_path,
-                 execute_dir=None, light=True, runtype='local', print_exec=False,
-                 binding_site_pred=False, ec_pred=False, go_pred=False, walltime='72:00:00', queue='regular',
-                 slurm_project_id=None, slurm_email='', slurm_username='', slurm_memory='8GB'):
+                 execute_dir=None, light=True, runtype='local', print_exec=False, java_home='${JAVA_HOME}',
+                 binding_site_pred=False, ec_pred=False, go_pred=False, additional_options=None,
+                 job_scheduler_header=None):
         """Create the I-TASSER folder and also an executable script to run I-TASSER
 
         Args:
@@ -33,12 +33,8 @@ class ITASSERPrep():
             binding_site_pred: If binding site predictions should be run
             ec_pred: If EC number predictions should be run
             go_pred: If GO term predictions should be run
-            walltime: SLURM or Torque walltime
-            queue: SLURM or Torque queue
-            slurm_project_id: SLURM project ID
-            slurm_email: SLURM email
-            slurm_username: SLURM username
-            slurm_memory: Amount of memory to allocate to this run
+            additional_options: Any other additional I-TASSER options, appended to the command
+            job_scheduler_header: Any job scheduling options, prepended as a header to the file
         """
 
         if runtype.lower() not in ['local', 'torque', 'slurm']:
@@ -73,7 +69,10 @@ class ITASSERPrep():
 
         self.model_exists = op.exists(op.join(self.execute_dir, 'model1.pdb'))
 
-        additional_options = ''
+        if not additional_options:
+            additional_options = ''
+        else:
+            additional_options += ' '
         if binding_site_pred:
             additional_options += '-LBS true '
         if ec_pred:
@@ -82,19 +81,14 @@ class ITASSERPrep():
             additional_options += '-GO true '
         self.additional_options = additional_options
 
-        self.queue = queue
-        self.walltime = walltime
+        self.java_home = java_home
+        self.job_scheduler_header = job_scheduler_header
 
         if runtype == 'local' or runtype == 'torque':
             self.prep_script_local(itasser_loc=itasser_path,
                                    itlib_loc=itlib_path)
 
         if runtype == 'slurm':
-            self.slurm_email = slurm_email
-            self.slurm_username = slurm_username
-            self.slurm_project_id = slurm_project_id
-            self.slurm_memory = slurm_memory
-
             self.prep_script_slurm(itasser_loc=itasser_path,
                                    itlib_loc=itlib_path)
 
@@ -114,7 +108,7 @@ class ITASSERPrep():
                                          outdir=itasser_dir)
         return itasser_dir
 
-    def prep_script_local(self, itasser_loc, itlib_loc, java_home='/usr/'):
+    def prep_script_local(self, itasser_loc, itlib_loc):
         script_file = '{}.sh'.format(self.id)
         outfile = os.path.join(self.root_dir, script_file)
 
@@ -123,29 +117,21 @@ class ITASSERPrep():
                    'libdir': itlib_loc,
                    'seqname': self.id,
                    'datadir': self.execute_dir,
-                   'usrname': getpass.getuser(),
-                   'java_home': java_home,
+                   'java_home': self.java_home,
                    'additional_options': self.additional_options,
-                   'queue': self.queue,
-                   'walltime': self.walltime,
                    'light': self.light}
 
         script = open(outfile, 'w')
         script.write('#!/bin/bash -l\n')
 
         if self.runtype == 'torque':
-            script.write('#PBS -l walltime={i[walltime]}\n'.format(i=itasser))
-            script.write('#PBS -q {i[queue]}\n'.format(i=itasser))
-            script.write('#PBS -N {i[seqname]}\n'.format(i=itasser))
-            script.write('#PBS -o {i[seqname]}.out\n'.format(i=itasser))
-            script.write('#PBS -e {i[seqname]}.err\n'.format(i=itasser))
+            script.write('{}'.format(self.job_scheduler_header))
 
         script.write(("{i[executable]} "
                       "-pkgdir {i[pkgdir]} "
                       "-libdir {i[libdir]} "
                       "-seqname {i[seqname]} "
                       "-datadir {i[datadir]} "
-                      "-usrname {i[usrname]} "
                       "-java_home {i[java_home]} "
                       "{i[additional_options]}"
                       "-light {i[light]}\n\n").format(i=itasser))
@@ -163,11 +149,7 @@ class ITASSERPrep():
 
         return outfile
 
-    def prep_script_slurm(self,
-                          itasser_loc,
-                          itlib_loc,
-                          java_home='${JAVA_HOME}'
-                          ):
+    def prep_script_slurm(self, itasser_loc, itlib_loc):
         script_file = '{}.slm'.format(self.id)
         outfile = os.path.join(self.root_dir, script_file)
 
@@ -176,35 +158,19 @@ class ITASSERPrep():
                    'libdir': itlib_loc,
                    'seqname': self.id,
                    'datadir': self.execute_dir,
-                   'usrname': self.slurm_username,
-                   'java_home': java_home,
+                   'java_home': self.java_home,
                    'light': self.light,
-                   'additional_options': self.additional_options,
-                   'slurm_project_id': self.slurm_project_id,
-                   'walltime': self.walltime,
-                   'queue': self.queue,
-                   'slurm_email': self.slurm_email,
-                   'slurm_memory': self.slurm_memory}
+                   'additional_options': self.additional_options}
 
         slurm = open(outfile, 'w')
 
         slurm.write('#!/bin/bash -l\n')
-        slurm.write('#SBATCH -p {i[queue]}\n'.format(i=itasser))
-        slurm.write('#SBATCH -A {i[slurm_project_id]}\n'.format(i=itasser))
-        slurm.write('#SBATCH -t {i[walltime]}\n'.format(i=itasser))
-        slurm.write('#SBATCH --mem={i[slurm_memory]}\n'.format(i=itasser))
-        slurm.write('#SBATCH -J {i[seqname]}\n'.format(i=itasser))
-        slurm.write('#SBATCH --mail-user {i[slurm_email]}\n'.format(i=itasser))
-        slurm.write('#SBATCH -o {i[seqname]}.out\n'.format(i=itasser))
-        slurm.write('#SBATCH -e {i[seqname]}.err\n'.format(i=itasser))
-        slurm.write('#SBATCH --mail-type=BEGIN\n')
-        slurm.write('#SBATCH --mail-type=END\n')
+        slurm.write('{}'.format(self.job_scheduler_header))
         slurm.write(('{i[executable]} '
                      '-pkgdir {i[pkgdir]} '
                      '-libdir {i[libdir]} '
                      '-seqname {i[seqname]} '
                      '-datadir {i[datadir]} '
-                     '-usrname {i[usrname]} '
                      '-java_home {i[java_home]} '
                      '{i[additional_options]}'
                      '-light {i[light]}\n\n').format(i=itasser))
