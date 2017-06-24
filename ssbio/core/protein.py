@@ -641,6 +641,7 @@ class Protein(Object):
         repseq = self.representative_sequence
 
         itasser_kwargs = {'light': True,
+                          'java_home': None,
                           'binding_site_pred': False,
                           'ec_pred': False,
                           'go_pred': False,
@@ -653,6 +654,7 @@ class Protein(Object):
         ITASSERPrep(ident=self.id, seq_str=repseq.seq_str, root_dir=self.homology_models_dir,
                     itasser_path=itasser_installation, itlib_path=itlib_folder,
                     runtype=runtype, print_exec=print_exec, execute_dir=execute_from_dir,
+                    java_home=itasser_kwargs['java_home'],
                     light=itasser_kwargs['light'],
                     binding_site_pred=itasser_kwargs['binding_site_pred'],
                     ec_pred=itasser_kwargs['ec_pred'],

@@ -14,7 +14,7 @@ class ITASSERPrep():
     """
 
     def __init__(self, ident, seq_str, root_dir, itasser_path, itlib_path,
-                 execute_dir=None, light=True, runtype='local', print_exec=False, java_home='${JAVA_HOME}',
+                 execute_dir=None, light=True, runtype='local', print_exec=False, java_home=None,
                  binding_site_pred=False, ec_pred=False, go_pred=False, additional_options=None,
                  job_scheduler_header=None):
         """Create the I-TASSER folder and also an executable script to run I-TASSER
@@ -81,7 +81,10 @@ class ITASSERPrep():
             additional_options += '-GO true '
         self.additional_options = additional_options
 
-        self.java_home = java_home
+        if not java_home:
+            self.java_home = '${JAVA_HOME}'
+        else:
+            self.java_home = java_home
         self.job_scheduler_header = job_scheduler_header
 
         if runtype == 'local' or runtype == 'torque':
