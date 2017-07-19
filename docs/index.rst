@@ -63,9 +63,9 @@ Check out some Jupyter notebook tutorials at :ref:`protein` and :ref:`gempro`.
 Citation
 ========
 
-Currently, use of this package can be cited by our 2016 paper in BMC Systems Biology [1]_, which details the GEM-PRO pipeline. The manuscript for the ``ssbio`` package itself is in preparation at this moment.
+The manuscript for the ``ssbio`` package can be found and cited at [1]_.
 
-.. [1] Brunk, E.*, Mih, N.*, Monk, J., Zhang, Z., O’Brien, E. J., Bliven, S. E., Bourne, P. E., Palsson, B. O. (2016). Systems biology of the structural proteome. BMC Systems Biology, 10(1), 26. http://doi.org/10.1186/s12918-016-0271-6. *Authors contributed equally.
+.. [1] Mih, N. et al. ssbio: A Python Framework for Structural Systems Biology. bioRxiv 165506 (2017). doi:10.1101/165506
 
 
 Index
