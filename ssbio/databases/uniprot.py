@@ -355,7 +355,12 @@ def parse_uniprot_txt_file(infile):
     uniprot_metadata_dict = {}
 
     metadata = old_parse_uniprot_txt_file(infile)
-    metadata_key = list(metadata.keys())[0]
+    metadata_keys = list(metadata.keys())
+
+    if metadata_keys:
+        metadata_key = metadata_keys[0]
+    else:
+        return uniprot_metadata_dict
 
     uniprot_metadata_dict['seq_len'] = len(str(metadata[metadata_key]['sequence']))
     uniprot_metadata_dict['reviewed'] = metadata[metadata_key]['is_reviewed']
