@@ -15,11 +15,9 @@ setup(
         packages=find_packages(),
         package_dir={'ssbio': 'ssbio'},
         package_data={'ssbio': ['ssbio/etc/*']},
-        # scripts=['ssbio/protein/structure/utils/cleanpdb.py',
-        #          'ssbio/protein/sequence/properties/aggregation_propensity.py',
-        #          'ssbio/protein/sequence/properties/thermostability.py',
+        scripts=['ssbio/protein/structure/utils/cleanpdb.py',
         #          'ssbio/protein/structure/utils/mutatepdb.py',
-        #          'ssbio/protein/structure/utils/tleap.py',
+                 'ssbio/protein/structure/utils/tleap.py'],
         #          'ssbio/protein/structure/properties/msms.py'],
         long_description=open('README.md').read(),
         install_requires=required
