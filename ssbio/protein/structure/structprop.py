@@ -543,6 +543,7 @@ class StructProp(Object):
             NGLviewer object
 
         """
+        # TODO: show_structure_file does not work for MMTF files - need to check for that and load accordingly
 
         if not self.structure_path:
             raise ValueError("Structure file not loaded")

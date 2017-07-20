@@ -69,16 +69,16 @@ class StructureIO(PDBIO):
             raise ValueError('{}: unsupported file type'.format(file_type))
 
         # If there are multiple models (NMR), use the first model as the representative structure
-        if len(structure) > 1:
-            self.first_model = structure[0]
-            structure = structure[0]
-            self.set_structure(structure)
-            log.debug('{}: using first model'.format(structure_file))
-        elif len(structure) == 0:
-            log.error('{}: no models in structure!'.format(structure_file))
-        else:
-            self.set_structure(structure)
-            self.first_model = structure[0]
+        # if len(structure) > 1:
+        #     self.first_model = structure[0]
+        #     structure = structure[0]
+        #     self.set_structure(structure)
+        #     log.debug('{}: using first model'.format(structure_file))
+        # elif len(structure) == 0:
+        #     log.error('{}: no models in structure!'.format(structure_file))
+        # else:
+        self.set_structure(structure)
+        self.first_model = structure[0]
 
     def write_pdb(self, custom_name='', out_suffix='', out_dir=None, custom_selection=None, force_rerun=False):
         """Write a new PDB file for the Structure's FIRST MODEL.
@@ -113,10 +113,11 @@ class StructureIO(PDBIO):
         try:
             if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
                 self.save(outfile, custom_selection)
-        except TypeError:
+        except TypeError as e:
             # If trying to save something that can't be saved as a PDB (example: 5iqr.cif), log an error and return None
             # The error thrown by PDBIO.py is "TypeError: %c requires int or char"
             log.error('{}: unable to save structure in PDB file format'.format(self.structure_file))
+            print(e)
             return None
 
         return outfile
