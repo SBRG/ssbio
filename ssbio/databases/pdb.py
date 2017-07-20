@@ -224,12 +224,12 @@ def parse_mmcif_header(infile):
     if '_struct.pdbx_descriptor' in mmdict:
         newdict['description'] = mmdict['_struct.pdbx_descriptor']
     else:
-        log.debug('{}: no description field').format(infile)
+        log.debug('{}: no description field'.format(infile))
 
     if '_database_PDB_rev.date' in mmdict:
         newdict['date'] = mmdict['_database_PDB_rev.date']
     else:
-        log.debug('{}: no date field').format(infile)
+        log.debug('{}: no date field'.format(infile))
 
     if '_exptl.method' in mmdict:
         newdict['experimental_method'] = mmdict['_exptl.method']
