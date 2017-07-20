@@ -20,7 +20,7 @@ def search_ss_bonds(model, threshold=3.0):
         Average distance is 2.05A. Threshold is 3A default.
         Returns iterator with tuples of residues.
 
-        # ADAPTED FROM JOAO RODRIGUES BIOPYTHON GSOC PROJECT
+        ADAPTED FROM JOAO RODRIGUES' BIOPYTHON GSOC PROJECT (http://biopython.org/wiki/GSOC2010_Joao)
     """
 
     # Taken from http://docs.python.org/library/itertools.html

@@ -1,13 +1,34 @@
-#!/usr/bin/env python
+"""This module provides a function to predict the aggregation propensity of proteins, specifically the number 
+    of aggregation-prone segments on an unfolded protein sequence. The main method is a web wrapper for the 
+    AMYLPRED2 web server available at http://aias.biol.uoa.gr/AMYLPRED2/. In order to obtain the best balance between 
+    sensitivity and specificity, we follow the author’s guidelines to consider every 5 consecutive residues agreed 
+    among at least 5 methods contributing 1 to the aggregation propensity
+
+This method is adapted from:
+
+    Tsolis, A. C., Papandreou, N. C., Iconomidou, V. A., & Hamodrakas, S. J. (2013). 'A consensus method for the 
+        prediction of "aggregation-prone" peptides in globular proteins', PloS one, 8/1: e54175. 
+        DOI: 10.1371/journal.pone.0054175
+
+For an example of usage of this parameter in a genome-scale model:
+
+    Chen, K., Gao, Y., Mih, N., O'Brien, E., Yang, L., Palsson, B.O. (2017). 
+        'Thermo-sensitivity of growth is determined by chaperone-mediated proteome re-allocation.',
+        Submitted to PNAS.
+
+"""
 from __future__ import print_function
-import argparse
+
+__author__ = 'Ke Chen'
+__email__ = "kec003@eng.ucsd.edu"
+
 import glob
-import os
+import time
+import requests
 import os.path as op
-import pandas as pd
-from tqdm import tqdm
-from ssbio import utils
-date = utils.Date()
+import ssbio.protein.sequence.utils
+
+# TODO: replace urllib usage with six library
 try:
     from urllib.request import urlopen
     from urllib.request import build_opener
@@ -20,47 +41,61 @@ except ImportError:
     from urllib import urlencode
     from urllib2 import build_opener
     from urllib2 import HTTPCookieProcessor
-# TODO: replace urllib usage with six library
 try:
     from http.cookiejar import CookieJar
 except ImportError:
     from cookielib import CookieJar
 
-import glob
-import time
-# import cachetools
-import requests
-
-
-# author: Ke Chen
 
 class AMYLPRED:
     def __init__(self, email, password):
+        """AMYLPRED2 requires registration at http://aias.biol.uoa.gr/AMYLPRED2/. Set your email and password 
+            used to login here.
+        
+        Args:
+            email (str): Account email 
+            password (str): Account password
+             
+        """
+
         self.email = email
         self.password = password
 
     def get_aggregation_propensity(self, seq, cutoff_v=5, cutoff_n=5):
-        """Predict aggregation propensity
+        """Predict aggregation propensity.
 
         Args:
-            seq:     amino acid sequence
-            cutoff_v: the minimal number of methods that agree on
-                      a residue being a aggregation-prone residue
-            cutoff_n: minimal number of consecutive residues to be
-                      considered as a 'stretch' of aggregation-prone region
+            seq (str, Seq, SeqRecord): Amino acid sequence
+            cutoff_v (int): The minimal number of methods that agree on a residue being a aggregation-prone residue
+            cutoff_n (int): The minimal number of consecutive residues to be considered as a 'stretch' of 
+                aggregation-prone region
 
         Returns:
-            aggregation propensity
+            int: Aggregation propensity
 
         """
+
+        seq = ssbio.protein.sequence.utils.cast_to_str(seq)
 
         output = self.consensus_aggregation(seq)
         agg_index, agg_conf = self.write_propensity(len(seq), output, cutoff_v=cutoff_v, cutoff_n=cutoff_n)
 
         return agg_index
 
-    # @cachetools.func.ttl_cache(maxsize=128)
-    def consensus_aggregation(self, seq):
+    def consensus_aggregation(self, seq, outfile, run_amylmuts=False):
+        """Run the AMYLPRED2 web server for an amino acid sequence. 
+        
+        AMYLMUTS is an optional method to run as it is the most time consuming and generates a slightly different
+            result every submission.
+        
+        Args:
+            seq (str): Amino acid sequence as a string
+            outdir (str): Directory to where output files should be saved
+            run_amylmuts (bool): If AMYLMUTS method should be run, default False
+
+        Returns:
+
+        """
         url = "http://aias.biol.uoa.gr/AMYLPRED2/login.php"
         cj = CookieJar()
         opener = build_opener(HTTPCookieProcessor(cj))
@@ -69,21 +104,20 @@ class AMYLPRED:
         data_encoded = data_encoded.encode('ASCII')
         response = opener.open(url, data_encoded)
 
-        # TODO: usually AMYLMUTS is most time consuming,
-        #        and generate a slightly different result every submission
-        #        consider remove this from list to save computational time?
-        #        will need redo statistics
-        Methods = ['AGGRESCAN', 'NETCSSP', 'PAFIG', 'APD', 'AMYLPATTERN',
-                   'SECSTR', 'BSC', 'WALTZ', 'CONFENERGY', 'TANGO']#, 'AMYLMUTS']
+        # AMYLMUTS is most time consuming and generates a slightly different result every submission
+        methods = ['AGGRESCAN', 'NETCSSP', 'PAFIG', 'APD', 'AMYLPATTERN',
+                   'SECSTR', 'BSC', 'WALTZ', 'CONFENERGY', 'TANGO']
 
-        # TODO: can each method be cached?
-
+        if run_amylmuts:
+            methods.append('AMYLMUTS')
 
         output = {}
         timeCounts = 0
-        for met in Methods:
 
-            # first check if there is an existing results file
+        for met in methods:
+            # TODO: utilize saved file as cached resultr
+
+            # First check if there is an existing results file
             existing_results = glob.glob('*_{}.txt'.format(met))
             if existing_results:
                 results_file = existing_results[0]
@@ -91,7 +125,6 @@ class AMYLPRED:
                 values = {'seq_data': seq, 'method': met}
                 data = urlencode(values)
                 data = data.encode('ASCII')
-                # url_input = "http://aias.biol.uoa.gr/AMYLPRED2/input.php"
                 url_input = "http://aias.biol.uoa.gr/cgi-bin/AMYLPRED2/amylpred2.pl"
                 response = opener.open(url_input, data)
                 result = str(response.read())
@@ -101,7 +134,7 @@ class AMYLPRED:
                 ind2 = str.find(result2, '<BR>')
                 job_id = result2[ind1 + 2:ind2]
 
-                # waiting for the calculation to complete
+                # Waiting for the calculation to complete
                 url_result = 'http://aias.biol.uoa.gr/AMYLPRED2/tmp/' + job_id + '.txt'
                 print(url_result)
                 print("Waiting for %s results" % met, end='.')
@@ -114,11 +147,11 @@ class AMYLPRED:
                     else:
                         response = requests.get(url_result)
                         break
-                # TODO: utilize saved file as cached resultr
                 results_file = "{}_{}.txt".format(url_result.split('/')[-1].strip('.txt'), met)
                 with open(results_file, "wb") as handle:
                     for data in response.iter_content():
                         handle.write(data)
+
             print("")
             method, hits = self.get_method_hits(results_file, met)
             # if method.lower() == met.lower():
@@ -203,63 +236,67 @@ class AMYLPRED:
                 output2.append(Hits_res_count[i])
             else:
                 output2.append(0.0)
-        agg_index, agg_conf = self.get_aggregation_index(output2, cutoff_v,
-                                                         cutoff_n)  # these are parameters that you can explore, "5,5" means
+        agg_index, agg_conf = self.get_aggregation_index(output2, cutoff_v, cutoff_n)
+        # These are parameters that you can explore, "5,5" means
         # 5 consecutive residues agreed among at least 5 methods
         # is considered contributing 1 to the aggregation propensity
         return agg_index, agg_conf
 
-if __name__ == '__main__':
-    # load inputs from command line
 
-    p = argparse.ArgumentParser(description='Run AMYLPRED2 on a FASTA file or a folder of FASTA files.')
-    p.add_argument('email', help='http://aias.biol.uoa.gr/AMYLPRED2/login.php Email')
-    p.add_argument('password', help='Password')
-    p.add_argument('infile', help='FASTA file or directory of FASTA files.')
-    args = p.parse_args()
-
-    curr_dir = os.getcwd()
-    # initialize the class with your email and password for the site
-    agg_predictions = agg.AMYLPRED(args.email, args.password)
-
-    prop_dir = 'properties'
-    if not op.exists(prop_dir):
-        os.mkdir(prop_dir)
-
-    agg_prop_dir = op.join(prop_dir,'aggregation_propensity')
-    if not op.exists(agg_prop_dir):
-        os.mkdir(agg_prop_dir)
-
-    # TODO: improve arg parsing for files/dirs
-    # TODO: this was all done in a rush - current dir and infile should be improved
-    if len(args.infile) == 1 and op.isdir(args.infile[0]):
-        os.chdir(args.infile[0])
-        files = glob.glob('*')
-    else:
-        files = args.infile
-
-    results = []
-
-    for file in tqdm(files):
-        if op.isdir(file):
-            continue
-
-        # load the sequence file, also the ID
-        seq_records = fasta.load_fasta_file(file)
-        seq_id = op.splitext(op.basename(file))[0]
-
-        seq_folder = op.join(agg_prop_dir, seq_id)
-        if not op.exists(seq_folder):
-            os.mkdir(seq_folder)
-
-        os.chdir(seq_folder)
-        # TODO: seems useless to return seqrecords to just convert them to strings
-        for seq_record in seq_records:
-            agg_index = agg_predictions.get_aggregation_propensity(str(seq_record.seq))
-            result = {'id':seq_id, 'agg_index':agg_index}
-            results.append(result)
-        os.chdir(curr_dir)
-
-    agg_df = pd.DataFrame(results)
-    agg_df.to_csv(op.join(prop_dir, '{}_aggprop_results.csv'.format(date.short_date)))
-    print('Saved results in properties/aggregation_propensity and summarized in aggprop_results.csv')
+# TODO: clean up execution script to run on FASTA file(s)
+# if __name__ == '__main__':
+#     from ssbio import utils
+#     date = utils.Date()
+#     # load inputs from command line
+#
+#     p = argparse.ArgumentParser(description='Run AMYLPRED2 on a FASTA file or a folder of FASTA files.')
+#     p.add_argument('email', help='http://aias.biol.uoa.gr/AMYLPRED2/login.php Email')
+#     p.add_argument('password', help='Password')
+#     p.add_argument('infile', help='FASTA file or directory of FASTA files.')
+#     args = p.parse_args()
+#
+#     curr_dir = os.getcwd()
+#     # initialize the class with your email and password for the site
+#     agg_predictions = agg.AMYLPRED(args.email, args.password)
+#
+#     prop_dir = 'properties'
+#     if not op.exists(prop_dir):
+#         os.mkdir(prop_dir)
+#
+#     agg_prop_dir = op.join(prop_dir,'aggregation_propensity')
+#     if not op.exists(agg_prop_dir):
+#         os.mkdir(agg_prop_dir)
+#
+#     # TODO: improve arg parsing for files/dirs
+#     # TODO: this was all done in a rush - current dir and infile should be improved
+#     if len(args.infile) == 1 and op.isdir(args.infile[0]):
+#         os.chdir(args.infile[0])
+#         files = glob.glob('*')
+#     else:
+#         files = args.infile
+#
+#     results = []
+#
+#     for file in tqdm(files):
+#         if op.isdir(file):
+#             continue
+#
+#         # load the sequence file, also the ID
+#         seq_records = fasta.load_fasta_file(file)
+#         seq_id = op.splitext(op.basename(file))[0]
+#
+#         seq_folder = op.join(agg_prop_dir, seq_id)
+#         if not op.exists(seq_folder):
+#             os.mkdir(seq_folder)
+#
+#         os.chdir(seq_folder)
+#         # TODO: seems useless to return seqrecords to just convert them to strings
+#         for seq_record in seq_records:
+#             agg_index = agg_predictions.get_aggregation_propensity(str(seq_record.seq))
+#             result = {'id':seq_id, 'agg_index':agg_index}
+#             results.append(result)
+#         os.chdir(curr_dir)
+#
+#     agg_df = pd.DataFrame(results)
+#     agg_df.to_csv(op.join(prop_dir, '{}_aggprop_results.csv'.format(date.short_date)))
+#     print('Saved results in properties/aggregation_propensity and summarized in aggprop_results.csv')

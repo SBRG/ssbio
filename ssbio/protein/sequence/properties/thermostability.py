@@ -1,27 +1,37 @@
-#!/usr/bin/env python
-import argparse
-import glob
-import os
-import os.path as op
-import pandas as pd
-from tqdm import tqdm
-from ssbio import utils
-date = utils.Date()
+"""This module provides functions to predict thermostability parameters (specifically the free energy of unfolding dG) 
+    of an amino acid sequence.
+
+These methods are adapted from:
+
+    Oobatake, M., & Ooi, T. (1993). 'Hydration and heat stability effects on protein unfolding', 
+        Progress in biophysics and molecular biology, 59/3: 237–84.
+    
+    Dill, K. A., Ghosh, K., & Schmit, J. D. (2011). 'Physical limits of cells and proteomes', 
+        Proceedings of the National Academy of Sciences of the United States of America, 
+        108/44: 17876–82. DOI: 10.1073/pnas.1114477108
+
+For an example of usage of these parameters in a genome-scale model:
+
+    Chen, K., Gao, Y., Mih, N., O'Brien, E., Yang, L., Palsson, B.O. (2017). 
+        'Thermo-sensitivity of growth is determined by chaperone-mediated proteome re-allocation.',
+        Submitted to PNAS.
+
+"""
+
+__author__ = 'Ke Chen'
+__email__ = "kec003@eng.ucsd.edu"
 
 import math
-# import cachetools
 import scipy.constants
+import ssbio.protein.sequence.utils
 
-# author: Ke Chen
-
-# R = scipy.constants.R # J/K.mol
-# R is the molar gas constant in cal/K.mol
+# R (molar gas constant) in calories
 r_cal = scipy.constants.R / scipy.constants.calorie
 
-# Oobatake dG
-# dG and dCp from Table 8 in Oobatake paper.
-# dG,dH in unit kcal/mol
-# dCp,dS in unit cal/mol.K
+# Oobatake dG constants
+## dG and dCp from Table 8 in Oobatake paper.
+## dG,dH in unit kcal/mol
+## dCp,dS in unit cal/mol.K
 oobatake_dictionary = {}
 oobatake_dictionary['A'] = {'dG': -0.02, 'dCp': 14.22, 'dH': 0.51, 'dS': 1.82}
 oobatake_dictionary['C'] = {'dG': 1.08, 'dCp': 9.41, 'dH': 5.21, 'dS': 13.85}
@@ -46,7 +56,7 @@ oobatake_dictionary['Y'] = {'dG': 0.91, 'dCp': 30.54, 'dH': 3.73, 'dS': 9.46}
 oobatake_dictionary['U'] = {'dG': 1.08, 'dCp': 9.41, 'dH': 5.21, 'dS': 13.85}  # assume U==C
 
 
-def sum_of_dCp(seq):
+def _sum_of_dCp(seq):
     dCp_sum = 0
     for aa in seq:
         dCp_sum += oobatake_dictionary[aa]['dCp']
@@ -54,59 +64,64 @@ def sum_of_dCp(seq):
 
 
 def calculate_oobatake_dH(seq, temp):
-    """Get dH in units cal/mol
+    """Get dH using Oobatake method in units cal/mol.
 
     Args:
-        seq: amino acid sequence
-        temp: temperature in degrees C
+        seq (str, Seq, SeqRecord): Amino acid sequence
+        temp (float): Temperature in degrees C
 
     Returns:
-        dH
+        float: dH in units cal/mol
 
     """
+
+    seq = ssbio.protein.sequence.utils.cast_to_str(seq)
+
     dH = 0
     temp += 273.15
     T0 = 298.15
     for aa in seq:
         H0 = oobatake_dictionary[aa]['dH'] * 1000
         dH += H0
-    return dH + sum_of_dCp(seq) * (temp - T0)
+    return dH + _sum_of_dCp(seq) * (temp - T0)
 
 
 def calculate_oobatake_dS(seq, temp):
-    """Get dS in units cal/mol
+    """Get dS using Oobatake method in units cal/mol.
 
     Args:
-        seq: amino acid sequence
-        temp: temperature in degrees C
+        seq (str, Seq, SeqRecord): Amino acid sequence
+        temp (float): Temperature in degrees C
 
     Returns:
-        dS
+        float: dS in units cal/mol
 
     """
+
+    seq = ssbio.protein.sequence.utils.cast_to_str(seq)
+
     dS = 0
     temp += 273.15
     T0 = 298.15
-    dCp_sum = sum_of_dCp(seq)
+    dCp_sum = _sum_of_dCp(seq)
     for aa in seq:
         S0 = oobatake_dictionary[aa]['dS']
         dS += S0
     return dS + dCp_sum * math.log(temp / T0)
 
 
-# @cachetools.func.ttl_cache(maxsize=256)
 def calculate_oobatake_dG(seq, temp):
-    """Get dG in units cal/mol
+    """Get free energy of unfolding (dG) using Oobatake method in units cal/mol.
 
     Args:
-        seq: amino acid sequence
-        temp: temperature in degrees C
+        seq (str, Seq, SeqRecord): Amino acid sequence
+        temp (float): Temperature in degrees C
 
     Returns:
-        dG
+        float: Free energy of unfolding dG (J/mol)
 
     """
-    T0 = 298.15
+
     dH = calculate_oobatake_dH(seq, temp)
     dS = calculate_oobatake_dS(seq, temp)
     dG = dH - (temp + 273.15) * dS
@@ -115,47 +130,54 @@ def calculate_oobatake_dG(seq, temp):
     return dG - 563.552
 
 
-# @cachetools.func.ttl_cache(maxsize=128)
 def calculate_dill_dG(seq_len, temp):
-    """Get dG using Dill method in units J/mol
+    """Get free energy of unfolding (dG) using Dill method in units J/mol.
 
     Args:
-        seq_len: length of amino acid sequence
-        temp: temperature in degrees C
+        seq_len (int): Length of amino acid sequence
+        temp (float): Temperature in degrees C
 
     Returns:
-        dG in J/mol
+        float: Free energy of unfolding dG (J/mol)
     """
-    Th = 373.5  # this quantity affects the up-and-down of the dG vs temperature curve (dG values)
-    Ts = 385  # this quantity affects the left-and-right
+    Th = 373.5  # This quantity affects the up-and-down of the dG vs temperature curve (dG values)
+    Ts = 385  # This quantity affects the left-and-right
     temp += 273.15
+
     dH = (4.0 * seq_len + 143) * 1000
     dS = 13.27 * seq_len + 448
     dCp = (0.049 * seq_len + 0.85) * 1000
     dG = dH + dCp * (temp - Th) - temp * dS - temp * dCp * math.log(float(temp) / Ts)
+
     return dG
 
-# @cachetools.func.ttl_cache(maxsize=500)
+
 def get_dG_at_T(seq, temp):
-    """Predict dG at temperature T
+    """Predict dG at temperature T, using best predictions from Dill or Oobatake methods.
 
     Args:
-        seq: sequence string
-        temp: temperature
+        seq (str, Seq, SeqRecord): Amino acid sequence
+        temp (float): Temperature in degrees C
 
     Returns:
-        free energy of unfolding dG (cal/mol)
-        equilibrium constant Keq (for ME2.0 coupling constraint)
-        method used to calculate
+        (tuple): tuple containing:
+
+            dG (float) Free energy of unfolding dG (cal/mol)
+            keq (float): equilibrium constant Keq
+            method (str): Method used to calculate
+            
     """
+
+    seq = ssbio.protein.sequence.utils.cast_to_str(seq)
 
     oobatake = {}
     for t in range(20, 51):
         oobatake[t] = calculate_oobatake_dG(seq, t)
 
     stable = [i for i in oobatake.values() if i > 0]
+
     if len(stable) == 0:
-        # if oobatake dG < 0 for all tempertures [20,50], use Dill dG
+        # If oobatake dG < 0 for all tempertures [20,50], use Dill dG
         # and convert the number from J/mol to cal/mol
         dG = 0.238846 * calculate_dill_dG(len(seq), temp)
         method='Dill'
@@ -168,42 +190,40 @@ def get_dG_at_T(seq, temp):
     return dG, keq, method
 
 
-if __name__ == '__main__':
-    # load inputs from command line
-
-    p = argparse.ArgumentParser(description='Run thermostability calculations on a FASTA file or a folder of FASTA files.')
-    p.add_argument('infile', help='FASTA file or directory of FASTA files.')
-    p.add_argument('--temp', '-t', default=37)
-    args = p.parse_args()
-
-
-    prop_dir = 'properties'
-    if not op.exists(prop_dir):
-        os.mkdir(prop_dir)
-
-    # TODO: improve arg parsing for files/dirs
-    if len(args.infile) == 1 and op.isdir(args.infile[0]):
-        os.chdir(args.infile[0])
-        files = glob.glob('*')
-    else:
-        files = args.infile
-
-    results = []
-
-    for file in tqdm(files):
-        if op.isdir(file):
-            continue
-
-        # load the sequence file, also the ID
-        seq_records = fasta.load_fasta_file(file)
-        seq_id = op.splitext(op.basename(file))[0]
-
-        # TODO: seems useless to return seqrecords to just convert them to strings
-        for seq_record in seq_records:
-            res = ts.get_dG_at_T(str(seq_record.seq), temp=args.temp)
-            result = {'id':seq_id, 'dg':res[0], 'keq':res[1], 'method':res[2]}
-            results.append(result)
-
-    agg_df = pd.DataFrame(results)
-    agg_df.to_csv(op.join(prop_dir, '{}_thermo_results.csv'.format(date.short_date)))
-    print('Saved results in thermo_results.csv')
+# TODO: clean up execution script to run on FASTA file(s)
+# if __name__ == '__main__':
+#     from ssbio import utils
+#     date = utils.Date()
+#     p = argparse.ArgumentParser(description='Run thermostability calculations on a FASTA file or a folder of FASTA files.')
+#     p.add_argument('infile', help='FASTA file or directory of FASTA files.')
+#     p.add_argument('--temp', '-t', default=37)
+#     args = p.parse_args()
+#
+#     prop_dir = 'properties'
+#     if not op.exists(prop_dir):
+#         os.mkdir(prop_dir)
+#
+#     if len(args.infile) == 1 and op.isdir(args.infile[0]):
+#         os.chdir(args.infile[0])
+#         files = glob.glob('*')
+#     else:
+#         files = args.infile
+#
+#     results = []
+#
+#     for file in tqdm(files):
+#         if op.isdir(file):
+#             continue
+#
+#         # load the sequence file, also the ID
+#         seq_records = fasta.load_fasta_file(file)
+#         seq_id = op.splitext(op.basename(file))[0]
+#
+#         for seq_record in seq_records:
+#             res = ts.get_dG_at_T(str(seq_record.seq), temp=args.temp)
+#             result = {'id':seq_id, 'dg':res[0], 'keq':res[1], 'method':res[2]}
+#             results.append(result)
+#
+#     agg_df = pd.DataFrame(results)
+#     agg_df.to_csv(op.join(prop_dir, '{}_thermo_results.csv'.format(date.short_date)))
+#     print('Saved results in thermo_results.csv')

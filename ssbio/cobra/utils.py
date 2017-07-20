@@ -90,9 +90,14 @@ def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif'):
 
 def is_spontaneous(gene, custom_id=None):
     """Input a COBRApy Gene object and check if the ID matches a spontaneous ID regex.
+    
+    Args:
+        gene (Gene): COBRApy Gene
+        custom_id (str): Custom spontaneous ID if not matching regex
 
-    :param gene:
-    :return:
+    Returns:
+        bool: If gene ID matches spontaneous ID
+
     """
     spont = re.compile("[Ss](_|)0001")
     if spont.match(gene.id):
