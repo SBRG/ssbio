@@ -305,22 +305,24 @@ class Protein(Object):
 
         return self.sequences.get_by_id(kegg_id)
 
-    def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None,
-                     set_as_representative=False, download=False, download_metadata_file_type='xml', simple_parse=False,
-                     outdir=None, force_rerun=False):
+    def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None, download=False, outdir=None,
+                     set_as_representative=False, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
-
+        
+        Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
+            Metadata files will be downloaded as XML files.
+        
         Args:
-            uniprot_id:
-            uniprot_seq_file:
-            uniprot_xml_file:
-            set_as_representative:
-            download:
-            outdir:
-            force_rerun:
+            uniprot_id (str): UniProt ID/ACC
+            uniprot_seq_file (str): Path to FASTA file
+            uniprot_xml_file (str): Path to UniProt XML file
+            download (bool): If sequence and metadata files should be downloaded
+            outdir (str): Output directory for sequence and metadata files
+            set_as_representative (bool): If this sequence should be set as the representative one
+            force_rerun (bool): If files should be redownloaded and metadata reloaded
 
         Returns:
-            UniProtProp:
+            UniProtProp: sequence that was loaded into the sequences attribute
 
         """
         if download:
@@ -329,29 +331,30 @@ class Protein(Object):
                 if not outdir:
                     raise ValueError('Output directory must be specified')
 
-        # If we have already loaded the KEGG ID
+        # If we have already loaded the UniProt ID
         if self.sequences.has_id(uniprot_id):
             # Remove it if we want to force rerun things
             if force_rerun:
                 existing = self.sequences.get_by_id(uniprot_id)
                 self.sequences.remove(existing)
-            # Otherwise just get that KEGG object
+            # Otherwise just get that UniProt object
             else:
                 log.debug('{}: UniProt ID already present in list of sequences'.format(uniprot_id))
                 uniprot_prop = self.sequences.get_by_id(uniprot_id)
 
         if not self.sequences.has_id(uniprot_id):
-            uniprot_prop = UniProtProp(uniprot_id, uniprot_seq_file, uniprot_xml_file)
+            uniprot_prop = UniProtProp(uniprot_acc=uniprot_id,
+                                       fasta_path=uniprot_seq_file,
+                                       xml_path=uniprot_xml_file)
             if download:
-                uniprot_prop.download_metadata_file(outdir=outdir, file_type=download_metadata_file_type,
-                                                    simple_parse=simple_parse, force_rerun=force_rerun)
+                uniprot_prop.download_metadata_file(outdir=outdir, force_rerun=force_rerun)
                 uniprot_prop.download_seq_file(outdir=outdir, force_rerun=force_rerun)
 
             # Also check if UniProt sequence matches a potentially set representative sequence
             if self.representative_sequence:
                 # Test equality
                 if uniprot_prop.equal_to(self.representative_sequence):
-                    # Update the representative sequence field with UniProt metadata
+                    # Update the representative sequence field with UniProt metadata if it is the same
                     self.representative_sequence.update(uniprot_prop.get_dict(), only_keys=['sequence_path',
                                                                                             'metadata_path',
                                                                                             'kegg',

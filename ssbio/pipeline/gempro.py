@@ -378,7 +378,6 @@ class GEMPRO(Object):
         return list(set(kegg_missing))
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
-                                     download_metadata_file_type='xml', simple_parse=False,
                                      set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service.
         Also download all metadata and sequences.
@@ -423,8 +422,6 @@ class GEMPRO(Object):
                     try:
                         uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
                                                               set_as_representative=set_as_representative,
-                                                              download_metadata_file_type=download_metadata_file_type,
-                                                              simple_parse=simple_parse,
                                                               force_rerun=force_rerun)
                     except HTTPError as e:
                         log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
@@ -437,8 +434,7 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes mapped to UniProt'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> UniProt. See the "df_uniprot_metadata" attribute for a summary dataframe.')
 
-    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, download_metadata_file_type='xml',
-                               simple_parse=False, set_as_representative=True):
+    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, set_as_representative=True):
         """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
@@ -464,8 +460,6 @@ class GEMPRO(Object):
             try:
                 uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
                                                          outdir=outdir, download=True,
-                                                         download_metadata_file_type=download_metadata_file_type,
-                                                         simple_parse=simple_parse,
                                                          set_as_representative=set_as_representative)
             except HTTPError as e:
                 log.error('{}, {}: unable to complete web request'.format(g, u))
@@ -478,7 +472,8 @@ class GEMPRO(Object):
     def df_uniprot_metadata(self):
         uniprot_pre_df = []
         df_cols = ['gene', 'uniprot', 'reviewed', 'gene_name', 'kegg', 'refseq', 'num_pdbs', 'pdbs', 'ec_number',
-                   'pfam', 'seq_len', 'description', 'entry_version', 'seq_version', 'sequence_file', 'metadata_file']
+                   'pfam', 'seq_len', 'description', 'entry_date', 'entry_version', 'seq_date', 'seq_version',
+                   'sequence_file', 'metadata_file']
 
         for g in self.genes:
             uniprot_mappings = g.protein.filter_sequences(UniProtProp)

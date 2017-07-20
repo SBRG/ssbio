@@ -78,6 +78,15 @@ class SeqProp(Object):
         self.uniprot = None
         self.gene_name = None
         self.pdbs = None
+        self.go = None
+        self.pfam = None
+        self.ec_number = None
+
+        # Annotations and features
+        # If metadata file is provided, any existing letter annotations and features are copied
+        self.annotations = {}
+        self.letter_annotations = {}
+        self.features = []
 
         # Sequence information
         # SeqRecord is read directly from a provided file and not kept in memory
@@ -86,30 +95,23 @@ class SeqProp(Object):
             # Load sequence if not provided as a file
             self.seq_record = ssbio.protein.sequence.utils.cast_to_seq_record(obj=seq, id=ident, description=description)
 
-        # File information
+        # Sequence file information
         self._sequence_dir = None
         self.sequence_file = None
         if sequence_path:
             self.load_sequence_path(sequence_path)
+
+        # Metadata file information
         self._metadata_dir = None
         self.metadata_file = None
         if metadata_path:
             self.load_metadata_path(metadata_path)
+
+        # Write a standalone fasta file if specified
         if write_fasta_file:
             if not outfile:
                 raise ValueError('Output path must be specified if you want to write a FASTA file.')
             self.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
-
-        # Alignments
-        # Stores AlignIO objects of this sequence to others
-        # self.sequence_alignments = DictList()
-        # self.structure_alignments = DictList()
-
-        # Annotations and features
-        # Copy SeqRecord annotations, letter annotations, and features from the SeqRecord for JSON saving capabilities
-        self.annotations = {}
-        self.letter_annotations = {}
-        self.features = []
 
     @property
     def sequence_dir(self):
@@ -138,14 +140,13 @@ class SeqProp(Object):
 
     @property
     def seq_record(self):
-        # The SeqRecord object is not kept in memory unless explicitly set, so when saving as a json we only save a
-        # pointer to the file
+        """SeqRecord: Dynamically loaded SeqRecord object from the sequence or metadata file"""
         if not self.sequence_path:
             return self._seq_record
-            # log.error('{}: sequence file not available'.format(self.id))
-            # return None
 
         sr = SeqIO.read(open(self.sequence_path), 'fasta')
+
+        # Associate any existing annotations, letter annotations, or features with this SeqRecord
         sr.annotations = self.annotations
         sr.letter_annotations = self.letter_annotations
         sr.features = self.features
@@ -188,28 +189,28 @@ class SeqProp(Object):
 
     @property
     def seq_str(self):
-        """Get the sequence formatted as a string"""
+        """str: Get the sequence formatted as a string"""
         if not self.seq_record:
             return None
         return ssbio.protein.sequence.utils.cast_to_str(self.seq_record)
 
     @property
     def seq_len(self):
-        """Get the sequence length"""
+        """int: Get the sequence length"""
         if not self.seq_record:
             return 0
         return len(self.seq_record.seq)
 
     @property
     def num_pdbs(self):
-        """Report the number of PDB IDs mapped"""
+        """int: Report the number of PDB IDs mapped"""
         if not self.pdbs:
             return 0
         else:
             return len(self.pdbs)
 
     def load_sequence_path(self, sequence_path):
-        """Load a sequence file and provide pointers to its location
+        """Provide pointers to the paths of the sequence file
 
         Args:
             sequence_path: Path to sequence file
@@ -219,7 +220,7 @@ class SeqProp(Object):
         self.sequence_file = op.basename(sequence_path)
 
     def load_metadata_path(self, metadata_path):
-        """Load a metadata file and provide pointers to its location
+        """Provide pointers to the paths of the metadata file
 
         Args:
             metadata_path: Path to metadata file
@@ -303,7 +304,7 @@ class SeqProp(Object):
         """Add per-residue annotations to the letter_annotations attribute
 
         Args:
-            annotation_name: Name of the key that will be used to access this annotation
+            annotation_name (str): Name of the key that will be used to access this annotation
             letter_annotation (str, list, tuple): Sequence that contains information on the sequence, with the length
                 being equal to the protein sequence length
 
@@ -314,7 +315,7 @@ class SeqProp(Object):
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module.
 
-        Stores statistics in the seq_record.annotations attribute.
+        Stores statistics in the ``annotations`` attribute.
         """
         try:
             pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
@@ -326,7 +327,7 @@ class SeqProp(Object):
     def get_emboss_pepstats(self):
         """Run the EMBOSS pepstats program on the protein sequence.
 
-        Stores statistics in the seq_record.annotations attribute.
+        Stores statistics in the ``annotations`` attribute.
         Saves a .pepstats file of the results where the sequence file is located.
         """
         outfile = ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)

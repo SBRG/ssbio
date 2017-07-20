@@ -4,6 +4,7 @@ import warnings
 import bioservices
 import pandas as pd
 import requests
+from collections import defaultdict
 from dateutil.parser import parse as dateparse
 import ssbio.utils
 from ssbio.protein.sequence.seqprop import SeqProp
@@ -21,57 +22,78 @@ bsup = bioservices.uniprot.UniProt()
 
 
 class UniProtProp(SeqProp):
-    """Class to parse through UniProt metadata all at once
+    """Generic class to store information on a UniProt entry, extended from a SeqProp object.
+
+    The main utilities of this class are to:
+
+    #. Download and/or parse UniProt text or xml files
+    #. Store extra parsed information in attributes
+
+    Attributes:
+        uniprot (str): Main UniProt accession code
+        alt_uniprots (list): Alternate accession codes that point to the main one
+        file_type (str): Metadata file type
+        reviewed (bool): If this entry is a "reviewed" entry. If None, then status is unknown.
+        ec_number (str): EC number
+        pfam (list): PFAM IDs
+        entry_version (str): Date of last update of the UniProt entry
+        seq_version (str): Date of last update of the UniProt sequence
+
     """
 
-    def __init__(self, uniprot_acc, sequence_path=None, xml_path=None, txt_path=None):
+    def __init__(self, uniprot_acc, fasta_path=None, xml_path=None):
+        """Store basic protein sequence properties from a UniProt ID/ACC.
+
+        One or all of the input files can be provided - you might ask why even provide the FASTA if the XML has the
+            sequence in it? The FASTA file can be used in alignment programs run locally.
+
+        Args:
+            uniprot_acc (str): UniProt ID/ACC
+            sequence_path (str): Path to FASTA file
+            xml_path (str): Path to UniProt XML file
+
+        """
+
         if not is_valid_uniprot_id(uniprot_acc):
             raise ValueError("{}: invalid UniProt ID!".format(uniprot_acc))
 
-        if xml_path:
-            metadata_path = xml_path
-            self.file_type = 'xml'
-        elif txt_path:
-            metadata_path = txt_path
-            self.file_type = 'txt'
-        else:
-            metadata_path = None
-            self.file_type = None
-
-        SeqProp.__init__(self, ident=uniprot_acc, sequence_path=sequence_path, metadata_path=metadata_path)
-        self.uniprot = uniprot_acc
-        self.ec_number = None
-        self.entry_version = None
-        self.pfam = None
         self.reviewed = False
+        self.alt_uniprots = None
+        self.taxonomy = None
         self.seq_version = None
-        self.reviewed = False
+        self.seq_date = None
+        self.entry_version = None
+        self.entry_date = None
+
+        SeqProp.__init__(self, ident=uniprot_acc, sequence_path=fasta_path, metadata_path=xml_path)
+        self.uniprot = uniprot_acc
 
     @property
     def seq_record(self):
-        # The SeqRecord object is not kept in memory unless explicitly set, so when saving as a json we only save a
-        # pointer to the file
-        if self.sequence_path:
+        """SeqRecord: Dynamically loaded SeqRecord object from the sequence or metadata file"""
+
+        # The SeqRecord object is not kept in memory unless explicitly set,
+        # so when saving as a json we only save a pointer to the file
+        if self.metadata_path:
+            # Parse the metadata file using SeqIO
+            with open(self.metadata_path) as handle:
+                seq_record = SeqIO.read(handle, 'uniprot-xml')
+        elif self.sequence_path:
             seq_record = SeqIO.read(open(self.sequence_path), 'fasta')
-        elif self.metadata_path:
-            if self.file_type == 'xml':
-                with open(self.metadata_path) as handle:
-                    seq_record = SeqIO.read(handle, "uniprot-xml")
-            elif self.file_type == 'txt':
-                with open(self.metadata_path) as handle:
-                    seq_record = SeqIO.read(handle, "swiss")
         else:
             seq_record = self._seq_record
 
+        # Update the SeqRecord annotations, letter_annotations, and features with the stored ones for this object
         if seq_record:
-            seq_record.letter_annotations = self.letter_annotations
-            seq_record.annotations = self.annotations
-            seq_record.features = self.features
+            seq_record.annotations.update(self.annotations)
+            seq_record.letter_annotations.update(self.letter_annotations)
+            seq_record.features.extend(self.features)
 
         return seq_record
 
     def download_seq_file(self, outdir, force_rerun=False):
-        """Download and load the UniProt sequence file"""
+        """Download and load the UniProt FASTA file"""
+
         uniprot_seq_file = download_uniprot_file(uniprot_id=self.id,
                                                  filetype='fasta',
                                                  outdir=outdir,
@@ -79,50 +101,38 @@ class UniProtProp(SeqProp):
 
         self.load_sequence_path(uniprot_seq_file)
 
-    def download_metadata_file(self, outdir, file_type='xml', simple_parse=False, force_rerun=False):
-        """Download and load the UniProt metadata file"""
+    def download_metadata_file(self, outdir, force_rerun=False):
+        """Download and load the UniProt XML file"""
+
         uniprot_metadata_file = download_uniprot_file(uniprot_id=self.id,
-                                                      filetype=file_type,
                                                       outdir=outdir,
+                                                      filetype='xml',
                                                       force_rerun=force_rerun)
-        self.file_type = file_type
-        self.load_metadata_path(metadata_path=uniprot_metadata_file, simple_parse=simple_parse)
+        self.load_metadata_path(metadata_path=uniprot_metadata_file)
         self.sequence_dir = self.metadata_dir
 
-    def load_metadata_path(self, metadata_path, simple_parse=False):
-        """Load a metadata file and provide pointers to its location
+    def load_metadata_path(self, metadata_path):
+        """Parse a metadata file and also provide pointers to its location
 
         Args:
             metadata_path: Path to metadata file
 
         """
+        # Set directory and filename attributes
         if not op.dirname(metadata_path):
             self.metadata_dir = '.'
         else:
             self.metadata_dir = op.dirname(metadata_path)
         self.metadata_file = op.basename(metadata_path)
 
-        if simple_parse:
-            self.update(parse_uniprot_txt_file(metadata_path), overwrite=True,
-                        only_keys=['description', 'kegg', 'refseq', 'ec_number', 'entry_version', 'gene_name',
-                                   'pfam', 'pdbs', 'reviewed', 'seq_version'])
+        # Parse the metadata file
+        sr = self.seq_record
+        parsed = get_seq_record_metadata(sr)
+        self.update(parsed, overwrite=True)
 
-        else:
-            # TODO: need to rethink the flow here...
-            # Additionally load in metadata from xml or txt files
-            if self.file_type == 'xml':
-                with open(self.metadata_path) as handle:
-                    seq_record = SeqIO.read(handle, "uniprot-xml")
-            elif self.file_type == 'txt':
-                with open(self.metadata_path) as handle:
-                    seq_record = SeqIO.read(handle, "swiss")
-            self.update(seq_record.__dict__, overwrite=True, only_keys=['description'])
-            # TODO: need to parse the dbxrefs for Pfam, refseq, kegg, pdb, and what about "reviewed"?
-            self.update(seq_record.annotations, overwrite=True,
-                        only_keys=['gene_name_primary', 'modified', 'sequence_modified'])
-            self.annotations = seq_record.annotations
-            self.letter_annotations = seq_record.letter_annotations
-            self.features = seq_record.features
+        # Also copy over any letter_annotations and features
+        self.letter_annotations.update(sr.letter_annotations)
+        self.features.extend(sr.features)
 
     def ranking_score(self):
         """Provide a score for this UniProt ID based on reviewed (True=1, False=0) + number of PDBs
@@ -143,6 +153,47 @@ class UniProtProp(SeqProp):
             else:
                 to_return.update({x: getattr(self, x)})
         return to_return
+
+
+def get_seq_record_metadata(sr):
+    """Load relevant attributes and dbxrefs from a parsed UniProt XML file in a SeqRecord.
+
+    Returns:
+        dict: All parsed information 
+
+    """
+    # TODO: What about "reviewed" status?
+    xref_dbs_to_keep = ['GO', 'KEGG', 'PDB', 'PROSITE', 'Pfam', 'RefSeq']
+
+    infodict = {}
+
+    infodict['alt_uniprots'] = list(set(sr.annotations['accessions']).difference([sr.id]))
+    infodict['gene_name'] = sr.annotations['gene_name_primary']
+    infodict['description'] = sr.description
+    infodict['taxonomy'] = sr.annotations['organism']
+
+    infodict['letter_annotations'] = sr.letter_annotations
+    infodict['features'] = sr.features
+
+    infodict['seq_version'] = sr.annotations['sequence_version']
+    infodict['seq_date'] = sr.annotations['sequence_modified']
+    infodict['entry_version'] = sr.annotations['version']
+    infodict['entry_date'] = sr.annotations['modified']
+
+    tmp = defaultdict(list)
+    for xref in sr.dbxrefs:
+        database = xref.split(':', 1)[0]
+        xrefs = xref.split(':', 1)[-1]
+
+        if database in xref_dbs_to_keep:
+            if database == 'PDB':
+                tmp['pdbs'].append(xrefs)
+            else:
+                tmp[database.lower()].append(xrefs)
+
+    infodict.update(tmp)
+
+    return infodict
 
 
 def is_valid_uniprot_id(instring):
@@ -349,7 +400,7 @@ def parse_uniprot_txt_file(infile):
         infile: Path to metadata file
 
     Returns:
-        dict: Metadata dictionaruy
+        dict: Metadata dictionary
 
     """
     uniprot_metadata_dict = {}
