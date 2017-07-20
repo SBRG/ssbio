@@ -1032,6 +1032,9 @@ class Protein(Object):
         """
         # TODO: **kwargs for alignment options
 
+        if not outdir:
+            outdir = self.sequence_dir
+
         # Parse the structure so chain sequences are stored
         my_structure = structprop.parse_structure()
 
