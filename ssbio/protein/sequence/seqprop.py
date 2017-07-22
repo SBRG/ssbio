@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 
 Todo:
     * Include methods to read and write GFF files so features don't need to be stored in memory
+    * load_json for SeqProp objects needs to load letter_annotations as a Bio.SeqRecord._RestrictedDict object, 
+    otherwise newly stored annotations can be of any length
     
 """
 
@@ -42,6 +44,9 @@ class SeqProp(Object):
         uniprot (str): UniProt ID for this protein
         gene_name (str): Gene name encoding this protein
         pdbs (list): List of PDB IDs mapped to this protein
+        go (list): List of GO terms
+        pfam (list): List of PFAMs
+        ec_number: EC numbers for this protein
         seq_record (SeqRecord): Biopython ``SeqRecord`` representation of sequence
         sequence_file (str): Path to FASTA file
         metadata_file (str): Path to generic metadata file
@@ -50,7 +55,7 @@ class SeqProp(Object):
         features (list): Sequence features, copied from any SeqRecord ``features``
     
     """
-    def __init__(self, ident, sequence_path=None, metadata_path=None, seq=None, description="<unknown description>",
+    def __init__(self, ident, sequence_path=None, metadata_path=None, seq=None, description='<unknown description>',
                  write_fasta_file=False, outfile=None, force_rewrite=False):
         """Store basic protein sequence properties.
 
@@ -113,79 +118,73 @@ class SeqProp(Object):
                 raise ValueError('Output path must be specified if you want to write a FASTA file.')
             self.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
 
+        # Parse the SeqRecord in order to copy description, annotations
+        parser = self.seq_record
+
     @property
     def sequence_dir(self):
+        if not self._sequence_dir:
+            raise IOError('No sequence folder set')
         return self._sequence_dir
 
     @sequence_dir.setter
     def sequence_dir(self, path):
         if not op.exists(path):
-            raise ValueError('{}: folder does not exist'.format(path))
+            raise IOError('{}: folder does not exist'.format(path))
 
         self._sequence_dir = path
 
     @property
     def sequence_path(self):
-        if self.sequence_dir and self.sequence_file:
-            path = op.join(self.sequence_dir, self.sequence_file)
-            if not op.exists(path):
-                raise ValueError('{}: file does not exist'.format(path))
-            return path
-        else:
-            if not self.sequence_dir:
-                log.debug('{}: sequence directory not set'.format(self.id))
-            if not self.sequence_file:
-                log.debug('{}: sequence file not available'.format(self.id))
-            return None
-
-    @property
-    def seq_record(self):
-        """SeqRecord: Dynamically loaded SeqRecord object from the sequence or metadata file"""
-        if not self.sequence_path:
-            return self._seq_record
-
-        sr = SeqIO.read(open(self.sequence_path), 'fasta')
-
-        # Associate any existing annotations, letter annotations, or features with this SeqRecord
-        sr.annotations = self.annotations
-        sr.letter_annotations = self.letter_annotations
-        sr.features = self.features
-
-        return sr
-
-    @seq_record.setter
-    def seq_record(self, sr):
-        # Copy SeqRecord annotations and letter annotations for JSON saving capabilities
-        if sr:
-            self.annotations = sr.annotations
-            self.letter_annotations = sr.letter_annotations
-            self.features = sr.features
-        self._seq_record = sr
+        path = op.join(self.sequence_dir, self.sequence_file)
+        if not op.exists(path):
+            raise IOError('{}: file does not exist'.format(path))
+        return path
 
     @property
     def metadata_dir(self):
+        if not self._metadata_dir:
+            raise IOError('No metadata folder set')
         return self._metadata_dir
 
     @metadata_dir.setter
     def metadata_dir(self, path):
         if not op.exists(path):
-            raise ValueError('{}: folder does not exist'.format(path))
+            raise IOError('{}: folder does not exist'.format(path))
 
         self._metadata_dir = path
 
     @property
     def metadata_path(self):
-        if self.metadata_dir and self.metadata_file:
-            path = op.join(self.metadata_dir, self.metadata_file)
-            if not op.exists(path):
-                raise ValueError('{}: file does not exist'.format(path))
-            return path
+        path = op.join(self.metadata_dir, self.metadata_file)
+        if not op.exists(path):
+            raise IOError('{}: file does not exist'.format(path))
+        return path
+
+    @property
+    def seq_record(self):
+        """SeqRecord: Dynamically loaded SeqRecord object from the sequence or metadata file"""
+        if not self.sequence_file:
+            sr = self._seq_record
         else:
-            if not self.metadata_dir:
-                log.debug('{}: metadata directory not set'.format(self.id))
-            if not self.metadata_file:
-                log.debug('{}: metadata file not available'.format(self.id))
-            return None
+            sr = SeqIO.read(self.sequence_path, 'fasta')
+
+        if sr:
+            if self.description == '<unknown description>':
+                self.description = sr.description
+            if not self.annotations:
+                self.annotations = sr.annotations
+            if not self.letter_annotations:
+                self.letter_annotations = sr.letter_annotations
+            if not self.features:
+                self.features = sr.features
+
+        return sr
+
+    @seq_record.setter
+    def seq_record(self, sr):
+        # Only used when a sequence is manually provided as a string, Seq, or SeqRecord
+        self._seq_record = sr
 
     @property
     def seq_str(self):
@@ -203,7 +202,7 @@ class SeqProp(Object):
 
     @property
     def num_pdbs(self):
-        """int: Report the number of PDB IDs mapped"""
+        """int: Report the number of PDB IDs stored in the `pdbs` attribute"""
         if not self.pdbs:
             return 0
         else:
@@ -216,7 +215,13 @@ class SeqProp(Object):
             sequence_path: Path to sequence file
 
         """
-        self.sequence_dir = op.dirname(sequence_path)
+        if not op.exists(sequence_path):
+            return IOError('{}: file does not exist!'.format(sequence_path))
+
+        if not op.dirname(sequence_path):
+            self.sequence_dir = '.'
+        else:
+            self.sequence_dir = op.dirname(sequence_path)
         self.sequence_file = op.basename(sequence_path)
 
     def load_metadata_path(self, metadata_path):
@@ -226,6 +231,9 @@ class SeqProp(Object):
             metadata_path: Path to metadata file
 
         """
+        if not op.exists(metadata_path):
+            return IOError('{}: file does not exist!'.format(metadata_path))
+
         if not op.dirname(metadata_path):
             self.metadata_dir = '.'
         else:
