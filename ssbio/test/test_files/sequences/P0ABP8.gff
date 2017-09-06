@@ -1,0 +1,33 @@
+##gff-version 3
+##sequence-region P0ABP8 1 239
+P0ABP8	UniProtKB	Initiator methionine	1	1	.	.	.	Note=Removed;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:8506346;Dbxref=PMID:8506346	
+P0ABP8	UniProtKB	Chain	2	239	.	.	.	ID=PRO_0000063130;Note=Purine nucleoside phosphorylase DeoD-type	
+P0ABP8	UniProtKB	Region	88	91	.	.	.	Note=Phosphate binding;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11786017;Dbxref=PMID:11786017	
+P0ABP8	UniProtKB	Region	180	182	.	.	.	Note=Purine nucleoside binding;Ontology_term=ECO:0000250;evidence=ECO:0000250|UniProtKB:P50389	
+P0ABP8	UniProtKB	Region	204	205	.	.	.	Note=Purine nucleoside binding;Ontology_term=ECO:0000250;evidence=ECO:0000250|UniProtKB:P50389	
+P0ABP8	UniProtKB	Binding site	5	5	.	.	.	Note=Purine nucleoside%3B shared with dimeric partner;Ontology_term=ECO:0000250;evidence=ECO:0000250|UniProtKB:P50389	
+P0ABP8	UniProtKB	Binding site	21	21	.	.	.	Note=Phosphate%3B via amide nitrogen;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11786017;Dbxref=PMID:11786017	
+P0ABP8	UniProtKB	Binding site	25	25	.	.	.	Note=Phosphate;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11786017;Dbxref=PMID:11786017	
+P0ABP8	UniProtKB	Binding site	44	44	.	.	.	Note=Phosphate%3B shared with dimeric partner;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11786017;Dbxref=PMID:11786017	
+P0ABP8	UniProtKB	Modified residue	27	27	.	.	.	Note=N6-acetyllysine;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:18723842;Dbxref=PMID:18723842	
+P0ABP8	UniProtKB	Beta strand	15	19	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	23	33	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	35	41	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	43	45	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	48	53	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	56	61	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	67	80	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	85	94	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	96	99	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:3OOH	
+P0ABP8	UniProtKB	Beta strand	104	113	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	116	120	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Turn	121	123	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	132	145	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	149	156	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	167	173	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	178	182	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	183	193	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Beta strand	196	206	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Turn	207	209	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	215	220	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	223	237	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	

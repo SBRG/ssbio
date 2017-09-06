@@ -86,7 +86,7 @@ class TestProtein(unittest.TestCase):
         # newitasser.copy_results(copy_to_dir='test_files/structures/test_out/', rename_model_to='haha', force_rerun=True)
 
     def test_load_homology_model(self):
-        newprot = self.prot.load_generic_structure('DEOD', structure_file='test_files/structures/DEOD_ECOLI_model1.pdb')
+        newprot = self.prot.load_pdb_file('DEOD', pdb_file='test_files/structures/DEOD_ECOLI_model1.pdb')
         self.assertTrue(self.prot.structures.has_id('DEOD'))
         self.assertTrue(isinstance(newprot, StructProp))
 
