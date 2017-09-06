@@ -22,14 +22,11 @@ log = logging.getLogger(__name__)
 
 
 class PDBProp(StructProp):
-    """Class to parse through PDB properties
-    """
+    """Class to parse through PDB properties"""
 
-    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
-                 representative_chain=None):
+    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None):
         StructProp.__init__(self, ident, description=description, chains=chains, mapped_chains=mapped_chains,
-                            structure_path=structure_path, file_type=file_type,
-                            representative_chain=representative_chain, is_experimental=True)
+                            is_experimental=True, structure_path=structure_path, file_type=file_type)
         self.experimental_method = None
         self.resolution = None
         self.date = None
