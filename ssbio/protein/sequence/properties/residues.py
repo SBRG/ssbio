@@ -9,10 +9,6 @@ import ssbio.utils
 log = logging.getLogger(__name__)
 
 
-# TODO: function to predict secondary structure (PSIPRED)
-# TODO: function to predict solvent accessibility/resdepth just based on sequence (SCRATCH, RDPred)
-# See more: https://www.researchgate.net/publication/235633540_Recent_Advances_in_Predicting_Functional_Impact_of_Single_Amino_Acid_Polymorphisms_A_Review_of_Useful_Features_Computational_Methods_and_Available_Tools
-
 _aa_property_dict_one = {
     'Aliphatic': ['A', 'I', 'L', 'V'],
     'Aromatic' : ['F', 'H', 'W', 'Y'],
@@ -25,6 +21,30 @@ _aa_property_dict_one = {
 # 'Small': ['A','C','D','G','N','P','S','T','V']
 
 _aa_property_dict_three = {k: [one_to_three(x) for x in v] for k, v in _aa_property_dict_one.items()}
+
+
+_aa_flexibility_dict_one = {'A': -0.605,
+                            'C': -0.692,
+                            'D': -0.279,
+                            'E': -0.16,
+                            'F': -0.719,
+                            'G': -0.537,
+                            'H': -0.662,
+                            'I': -0.682,
+                            'K': -0.043,
+                            'L': -0.631,
+                            'M': -0.626,
+                            'N': -0.381,
+                            'P': -0.271,
+                            'Q': -0.368,
+                            'R': -0.448,
+                            'S': -0.424,
+                            'T': -0.525,
+                            'V': -0.669,
+                            'W': -0.727,
+                            'Y': -0.721}
+
+_aa_flexibility_dict_three = {one_to_three(k): v for k, v in _aa_flexibility_dict_one.items()}
 
 
 def biopython_protein_analysis(inseq):

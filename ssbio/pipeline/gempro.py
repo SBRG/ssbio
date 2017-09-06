@@ -378,7 +378,7 @@ class GEMPRO(Object):
         return list(set(kegg_missing))
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
-                                     set_as_representative=False, force_rerun=False):
+                                     load_letter_annotations_features=True, set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service.
         Also download all metadata and sequences.
 
@@ -394,6 +394,8 @@ class GEMPRO(Object):
                 Dictionary keys must match model genes.
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            load_letter_annotations_features (bool): If annotations, letter_annotations and features should be loaded, 
+                useful for when working with GEM-PRO models since this adds to the object memory/file size when saving
             set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences
             force_rerun (bool): If you want to overwrite any existing mappings and files
 
@@ -421,6 +423,7 @@ class GEMPRO(Object):
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
                     try:
                         uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
+                                                              load_letter_annotations_features=load_letter_annotations_features,
                                                               set_as_representative=set_as_representative,
                                                               force_rerun=force_rerun)
                     except HTTPError as e:
@@ -434,7 +437,8 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes mapped to UniProt'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> UniProt. See the "df_uniprot_metadata" attribute for a summary dataframe.')
 
-    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, set_as_representative=True):
+    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, load_letter_annotations_features=False,
+                               set_as_representative=True):
         """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
@@ -460,6 +464,7 @@ class GEMPRO(Object):
             try:
                 uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
                                                          outdir=outdir, download=True,
+                                                         load_letter_annotations_features=load_letter_annotations_features,
                                                          set_as_representative=set_as_representative)
             except HTTPError as e:
                 log.error('{}, {}: unable to complete web request'.format(g, u))
@@ -555,7 +560,7 @@ class GEMPRO(Object):
 
             if not repseq:
                 sequence_missing.append(g.id)
-            elif not repseq.sequence_path:
+            elif not repseq.sequence_file:
                 sequence_missing.append(g.id)
             else:
                 successfully_mapped_counter += 1
@@ -663,16 +668,16 @@ class GEMPRO(Object):
 
             if g_id in scratch.sspro_summary():
                 # Secondary structure
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.sspro_summary()[g_id])
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.sspro8_summary()[g_id])
-                g.protein.representative_sequence.load_letter_annotations('SS-sspro', scratch.sspro_results()[g_id])
-                g.protein.representative_sequence.load_letter_annotations('SS-sspro8', scratch.sspro8_results()[g_id])
+                g.protein.representative_sequence.annotations.update(scratch.sspro_summary()[g_id])
+                g.protein.representative_sequence.annotations.update(scratch.sspro8_summary()[g_id])
+                g.protein.representative_sequence.letter_annotations['SS-sspro'] = scratch.sspro_results()[g_id]
+                g.protein.representative_sequence.letter_annotations['SS-sspro8'] = scratch.sspro8_results()[g_id]
 
                 # Solvent accessibility
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.accpro_summary()[g_id])
-                g.protein.representative_sequence.seq_record.annotations.update(scratch.accpro20_summary(exposed_buried_cutoff)[g_id])
-                g.protein.representative_sequence.load_letter_annotations('RSA-accpro', scratch.accpro_results()[g_id])
-                g.protein.representative_sequence.load_letter_annotations('RSA-accpro20', scratch.accpro20_results()[g_id])
+                g.protein.representative_sequence.annotations.update(scratch.accpro_summary()[g_id])
+                g.protein.representative_sequence.annotations.update(scratch.accpro20_summary(exposed_buried_cutoff)[g_id])
+                g.protein.representative_sequence.letter_annotations['RSA-accpro'] = scratch.accpro_results()[g_id]
+                g.protein.representative_sequence.letter_annotations['RSA-accpro20'] = scratch.accpro20_results()[g_id]
 
                 counter += 1
             else:
@@ -711,8 +716,8 @@ class GEMPRO(Object):
                 log.debug('{}: loading TMHMM results'.format(g.id))
                 if not tmhmm_dict[g_id]:
                     log.error("{}: missing TMHMM results".format(g.id))
-                g.protein.representative_sequence.seq_record.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g_id]['num_tm_helices']
-                g.protein.representative_sequence.load_letter_annotations('TM-tmhmm', tmhmm_dict[g_id]['sequence'])
+                g.protein.representative_sequence.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g_id]['num_tm_helices']
+                g.protein.representative_sequence.letter_annotations['TM-tmhmm'] = tmhmm_dict[g_id]['sequence']
                 counter += 1
             else:
                 log.error("{}: missing TMHMM results".format(g.id))
@@ -885,8 +890,8 @@ class GEMPRO(Object):
                 if 'model_file' not in hdict or 'file_type' not in hdict:
                     raise KeyError('"model_file" and "file_type" must be keys in the manual input dictionary.')
 
-                new_homology = g.protein.load_generic_structure(ident=hid, structure_file=hdict['model_file'],
-                                                                file_type=hdict['file_type'])
+                new_homology = g.protein.load_pdb(pdb_id=hid, pdb_file=hdict['model_file'],
+                                                  file_type=hdict['file_type'], is_experimental=False)
 
                 if clean:
                     new_homology.load_structure_path(new_homology.clean_structure(outdir=outdir, force_rerun=force_rerun),

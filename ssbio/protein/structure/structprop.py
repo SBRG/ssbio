@@ -26,38 +26,36 @@ log = logging.getLogger(__name__)
 class StructProp(Object):
     """Class for protein structural properties."""
 
-    def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None,
-                 representative_chain=None, is_experimental=False):
+    def __init__(self, ident, description=None, chains=None, mapped_chains=None,
+                 is_experimental=False, structure_path=None, file_type=None):
         """Initialize a StructProp object.
         
         Args:
             ident (str): Unique identifier for this structure 
             description (str): Optional human-readable description
             chains (DictList): A DictList of ChainProp objects 
-            mapped_chains (list): A simple list of chain IDs (str) to indicate what chains should be analyzed 
+            mapped_chains (list): A simple list of chain IDs (str) to indicate what chains should be analyzed
+            is_experimental (bool): Flag to indicate if structure is an experimental or computational model
             structure_path (str): Path to structure file 
-            file_type (str): File type of structure file
-            representative_chain (str): Chain ID which "best" represents a gene 
-            is_experimental (bool): Flag to indicate if structure is an experimental or computatational model
+            file_type (str): File type of structure file - ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``,
+                ``xml.gz``, ``mmtf``, ``mmtf.gz``
+
         """
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
 
-        # TODO: DEPRECATED!
-        self.reference_seq_top_coverage = None
-
         # Chain information
         # chains is a DictList of ChainProp objects
+        # If you run self.parse_structure(), all chains will be parsed and stored here
+        # Use mapped_chains below to keep track of chains you are interested in
         self.chains = DictList()
         if chains:
             self.add_chain_ids(chains)
-        # representative_chain is a pointer to the chain in self.chains that matches a reference seq
-        self.representative_chain = None
-        if representative_chain:
-            self.representative_chain = self.chains.get_by_id(representative_chain)
         # mapped_chains is an ordered list of mapped chain IDs which would come from BLAST or the best_structures API
-        self.mapped_chains = ssbio.utils.force_list(mapped_chains)
+        self.mapped_chains = []
+        if mapped_chains:
+            self.add_mapped_chain_ids(mapped_chains)
 
         # File information
         self.file_type = file_type

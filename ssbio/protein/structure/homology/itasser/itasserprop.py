@@ -15,23 +15,25 @@ log = logging.getLogger(__name__)
 
 
 class ITASSERProp(StructProp):
-    """Parse all available information for an I-TASSER modeling run.
+    """Parse all available information for a local I-TASSER modeling run.
+
+    Initializes a class to collect I-TASSER modeling information and optionally copy results to a new directory.
+
+    Args:
+        original_results_path: Path to I-TASSER modeling folder
+        create_dfs: If data frames should be created for COACH results
+        coach_results_folder: Path to original COACH results
+        model_to_use: Which I-TASSER model to use. Default is "model1"
+
     """
 
     # TODO: parse   1) predicted SS   2) predicted solvent acc    3) B-factor
     _main_files_to_copy = ['seq.dat', 'cscore']
     _coach_files_to_copy = ['Bsites.inf', 'EC.dat', 'GO_MF.dat', 'GO_BP.dat', 'GO_CC.dat']
 
-    def __init__(self, ident, original_results_path, create_dfs=False,
-                 coach_results_folder='model1/coach', model_to_use='model1'):
-        """Initialize a class to collect I-TASSER modeling information and optionally copy results to a new directory.
+    def __init__(self, ident, original_results_path, create_dfs=False, coach_results_folder='model1/coach',
+                 model_to_use='model1'):
 
-        Args:
-            original_results_path: Path to I-TASSER modeling folder
-            create_dfs: If data frames should be created for COACH results
-            coach_results_folder: Path to original COACH results
-            model_to_use: Which I-TASSER model to use. Default is "model1"
-        """
         if not op.exists(original_results_path):
             raise OSError('{}: folder does not exist'.format(original_results_path))
 

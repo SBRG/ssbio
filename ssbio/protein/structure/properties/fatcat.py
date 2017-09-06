@@ -10,7 +10,7 @@ __author__ = "Anand Sastry"
 __email__ = "avsastry@eng.ucsd.edu"
 
 
-def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=False, force_rerun=False):
+def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=False, print_cmd=False, force_rerun=False):
     """Run FATCAT on two PDB files, and return the path of the XML result file.
     
     Args:
@@ -31,6 +31,8 @@ def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=
 
     # Run FATCAT on the structures, print the XML of the result to stdout
     fatcat_cmd = '{} -file1 {} -file2 {} -outFile {}'.format(fatcat_sh, structure_path_1, structure_path_2, outfile)
+    if print_cmd:
+        print(fatcat_cmd)
     ssbio.utils.command_runner(fatcat_cmd, force_rerun_flag=force_rerun, outfile=outfile, silent=silent)
 
     return outfile
