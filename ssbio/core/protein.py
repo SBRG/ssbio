@@ -38,24 +38,26 @@ Todo:
 """
 
 class Protein(Object):
-    """Generic class to store information on a protein, which may consist of multiple sequences and structures.
+
+    """Store information on a protein that represents the translated unit of a gene.
 
     The main utilities of this class are to:
     
-    #. Load, parse, and store multiple sources of the same or similar (ie. from different strains) protein sequences 
-        as ``SeqProp`` objects
-    #. Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` objects
+    #. Load, parse, and store multiple sources of the same or similar (ie. from different strains) \
+        protein sequences as ``SeqProp`` objects in the ``sequences`` attribute
+    #. Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` \
+        objects in the ``structures`` attribute
     #. Calculate, store, and access sequence alignments to stored sequences or structures
-    #. Provide summaries of alignments
+    #. Provide summaries of alignments and mutations seen
     #. Map between residue numbers of sequences and structures
 
     Attributes:
         id (str): Unique identifier for this protein
         description (str): Optional description for this protein
-        sequences (DictList): Path to FASTA file
-        structures (DictList): Path to generic metadata file
+        sequences (DictList): Stored amino acids which are related to this protein
+        structures (DictList): Stored protein structures which are related to this protein
         representative_sequence (SeqProp): Sequence set to represent this protein
-        representative_structure (StructProp): Structure set to represent this protein, cleaned and monomeric
+        representative_structure (StructProp): Structure set to represent this protein, optionally in monomeric form
         representative_chain (str): Chain ID in the representative structure which best represents a sequence
         representative_chain_seq_coverage (float): Percent identity of sequence coverage for the representative chain
         sequence_alignments (DictList): Pairwise or multiple sequence alignments stored as 
@@ -276,27 +278,26 @@ class Protein(Object):
                 kegg_prop.download_seq_file(outdir, force_rerun)
                 kegg_prop.download_metadata_file(outdir, force_rerun)
 
-            if kegg_prop.sequence_path:
-                # Check if KEGG sequence matches a potentially set representative sequence
-                # Do not add any info if a UniProt ID was already mapped though, we want to use that
-                if self.representative_sequence:
-                    if not self.representative_sequence.uniprot:
-                        if kegg_prop.equal_to(self.representative_sequence):
-                            # Update the representative sequence field with KEGG metadata
-                            self.representative_sequence.update(kegg_prop.get_dict(), only_keys=['sequence_path',
-                                                                                                 'metadata_path',
-                                                                                                 'kegg',
-                                                                                                 'description',
-                                                                                                 'taxonomy',
-                                                                                                 'id',
-                                                                                                 'pdbs',
-                                                                                                 'uniprot',
-                                                                                                 'seq_record',
-                                                                                                 'gene_name',
-                                                                                                 'refseq'])
-                        else:
-                            # TODO: add option to use manual or kegg sequence if things do not match
-                            log.warning('{}: representative sequence does not match mapped KEGG sequence.'.format(self.id))
+            # Check if KEGG sequence matches a potentially set representative sequence
+            # Do not add any info if a UniProt ID was already mapped though, we want to use that
+            if self.representative_sequence:
+                if not self.representative_sequence.uniprot:
+                    if kegg_prop.equal_to(self.representative_sequence):
+                        # Update the representative sequence field with KEGG metadata
+                        self.representative_sequence.update(kegg_prop.get_dict(), only_keys=['sequence_path',
+                                                                                             'metadata_path',
+                                                                                             'kegg',
+                                                                                             'description',
+                                                                                             'taxonomy',
+                                                                                             'id',
+                                                                                             'pdbs',
+                                                                                             'uniprot',
+                                                                                             'seq_record',
+                                                                                             'gene_name',
+                                                                                             'refseq'])
+                    else:
+                        # TODO: add option to use manual or kegg sequence if things do not match
+                        log.warning('{}: representative sequence does not match mapped KEGG sequence.'.format(self.id))
 
             self.sequences.append(kegg_prop)
 
@@ -306,7 +307,7 @@ class Protein(Object):
         return self.sequences.get_by_id(kegg_id)
 
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None, download=False, outdir=None,
-                     set_as_representative=False, force_rerun=False):
+                     load_letter_annotations_features=True, set_as_representative=False, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
         
         Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
@@ -318,6 +319,8 @@ class Protein(Object):
             uniprot_xml_file (str): Path to UniProt XML file
             download (bool): If sequence and metadata files should be downloaded
             outdir (str): Output directory for sequence and metadata files
+            load_letter_annotations_features (bool): If letter_annotations and features should be loaded, useful for
+                when working with GEM-PRO models since this adds to the object memory/file size when saving
             set_as_representative (bool): If this sequence should be set as the representative one
             force_rerun (bool): If files should be redownloaded and metadata reloaded
 
@@ -347,7 +350,9 @@ class Protein(Object):
                                        fasta_path=uniprot_seq_file,
                                        xml_path=uniprot_xml_file)
             if download:
-                uniprot_prop.download_metadata_file(outdir=outdir, force_rerun=force_rerun)
+                uniprot_prop.download_metadata_file(outdir=outdir,
+                                                    load_letter_annotations_features=load_letter_annotations_features,
+                                                    force_rerun=force_rerun)
                 uniprot_prop.download_seq_file(outdir=outdir, force_rerun=force_rerun)
 
             # Also check if UniProt sequence matches a potentially set representative sequence
@@ -453,8 +458,14 @@ class Protein(Object):
 
     def _representative_sequence_setter(self, seq_prop):
         """Make a copy of a SeqProp object and store it as the representative. Only keep certain attributes"""
+        sp = None
+        mp = None
+        if seq_prop.sequence_file:
+            sp = seq_prop.sequence_path
+        if seq_prop.metadata_file:
+            mp = seq_prop.metadata_path
 
-        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=seq_prop.sequence_path, metadata_path=seq_prop.metadata_path,
+        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=sp, metadata_path=mp,
                                                seq=seq_prop.seq_record)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self.__representative_sequence_attributes)
         if self.representative_sequence.seq_record:
@@ -733,7 +744,17 @@ class Protein(Object):
         return ssbio.utils.clean_df(df)
 
     def map_uniprot_to_pdb(self, seq_ident_cutoff=0.0, outdir=None, force_rerun=False):
-        """"""
+        """Map the representative sequence's UniProt ID to PDB IDs using the PDBe "Best Structures" API.
+
+        Args:
+            seq_ident_cutoff (float): Sequence identity cutoff in decimal form
+            outdir (str): Output directory to cache JSON results of search
+            force_rerun (bool): Force re-downloading of JSON results if they already exist
+
+        Returns:
+            list: A rank-ordered list of PDB IDs that map to the UniProt ID
+
+        """
         if not self.representative_sequence:
             log.error('{}: no representative sequence set, cannot use best structures API'.format(self.id))
             return None
@@ -813,50 +834,57 @@ class Protein(Object):
         df = pd.DataFrame.from_records(best_structures_pre_df, columns=cols).set_index(['pdb_id', 'pdb_chain_id'])
         return ssbio.utils.clean_df(df)
 
-    def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, set_as_representative=False, force_rerun=False):
-        """Load a PDB ID into the structures attribute.
+    def load_pdb(self, pdb_id, mapped_chains=None, pdb_file=None, file_type=None, is_experimental=True,
+                 set_as_representative=False, representative_chain=None, force_rerun=False):
+        """Load a structure ID and optional structure file into the structures attribute.
 
         Args:
             pdb_id (str): PDB ID
             mapped_chains (str, list): Chain ID or list of IDs which you are interested in
             pdb_file (str): Path to PDB file
             file_type (str): Type of PDB file
+            is_experimental (bool): If this structure file is experimental
             set_as_representative (bool): If this structure should be set as the representative structure
-            parse (bool): If the structure's 3D coordinates and chains should be parsed
+            representative_chain (str): If ``set_as_representative`` is ``True``, provide the representative chain ID
+            force_rerun (bool): If the PDB should be reloaded if it is already in the list of structures
 
         Returns:
             PDBProp: The object that is now contained in the structures attribute
 
         """
-        pdb_id = pdb_id.lower()
 
         if self.structures.has_id(pdb_id):
+            # Remove the structure if set to force rerun
             if force_rerun:
                 existing = self.structures.get_by_id(pdb_id)
                 self.structures.remove(existing)
+            # Otherwise just retrieve it
             else:
                 log.debug('{}: PDB ID already present in list of structures'.format(pdb_id))
                 pdb = self.structures.get_by_id(pdb_id)
-
-                if mapped_chains:
-                    pdb.add_mapped_chain_ids(mapped_chains)
                 if pdb_file:
                     pdb.load_structure_path(pdb_file, file_type)
+                if mapped_chains:
+                    pdb.add_mapped_chain_ids(mapped_chains)
 
+        # Create a new StructProp entry
         if not self.structures.has_id(pdb_id):
-            pdb = PDBProp(ident=pdb_id, chains=mapped_chains, structure_path=pdb_file, file_type=file_type)
-            if mapped_chains:
-                pdb.add_mapped_chain_ids(mapped_chains)
+            if is_experimental:
+                pdb = PDBProp(ident=pdb_id, mapped_chains=mapped_chains, structure_path=pdb_file, file_type=file_type)
+            else:
+                pdb = StructProp(ident=pdb_id, mapped_chains=mapped_chains, structure_path=pdb_file, file_type=file_type)
             self.structures.append(pdb)
 
         if set_as_representative:
-            self._representative_structure_setter(pdb)
+            # Parse structure so chains are stored before setting representative
+            pdb.parse_structure()
+            self._representative_structure_setter(structprop=pdb, keep_chain=representative_chain, force_rerun=force_rerun)
 
         return self.structures.get_by_id(pdb_id)
 
     def load_itasser_folder(self, ident, itasser_folder, organize=False, outdir=None, organize_name=None,
-                            set_as_representative=False, create_dfs=False, force_rerun=False):
-        """Load the results folder from I-TASSER, copy structure files over, and create summary dataframes.
+                            set_as_representative=False, representative_chain='X', create_dfs=False, force_rerun=False):
+        """Load the results folder from an I-TASSER run (local, not from the server), copy structure files over, and create summary dataframes.
 
         Args:
             ident: I-TASSER ID
@@ -865,12 +893,12 @@ class Protein(Object):
             outdir (str): Path to directory where files will be copied and organized to
             organize_name (str): Basename of files to rename results to. If not provided, will use id attribute.
             set_as_representative: If this structure should be set as the representative structure
+            representative_chain (str): If ``set_as_representative`` is ``True``, provide the representative chain ID
             create_dfs: If summary dataframes should be created
-            parse: If the structure's 3D coordinates and chains should be parsed
-            force_rerun:
+            force_rerun (bool): If the PDB should be reloaded if it is already in the list of structures
 
         Returns:
-            ITASSERProp: StructProp object stored in the structures list.
+            ITASSERProp: The object that is now contained in the structures attribute
 
         """
         if organize:
@@ -892,7 +920,7 @@ class Protein(Object):
             self.structures.append(itasser)
 
         if set_as_representative:
-            self._representative_structure_setter(itasser)
+            self._representative_structure_setter(structprop=itasser, keep_chain=representative_chain, force_rerun=force_rerun)
 
         if organize:
             if itasser.model_file:
@@ -910,26 +938,6 @@ class Protein(Object):
                 itasser.copy_results(copy_to_dir=outdir, rename_model_to=new_itasser_name, force_rerun=force_rerun)
                 if create_dfs:
                     itasser.save_dataframes(outdir=dest_itasser_extra_dir)
-
-        return self.structures.get_by_id(ident)
-
-    def load_generic_structure(self, ident, structure_file=None, file_type=None, is_experimental=False,
-                               set_as_representative=False, force_rerun=False):
-        if self.structures.has_id(ident):
-            if force_rerun:
-                existing = self.structures.get_by_id(ident)
-                self.structures.remove(existing)
-            else:
-                log.warning('{}: already present in list of structures'.format(ident))
-                model = self.structures.get_by_id(ident)
-
-        if not self.structures.has_id(ident):
-            model = StructProp(ident=ident, structure_path=structure_file, file_type=file_type,
-                               is_experimental=is_experimental)
-            self.structures.append(model)
-
-        if set_as_representative:
-            self._representative_structure_setter(model)
 
         return self.structures.get_by_id(ident)
 
@@ -1039,7 +1047,7 @@ class Protein(Object):
             outdir = self.sequence_dir
 
         # Parse the structure so chain sequences are stored
-        my_structure = structprop.parse_structure()
+        structprop.parse_structure()
 
         if chains:
             chains_to_align_to = ssbio.utils.force_list(chains)
@@ -1113,7 +1121,7 @@ class Protein(Object):
                 aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
                 aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
 
-            if force_rerun:
+            if force_rerun and self.sequence_alignments.has_id(aln.id):
                 self.sequence_alignments.remove(aln.id)
             self.sequence_alignments.append(aln)
 
@@ -1207,17 +1215,13 @@ class Protein(Object):
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
 
-        if use_representatives:
-            full_structure_id = structprop.id
-        else:
-            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
-
+        full_structure_id = '{}-{}'.format(structprop.id, chain_id)
         aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
 
         access_key = '{}_chain_index'.format(aln_id)
         if access_key not in seqprop.letter_annotations:
-            raise KeyError('{}: structure mapping not available in sequence letter annotations. Was alignment parsed? \
-                           Run ``align_seqprop_to_structprop`` with ``parse=True``.'.format(aln_id))
+            raise KeyError('{}: structure mapping {} not available in sequence letter annotations. Was alignment parsed? '
+                           'Run ``align_seqprop_to_structprop`` with ``parse=True``.'.format(access_key, aln_id))
         chain_index_mapping = seqprop.letter_annotations[access_key]
 
         resnum_to_chain_index = {}
@@ -1242,6 +1246,8 @@ class Protein(Object):
             seqprop (SeqProp): SeqProp object
             structprop (StructProp): StructProp object
             chain_id (str): Chain ID to map to
+            use_representatives (bool): If the representative sequence and structure should be used. If True, seqprop,
+                structprop, and chain_id do not need to be defined.
 
         Returns:
             dict: Mapping of resnums to structure residue IDs
@@ -1277,17 +1283,36 @@ class Protein(Object):
             else:
                 final_mapping[k] = rn
 
+                # Additionally report if residues are the same - they could be different in the structure though
+                format_data = {'seqprop_id'       : seqprop.id,
+                               'seqprop_resid'    : seqprop.seq_record[k - 1],
+                               'seqprop_resnum'   : k,
+                               'structprop_id'    : structprop.id,
+                               'structprop_chid'  : chain_id,
+                               'structprop_resid' : chain.seq_record[rn - 1],
+                               'structprop_resnum': rn}
+
+                if seqprop.seq_record[k-1] != chain.seq_record[rn-1]:
+                    log.warning('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} does not match to '
+                                'structure {structprop_id}-{structprop_chid} residue '
+                                '{structprop_resid}{structprop_resnum}. NOTE: this may be due to '
+                                'structural differences'.format(**format_data))
+                else:
+                    log.debug('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} is mapped to '
+                              'structure {structprop_id}-{structprop_chid} residue '
+                              '{structprop_resid}{structprop_resnum}'.format(**format_data))
+
         return final_mapping
 
     def _representative_structure_setter(self, structprop, keep_chain, new_id=None, clean=True, keep_chemicals=None,
-                                         out_suffix='_clean', outdir=None):
+                                         out_suffix='_clean', outdir=None, force_rerun=False):
         """Set the representative structure by 1) cleaning it and 2) copying over attributes of the original structure.
 
         The structure is copied because the chains stored may change, and cleaning it makes a new PDB file.
 
         Args:
             structprop (StructProp): StructProp object to set as representative
-            keep_chain (str, list): List of chains to keep
+            keep_chain (str): Chain ID to keep
             new_id (str): New ID to call this structure, for example 1abc-D to represent PDB 1abc, chain D
             clean (bool): If the PDB file should be cleaned (see ssbio.structure.utils.cleanpdb)
             keep_chemicals (str, list): Keep specified chemical names
@@ -1298,24 +1323,36 @@ class Protein(Object):
             StructProp: representative structure
 
         """
+
+        # Set output directory for cleaned PDB file
         if not outdir:
             outdir = self.structure_dir
             if not outdir:
                 raise ValueError('Output directory must be specified')
 
+        # Create new ID for this representative structure, it cannot be the same as the original one
         if not new_id:
-            new_id = structprop.id
+            c = ssbio.utils.force_list(keep_chain)
+            new_id = '{}-{}'.format(structprop.id, ''.join(c))
+
+        # Remove the structure if set to force rerun
+        if self.structures.has_id(new_id):
+            if force_rerun:
+                existing = self.structures.get_by_id(new_id)
+                self.structures.remove(existing)
 
         # If the structure is to be cleaned, and which chain to keep
         if clean:
             final_pdb = structprop.clean_structure(outdir=outdir, out_suffix=out_suffix,
-                                                   keep_chemicals=keep_chemicals, keep_chains=keep_chain)
+                                                   keep_chemicals=keep_chemicals, keep_chains=keep_chain,
+                                                   force_rerun=force_rerun)
+            log.debug('{}: cleaned structure and saved new file at {}'.format(structprop.id, final_pdb))
         else:
             final_pdb = structprop.structure_path
 
         self.representative_structure = StructProp(ident=new_id, chains=keep_chain, mapped_chains=keep_chain,
-                                                   structure_path=final_pdb, file_type='pdb',
-                                                   representative_chain=keep_chain)
+                                                   structure_path=final_pdb, file_type='pdb')
+        self.representative_chain = keep_chain
 
         self.representative_structure.update(structprop.get_dict_with_chain(chain=keep_chain),
                                              only_keys=self.__representative_structure_attributes,
@@ -1485,7 +1522,8 @@ class Protein(Object):
                                                               out_suffix='-{}_clean'.format(best_chain),
                                                               keep_chain=best_chain,
                                                               keep_chemicals=keep_chemicals,
-                                                              outdir=struct_outdir)
+                                                              outdir=struct_outdir,
+                                                              force_rerun=force_rerun)
                     except:
                         # TODO: inspect causes of these errors - most common is Biopython PDBParser error
                         logging.exception("Unknown error with PDB ID {}".format(pdb.id))
@@ -1535,7 +1573,8 @@ class Protein(Object):
                                                               clean=True,
                                                               out_suffix='-{}_clean'.format(best_chain),
                                                               keep_chain=best_chain,
-                                                              outdir=struct_outdir)
+                                                              outdir=struct_outdir,
+                                                              force_rerun=force_rerun)
                     except:
                         # TODO: inspect causes of these errors - most common is Biopython PDBParser error
                         logging.exception("Unknown error with homology model {}".format(homology.id))
@@ -1678,6 +1717,76 @@ class Protein(Object):
                 except KeyError:
                     log.error('{}: unable to run disulfide bridge finder on {}'.format(self.id, s.id))
 
+    def get_residue_annotations(self, seq_resnum, seq_id=None, struct_id=None, struct_chain_id=None,
+                                use_representatives=True):
+        """Get all residue-level annotations stored in the SeqRecord letter_annotations field for a given residue number
+
+        Uses the representative sequence, structure, and chain ID stored by default. If other properties from other
+            structures are desired, input the proper IDs. An alignment for the given sequence to the structure must
+            be present in the sequence_alignments list.
+
+        Args:
+            seq_resnum (int): Residue number in the sequence
+            seq_id (str): ID of the sequence
+            struct_id (str): ID of the structure
+            struct_chain_id (str): ID of the structure's chain
+            use_representatives (bool): If the representative sequence/structure/chain IDs should be used
+
+        Returns:
+            dict: All available letter_annotations for this residue number
+
+        """
+        from Bio.SeqFeature import SeqFeature, FeatureLocation
+
+        if use_representatives:
+            if seq_id and struct_id and struct_chain_id:
+                log.warning('Overriding sequence, structure, and chain IDs with representatives. Set use_representatives to False if custom IDs are to be used.')
+        else:
+            if not seq_id or not struct_id or not struct_chain_id:
+                raise ValueError('Input sequence, structure, and chain to map between')
+
+        if use_representatives:
+            seq = self.representative_sequence
+            struct = self.representative_structure
+            chain_id = self.representative_chain
+            chain = self.representative_structure.chains.get_by_id(chain_id)
+        else:
+            seq = self.sequences.get_by_id(seq_id)
+            struct = self.structures.get_by_id(struct_id)
+            chain = struct.chains.get_by_id(struct_chain_id)
+
+        log.debug('Using sequence: {}, structure: {}, chain: {}'.format(seq.id, struct.id, chain_id))
+
+        # Create a new SeqFeature
+        f = SeqFeature(FeatureLocation(seq_resnum-1, seq_resnum))
+
+        # TODO: remove later
+        if f.location.end.position != seq_resnum:
+            raise ValueError('Fatal error')
+
+        # Get sequence properties
+        seq_features = f.extract(seq.seq_record)
+        print(seq_features.annotations)
+        print(seq_features.letter_annotations)
+        print('seq_resnum:', f.location.end.position, type(f.location.end.position))
+        print('seq_residue', seq_features.seq, seq_features.seq[0], type(seq_features.seq))
+
+        # Get structure properties
+        mapping_to_structure_resnum = self.map_seqprop_resnums_to_structprop_resnums(resnums=f.location.end.position,
+                                                                                     seqprop=seq,
+                                                                                     structprop=struct,
+                                                                                     chain_id=chain_id)
+
+        # Try finding the residue in the structure
+        if f.location.end.position in mapping_to_structure_resnum:
+            struct_resnum = mapping_to_structure_resnum[f.location.end.position]
+            struct_f = SeqFeature(FeatureLocation(struct_resnum-1, struct_resnum))
+
+            struct_seq_features = struct_f.extract(chain.seq_record)
+            print(struct_seq_features.annotations)
+            print(struct_seq_features.letter_annotations)
+
+
     def sequence_mutation_summary(self, sequence_ids=None, alignment_type=None):
         """Summarize all mutations found in the sequence_alignments attribute.
 
@@ -1791,66 +1900,66 @@ class Protein(Object):
                                                                                        gui=gui)
             return view
 
-    def summarize_protein(self):
-        """Gather all possible attributes in the sequences and structures and summarize everything.
-
-        Returns:
-            dict:
-
-        """
-        d = OrderedDict()
-        repseq = self.representative_sequence
-        if not self.representative_structure:
-            repstruct = StructProp(self.id)
-            repchain = repstruct.representative_chain
-        else:
-            repstruct = self.representative_structure
-            repchain = self.representative_structure.representative_chain
-        single, fingerprint = self.representative_sequence.sequence_mutation_summary()
-        numstrains = len(self.sequences) - 1
-
-        d['Gene ID'] = self.id
-        d['Number of sequences'] = len(self.sequences)
-        d['Number of structures (total)'] = self.num_structures
-        d['Number of structures (experimental)'] = self.num_structures_experimental
-        d['Number of structures (homology models)'] = self.num_structures_homology
-
-        # d['------REPRESENTATIVE SEQUENCE PROPERTIES------')
-        #     d['Sequence ID'] = repseq.id
-        d['Sequence length'] = repseq.sequence_len
-        d['Predicted number of transmembrane helices'] = repseq.seq_record.annotations['num_tm_helix-tmhmm']
-
-        # d['------REPRESENTATIVE STRUCTURE PROPERTIES------')
-        d['Structure ID'] = repstruct.id
-        #     d['Structure representative chain'] = format(repchain.id)))
-        d['Structure is experimental'] = repstruct.is_experimental
-        # d['Structure origin'] = repstruct.taxonomy_name))
-        # d['Structure description'] = repstruct.description))
-        if repstruct.reference_seq_top_coverage:
-            d['Structure coverage of sequence'] = str(repstruct.reference_seq_top_coverage) + '%'
-
-        # d['------ALIGNMENTS SUMMARY------')
-        #     d['Number of sequence alignments'] = len(repseq.sequence_alignments)))
-        #     d['Number of structure alignments'] = len(repseq.structure_alignments)))
-
-        singles = []
-        for k, v in single.items():
-            k = [str(x) for x in k]
-            if len(v) / numstrains >= 0.01:
-                singles.append(''.join(k))  # len(v) is the number of strains
-        d['Mutations that show up in more than 10% of strains'] = ';'.join(singles)
-
-        allfingerprints = []
-        for k, v in fingerprint.items():
-            if len(v) / numstrains >= 0.01:
-                fingerprints = []
-                for m in k:
-                    y = [str(x) for x in m]
-                    fingerprints.append(''.join(y))
-                allfingerprints.append('-'.join(fingerprints))
-        d['Mutation groups that show up in more than 10% of strains'] = ';'.join(allfingerprints)
-
-        return d
+    # def summarize_protein(self):
+    #     """Gather all possible attributes in the sequences and structures and summarize everything.
+    #
+    #     Returns:
+    #         dict:
+    #
+    #     """
+    #     d = OrderedDict()
+    #     repseq = self.representative_sequence
+    #     if not self.representative_structure:
+    #         repstruct = StructProp(self.id)
+    #         repchain = repstruct.representative_chain
+    #     else:
+    #         repstruct = self.representative_structure
+    #         repchain = self.representative_structure.representative_chain
+    #     single, fingerprint = self.representative_sequence.sequence_mutation_summary()
+    #     numstrains = len(self.sequences) - 1
+    #
+    #     d['Gene ID'] = self.id
+    #     d['Number of sequences'] = len(self.sequences)
+    #     d['Number of structures (total)'] = self.num_structures
+    #     d['Number of structures (experimental)'] = self.num_structures_experimental
+    #     d['Number of structures (homology models)'] = self.num_structures_homology
+    #
+    #     # d['------REPRESENTATIVE SEQUENCE PROPERTIES------')
+    #     #     d['Sequence ID'] = repseq.id
+    #     d['Sequence length'] = repseq.sequence_len
+    #     d['Predicted number of transmembrane helices'] = repseq.seq_record.annotations['num_tm_helix-tmhmm']
+    #
+    #     # d['------REPRESENTATIVE STRUCTURE PROPERTIES------')
+    #     d['Structure ID'] = repstruct.id
+    #     #     d['Structure representative chain'] = format(repchain.id)))
+    #     d['Structure is experimental'] = repstruct.is_experimental
+    #     # d['Structure origin'] = repstruct.taxonomy_name))
+    #     # d['Structure description'] = repstruct.description))
+    #     if repstruct.reference_seq_top_coverage:
+    #         d['Structure coverage of sequence'] = str(repstruct.reference_seq_top_coverage) + '%'
+    #
+    #     # d['------ALIGNMENTS SUMMARY------')
+    #     #     d['Number of sequence alignments'] = len(repseq.sequence_alignments)))
+    #     #     d['Number of structure alignments'] = len(repseq.structure_alignments)))
+    #
+    #     singles = []
+    #     for k, v in single.items():
+    #         k = [str(x) for x in k]
+    #         if len(v) / numstrains >= 0.01:
+    #             singles.append(''.join(k))  # len(v) is the number of strains
+    #     d['Mutations that show up in more than 10% of strains'] = ';'.join(singles)
+    #
+    #     allfingerprints = []
+    #     for k, v in fingerprint.items():
+    #         if len(v) / numstrains >= 0.01:
+    #             fingerprints = []
+    #             for m in k:
+    #                 y = [str(x) for x in m]
+    #                 fingerprints.append(''.join(y))
+    #             allfingerprints.append('-'.join(fingerprints))
+    #     d['Mutation groups that show up in more than 10% of strains'] = ';'.join(allfingerprints)
+    #
+    #     return d
 
     def __json_decode__(self, **attrs):
         for k, v in attrs.items():
