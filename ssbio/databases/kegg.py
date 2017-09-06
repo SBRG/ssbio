@@ -15,9 +15,9 @@ bs_kegg = KEGG()
 
 
 class KEGGProp(SeqProp):
-    def __init__(self, kegg_id, sequence_path=None, metadata_path=None):
+    def __init__(self, kegg_id, fasta_path=None, metadata_path=None):
 
-        SeqProp.__init__(self, ident=kegg_id, sequence_path=sequence_path, metadata_path=metadata_path)
+        SeqProp.__init__(self, ident=kegg_id, sequence_path=fasta_path, metadata_path=metadata_path)
 
         if kegg_id:
             self.kegg = kegg_id
