@@ -307,7 +307,7 @@ class Protein(Object):
         return self.sequences.get_by_id(kegg_id)
 
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None, download=False, outdir=None,
-                     load_letter_annotations_features=True, set_as_representative=False, force_rerun=False):
+                     set_as_representative=False, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
         
         Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
@@ -319,8 +319,6 @@ class Protein(Object):
             uniprot_xml_file (str): Path to UniProt XML file
             download (bool): If sequence and metadata files should be downloaded
             outdir (str): Output directory for sequence and metadata files
-            load_letter_annotations_features (bool): If letter_annotations and features should be loaded, useful for
-                when working with GEM-PRO models since this adds to the object memory/file size when saving
             set_as_representative (bool): If this sequence should be set as the representative one
             force_rerun (bool): If files should be redownloaded and metadata reloaded
 
@@ -351,7 +349,6 @@ class Protein(Object):
                                        xml_path=uniprot_xml_file)
             if download:
                 uniprot_prop.download_metadata_file(outdir=outdir,
-                                                    load_letter_annotations_features=load_letter_annotations_features,
                                                     force_rerun=force_rerun)
                 uniprot_prop.download_seq_file(outdir=outdir, force_rerun=force_rerun)
 
@@ -465,8 +462,8 @@ class Protein(Object):
         if seq_prop.metadata_file:
             mp = seq_prop.metadata_path
 
-        self.representative_sequence = SeqProp(ident=seq_prop.id, sequence_path=sp, metadata_path=mp,
-                                               seq=seq_prop.seq_record)
+        self.representative_sequence = SeqProp(ident=seq_prop.id, seq=seq_prop.seq_record,
+                                               sequence_path=sp, metadata_path=mp)
         self.representative_sequence.update(seq_prop.get_dict(), only_keys=self.__representative_sequence_attributes)
         if self.representative_sequence.seq_record:
             self.representative_sequence.seq_record.id = self.representative_sequence.id
@@ -1211,12 +1208,17 @@ class Protein(Object):
             seqprop = self.representative_sequence
             structprop = self.representative_structure
             chain_id = self.representative_chain
+
+            # Alignment ID is the original structure ID + chain ID, which is simply just the repstruct ID as that is combined
+            full_structure_id = structprop.id
+            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+
         else:
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
 
-        full_structure_id = '{}-{}'.format(structprop.id, chain_id)
-        aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
+            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
 
         access_key = '{}_chain_index'.format(aln_id)
         if access_key not in seqprop.letter_annotations:
@@ -1304,7 +1306,7 @@ class Protein(Object):
 
         return final_mapping
 
-    def _representative_structure_setter(self, structprop, keep_chain, new_id=None, clean=True, keep_chemicals=None,
+    def _representative_structure_setter(self, structprop, keep_chain, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None, force_rerun=False):
         """Set the representative structure by 1) cleaning it and 2) copying over attributes of the original structure.
 
@@ -1313,7 +1315,6 @@ class Protein(Object):
         Args:
             structprop (StructProp): StructProp object to set as representative
             keep_chain (str): Chain ID to keep
-            new_id (str): New ID to call this structure, for example 1abc-D to represent PDB 1abc, chain D
             clean (bool): If the PDB file should be cleaned (see ssbio.structure.utils.cleanpdb)
             keep_chemicals (str, list): Keep specified chemical names
             out_suffix (str): Suffix to append to clean PDB file
@@ -1331,11 +1332,9 @@ class Protein(Object):
                 raise ValueError('Output directory must be specified')
 
         # Create new ID for this representative structure, it cannot be the same as the original one
-        if not new_id:
-            c = ssbio.utils.force_list(keep_chain)
-            new_id = '{}-{}'.format(structprop.id, ''.join(c))
+        new_id = '{}-{}'.format(structprop.id, keep_chain)
 
-        # Remove the structure if set to force rerun
+        # Remove the previously set representative structure if set to force rerun
         if self.structures.has_id(new_id):
             if force_rerun:
                 existing = self.structures.get_by_id(new_id)
@@ -1517,7 +1516,7 @@ class Protein(Object):
                 if best_chain:
                     try:
                         self._representative_structure_setter(structprop=pdb,
-                                                              new_id='{}-{}'.format(pdb.id, best_chain),
+                                                              # new_id='{}-{}'.format(pdb.id, best_chain), # 170906 Deprecated use of new_id
                                                               clean=clean,
                                                               out_suffix='-{}_clean'.format(best_chain),
                                                               keep_chain=best_chain,
@@ -1569,7 +1568,7 @@ class Protein(Object):
                         best_chain = 'X'
                     try:
                         self._representative_structure_setter(structprop=homology,
-                                                              new_id='{}-{}'.format(homology.id, best_chain),
+                                                              # new_id='{}-{}'.format(homology.id, best_chain), # 170906 Deprecated use of new_id
                                                               clean=True,
                                                               out_suffix='-{}_clean'.format(best_chain),
                                                               keep_chain=best_chain,
@@ -1769,13 +1768,14 @@ class Protein(Object):
         print(seq_features.annotations)
         print(seq_features.letter_annotations)
         print('seq_resnum:', f.location.end.position, type(f.location.end.position))
-        print('seq_residue', seq_features.seq, seq_features.seq[0], type(seq_features.seq))
+        print('seq_residue:', seq_features.seq, seq_features.seq[0], type(seq_features.seq))
 
         # Get structure properties
         mapping_to_structure_resnum = self.map_seqprop_resnums_to_structprop_resnums(resnums=f.location.end.position,
                                                                                      seqprop=seq,
                                                                                      structprop=struct,
-                                                                                     chain_id=chain_id)
+                                                                                     chain_id=chain_id,
+                                                                                     use_representatives=use_representatives)
 
         # Try finding the residue in the structure
         if f.location.end.position in mapping_to_structure_resnum:
