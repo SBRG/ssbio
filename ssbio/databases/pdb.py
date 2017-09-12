@@ -3,13 +3,14 @@ import json
 import logging
 import os.path as op
 import zlib
+
 import pandas as pd
 import requests
-import ssbio.protein.structure.complexes as cplx
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from lxml import etree
 from six.moves.urllib.request import urlopen, urlretrieve
 
+import ssbio.databases.pisa as pisa
 import ssbio.utils
 from ssbio.protein.structure.structprop import StructProp
 
@@ -56,12 +57,12 @@ class PDBProp(StructProp):
             return
 
         if not existing_pisa_multimer_xml:
-            pisa_xmls = cplx.download_pisa_multimers_xml(pdb_ids=self.id, outdir=outdir,
+            pisa_xmls = pisa.download_pisa_multimers_xml(pdb_ids=self.id, outdir=outdir,
                                                          save_single_xml_files=True)
         else:
             pisa_xmls = {}
             pisa_xmls[self.id] = existing_pisa_multimer_xml
-        pisa_dict = cplx.parse_pisa_multimers_xml(pisa_xmls[self.id], download_structures=True,
+        pisa_dict = pisa.parse_pisa_multimers_xml(pisa_xmls[self.id], download_structures=True,
                                                   outdir=outdir)
 
     def __json_encode__(self):
