@@ -33,8 +33,8 @@ class StructProp(Object):
         Args:
             ident (str): Unique identifier for this structure 
             description (str): Optional human-readable description
-            chains (DictList): A DictList of ChainProp objects 
-            mapped_chains (list): A simple list of chain IDs (str) to indicate what chains should be analyzed
+            chains (str, list): Chain ID or list of IDs
+            mapped_chains (str, list): A chain ID or IDs to indicate what chains should be analyzed
             is_experimental (bool): Flag to indicate if structure is an experimental or computational model
             structure_path (str): Path to structure file 
             file_type (str): File type of structure file - ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``,
