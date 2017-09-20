@@ -27,6 +27,8 @@ def download_pisa_multimers_xml(pdb_ids, save_single_xml_files=True, outdir=None
 
     Args:
         pdb_ids (str, list): PDB ID or list of IDs
+        save_single_xml_files (bool): If single XML files should be saved per PDB ID. If False, if multiple PDB IDs are
+            provided, then a single, combined XML output file is downloaded
         outdir (str): Directory to output PISA XML files
         force_rerun (bool): Redownload files if they already exist
 
@@ -113,9 +115,13 @@ def parse_pisa_multimers_xml(pisa_multimers_xml, download_structures=False, outd
         silently die in the server queue.
 
     Args:
-        pdb_id: 4 character PDB ID
+        pisa_multimers_xml (str): Path to PISA XML output file
+        download_structures (bool): If assembly files should be downloaded
+        outdir (str): Directory to output assembly files
+        force_rerun (bool): Redownload files if they already exist
 
     Returns:
+        dict: of parsed PISA information
 
     """
     if not outdir:

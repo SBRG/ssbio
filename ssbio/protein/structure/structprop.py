@@ -339,7 +339,7 @@ class StructProp(Object):
 
         return final_dict
 
-    def get_disulfide_bridges(self, threshold=3.0):
+    def find_disulfide_bridges(self, threshold=3.0):
         """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp."""
         parsed = self.parse_structure()
         if not parsed:
