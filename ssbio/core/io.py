@@ -4,7 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def save_json(obj, outfile, allow_nan=True, compression=True):
+def save_json(obj, outfile, allow_nan=True, compression=False):
     """Save an ssbio object as a JSON file using json_tricks"""
     if compression:
         with open(outfile, 'wb') as f:
@@ -15,7 +15,7 @@ def save_json(obj, outfile, allow_nan=True, compression=True):
     log.info('Saved {} (id: {}) to {}'.format(type(obj), obj.id, outfile))
 
 
-def load_json(file, new_root_dir=None, decompression=True):
+def load_json(file, new_root_dir=None, decompression=False):
     """Load a JSON file using json_tricks"""
     if decompression:
         with open(file, 'rb') as f:

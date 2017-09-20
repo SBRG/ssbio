@@ -180,6 +180,6 @@ class Object(object):
             to_return.update({x: getattr(self, x)})
         return to_return
 
-    def save_json(self, outfile, compression=True):
+    def save_json(self, outfile, compression=False):
         """Save the object as a JSON file using json_tricks"""
         ssbio.core.io.save_json(self, outfile, compression=compression)
