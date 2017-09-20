@@ -41,8 +41,8 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
     """Run a global pairwise sequence alignment between two sequence strings.
 
     Args:
-        a_seq (str, Seq, SeqRecord): Reference sequence
-        b_seq (str, Seq, SeqRecord): Sequence to be aligned to reference
+        a_seq (str, Seq, SeqRecord, SeqProp): Reference sequence
+        b_seq (str, Seq, SeqRecord, SeqProp): Sequence to be aligned to reference
         engine (str): `biopython` or `needle` - which pairwise alignment program to use
         a_seq_id (str): Reference sequence ID. If not set, is "a_seq"
         b_seq_id (str): Sequence to be aligned ID. If not set, is "b_seq"

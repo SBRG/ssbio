@@ -1,7 +1,8 @@
 ##gff-version 3
 ##sequence-region P0ABP8 1 239
-P0ABP8	UniProtKB	Initiator methionine	1	1	.	.	.	Note=Removed;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:8506346;Dbxref=PMID:8506346	
-P0ABP8	UniProtKB	Chain	2	239	.	.	.	ID=PRO_0000063130;Note=Purine nucleoside phosphorylase DeoD-type	
+##NOTE: edited to comment out some features for testing
+##P0ABP8	UniProtKB	Initiator methionine	1	1	.	.	.	Note=Removed;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:8506346;Dbxref=PMID:8506346
+##P0ABP8	UniProtKB	Chain	2	239	.	.	.	ID=PRO_0000063130;Note=Purine nucleoside phosphorylase DeoD-type
 P0ABP8	UniProtKB	Region	88	91	.	.	.	Note=Phosphate binding;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11786017;Dbxref=PMID:11786017	
 P0ABP8	UniProtKB	Region	180	182	.	.	.	Note=Purine nucleoside binding;Ontology_term=ECO:0000250;evidence=ECO:0000250|UniProtKB:P50389	
 P0ABP8	UniProtKB	Region	204	205	.	.	.	Note=Purine nucleoside binding;Ontology_term=ECO:0000250;evidence=ECO:0000250|UniProtKB:P50389	
@@ -30,4 +31,4 @@ P0ABP8	UniProtKB	Helix	183	193	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000
 P0ABP8	UniProtKB	Beta strand	196	206	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
 P0ABP8	UniProtKB	Turn	207	209	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
 P0ABP8	UniProtKB	Helix	215	220	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
-P0ABP8	UniProtKB	Helix	223	237	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9	
+P0ABP8	UniProtKB	Helix	223	237	.	.	.	Ontology_term=ECO:0000244;evidence=ECO:0000244|PDB:4TS9

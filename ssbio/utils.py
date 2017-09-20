@@ -148,6 +148,41 @@ def clean_df(df, fill_nan=True, drop_empty_columns=True):
     return df.sort_index()
 
 
+def clean_single_dict(indict, prepend_to_keys=None, remove_keys_containing=None):
+    """Clean a dict with values that contain single item iterators to single items
+
+    Args:
+        indict (dict): Dictionary to be cleaned
+        prepend_to_keys (str): String to prepend to all keys
+        remove_keys_containing (str): Text to check for in keys to ignore
+
+    Returns:
+         dict: Cleaned dictionary
+
+    Examples:
+        >>> clean_single_dict(indict={'test1': [1], 'test2': ['H']})
+        {'test1': 1, 'test2': 'H'}
+
+        >>> clean_single_dict(indict={'test1': [1], 'test2': ['H']}, prepend_to_keys='struct_')
+        {'struct_test1': 1, 'struct_test2': 'H'}
+
+        >>> clean_single_dict(indict={'test1': [1], 'ignore': ['H']}, prepend_to_keys='struct_', remove_keys_containing='ignore')
+        {'struct_test1': 1}
+
+    """
+    if not prepend_to_keys:
+        prepend_to_keys = ''
+
+    outdict = {}
+    for k, v in indict.items():
+        if remove_keys_containing:
+            if remove_keys_containing in k:
+                continue
+        outdict[prepend_to_keys + k] = v[0]
+
+    return outdict
+
+
 def deprecated(func):
     """This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emmitted

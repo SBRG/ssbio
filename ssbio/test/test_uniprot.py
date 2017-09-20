@@ -1,108 +1,170 @@
-import unittest
-import six
-
-import ssbio.databases.uniprot
+import pytest
+import os.path as op
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import IUPAC
+from BCBio import GFF
 from ssbio.databases.uniprot import UniProtProp
 
-class TestUniProt(unittest.TestCase):
-    """Unit tests for UniProt
-    """
+@pytest.fixture(scope='class')
+def seq_record_loaded_from_file_example(fasta_path):
+    """Original SeqRecord loaded from sequence file"""
+    return SeqIO.read(fasta_path, "fasta")
 
-    def test_uniprotprop(self):
-        up = UniProtProp(uniprot_acc='P0ABP8', sequence_path='test_files/sequences/P0ABP8.fasta',
-                         metadata_path='test_files/sequences/P0ABP8.txt')
+@pytest.fixture(scope='class')
+def xml_record_loaded_from_file_example(xml_path):
+    """Original SeqRecord loaded from sequence file"""
+    return SeqIO.read(xml_path, "uniprot-xml")
 
-        up_keys = ['bigg','description','ec_number','entry_version','gene_name','id','kegg',
-                   'metadata_file','metadata_path','pdbs','pfam','refseq','reviewed','sequence_file','seq_len',
-                   'sequence_path','seq_version','uniprot']
+@pytest.fixture(scope='class')
+def features_loaded_from_file_example(gff_path):
+    """Original list of features"""
+    with open(gff_path) as handle:
+        feats = list(GFF.parse(handle))
+        return feats[0].features
 
-        for k in up_keys:
-            # print(k)
-            self.assertTrue(hasattr(up, k))
+@pytest.fixture(scope='module')
+def uniprot_id():
+    return 'P0ABP8'
 
-        self.assertEqual(up.bigg, None)
-        self.assertEqual(up.description, ['Inosine phosphorylase', 'PNP', 'Purine nucleoside phosphorylase DeoD-type'])
-        self.assertEqual(up.gene_name, 'deoD')
-        self.assertEqual(up.id, 'P0ABP8')
-        six.assertCountEqual(self, up.kegg, ['ecj:JW4347', 'eco:b4384'])
-        self.assertEqual(up.metadata_file, 'P0ABP8.txt')
-        six.assertCountEqual(self, up.pdbs,
-                        ['1OUM', '4TTA', '4TS3', '1OTY', '1K9S', '3OOE', '1OVG', '3ONV', '3UT6', '1OV6', '4TTJ', '1OTX',
-                         '1OU4', '3OOH', '4TS9', '1A69', '3OPV', '1ECP', '4TTI'])
-        six.assertCountEqual(self, up.refseq, ['NP_418801.1', 'NC_000913.3', 'WP_000224877.1', 'NZ_LN832404.1'])
-        self.assertEqual(up.reviewed, True)
-        self.assertEqual(up.sequence_file, 'P0ABP8.fasta')
-        self.assertEqual(up.seq_len, 239)
-        self.assertEqual(up.uniprot, 'P0ABP8')
+@pytest.fixture(scope='module')
+def fasta_file():
+    return 'P0ABP8.fasta'
 
-    def test_uniprot_valid_id(self):
-        valid_ids = ['P20020',
-                     'V9HWB9',
-                     'A0A024QZK7',
-                     'Q9Y633',
-                     'O75414',
-                     'B7Z3W8',
-                     'V9HWJ2',
-                     'F2Z2Y4',
-                     'A0A024RDQ9',
-                     'P48426']
-        invalid_ids = ['1AAG', '1AN3', '1A8X', '8CEL', 'ASDASDASD##']
+@pytest.fixture(scope='module')
+def xml_file():
+    return 'P0ABP8.xml'
 
-        for u in valid_ids:
-            self.assertTrue(ssbio.databases.uniprot.is_valid_uniprot_id(u))
+@pytest.fixture(scope='module')
+def gff_file():
+    return 'P0ABP8.gff'
 
-        for u in invalid_ids:
-            self.assertFalse(ssbio.databases.uniprot.is_valid_uniprot_id(u))
+@pytest.fixture(scope='module')
+def fasta_path(test_files_sequences, fasta_file):
+    return op.join(test_files_sequences, fasta_file)
 
-    def test_uniprot_reviewed_checker(self):
-        status = {'I1Z9G4': False,
-                  'O14735': True}
+@pytest.fixture(scope='module')
+def xml_path(test_files_sequences, xml_file):
+    return op.join(test_files_sequences, xml_file)
 
-        for f,v in status.items():
-            self.assertEqual(ssbio.databases.uniprot.uniprot_reviewed_checker(f), v)
+@pytest.fixture(scope='module')
+def gff_path(test_files_sequences, gff_file):
+    return op.join(test_files_sequences, gff_file)
 
-    def test_uniprot_reviewed_checker_batch(self):
-        status = {'I1Z9G4': False,
-                  'I3L3I9': False,
-                  'J3KN10': False,
-                  'J3KQV8': False,
-                  'J3KRC4': False,
-                  'O00408': True,
-                  'O00757': True,
-                  'O00764': True,
-                  'O14494': True,
-                  'O14495': True,
-                  'O14735': True}
+@pytest.fixture(scope='class')
+def uniprotprop_with_i(uniprot_id):
+    return UniProtProp(id=uniprot_id,
+                       seq=None)
 
-        test_status = ssbio.databases.uniprot.uniprot_reviewed_checker_batch(list(status.keys()))
-        self.assertEqual(test_status, status)
+@pytest.fixture(scope='class')
+def uniprotprop_with_i_s_m_f(uniprot_id, fasta_path, xml_path, gff_path):
+    return UniProtProp(id=uniprot_id,
+                       seq=None,
+                       fasta_path=fasta_path,
+                       xml_path=xml_path,
+                       gff_path=gff_path)
 
-    # def test_uniprot_metadata(self):
-    #     test_out = {
-    #         'P36959': {'u_description': ['Guanosine monophosphate reductase 1 {ECO:0000255|HAMAP-Rule:MF_03195}',
-    #                                      "Guanosine 5'-monophosphate oxidoreductase 1 {ECO:0000255|HAMAP-Rule:MF_03195}",
-    #                                      'GMPR 1 {ECO:0000255|HAMAP-Rule:MF_03195}',
-    #                                      'GMP reductase 1 {ECO:0000255|HAMAP-Rule:MF_03195}'],
-    #                    'u_ec_number': ['1.7.1.7'],
-    #                    'u_entry_version': '2016-04-13',
-    #                    'u_gene_name': 'GMPR',
-    #                    'u_go': ['GO:0005829; C:cytosol; TAS:Reactome.',
-    #                             'GO:1902560; C:GMP reductase complex; IEA:UniProtKB-EC.',
-    #                             'GO:0003920; F:GMP reductase activity; TAS:ProtInc.',
-    #                             'GO:0046872; F:metal ion binding; IEA:UniProtKB-KW.',
-    #                             'GO:0055086; P:nucleobase-containing small molecule metabolic process; TAS:Reactome.',
-    #                             'GO:0006144; P:purine nucleobase metabolic process; TAS:Reactome.',
-    #                             'GO:0006163; P:purine nucleotide metabolic process; IEA:UniProtKB-HAMAP.',
-    #                             'GO:0043101; P:purine-containing compound salvage; TAS:Reactome.',
-    #                             'GO:0009409; P:response to cold; TAS:ProtInc.',
-    #                             'GO:0044281; P:small molecule metabolic process; TAS:Reactome.'],
-    #                    'u_kegg_id': ['hsa:2766'],
-    #                    'u_pfam': ['PF00478'],
-    #                    'u_refseq': ['NP_006868.3', 'NM_006877.3'],
-    #                    'u_reviewed': True,
-    #                    'u_seq': 'MPRIDADLKLDFKDVLLRPKRSSLKSRAEVDLERTFTFRNSKQTYSGIPIIVANMDTVGTFEMAAVMSQHSMFTAIHKHYSLDDWKLFATNHPECLQNVAVSSGSGQNDLEKMTSILEAVPQVKFICLDVANGYSEHFVEFVKLVRAKFPEHTIMAGNVVTGEMVEELILSGADIIKVGVGPGSVCTTRTKTGVGYPQLSAVIECADSAHGLKGHIISDGGCTCPGDVAKAFGAGADFVMLGGMFSGHTECAGEVFERNGRKLKLFYGMSSDTAMNKHAGGVAEYRASEGKTVEVPYKGDVENTILDILGGLRSTCTYVGAAKLKELSRRATFIRVTQQHNTVFS',
-    #                    'u_seq_len': 345,
-    #                    'u_seq_version': '1994-06-01',
-    #                    'u_uniprot_acc': 'P36959'}}
-    #
-    #     self.assertEqual(ssbio.databases.uniprot.uniprot_metadata('P36959'), test_out)
+
+class TestUniProtPropWithID():
+    """Class to test a bare UniProtProp object with just an ID"""
+
+    def test_init(self, uniprotprop_with_i, uniprot_id):
+        """Test initializing with just an ID"""
+        assert uniprotprop_with_i.id == uniprot_id
+
+        # If just an ID initialized, everything should be empty
+        assert uniprotprop_with_i.seq == None
+        assert uniprotprop_with_i.name == '<unknown name>'
+        assert uniprotprop_with_i.description == '<unknown description>'
+        assert len(uniprotprop_with_i.annotations) == 0
+        assert len(uniprotprop_with_i.letter_annotations) == 0
+        assert len(uniprotprop_with_i.features) == 0
+
+        # Files should not exist and raise errors if accessed
+        assert uniprotprop_with_i.sequence_file == None
+        with pytest.raises(IOError):
+            uniprotprop_with_i.sequence_dir
+        with pytest.raises(IOError):
+            uniprotprop_with_i.sequence_path
+        assert uniprotprop_with_i.metadata_file == None
+        with pytest.raises(IOError):
+            uniprotprop_with_i.metadata_dir
+        with pytest.raises(IOError):
+            uniprotprop_with_i.metadata_path
+        assert uniprotprop_with_i.feature_file == None
+        with pytest.raises(IOError):
+            uniprotprop_with_i.feature_dir
+        with pytest.raises(IOError):
+            uniprotprop_with_i.feature_path
+
+    def test_set_sequence_path(self, uniprotprop_with_i, fasta_path, fasta_file, test_files_sequences):
+        """Test setting the seq attribute with a sequence file"""
+        uniprotprop_with_i.sequence_path = fasta_path
+
+        # Test that file paths are correct
+        assert uniprotprop_with_i.sequence_path == fasta_path
+        assert uniprotprop_with_i.sequence_file == fasta_file
+        assert uniprotprop_with_i.sequence_dir == test_files_sequences
+
+    def test_set_feature_path(self, uniprotprop_with_i, features_loaded_from_file_example,
+                              gff_path, gff_file, test_files_sequences):
+        """Test loading a feature file, and that old features are overwritten"""
+        # Test that the existing feature set is not the same as the new one to be loaded
+        assert len(uniprotprop_with_i.features) != len(features_loaded_from_file_example)
+
+        uniprotprop_with_i.feature_path = gff_path
+
+        # Test that file paths are correct
+        assert uniprotprop_with_i.feature_path == gff_path
+        assert uniprotprop_with_i.feature_file == gff_file
+        assert uniprotprop_with_i.feature_dir == test_files_sequences
+
+        # Test that features cannot be changed
+        with pytest.raises(ValueError):
+            uniprotprop_with_i.features = ['NOFEATURES']
+
+        # Test that number of features stored is same
+        assert len(uniprotprop_with_i.features) == len(features_loaded_from_file_example)
+
+    def test_set_metadata_path(self, uniprotprop_with_i, xml_path, xml_file, test_files_sequences,
+                               xml_record_loaded_from_file_example):
+        uniprotprop_with_i.metadata_path = xml_path
+
+        # Unset sequence and feature paths
+        uniprotprop_with_i.sequence_path = None
+        uniprotprop_with_i.feature_path = None
+
+        # Test that file paths are correct
+        assert uniprotprop_with_i.metadata_path == xml_path
+        assert uniprotprop_with_i.metadata_file == xml_file
+        assert uniprotprop_with_i.metadata_dir == test_files_sequences
+
+        # Test loaded information
+        assert uniprotprop_with_i.description == xml_record_loaded_from_file_example.description
+        assert uniprotprop_with_i.bigg == None
+        for k in ['ecj:JW4347', 'eco:b4384']:
+            assert k in uniprotprop_with_i.kegg
+        for r in ['NP_418801.1', 'WP_000224877.1']:
+            assert r in uniprotprop_with_i.refseq
+        assert uniprotprop_with_i.uniprot == 'P0ABP8'
+        assert uniprotprop_with_i.gene_name == 'deoD'
+        for p in ['1A69', '1ECP', '1K9S', '1OTX', '1OTY', '1OU4', '1OUM', '1OV6', '1OVG',
+                    '3ONV', '3OOE', '3OOH', '3OPV', '3UT6', '4TS3', '4TS9', '4TTA', '4TTI',
+                    '4TTJ', '5I3C', '5IU6']:
+            assert p in uniprotprop_with_i.pdbs
+        for g in ['GO:0004731', 'GO:0005829', 'GO:0006152', 'GO:0006974', 'GO:0016020', 'GO:0019686', 'GO:0042802']:
+            assert g in uniprotprop_with_i.go
+        assert uniprotprop_with_i.pfam == ['PF01048']
+        assert uniprotprop_with_i.ec_number == None  ## TODO: parse
+        assert uniprotprop_with_i.reviewed == False  ## TODO: parse
+        for u in ['Q2M5T3', 'P09743']:
+            assert u in uniprotprop_with_i.alt_uniprots
+        assert uniprotprop_with_i.taxonomy == 'Escherichia coli (strain K12)'
+        assert uniprotprop_with_i.seq_version == 2
+        assert uniprotprop_with_i.seq_date == '2007-01-23'
+        assert uniprotprop_with_i.entry_version == 106
+        assert uniprotprop_with_i.entry_date == '2017-08-30'
+
+        # Test that features are loaded directly from this metadata file
+        assert len(uniprotprop_with_i.features) == len(xml_record_loaded_from_file_example.features)

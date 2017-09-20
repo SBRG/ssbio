@@ -24,6 +24,29 @@ def cast_to_str(obj):
         raise ValueError('Must provide a string, Seq, or SeqRecord object.')
 
 
+def cast_to_seq(obj, alphabet=IUPAC.extended_protein):
+    """Return a Seq representation of a string or SeqRecord object.
+
+    Args:
+        obj (str, Seq, SeqRecord): Sequence string or Biopython SeqRecord object
+        alphabet: See Biopython SeqRecord docs
+
+    Returns:
+        Seq: Seq representation of the sequence
+
+    """
+
+    if isinstance(obj, Seq):
+        return obj
+    if isinstance(obj, SeqRecord):
+        return obj.seq
+    if isinstance(obj, str):
+        obj = obj.upper()
+        return Seq(obj, alphabet)
+    else:
+        raise ValueError('Must provide a string, Seq, or SeqRecord object.')
+
+
 def cast_to_seq_record(obj, alphabet=IUPAC.extended_protein, id="<unknown id>", name="<unknown name>",
                        description="<unknown description>", dbxrefs=None,
                        features=None, annotations=None,

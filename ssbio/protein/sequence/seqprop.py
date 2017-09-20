@@ -1,93 +1,76 @@
-import logging
-from collections import defaultdict
-from copy import deepcopy
-from os import path as op
+import os.path as op
 import requests
-from Bio import SeqIO
+import logging
+from copy import copy
 from slugify import Slugify
-import ssbio.protein.sequence.properties.residues
+
+from Bio import SeqIO
+from BCBio import GFF
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.SeqFeature import SeqFeature, FeatureLocation
+
+from ssbio.core.object import Object
+import ssbio.utils
+import ssbio.databases.pdb
 import ssbio.protein.sequence.utils
 import ssbio.protein.sequence.utils.fasta
-import ssbio.databases.pdb
-import ssbio.utils
-from ssbio.core.object import Object
-from BCBio import GFF
+import ssbio.protein.sequence.properties.residues
 
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
-"""seqprop.py
 
-Todo:
-    * Include methods to read and write GFF files so features don't need to be stored in memory
-    * load_json for SeqProp objects needs to load letter_annotations as a Bio.SeqRecord._RestrictedDict object, 
-    otherwise newly stored annotations can be of any length
-    
-"""
+class SeqProp(SeqRecord, Object):
 
+    """Generic class to represent information for a protein sequence.
 
-class SeqProp(Object):
-    """Generic class to store information on a protein sequence.
+    Extends the Biopython SeqRecord class. The main functionality added is the ability to set and load directly from
+        sequence, metadata, and feature files. Additionally, methods are provided to calculate and store sequence
+        properties in the ``annotations`` and ``letter_annotations`` field of a SeqProp. These can then be accessed
+        for a range of residue numbers.
 
-    The main utilities of this class are to:
-    
-    #. Provide database identifier mappings as top level attributes
-    #. Manipulate a sequence as a Biopython SeqRecord
-    #. Calculate, store, and access sequence features and annotations
-    #. File I/O (sequence and feature files)
-    
     Attributes:
-        bigg (str): BiGG ID for this protein
-        kegg (str): KEGG ID for this protein
-        refseq (str): RefSeq ID for this protein
-        uniprot (str): UniProt ID for this protein
-        gene_name (str): Gene name encoding this protein
-        pdbs (list): List of PDB IDs mapped to this protein
-        go (list): List of GO terms
-        pfam (list): List of PFAMs
-        ec_number: EC numbers for this protein
-        seq_record (SeqRecord): Biopython ``SeqRecord`` representation of sequence
-        sequence_file (str): Path to FASTA file
-        metadata_file (str): Path to generic metadata file
-        annotations (dict): Freeform dictionary of annotations, copied from any SeqRecord ``annotations``
-        letter_annotations (dict): Per-residue annotations, copied from any SeqRecord ``letter_annotations``
-        features (list): Sequence features, copied from any SeqRecord ``features``
-    
-    """
-    def __init__(self, ident, description='<unknown description>', seq=None,
-                 sequence_path=None, metadata_path=None, feature_path=None,
-                 sync_description=True, sync_annotations=True, sync_letter_annotations=True, sync_features=True,
-                 write_fasta_file=False, outfile=None, force_rewrite=False):
-        """Store basic protein sequence properties.
+        id (str): Unique identifier for this protein sequence
+        seq (Seq): Protein sequence as a Biopython Seq object
+        name (str): Optional name for this sequence
+        description (str): Optional description for this sequence
+        bigg (str, list): BiGG IDs mapped to this sequence
+        kegg (str, list): KEGG IDs mapped to this sequence
+        refseq (str, list): RefSeq IDs mapped to this sequence
+        uniprot (str, list): UniProt IDs mapped to this sequence
+        gene_name (str, list): Gene names mapped to this sequence
+        pdbs (list): PDB IDs mapped to this sequence
+        go (str, list): GO terms mapped to this sequence
+        pfam (str, list): PFAMs mapped to this sequence
+        ec_number (str, list): EC numbers mapped to this sequence
+        sequence_file (str): FASTA file for this sequence
+        metadata_file (str): Metadata file (any format) for this sequence
+        feature_file (str): GFF file for this sequence
+        features (list): List of protein sequence features, which define regions of the protein
+        annotations (dict): Annotations of this protein sequence, which summarize global properties
+        letter_annotations (RestrictedDict): Residue-level annotations, which describe single residue properties
 
-        Takes as input a sequence FASTA file, sequence string, Biopython Seq or SeqRecord. You can also provide the
-        path to the metadata file if available (see UniProtProp and KEGGProp classes for parsers). If provided as a
-        string/Seq/SeqRecord object, you can also set write_fasta_file to write them out as FASTA files.
+    """
+
+    def __init__(self, seq, id, name='<unknown name>', description='<unknown description>',
+                 sequence_path=None, metadata_path=None, feature_path=None):
+        """Initialize a SeqProp object with the standard SeqRecord inputs, along with optional paths to files.
 
         Args:
-            ident (str): Identifier of the sequence
-            sequence_path (str): Path to FASTA file of the sequence
-            metadata_path (str): Path to metadata file of the sequence
-            seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
-            description (str): Optional description of the sequence
-            load_description (bool): If the ``description`` field from a SeqRecord object should be copied
-            load_annotations (bool): If the ``annotations`` field from a SeqRecord object should be copied
-            load_letter_annotations (bool): If the ``letter_annotations`` field from a SeqRecord object should be copied
-            load_features (bool): If the ``features`` field from a SeqRecord object should be copied
-            write_fasta_file (bool): If a FASTA file of the sequence should be written
-            outfile (str): Path to output file if write_fasta_file is True
-            force_rewrite (bool): If existing outfile should be overwritten
+            seq (str, Seq, SeqRecord): Protein sequence to load
+            id (str): Unique identifier for this protein sequence
+            name (str): Optional name for this sequence
+            description (str): Optional description for this sequence
+            sequence_path (str): Absolute or relative path to sequence (FASTA) file
+            metadata_path (str): Absolute or relative path to metadata file
+            feature_path (str): Absolute or relative path to feature (GFF) file
+
         """
 
-        Object.__init__(self, id=ident, description=description)
+        Object.__init__(self, id=id, description=description)
 
-        # Sync options
-        self._sync_description = sync_description
-        self._sync_annotations = sync_annotations
-        self._sync_letter_annotations = sync_letter_annotations
-        self._sync_features = sync_features
-
-        # Database identifiers
+        # Top level database identifiers
         self.bigg = None
         self.kegg = None
         self.refseq = None
@@ -98,42 +81,122 @@ class SeqProp(Object):
         self.pfam = None
         self.ec_number = None
 
-        # Annotations and features
-        # If metadata file is provided, any existing letter annotations and features are copied
-        self.annotations = {}
-        self.letter_annotations = {}
-        self.features = []
-
-        # Sequence information
-        self._seq_record = None
+        # Files, sequences, features
         self._sequence_dir = None
         self.sequence_file = None
         self._metadata_dir = None
         self.metadata_file = None
+        self._feature_dir = None
+        self.feature_file = None
+        self._seq = None
+        self._features = None
 
-        # SeqRecord is read directly from a provided file and not kept in memory
-        if seq:
-            # Load sequence if not provided as a file
-            self.seq_record = seq
-            self.load_from_seq_record_attributes(self.seq_record)
+        SeqRecord.__init__(self, seq=seq, id=id, name=name, description=description)
 
-        # Sequence file information
         if sequence_path:
-            self.load_sequence_path(sequence_path)
-
-        # Metadata file information
+            self.sequence_path = sequence_path
         if metadata_path:
-            self.load_metadata_path(metadata_path)
-
-        # Feature file information
+            self.metadata_path = metadata_path
         if feature_path:
-            self.load_feature_path(feature_path)
+            self.feature_path = feature_path
 
-        # Write a standalone fasta file if specified
-        if write_fasta_file:
-            if not outfile:
-                raise ValueError('Output path must be specified if you want to write a FASTA file.')
-            self.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
+    @property
+    def seq(self):
+        """Seq: Dynamically loaded Seq object from the sequence file"""
+
+        if self.sequence_file:
+            file_to_load = copy(self.sequence_path)
+            log.debug('{}: reading sequence from sequence file {}'.format(self.id, file_to_load))
+            tmp_sr = SeqIO.read(file_to_load, 'fasta')
+            return tmp_sr.seq
+
+        else:
+            if not self._seq:
+                log.debug('{}: no sequence stored in memory'.format(self.id))
+            else:
+                log.debug('{}: reading sequence from memory'.format(self.id))
+
+            return self._seq
+
+    @seq.setter
+    def seq(self, s):
+        if self.sequence_file:
+            raise ValueError('{}: unable to set sequence, sequence file is associated with this object'.format(self.id))
+
+        elif type(s) == str or type(s) == Seq:
+            self._seq = ssbio.protein.sequence.utils.cast_to_seq(obj=s)
+
+        # If a SeqRecord, copy all attributes
+        elif type(s) == SeqRecord:
+            self._seq = s.seq
+            if self.name == '<unknown name>':
+                self.name = s.name
+            if self.description == '<unknown description>':
+                self.description = s.description
+            if not self.dbxrefs:
+                self.dbxrefs = s.dbxrefs
+            if not self.features:
+                self.features = s.features
+            if not self.annotations:
+                self.annotations = s.annotations
+            if not self.letter_annotations:
+                self.letter_annotations = s.letter_annotations
+
+        else:
+            self._seq = None
+
+    @property
+    def features(self):
+        """list: Get the features stored in memory or in the GFF file"""
+
+        if self.feature_file:
+            log.debug('{}: reading features from feature file {}'.format(self.id, self.feature_path))
+            with open(self.feature_path) as handle:
+                feats = list(GFF.parse(handle))
+                if len(feats) > 1:
+                    log.warning('Too many sequences in GFF')
+                else:
+                    return feats[0].features
+
+        else:
+            return self._features
+
+    @features.setter
+    def features(self, feats):
+        if self.feature_file:
+            raise ValueError('{}: unable to set features, feature file is associated with this object'.format(self.id))
+        elif feats:
+            self._features = feats
+        else:
+            self._features = []
+
+    @property
+    def seq_str(self):
+        """str: Get the sequence formatted as a string"""
+
+        if not self.seq:
+            return None
+
+        return ssbio.protein.sequence.utils.cast_to_str(self.seq)
+
+    @property
+    def seq_len(self):
+        """int: Get the sequence length"""
+
+        if not self.seq:
+            return 0
+
+        return len(self.seq)
+
+    @property
+    def num_pdbs(self):
+        """int: Report the number of PDB IDs stored in the ``pdbs`` attribute"""
+
+        if not self.pdbs:
+            return 0
+
+        else:
+            return len(self.pdbs)
 
     @property
     def sequence_dir(self):
@@ -143,17 +206,56 @@ class SeqProp(Object):
 
     @sequence_dir.setter
     def sequence_dir(self, path):
-        if not op.exists(path):
+        if path and not op.exists(path):
             raise OSError('{}: folder does not exist'.format(path))
 
         self._sequence_dir = path
 
     @property
     def sequence_path(self):
+        if not self.sequence_file:
+            raise OSError('Sequence file not loaded')
+
         path = op.join(self.sequence_dir, self.sequence_file)
         if not op.exists(path):
             raise OSError('{}: file does not exist'.format(path))
         return path
+
+    @sequence_path.setter
+    def sequence_path(self, fasta_path):
+        """Provide pointers to the paths of the FASTA file
+
+        Args:
+            fasta_path: Path to FASTA file
+
+        """
+        if not fasta_path:
+            self.sequence_dir = None
+            self.sequence_file = None
+
+        else:
+            if not op.exists(fasta_path):
+                raise OSError('{}: file does not exist'.format(fasta_path))
+
+            if not op.dirname(fasta_path):
+                self.sequence_dir = '.'
+            else:
+                self.sequence_dir = op.dirname(fasta_path)
+            self.sequence_file = op.basename(fasta_path)
+
+            tmp_sr = SeqIO.read(fasta_path, 'fasta')
+            if self.name == '<unknown name>':
+                self.name = tmp_sr.name
+            if self.description == '<unknown description>':
+                self.description = tmp_sr.description
+            if not self.dbxrefs:
+                self.dbxrefs = tmp_sr.dbxrefs
+            if not self.features:
+                self.features = tmp_sr.features
+            if not self.annotations:
+                self.annotations = tmp_sr.annotations
+            if not self.letter_annotations:
+                self.letter_annotations = tmp_sr.letter_annotations
 
     @property
     def metadata_dir(self):
@@ -163,17 +265,42 @@ class SeqProp(Object):
 
     @metadata_dir.setter
     def metadata_dir(self, path):
-        if not op.exists(path):
+        if path and not op.exists(path):
             raise OSError('{}: folder does not exist'.format(path))
 
         self._metadata_dir = path
 
     @property
     def metadata_path(self):
+        if not self.metadata_file:
+            raise OSError('Metadata file not loaded')
+
         path = op.join(self.metadata_dir, self.metadata_file)
         if not op.exists(path):
             raise OSError('{}: file does not exist'.format(path))
         return path
+
+    @metadata_path.setter
+    def metadata_path(self, m_path):
+        """Provide pointers to the paths of the metadata file
+
+        Args:
+            m_path: Path to metadata file
+
+        """
+        if not m_path:
+            self.metadata_dir = None
+            self.metadata_file = None
+
+        else:
+            if not op.exists(m_path):
+                raise OSError('{}: file does not exist!'.format(m_path))
+
+            if not op.dirname(m_path):
+                self.metadata_dir = '.'
+            else:
+                self.metadata_dir = op.dirname(m_path)
+            self.metadata_file = op.basename(m_path)
 
     @property
     def feature_dir(self):
@@ -183,7 +310,7 @@ class SeqProp(Object):
 
     @feature_dir.setter
     def feature_dir(self, path):
-        if not op.exists(path):
+        if path and not op.exists(path):
             raise OSError('{}: folder does not exist'.format(path))
 
         self._feature_dir = path
@@ -195,158 +322,27 @@ class SeqProp(Object):
             raise OSError('{}: file does not exist'.format(path))
         return path
 
-    @property
-    def seq_record(self):
-        """SeqRecord: Dynamically loaded SeqRecord object from the sequence or metadata file"""
-        # If there was no sequence file provided, return the provided sequence, if any
-        if not self.sequence_file:
-            sr = self._seq_record
-        # Otherwise read directly from the FASTA file
-        else:
-            sr = SeqIO.read(self.sequence_path, 'fasta')
-
-        if sr:
-            # And associate attributes to the SeqRecord
-            self.load_to_seq_record_attributes(sr)
-
-        return sr
-
-    @seq_record.setter
-    def seq_record(self, seq):
-        # Only used when a sequence is manually provided as a string, Seq, or SeqRecord
-        if seq:
-            self._seq_record = ssbio.protein.sequence.utils.cast_to_seq_record(obj=seq,
-                                                                               id=self.id,
-                                                                               description=self.description)
-        else:
-            self._seq_record = None
-
-    @property
-    def seq_str(self):
-        """str: Get the sequence formatted as a string"""
-        if not self.seq_record:
-            return None
-        return ssbio.protein.sequence.utils.cast_to_str(self.seq_record)
-
-    @property
-    def seq_len(self):
-        """int: Get the sequence length"""
-        if not self.seq_record:
-            return 0
-        return len(self.seq_record.seq)
-
-    @property
-    def num_pdbs(self):
-        """int: Report the number of PDB IDs stored in the ``pdbs`` attribute"""
-        if not self.pdbs:
-            return 0
-        else:
-            return len(self.pdbs)
-
-    def load_to_seq_record_attributes(self, sr):
-        """Load specific attributes from the SeqProp to a SeqRecord object
-        """
-        if self._sync_description:
-            if self.description != '<unknown description>':
-                sr.description = self.description
-        if self._sync_annotations:
-            sr.annotations = self.annotations
-        if self._sync_letter_annotations:
-            sr.letter_annotations = self.letter_annotations
-        if self._sync_features:
-            sr.features = self.features
-
-    def load_from_seq_record_attributes(self, sr):
-        """Load specific attributes from a SeqRecord object into a SeqProp.
-        """
-        if self._sync_description:
-            if sr.description != '<unknown description>':
-                self.description = sr.description
-        if self._sync_annotations:
-            self.annotations = sr.annotations
-        if self._sync_letter_annotations:
-            self.letter_annotations = sr.letter_annotations
-        if self._sync_features:
-            self.features = sr.features
-
-    def load_sequence_path(self, sequence_path):
-        """Provide pointers to the paths of the sequence file
-
-        Args:
-            sequence_path: Path to sequence file
-
-        """
-        if not op.exists(sequence_path):
-            raise OSError('{}: file does not exist'.format(sequence_path))
-
-        if not op.dirname(sequence_path):
-            self.sequence_dir = '.'
-        else:
-            self.sequence_dir = op.dirname(sequence_path)
-        self.sequence_file = op.basename(sequence_path)
-
-        # Load the SeqRecord so attributes are copied
-        tmp_loader = self.seq_record
-        self.load_from_seq_record_attributes(tmp_loader)
-
-    def load_metadata_path(self, metadata_path):
-        """Provide pointers to the paths of the metadata file
-
-        Args:
-            metadata_path: Path to metadata file
-
-        """
-        if not op.exists(metadata_path):
-            raise OSError('{}: file does not exist!'.format(metadata_path))
-
-        if not op.dirname(metadata_path):
-            self.metadata_dir = '.'
-        else:
-            self.metadata_dir = op.dirname(metadata_path)
-        self.metadata_file = op.basename(metadata_path)
-
-    def load_feature_path(self, gff_path):
+    @feature_path.setter
+    def feature_path(self, gff_path):
         """Load a GFF file with information on a single sequence and store features in the ``features`` attribute
-        
+
         Args:
             gff_path: Path to GFF file.
 
         """
-        if not op.exists(gff_path):
-            raise OSError('{}: file does not exist!'.format(gff_path))
+        if not gff_path:
+            self.feature_dir = None
+            self.feature_file = None
 
-        if not op.dirname(gff_path):
-            self.feature_dir = '.'
         else:
-            self.feature_dir = op.dirname(gff_path)
-        self.feature_file = op.basename(gff_path)
+            if not op.exists(gff_path):
+                raise OSError('{}: file does not exist!'.format(gff_path))
 
-        with open(self.feature_path) as handle:
-            feats = list(GFF.parse(handle))
-            if len(feats) > 1:
-                log.warning('Too many sequences in GFF')
+            if not op.dirname(gff_path):
+                self.feature_dir = '.'
             else:
-                self.features = feats[0].features
-
-    def write_fasta_file(self, outfile, force_rerun=False):
-        """Write a FASTA file for the protein sequence
-
-        If sequence was initialized in the object, it is cleared and ``seq_record`` will instead load from this file.
-
-        Args:
-            outfile (str): Path to new FASTA file to be written to
-            force_rerun (bool): If an existing file should be overwritten
-
-        """
-        outdir, outname, outext = ssbio.utils.split_folder_and_path(outfile)
-        sequence_path = ssbio.protein.sequence.utils.fasta.write_fasta_file(self.seq_record,
-                                                                            outname=outname,
-                                                                            outdir=outdir,
-                                                                            outext=outext,
-                                                                            force_rerun=force_rerun)
-        # Unset the SeqRecord as it will now be dynamically loaded from the file
-        self.seq_record = None
-        self.load_sequence_path(sequence_path)
+                self.feature_dir = op.dirname(gff_path)
+            self.feature_file = op.basename(gff_path)
 
     def equal_to(self, seq_prop):
         """Test if the sequence is equal to another SeqProp's sequence
@@ -358,31 +354,38 @@ class SeqProp(Object):
             bool: If the sequences are the same
 
         """
-        if not self.seq_str:
+        if not self.seq or not seq_prop or not seq_prop.seq:
             return False
 
-        if not seq_prop:
-            return False
+        return self.seq == seq_prop.seq
 
-        if not seq_prop.seq_str:
-            return False
-
-        return self.seq_str == seq_prop.seq_str
-
-    def equal_to_fasta(self, seq_file):
-        """Test if this sequence is equal to another sequence file.
+    def write_fasta_file(self, outfile, force_rerun=False):
+        """Write a FASTA file for the protein sequence, ``seq`` will now load directly from this file.
 
         Args:
-            seq_file: Path to another sequence file
-
-        Returns:
-            bool: If the sequences are the same
+            outfile (str): Path to new FASTA file to be written to
+            force_rerun (bool): If an existing file should be overwritten
 
         """
-        if not self.sequence_path:
-            log.error('Sequence file not available')
-            return False
-        return ssbio.protein.sequence.utils.fasta.fasta_files_equal(self.sequence_path, seq_file)
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+            SeqIO.write(self, outfile, "fasta")
+
+        # The Seq as it will now be dynamically loaded from the file
+        self.sequence_path = outfile
+
+    def write_gff_file(self, outfile, force_rerun=False):
+        """Write a GFF file for the protein features, ``features`` will now load directly from this file.
+
+        Args:
+            outfile (str): Path to new FASTA file to be written to
+            force_rerun (bool): If an existing file should be overwritten
+
+        """
+        if ssbio.utils.force_rerun(outfile=outfile, flag=force_rerun):
+            with open(outfile, "w") as out_handle:
+                GFF.write([self], out_handle)
+
+        self.feature_path = outfile
 
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module.
@@ -390,7 +393,7 @@ class SeqProp(Object):
         Stores statistics in the ``annotations`` attribute.
         """
         try:
-            pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
+            pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq)
         except KeyError as e:
             log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
             return
@@ -402,6 +405,8 @@ class SeqProp(Object):
         Stores statistics in the ``annotations`` attribute.
         Saves a ``.pepstats`` file of the results where the sequence file is located.
         """
+        if not self.sequence_file:
+            raise IOError('FASTA file needs to be written for EMBOSS pepstats to be run')
         outfile = ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
         pepstats = ssbio.protein.sequence.properties.residues.emboss_pepstats_parser(outfile)
         self.annotations.update(pepstats)
@@ -433,47 +438,23 @@ class SeqProp(Object):
 
         return blast_results
 
-    def get_dict(self, only_keys=None, exclude_attributes=None, df_format=False):
-        """Get a copy of all attributes as a dictionary, including object properties
+    def get_residue_annotations(self, start_resnum, end_resnum=None):
+        """Retrieve letter annotations for a residue or a range of residues
 
         Args:
-            only_keys:
-            exclude_attributes:
-            df_format:
+            start_resnum (int): Residue number
+            end_resnum (int): Optional residue number, specify if a range is desired
 
         Returns:
+            dict: Letter annotations for this residue or residues
 
         """
-        my_dict = Object.get_dict(self, only_keys=only_keys, exclude_attributes=exclude_attributes, df_format=df_format)
+        if not end_resnum:
+            end_resnum = start_resnum
 
-        additional_keys = ['seq_str', 'seq_len', 'sequence_file', 'metadata_file', 'num_pdbs']
-        for k in additional_keys:
-            my_dict[k] = deepcopy(getattr(self, k))
+        # Create a new SeqFeature
+        f = SeqFeature(FeatureLocation(start_resnum - 1, end_resnum))
 
-        # Choose attributes to return, return everything in the object if a list is not specified
-        if not only_keys:
-            keys = list(my_dict.keys())
-        else:
-            keys = ssbio.utils.force_list(only_keys)
-
-        # Remove keys you don't want returned
-        if exclude_attributes:
-            exclude_attributes = ssbio.utils.force_list(exclude_attributes)
-            for x in exclude_attributes:
-                if x in keys:
-                    keys.remove(x)
-
-        # Copy attributes into a new dictionary
-        for k, v in my_dict.items():
-            if k in keys:
-                if df_format:
-                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v, float) and not isinstance(v, bool):
-                        try:
-                            my_dict[k] = ssbio.utils.force_string(v)
-                        except TypeError:
-                            log.warning('{}: excluding attribute from dict, cannot transform into string'.format(k))
-                    else:
-                        my_dict[k] = v
-                else:
-                    my_dict[k] = v
-        return my_dict
+        # Get sequence properties
+        return ssbio.utils.clean_single_dict(indict=f.extract(self).letter_annotations,
+                                             remove_keys_containing='_chain_index')

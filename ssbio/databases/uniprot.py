@@ -7,6 +7,7 @@ import requests
 from collections import defaultdict
 from dateutil.parser import parse as dateparse
 import ssbio.utils
+from BCBio import GFF
 from ssbio.protein.sequence.seqprop import SeqProp
 
 try:
@@ -41,21 +42,24 @@ class UniProtProp(SeqProp):
 
     """
 
-    def __init__(self, uniprot_acc, fasta_path=None, xml_path=None, load_letter_annotations_features=True):
+    def __init__(self, seq, id, name='<unknown name>', description='<unknown description>',
+                 fasta_path=None, xml_path=None, gff_path=None):
         """Store basic protein sequence properties from a UniProt ID/ACC.
 
         One or all of the input files can be provided - you might ask why even provide the FASTA if the XML has the
             sequence in it? The FASTA file can be used in alignment programs run locally.
 
         Args:
-            uniprot_acc (str): UniProt ID/ACC
-            sequence_path (str): Path to FASTA file
+            seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
+            id (str): UniProt ID/ACC
+            fasta_path (str): Path to FASTA file
             xml_path (str): Path to UniProt XML file
+            gff_path (str): Path to GFF feature file
 
         """
 
-        if not is_valid_uniprot_id(uniprot_acc):
-            raise ValueError("{}: invalid UniProt ID!".format(uniprot_acc))
+        if not is_valid_uniprot_id(id):
+            raise ValueError("{}: invalid UniProt ID!".format(id))
 
         self.reviewed = False
         self.alt_uniprots = None
@@ -65,89 +69,116 @@ class UniProtProp(SeqProp):
         self.entry_version = None
         self.entry_date = None
 
-        SeqProp.__init__(self, ident=uniprot_acc, sequence_path=fasta_path)
+        SeqProp.__init__(self, id=id, seq=seq, name=name, description=description,
+                         sequence_path=fasta_path, metadata_path=xml_path, feature_path=gff_path)
 
-        # Metadata file information
-        if xml_path:
-            self.load_metadata_path(metadata_path=xml_path,
-                                    load_letter_annotations_features=load_letter_annotations_features)
-
-        self.uniprot = uniprot_acc
+        self.uniprot = id
 
     @property
-    def seq_record(self):
-        """SeqRecord: Dynamically loaded SeqRecord object from the sequence or metadata file"""
+    def seq(self):
+        """Seq: Get the Seq object from the sequence file, metadata file, or in memory"""
+        if self.sequence_file:
+            log.debug('{}: reading sequence from sequence file {}'.format(self.id, self.sequence_path))
+            tmp_sr = SeqIO.read(self.sequence_path, 'fasta')
+            return tmp_sr.seq
 
-        # The SeqRecord object is not kept in memory unless explicitly set,
-        # so when saving as a json we only save a pointer to the file
-        if self.metadata_file:
-            # Parse the metadata file using SeqIO
-            sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
-        elif self.sequence_file:
-            sr = SeqIO.read(self.sequence_path, 'fasta')
+        elif self.metadata_file:
+            log.debug('{}: reading sequence from metadata file {}'.format(self.id, self.metadata_path))
+            tmp_sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
+            return tmp_sr.seq
+
         else:
-            sr = self._seq_record
+            if not self._seq:
+                log.debug('{}: no sequence stored in memory'.format(self.id))
+            else:
+                log.debug('{}: reading sequence from memory'.format(self.id))
 
-        if sr:
-            if self.description == '<unknown description>':
-                self.description = sr.description
+            return self._seq
 
-        return sr
+    @property
+    def features(self):
+        """list: Get the features from the feature file, metadata file, or in memory"""
+        if self.feature_file:
+            log.debug('{}: reading features from feature file {}'.format(self.id, self.feature_path))
+            with open(self.feature_path) as handle:
+                feats = list(GFF.parse(handle))
+                if len(feats) > 1:
+                    log.warning('Too many sequences in GFF')
+                else:
+                    return feats[0].features
+
+        elif self.metadata_file:
+            log.debug('{}: reading features from metadata file {}'.format(self.id, self.metadata_path))
+            tmp_sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
+            return tmp_sr.features
+
+        else:
+            return self._features
+
+    @features.setter
+    def features(self, feats):
+        if self.feature_file:
+            raise ValueError('{}: unable to set features, feature file is associated with this object'.format(self.id))
+        elif feats:
+            self._features = feats
+        else:
+            self._features = []
+
+    @property
+    def metadata_path(self):
+        if not self.metadata_file:
+            raise OSError('Metadata file not loaded')
+
+        path = op.join(self.metadata_dir, self.metadata_file)
+        if not op.exists(path):
+            raise OSError('{}: file does not exist'.format(path))
+        return path
+
+    @metadata_path.setter
+    def metadata_path(self, m_path):
+        """Provide pointers to the paths of the metadata file
+
+        Args:
+            m_path: Path to metadata file
+
+        """
+        if not m_path:
+            self.metadata_dir = None
+            self.metadata_file = None
+
+        if not op.exists(m_path):
+            raise OSError('{}: file does not exist!'.format(m_path))
+
+        if not op.dirname(m_path):
+            self.metadata_dir = '.'
+        else:
+            self.metadata_dir = op.dirname(m_path)
+        self.metadata_file = op.basename(m_path)
+
+        # Parse the metadata file using Biopython's built in SeqRecord parser
+        # Just updating IDs and stuff
+        tmp_sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
+        parsed = parse_uniprot_xml_metadata(tmp_sr)
+        self.update(parsed, overwrite=True)
 
     def download_seq_file(self, outdir, force_rerun=False):
         """Download and load the UniProt FASTA file"""
 
-        uniprot_seq_file = download_uniprot_file(uniprot_id=self.id,
-                                                 filetype='fasta',
-                                                 outdir=outdir,
-                                                 force_rerun=force_rerun)
+        uniprot_fasta_file = download_uniprot_file(uniprot_id=self.id,
+                                                   filetype='fasta',
+                                                   outdir=outdir,
+                                                   force_rerun=force_rerun)
 
-        self.load_sequence_path(uniprot_seq_file)
+        self.sequence_path = uniprot_fasta_file
 
-    def download_metadata_file(self, outdir, load_letter_annotations_features=True, force_rerun=False):
+    def download_metadata_file(self, outdir, force_rerun=False):
         """Download and load the UniProt XML file"""
 
-        uniprot_metadata_file = download_uniprot_file(uniprot_id=self.id,
-                                                      outdir=outdir,
-                                                      filetype='xml',
-                                                      force_rerun=force_rerun)
-        self.load_metadata_path(metadata_path=uniprot_metadata_file,
-                                load_letter_annotations_features=load_letter_annotations_features)
-        self.sequence_dir = self.metadata_dir
-
-    def load_metadata_path(self, metadata_path, load_letter_annotations_features=True):
-        """Parse a metadata file and also provide pointers to its location
-
-        Args:
-            metadata_path (str): Path to metadata file
-            load_letter_annotations_features (bool): If letter_annotations and features should not be loaded, useful for
-                when working with GEM-PRO models since this adds to the object memory/file size when saving
-
-        """
-        if not op.exists(metadata_path):
-            raise IOError('{}: file does not exist'.format(metadata_path))
-
-        # Set directory and filename attributes
-        if not op.dirname(metadata_path):
-            self.metadata_dir = '.'
-        else:
-            self.metadata_dir = op.dirname(metadata_path)
-        self.metadata_file = op.basename(metadata_path)
-
-        # Parse the metadata file using Biopython's built in SeqRecord parser
-        # Just updating IDs and stuff
-        sr = self.seq_record
-        parsed = get_seq_record_metadata(sr)
-        self.update(parsed, overwrite=True)
-
-        # Update the SeqRecord letter_annotations and features with the stored ones for this object
-        if sr:
-            if self.description == '<unknown description>':
-                self.description = sr.description
-            if not self.letter_annotations and load_letter_annotations_features:
-                self.letter_annotations = sr.letter_annotations
-            if not self.features and load_letter_annotations_features:
-                self.features = sr.features
+        uniprot_xml_file = download_uniprot_file(uniprot_id=self.id,
+                                                 outdir=outdir,
+                                                 filetype='xml',
+                                                 force_rerun=force_rerun)
+        self.metadata_path = uniprot_xml_file
 
     def ranking_score(self):
         """Provide a score for this UniProt ID based on reviewed (True=1, False=0) + number of PDBs
@@ -170,14 +201,14 @@ class UniProtProp(SeqProp):
         return to_return
 
 
-def get_seq_record_metadata(sr):
+def parse_uniprot_xml_metadata(sr):
     """Load relevant attributes and dbxrefs from a parsed UniProt XML file in a SeqRecord.
 
     Returns:
         dict: All parsed information 
 
     """
-    # TODO: What about "reviewed" status?
+    # TODO: What about "reviewed" status? and EC number
     xref_dbs_to_keep = ['GO', 'KEGG', 'PDB', 'PROSITE', 'Pfam', 'RefSeq']
 
     infodict = {}
