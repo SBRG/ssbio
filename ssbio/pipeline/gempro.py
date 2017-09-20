@@ -378,7 +378,7 @@ class GEMPRO(Object):
         return list(set(kegg_missing))
 
     def uniprot_mapping_and_metadata(self, model_gene_source, custom_gene_mapping=None, outdir=None,
-                                     load_letter_annotations_features=True, set_as_representative=False, force_rerun=False):
+                                     set_as_representative=False, force_rerun=False):
         """Map all genes in the model to UniProt IDs using the UniProt mapping service.
         Also download all metadata and sequences.
 
@@ -394,8 +394,6 @@ class GEMPRO(Object):
                 Dictionary keys must match model genes.
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
-            load_letter_annotations_features (bool): If annotations, letter_annotations and features should be loaded, 
-                useful for when working with GEM-PRO models since this adds to the object memory/file size when saving
             set_as_representative (bool): If mapped UniProt IDs should be set as representative sequences
             force_rerun (bool): If you want to overwrite any existing mappings and files
 
@@ -423,7 +421,6 @@ class GEMPRO(Object):
                 for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
                     try:
                         uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
-                                                              load_letter_annotations_features=load_letter_annotations_features,
                                                               set_as_representative=set_as_representative,
                                                               force_rerun=force_rerun)
                     except HTTPError as e:
@@ -437,8 +434,7 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes mapped to UniProt'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> UniProt. See the "df_uniprot_metadata" attribute for a summary dataframe.')
 
-    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, load_letter_annotations_features=False,
-                               set_as_representative=True):
+    def manual_uniprot_mapping(self, gene_to_uniprot_dict, outdir=None, set_as_representative=True):
         """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
@@ -464,7 +460,6 @@ class GEMPRO(Object):
             try:
                 uniprot_prop = gene.protein.load_uniprot(uniprot_id=u,
                                                          outdir=outdir, download=True,
-                                                         load_letter_annotations_features=load_letter_annotations_features,
                                                          set_as_representative=set_as_representative)
             except HTTPError as e:
                 log.error('{}, {}: unable to complete web request'.format(g, u))
@@ -611,7 +606,7 @@ class GEMPRO(Object):
         tmp = []
         for x in self.genes_with_a_representative_sequence:
             repseq = x.protein.representative_sequence
-            copied_seq_record = copy(repseq.seq_record)
+            copied_seq_record = copy(repseq)
             if set_ids_from_model:
                 copied_seq_record.id = x.id
             tmp.append(copied_seq_record)
@@ -624,8 +619,7 @@ class GEMPRO(Object):
 
     def get_sequence_properties(self, representatives_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
-        Annotations are stored in the protein's sequence at:
-        ``.seq_record.annotations``
+        Annotations are stored in the protein's sequence at ``.annotations``
 
         """
         for g in tqdm(self.genes):
@@ -635,8 +629,8 @@ class GEMPRO(Object):
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
         """Run and parse ``SCRATCH`` results to predict secondary structure and solvent accessibility.
         Annotations are stored in the gene protein's representative sequence at:
-            * ``.seq_record.annotations``
-            * ``.seq_record.letter_annotations``
+            * ``.annotations``
+            * ``.letter_annotations``
 
         Args:
             path_to_scratch (str): Path to SCRATCH executable
@@ -1193,7 +1187,7 @@ class GEMPRO(Object):
 
         """
         for g in tqdm(self.genes):
-            g.protein.get_disulfide_bridges(representative_only=representatives_only)
+            g.protein.find_disulfide_bridges(representative_only=representatives_only)
 
 
     ### END STRUCTURE RELATED METHODS ###
