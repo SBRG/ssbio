@@ -509,8 +509,8 @@ class ATLAS(Object):
             rseq = p.representative_sequence
             if rseq.seq_record:
                 info['RepSeq_sequence_length'] = rseq.seq_len
-                info['RepSeq_num_sequence_alignments'] = len(rseq.sequence_alignments)
-                info['RepSeq_num_structure_alignments'] = len(rseq.structure_alignments)
+                info['RepSeq_num_sequence_alignments'] = len(p.sequence_alignments)
+                info['RepSeq_num_structure_alignments'] = len(p.structure_alignments)
 
                 # SeqRecord annotations (properties calculated that summarize the whole sequence)
                 rseq_sr = rseq.seq_record
@@ -525,7 +525,7 @@ class ATLAS(Object):
                 all_len_insertions = []
                 all_percent_identity = []
                 all_percent_similarity = []
-                for aln in rseq.sequence_alignments:
+                for aln in p.sequence_alignments:
                     # Gather the strain speicific stuff
                     if '{}_'.format(p.id) not in aln.annotations['b_seq']:
                         continue
@@ -572,20 +572,20 @@ class ATLAS(Object):
                 info['ATLAS_mean_percent_similarity'] = np.mean(all_percent_similarity)
 
                 # Other mutation analysis
-                single, fingerprint = rseq.sequence_mutation_summary()
+                single, fingerprint = p.sequence_mutation_summary()
 
                 # Mutations that show up in more than 10% of strains
                 singles = []
                 for k, v in single.items():
                     k = [str(x) for x in k]
-                    if len(v) / len(rseq.sequence_alignments) >= 0.01:
+                    if len(v) / len(p.sequence_alignments) >= 0.01:
                         singles.append(''.join(k))  # len(v) is the number of strains which have this mutation
                 info['ATLAS_popular_mutations'] = ';'.join(singles)
 
                 # Mutation groups that show up in more than 10% of strains
                 allfingerprints = []
                 for k, v in fingerprint.items():
-                    if len(v) / len(rseq.sequence_alignments) >= 0.01:
+                    if len(v) / len(p.sequence_alignments) >= 0.01:
                         fingerprints = []
                         for m in k:
                             y = [str(x) for x in m]
@@ -600,16 +600,16 @@ class ATLAS(Object):
                     info['RepStruct_ID'] = rstruct.id
                     info['RepStruct_is_experimental'] = rstruct.is_experimental
                     info['RepStruct_description'] = rstruct.description
-                    info['RepStruct_repseq_coverage'] = rstruct.reference_seq_top_coverage
+                    info['RepStruct_repseq_coverage'] = p.representative_chain_seq_coverage
 
                     # ChainProp
-                    rchain = rstruct.representative_chain
-                    info['RepChain_ID'] = rchain.id
+                    rchain = p.representative_chain
+                    info['RepChain_ID'] = rchain
 
-                    # ChainProp SeqRecord annotations
-                    rchain_sr = rchain.seq_record
-                    for annotation_name, annotation in rchain_sr.annotations.items():
-                        info['RepChain_' + annotation_name] = annotation
+                    # # ChainProp SeqRecord annotations
+                    # rchain_sr = rchain.seq_record
+                    # for annotation_name, annotation in rchain_sr.annotations.items():
+                    #     info['RepChain_' + annotation_name] = annotation
 
             all_info.append(info)
 
