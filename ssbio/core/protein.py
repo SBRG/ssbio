@@ -274,7 +274,7 @@ class Protein(Object):
 
         # Check again (instead of else) in case we removed it if force rerun
         if not self.sequences.has_id(kegg_id):
-            kegg_prop = KEGGProp(kegg_id, kegg_seq_file, kegg_metadata_file)
+            kegg_prop = KEGGProp(id=kegg_id, seq=None, fasta_path=kegg_seq_file, metadata_path=kegg_metadata_file)
             if download:
                 kegg_prop.download_seq_file(outdir, force_rerun)
                 kegg_prop.download_metadata_file(outdir, force_rerun)
@@ -400,7 +400,7 @@ class Protein(Object):
             shutil.copy(seq_file, outdir)
             seq_file = op.join(outdir, seq_file)
 
-        manual_sequence = SeqProp(ident=ident, sequence_path=seq_file)
+        manual_sequence = SeqProp(id=ident, sequence_path=seq_file, seq=None)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:
@@ -426,6 +426,10 @@ class Protein(Object):
         Returns:
 
         """
+
+        if not outname:
+            outname = ident
+
         if write_fasta_file:
             if not outdir:
                 outdir = self.sequence_dir
@@ -433,7 +437,7 @@ class Protein(Object):
                     raise ValueError('Output directory must be specified')
             outfile = op.join(outdir, '{}.faa'.format(outname))
         else:
-            outfile=None
+            outfile = None
 
         if isinstance(seq, str) or isinstance(seq, Seq):
             if not ident:
@@ -446,11 +450,9 @@ class Protein(Object):
                 # Overwrite SeqRecord ID with new ID if provided
                 seq.id = ident
 
-        if not outname:
-            outname = ident
-
-        manual_sequence = SeqProp(ident=ident, seq=seq, write_fasta_file=write_fasta_file,
-                                  outfile=outfile, force_rewrite=force_rewrite)
+        manual_sequence = SeqProp(id=ident, seq=seq)
+        if write_fasta_file:
+            manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
         self.sequences.append(manual_sequence)
 
         if set_as_representative:

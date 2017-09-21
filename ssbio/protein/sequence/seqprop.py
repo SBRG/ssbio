@@ -88,10 +88,10 @@ class SeqProp(SeqRecord, Object):
         self.metadata_file = None
         self._feature_dir = None
         self.feature_file = None
-        self._seq = None
         self._features = None
 
-        SeqRecord.__init__(self, seq=seq, id=id, name=name, description=description)
+        self.seq = seq
+        SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
 
         if sequence_path:
             self.sequence_path = sequence_path
@@ -456,5 +456,4 @@ class SeqProp(SeqRecord, Object):
         f = SeqFeature(FeatureLocation(start_resnum - 1, end_resnum))
 
         # Get sequence properties
-        return ssbio.utils.clean_single_dict(indict=f.extract(self).letter_annotations,
-                                             remove_keys_containing='_chain_index')
+        return f.extract(self).letter_annotations

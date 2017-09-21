@@ -71,6 +71,11 @@ def seqprop_with_i(sequence_id):
     return SeqProp(id=sequence_id, seq=None)
 
 @pytest.fixture(scope='class')
+def seqprop_with_i_seq(sequence_id, seq_str_example):
+    """SeqProp with ID and sequence string"""
+    return SeqProp(id=sequence_id, seq=seq_str_example)
+
+@pytest.fixture(scope='class')
 def seqprop_with_i_s_m_f(sequence_id, sequence_path, metadata_path, feature_path):
     """SeqProp with ID + sequence file + metadata file + feature file"""
     return SeqProp(id=sequence_id,
@@ -81,6 +86,7 @@ def seqprop_with_i_s_m_f(sequence_id, sequence_path, metadata_path, feature_path
 
 
 class TestSeqPropWithId():
+
     """Class to test a bare SeqProp object with just an ID"""
 
     def test_init(self, seqprop_with_i, sequence_id):
@@ -165,8 +171,8 @@ class TestSeqPropWithId():
 
     def test_get_residue_annotations(self, seqprop_with_i):
         """Test retrieval of residue letter_annotations"""
-        stuff = seqprop_with_i.get_residue_annotations(start_resnum=1, end_resnum=34)
-        assert stuff == {'test_la_key': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'}
+        stuff = seqprop_with_i.get_residue_annotations(start_resnum=1, end_resnum=10)
+        assert stuff == {'test_la_key': 'XXXXXXXXXX'}
 
     def test_get_biopython_pepstats(self, seqprop_with_i):
         """Test storing Biopython pepstats and consistency of results"""
@@ -255,7 +261,43 @@ class TestSeqPropWithId():
         assert len(seqprop_with_i.features) == len(features_loaded_from_file_example)
 
 
+class TestSeqPropWithIdAndSeq():
+
+    """Class to test a bare SeqProp object with just an ID"""
+
+    def test_init(self, seqprop_with_i_seq, sequence_id, seq_str_example):
+        """Test initializing with an ID and sequence string"""
+        assert seqprop_with_i_seq.id == sequence_id
+        assert str(seqprop_with_i_seq.seq) == seq_str_example
+        assert type(seqprop_with_i_seq.seq) == Seq
+
+        # If just a sequence string initialized, everything should be empty
+        assert seqprop_with_i_seq.name == '<unknown name>'
+        assert seqprop_with_i_seq.description == '<unknown description>'
+        assert len(seqprop_with_i_seq.annotations) == 0
+        assert len(seqprop_with_i_seq.letter_annotations) == 0
+        assert len(seqprop_with_i_seq.features) == 0
+
+        # Files should not exist and raise errors if accessed
+        assert seqprop_with_i_seq.sequence_file == None
+        with pytest.raises(IOError):
+            seqprop_with_i_seq.sequence_dir
+        with pytest.raises(IOError):
+            seqprop_with_i_seq.sequence_path
+        assert seqprop_with_i_seq.metadata_file == None
+        with pytest.raises(IOError):
+            seqprop_with_i_seq.metadata_dir
+        with pytest.raises(IOError):
+            seqprop_with_i_seq.metadata_path
+        assert seqprop_with_i_seq.feature_file == None
+        with pytest.raises(IOError):
+            seqprop_with_i_seq.feature_dir
+        with pytest.raises(IOError):
+            seqprop_with_i_seq.feature_path
+
+
 class TestSeqPropWithIdAndFiles():
+
     """Class to test a SeqProp object assigned files"""
 
     def test_init(self, seqprop_with_i_s_m_f, sequence_id,
@@ -271,7 +313,7 @@ class TestSeqPropWithIdAndFiles():
         assert seqprop_with_i_s_m_f.letter_annotations == seq_record_loaded_from_file_example.letter_annotations
         assert len(seqprop_with_i_s_m_f.features) == len(features_loaded_from_file_example)
 
-        # Files should not exist and raise errors if accessed
+        # Files should exist
         assert seqprop_with_i_s_m_f.sequence_file == sequence_file
         assert seqprop_with_i_s_m_f.sequence_dir == test_files_sequences
         assert seqprop_with_i_s_m_f.sequence_path == sequence_path

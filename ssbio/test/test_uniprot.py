@@ -66,7 +66,8 @@ def uniprotprop_with_i_s_m_f(uniprot_id, fasta_path, xml_path, gff_path):
                        gff_path=gff_path)
 
 
-class TestUniProtPropWithID():
+class TestUniProtPropWithId():
+
     """Class to test a bare UniProtProp object with just an ID"""
 
     def test_init(self, uniprotprop_with_i, uniprot_id):
@@ -168,3 +169,34 @@ class TestUniProtPropWithID():
 
         # Test that features are loaded directly from this metadata file
         assert len(uniprotprop_with_i.features) == len(xml_record_loaded_from_file_example.features)
+
+
+class TestUniProtPropWithIdAndFiles():
+
+    """Class to test a bare UniProtProp object with just an ID"""
+
+    def test_init(self, uniprotprop_with_i_s_m_f, uniprot_id,
+                  fasta_path, xml_path, gff_path, test_files_sequences,
+                  fasta_file, xml_file, gff_file,
+                  seq_record_loaded_from_file_example,
+                  features_loaded_from_file_example,
+                  xml_record_loaded_from_file_example):
+        """Test initializing with assigned files"""
+        assert uniprotprop_with_i_s_m_f.id == uniprot_id
+        assert uniprotprop_with_i_s_m_f.seq == seq_record_loaded_from_file_example.seq
+        assert uniprotprop_with_i_s_m_f.name == seq_record_loaded_from_file_example.name
+        assert uniprotprop_with_i_s_m_f.description == xml_record_loaded_from_file_example.description
+        assert uniprotprop_with_i_s_m_f.annotations == {}  # No annotations will be loaded from files
+        assert uniprotprop_with_i_s_m_f.letter_annotations == xml_record_loaded_from_file_example.letter_annotations
+        assert len(uniprotprop_with_i_s_m_f.features) == len(features_loaded_from_file_example)
+
+        # Files should exist
+        assert uniprotprop_with_i_s_m_f.sequence_file == fasta_file
+        assert uniprotprop_with_i_s_m_f.sequence_dir == test_files_sequences
+        assert uniprotprop_with_i_s_m_f.sequence_path == fasta_path
+        assert uniprotprop_with_i_s_m_f.metadata_file == xml_file
+        assert uniprotprop_with_i_s_m_f.metadata_dir == test_files_sequences
+        assert uniprotprop_with_i_s_m_f.metadata_path == xml_path
+        assert uniprotprop_with_i_s_m_f.feature_file == gff_file
+        assert uniprotprop_with_i_s_m_f.feature_dir == test_files_sequences
+        assert uniprotprop_with_i_s_m_f.feature_path == gff_path

@@ -146,20 +146,21 @@ class UniProtProp(SeqProp):
             self.metadata_dir = None
             self.metadata_file = None
 
-        if not op.exists(m_path):
-            raise OSError('{}: file does not exist!'.format(m_path))
-
-        if not op.dirname(m_path):
-            self.metadata_dir = '.'
         else:
-            self.metadata_dir = op.dirname(m_path)
-        self.metadata_file = op.basename(m_path)
+            if not op.exists(m_path):
+                raise OSError('{}: file does not exist!'.format(m_path))
 
-        # Parse the metadata file using Biopython's built in SeqRecord parser
-        # Just updating IDs and stuff
-        tmp_sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
-        parsed = parse_uniprot_xml_metadata(tmp_sr)
-        self.update(parsed, overwrite=True)
+            if not op.dirname(m_path):
+                self.metadata_dir = '.'
+            else:
+                self.metadata_dir = op.dirname(m_path)
+            self.metadata_file = op.basename(m_path)
+
+            # Parse the metadata file using Biopython's built in SeqRecord parser
+            # Just updating IDs and stuff
+            tmp_sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
+            parsed = parse_uniprot_xml_metadata(tmp_sr)
+            self.update(parsed, overwrite=True)
 
     def download_seq_file(self, outdir, force_rerun=False):
         """Download and load the UniProt FASTA file"""

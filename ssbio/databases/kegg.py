@@ -15,26 +15,52 @@ bs_kegg = KEGG()
 
 
 class KEGGProp(SeqProp):
-    def __init__(self, kegg_id, fasta_path=None, metadata_path=None):
+    def __init__(self, seq, id, fasta_path=None, txt_path=None, gff_path=None):
+        SeqProp.__init__(self, seq=seq, id=id, sequence_path=fasta_path, metadata_path=txt_path, feature_path=gff_path)
+        self.kegg = id
 
-        SeqProp.__init__(self, ident=kegg_id, sequence_path=fasta_path, metadata_path=metadata_path)
+    @property
+    def metadata_path(self):
+        if not self.metadata_file:
+            raise OSError('Metadata file not loaded')
 
-        if kegg_id:
-            self.kegg = kegg_id
+        path = op.join(self.metadata_dir, self.metadata_file)
+        if not op.exists(path):
+            raise OSError('{}: file does not exist'.format(path))
+        return path
 
-        if metadata_path:
-            self.load_metadata_path(metadata_path)
+    @metadata_path.setter
+    def metadata_path(self, m_path):
+        """Provide pointers to the paths of the metadata file
 
-    def load_metadata_path(self, metadata_path):
-        SeqProp.load_metadata_path(self, metadata_path)
-        self.update(parse_kegg_gene_metadata(metadata_path), overwrite=True)
+        Args:
+            m_path: Path to metadata file
+
+        """
+        if not m_path:
+            self.metadata_dir = None
+            self.metadata_file = None
+
+        else:
+            if not op.exists(m_path):
+                raise OSError('{}: file does not exist!'.format(m_path))
+
+            if not op.dirname(m_path):
+                self.metadata_dir = '.'
+            else:
+                self.metadata_dir = op.dirname(m_path)
+            self.metadata_file = op.basename(m_path)
+
+            # TODO: update using Biopython's built in SeqRecord parser
+            # Just updating IDs and stuff
+            self.update(parse_kegg_gene_metadata(self.metadata_path), overwrite=True)
 
     def download_seq_file(self, outdir, force_rerun=False):
         kegg_seq_file = download_kegg_aa_seq(gene_id=self.id,
                                              outdir=outdir,
                                              force_rerun=force_rerun)
         if kegg_seq_file:
-            self.load_sequence_path(kegg_seq_file)
+            self.sequence_path = kegg_seq_file
         else:
             log.warning('{}: no sequence file available'.format(self.id))
 
@@ -43,7 +69,7 @@ class KEGGProp(SeqProp):
                                                          outdir=outdir,
                                                          force_rerun=force_rerun)
         if kegg_metadata_file:
-            self.load_metadata_path(kegg_metadata_file)
+            self.metadata_path = kegg_metadata_file
         else:
             log.warning('{}: no metadata file available'.format(self.id))
 
