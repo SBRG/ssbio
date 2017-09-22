@@ -19,17 +19,7 @@ class KEGGProp(SeqProp):
         SeqProp.__init__(self, seq=seq, id=id, sequence_path=fasta_path, metadata_path=txt_path, feature_path=gff_path)
         self.kegg = id
 
-    @property
-    def metadata_path(self):
-        if not self.metadata_file:
-            raise OSError('Metadata file not loaded')
-
-        path = op.join(self.metadata_dir, self.metadata_file)
-        if not op.exists(path):
-            raise OSError('{}: file does not exist'.format(path))
-        return path
-
-    @metadata_path.setter
+    @SeqProp.metadata_path.setter
     def metadata_path(self, m_path):
         """Provide pointers to the paths of the metadata file
 

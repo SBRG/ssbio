@@ -74,9 +74,10 @@ class UniProtProp(SeqProp):
 
         self.uniprot = id
 
-    @property
+    @SeqProp.seq.getter
     def seq(self):
         """Seq: Get the Seq object from the sequence file, metadata file, or in memory"""
+
         if self.sequence_file:
             log.debug('{}: reading sequence from sequence file {}'.format(self.id, self.sequence_path))
             tmp_sr = SeqIO.read(self.sequence_path, 'fasta')
@@ -95,7 +96,7 @@ class UniProtProp(SeqProp):
 
             return self._seq
 
-    @property
+    @SeqProp.features.getter
     def features(self):
         """list: Get the features from the feature file, metadata file, or in memory"""
         if self.feature_file:
@@ -115,26 +116,7 @@ class UniProtProp(SeqProp):
         else:
             return self._features
 
-    @features.setter
-    def features(self, feats):
-        if self.feature_file:
-            raise ValueError('{}: unable to set features, feature file is associated with this object'.format(self.id))
-        elif feats:
-            self._features = feats
-        else:
-            self._features = []
-
-    @property
-    def metadata_path(self):
-        if not self.metadata_file:
-            raise OSError('Metadata file not loaded')
-
-        path = op.join(self.metadata_dir, self.metadata_file)
-        if not op.exists(path):
-            raise OSError('{}: file does not exist'.format(path))
-        return path
-
-    @metadata_path.setter
+    @SeqProp.metadata_path.setter
     def metadata_path(self, m_path):
         """Provide pointers to the paths of the metadata file
 

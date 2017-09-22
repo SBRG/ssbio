@@ -90,6 +90,7 @@ class SeqProp(SeqRecord, Object):
         self.feature_file = None
         self._features = None
 
+        self._seq = None
         self.seq = seq
         SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
 
@@ -120,7 +121,10 @@ class SeqProp(SeqRecord, Object):
 
     @seq.setter
     def seq(self, s):
-        if self.sequence_file:
+        if not s:
+            self._seq = None
+
+        elif self.sequence_file:
             raise ValueError('{}: unable to set sequence, sequence file is associated with this object'.format(self.id))
 
         elif type(s) == str or type(s) == Seq:
@@ -141,9 +145,6 @@ class SeqProp(SeqRecord, Object):
                 self.annotations = s.annotations
             if not self.letter_annotations:
                 self.letter_annotations = s.letter_annotations
-
-        else:
-            self._seq = None
 
     @property
     def features(self):
