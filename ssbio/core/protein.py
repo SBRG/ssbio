@@ -274,7 +274,7 @@ class Protein(Object):
 
         # Check again (instead of else) in case we removed it if force rerun
         if not self.sequences.has_id(kegg_id):
-            kegg_prop = KEGGProp(id=kegg_id, seq=None, fasta_path=kegg_seq_file, metadata_path=kegg_metadata_file)
+            kegg_prop = KEGGProp(id=kegg_id, seq=None, fasta_path=kegg_seq_file, txt_path=kegg_metadata_file)
             if download:
                 kegg_prop.download_seq_file(outdir, force_rerun)
                 kegg_prop.download_metadata_file(outdir, force_rerun)

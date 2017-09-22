@@ -25,6 +25,7 @@ import ssbio.protein.sequence.properties.residues
 import ssbio.protein.sequence.properties.tmhmm
 import ssbio.protein.sequence.utils.fasta
 from ssbio import utils
+from ssbio.cobra.utils import ModelPro
 from ssbio.core.genepro import GenePro
 from ssbio.core.object import Object
 from ssbio.databases.kegg import KEGGProp
@@ -109,6 +110,13 @@ class GEMPRO(Object):
         self.pdb_file_type = pdb_file_type
         self.genome_path = genome_path
 
+        # Create directories
+        self._root_dir = None
+        if create_dirs:
+            if not root_dir:
+                root_dir = os.getcwd()
+            self.root_dir = root_dir
+
         self.model = None
         # Load a model object
         if gem:
@@ -116,7 +124,10 @@ class GEMPRO(Object):
 
         # Or, load a GEM file
         elif gem_file_path and gem_file_type:
-            gem_manual = ssbio.cobra.utils.model_loader(gem_file_path, gem_file_type, pdb_file_type)
+            gem_manual = ssbio.cobra.utils.model_loader(gem_file_path=gem_file_path,
+                                                        gem_file_type=gem_file_type,
+                                                        pdb_file_type=pdb_file_type,
+                                                        genes_dir=self.genes_dir)
             self._load_cobra_model(gem_manual)
 
         # Or, load a list of gene IDs
@@ -132,12 +143,6 @@ class GEMPRO(Object):
             self.genes = []
             log.warning('No model or genes input')
 
-        # Create directories
-        self._root_dir = None
-        if create_dirs:
-            if not root_dir:
-                root_dir = os.getcwd()
-            self.root_dir = root_dir
         if genes_and_sequences:
             self.manual_seq_mapping(genes_and_sequences)
 
@@ -161,9 +166,9 @@ class GEMPRO(Object):
 
             log.info('{}: GEM-PRO project location'.format(self.base_dir))
 
-            # Additionally set the gene folder paths
-            for g in self.genes:
-                g.root_dir = self.genes_dir
+            # # Genes dir is now set in the genes.setter instead
+            # for g in self.genes:
+            #     g.root_dir = self.genes_dir
         else:
             log.warning('Root directory not set')
 
@@ -210,8 +215,12 @@ class GEMPRO(Object):
             model (Model): COBRApy ``Model`` object
 
         """
-        self.model = model
-        self.genes = model.genes
+        self.model = ModelPro(model)
+        for g in self.model.genes:
+            g.root_dir = self.genes_dir
+            g.protein.pdb_file_type = self.pdb_file_type
+        self.genes = self.model.genes
+
         log.info('{}: loaded model'.format(model.id))
         log.info('{}: number of reactions'.format(len(self.model.reactions)))
         log.info('{}: number of reactions linked to a gene'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
@@ -266,7 +275,7 @@ class GEMPRO(Object):
             tmp_list = []
             for x in list(set(genes_list)):
                 x = str(x)
-                new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type)
+                new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type, root_dir=self.genes_dir)
                 tmp_list.append(new_gene)
             self._genes = DictList(tmp_list)
         else:
@@ -282,11 +291,18 @@ class GEMPRO(Object):
 
         new_genes = []
         for x in list(set(genes_list)):
-            new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type)
+            new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type, root_dir=self.genes_dir)
             new_genes.append(new_gene)
 
+        orig_num_genes = len(self.genes)
+
         # Add unique genes only
-        self.genes.union(new_genes)
+        if self.model:
+            self.model.genes.union(new_genes)
+        else:
+            self.genes.union(new_genes)
+
+        log.info('Added {}/{} genes to GEM-PRO project'.format(len(self.genes)-orig_num_genes, len(genes_list)))
 
     ####################################################################################################################
     ### SEQUENCE RELATED METHODS ###

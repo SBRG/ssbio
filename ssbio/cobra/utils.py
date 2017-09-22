@@ -58,7 +58,7 @@ class ModelPro(Model):
                 setattr(self, k, v)
 
 
-def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif'):
+def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif', genes_dir=None):
     """Consolidated function to load a GEM using COBRApy. Specify the file type being loaded.
 
     Args:
@@ -83,6 +83,7 @@ def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif'):
 
     modelpro = ModelPro(model)
     for g in modelpro.genes:
+        g.root_dir = genes_dir
         g.protein.pdb_file_type = pdb_file_type
 
     return modelpro
