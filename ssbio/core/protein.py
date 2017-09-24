@@ -11,6 +11,7 @@ from six.moves.urllib.error import URLError
 from Bio.Seq import Seq
 from Bio.SeqFeature import SeqFeature, FeatureLocation
 from Bio.PDB.PDBExceptions import PDBException, PDBConstructionException
+from msgpack.exceptions import ExtraData
 
 from cobra.core import DictList
 import ssbio.utils
@@ -91,6 +92,13 @@ class Protein(Object):
         """
         Object.__init__(self, id=ident, description=description)
 
+        self.pdb_file_type = pdb_file_type
+
+        # Create directories
+        self._root_dir = None
+        if root_dir:
+            self.root_dir = root_dir
+
         # Sequences
         self.sequences = DictList()
         self.representative_sequence = None
@@ -105,9 +113,6 @@ class Protein(Object):
         self.sequence_alignments = DictList()
         self.structure_alignments = DictList()
 
-        self.root_dir = root_dir
-        self.pdb_file_type = pdb_file_type
-
     @property
     def root_dir(self):
         """str: Directory where Protein project folder is located"""
@@ -115,26 +120,38 @@ class Protein(Object):
 
     @root_dir.setter
     def root_dir(self, path):
+        if not path:
+            raise ValueError('No path specified')
+
+        if not op.exists(path):
+            raise ValueError('{}: folder does not exist'.format(path))
+
+        if self._root_dir:
+            log.debug('Changing root directory of Protein "{}" from {} to {}'.format(self.id, self.root_dir, path))
+
+            if not op.exists(op.join(path, self.id)):
+                raise IOError('Protein "{}" does not exist in folder {}'.format(self.id, path))
+
         self._root_dir = path
 
-        if path:
-            if not op.exists(path):
-                raise ValueError('{}: folder does not exist'.format(path))
+        for d in [self.protein_dir, self.sequence_dir, self.structure_dir]:
+            ssbio.utils.make_dir(d)
 
-            for d in [self.protein_dir, self.sequence_dir, self.structure_dir]:
-                ssbio.utils.make_dir(d)
-
+        # Propagate changes to SeqProps
+        if hasattr(self, 'sequences'):
             for seq in self.sequences:
                 seq.sequence_dir = self.sequence_dir
                 seq.metadata_dir = self.sequence_dir
-
+        if hasattr(self, 'representative_sequence'):
             if self.representative_sequence:
                 self.representative_sequence.sequence_dir = self.sequence_dir
                 self.representative_sequence.metadata_dir = self.sequence_dir
 
+        # Propagate changes to StructProps
+        if hasattr(self, 'structures'):
             for struct in self.structures:
                 struct.structure_dir = self.structure_dir
-
+        if hasattr(self, 'representative_structure'):
             if self.representative_structure:
                 self.representative_structure.structure_dir = self.structure_dir
 
@@ -514,7 +531,7 @@ class Protein(Object):
 
                 best_u = uniprot_mappings.get_by_id(best_u_id)
                 self.representative_sequence = best_u
-                log.debug('{}: Representative sequence set from UniProt ID {}'.format(self.id, best_u_id))
+                log.debug('{}: representative sequence set from UniProt ID {}'.format(self.id, best_u_id))
 
         return self.representative_sequence
 
@@ -591,16 +608,32 @@ class Protein(Object):
             representative_only (bool): If analysis should only be run on the representative sequence
 
         """
-        if self.representative_sequence:
+        if representative_only:
+            # Check if a representative sequence was set
+            if not self.representative_sequence:
+                log.warning('{}: no representative sequence set, cannot get sequence properties'.format(self.id))
+                return
+
+            # Also need to check if a sequence has been stored
+            if not self.representative_sequence.seq:
+                log.warning('{}: representative sequence {} set, but no sequence stored. '
+                            'Cannot get sequence properties.'.format(self.id, self.representative_sequence.id))
+                return
+
             self.representative_sequence.get_biopython_pepstats()
             self.representative_sequence.get_emboss_pepstats()
-        else:
-            log.warning('{}: no representative sequence set, cannot get sequence properties'.format(self.id))
 
         if not representative_only:
             for s in self.sequences:
-                s.get_biopython_pepstats()
-                s.get_emboss_pepstats()
+                # Need to check if a sequence has been stored
+                if not s.seq:
+                    log.warning('{}: no sequence stored. '
+                                'Cannot get sequence properties.'.format(s.id))
+                    continue
+
+                else:
+                    s.get_biopython_pepstats()
+                    s.get_emboss_pepstats()
 
     def prep_itasser_modeling(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
                             execute_from_dir=None, print_exec=False, **kwargs):
@@ -670,7 +703,7 @@ class Protein(Object):
             return None
 
         # Also need to check if a sequence has been stored
-        if not self.representative_sequence.seq_str:
+        if not self.representative_sequence.seq:
             log.warning('{}: no representative sequence loaded, cannot BLAST'.format(self.id))
             return None
 
@@ -1471,8 +1504,9 @@ class Protein(Object):
                                                      engine=engine,
                                                      parse=True,
                                                      force_rerun=force_rerun)
-                except PDBConstructionException:
+                except (PDBConstructionException, ExtraData) as e:
                     log.error('{}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(pdb, pdb_file_type))
+                    print(e)
                     # Fall back to using mmCIF file if structure cannot be parsed
                     try:
                         pdb.download_structure_file(outdir=struct_outdir, file_type='cif',
@@ -1500,7 +1534,6 @@ class Protein(Object):
                 if best_chain:
                     try:
                         self._representative_structure_setter(structprop=pdb,
-                                                              # new_id='{}-{}'.format(pdb.id, best_chain), # 170906 Deprecated use of new_id
                                                               clean=clean,
                                                               out_suffix='-{}_clean'.format(best_chain),
                                                               keep_chain=best_chain,
@@ -1700,9 +1733,9 @@ class Protein(Object):
                 except KeyError:
                     log.error('{}: unable to run disulfide bridge finder on {}'.format(self.id, s.id))
 
-    def get_residue_annotations(self, seq_resnum, seq_id=None, struct_id=None, struct_chain_id=None,
+    def get_residue_annotations(self, seq_resnum, seqprop=None, structprop=None, chain_id=None,
                                 use_representatives=True):
-        """Get all residue-level annotations stored in the SeqRecord letter_annotations field for a given residue number
+        """Get all residue-level annotations stored in the SeqProp letter_annotations field for a given residue number
 
         Uses the representative sequence, structure, and chain ID stored by default. If other properties from other
             structures are desired, input the proper IDs. An alignment for the given sequence to the structure must
@@ -1710,9 +1743,9 @@ class Protein(Object):
 
         Args:
             seq_resnum (int): Residue number in the sequence
-            seq_id (str): ID of the sequence
-            struct_id (str): ID of the structure
-            struct_chain_id (str): ID of the structure's chain
+            seqprop (SeqProp): SeqProp object
+            structprop (StructProp): StructProp object
+            chain_id (str): ID of the structure's chain to get annotation from
             use_representatives (bool): If the representative sequence/structure/chain IDs should be used
 
         Returns:
@@ -1721,29 +1754,27 @@ class Protein(Object):
         """
 
         if use_representatives:
-            if seq_id and struct_id and struct_chain_id:
-                log.warning('Overriding sequence, structure, and chain IDs with representatives. Set use_representatives to False if custom IDs are to be used.')
+            if seqprop and structprop and chain_id:
+                log.warning('Overriding sequence, structure, and chain IDs with representatives. '
+                            'Set use_representatives to False if custom IDs are to be used.')
         else:
-            if not seq_id or not struct_id or not struct_chain_id:
+            if not seqprop or not structprop or not chain_id:
                 raise ValueError('Input sequence, structure, and chain to map between')
 
         if use_representatives:
-            seq = self.representative_sequence
-            struct = self.representative_structure
+            seqprop = self.representative_sequence
+            structprop = self.representative_structure
             chain_id = self.representative_chain
-            chain = self.representative_structure.chains.get_by_id(chain_id)
-        else:
-            seq = self.sequences.get_by_id(seq_id)
-            struct = self.structures.get_by_id(struct_id)
-            chain = struct.chains.get_by_id(struct_chain_id)
 
-        log.debug('Using sequence: {}, structure: {}, chain: {}'.format(seq.id, struct.id, chain_id))
+        chain = structprop.chains.get_by_id(chain_id)
+
+        log.debug('Using sequence: {}, structure: {}, chain: {}'.format(seqprop.id, structprop.id, chain_id))
 
         # Create a new SeqFeature
         f = SeqFeature(FeatureLocation(seq_resnum-1, seq_resnum))
 
         # Get sequence properties
-        seq_features = f.extract(seq)
+        seq_features = f.extract(seqprop)
 
         # Store in dictionary to return, clean it up
         all_info = ssbio.utils.clean_single_dict(indict=seq_features.letter_annotations,
@@ -1754,8 +1785,8 @@ class Protein(Object):
 
         # Get structure properties
         mapping_to_structure_resnum = self.map_seqprop_resnums_to_structprop_resnums(resnums=seq_resnum,
-                                                                                     seqprop=seq,
-                                                                                     structprop=struct,
+                                                                                     seqprop=seqprop,
+                                                                                     structprop=structprop,
                                                                                      chain_id=chain_id,
                                                                                      use_representatives=use_representatives)
 
@@ -1782,7 +1813,7 @@ class Protein(Object):
 
         return all_info
 
-    def sequence_mutation_summary(self, sequence_ids=None, alignment_type=None):
+    def sequence_mutation_summary(self, alignment_ids=None, alignment_type=None):
         """Summarize all mutations found in the sequence_alignments attribute.
 
         Returns 2 dictionaries, single_counter and fingerprint_counter.
@@ -1800,15 +1831,16 @@ class Protein(Object):
             Here, we report which genes/strains have the specific combinations (or "fingerprints") of point mutations
             
         Args:
-            sequence_ids (str, list): Specified alignment ID or IDs to use
-            alignment_type (str): Specified alignment type contained in the ``annotation`` field of an alignment object
+            alignment_ids (str, list): Specified alignment ID or IDs to use
+            alignment_type (str): Specified alignment type contained in the ``annotation`` field of an alignment object,
+                ``seqalign`` or ``structalign`` are the current types.
 
         Returns:
             dict, dict: single_counter, fingerprint_counter
 
         """
-        if sequence_ids:
-            ssbio.utils.force_list(sequence_ids)
+        if alignment_ids:
+            ssbio.utils.force_list(alignment_ids)
 
         if len(self.sequence_alignments) == 0:
             log.error('{}: no sequence alignments'.format(self.id))
@@ -1819,8 +1851,8 @@ class Protein(Object):
 
         for alignment in self.sequence_alignments:
             # Ignore alignments if a list of identifiers is provided
-            if sequence_ids:
-                if alignment.id not in sequence_ids:
+            if alignment_ids:
+                if alignment.id not in alignment_ids:
                     continue
             # Ignore alignments if type is specified
             if alignment_type:
@@ -1840,11 +1872,13 @@ class Protein(Object):
 
         return dict(single_counter), dict(fingerprint_counter)
 
-    def view_all_mutations(self, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
+    def view_all_mutations(self, alignment_type, grouped=False, color='red', unique_colors=True, structure_opacity=0.5,
                            opacity_range=(0.8,1), scale_range=(1,5), gui=False):
         """Map all sequence alignment mutations to the structure.
 
         Args:
+            alignment_type (str): Specified alignment type contained in the ``annotation`` field of an alignment object,
+                ``seqalign`` or ``structalign`` are the current types.
             grouped (bool): If groups of mutations should be colored and sized together
             color (str): Color of the mutations (overridden if unique_colors=True)
             unique_colors (bool): If each mutation/mutation group should be colored uniquely
@@ -1857,7 +1891,7 @@ class Protein(Object):
             NGLviewer object
 
         """
-        single, fingerprint = self.sequence_mutation_summary()
+        single, fingerprint = self.sequence_mutation_summary(alignment_type=alignment_type)
 
         single_lens = {k: len(v) for k, v in single.items()}
         single_map_to_structure = {}
@@ -1958,7 +1992,6 @@ class Protein(Object):
 
     def __json_decode__(self, **attrs):
         for k, v in attrs.items():
-            # print(k)
             if k == 'sequences' or k == 'structures' or k == 'sequence_alignments' or k == 'structure_alignments':
                 setattr(self, k, DictList(v))
             else:
