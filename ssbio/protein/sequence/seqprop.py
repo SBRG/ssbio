@@ -393,12 +393,15 @@ class SeqProp(SeqRecord, Object):
 
         Stores statistics in the ``annotations`` attribute.
         """
-        try:
-            pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq)
-        except KeyError as e:
-            log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
-            return
-        self.annotations.update(pepstats)
+        if self.seq:
+            try:
+                pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq)
+            except KeyError as e:
+                log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
+                return
+            self.annotations.update(pepstats)
+        else:
+            raise ValueError('{}: no sequence available, unable to run ProteinAnalysis'.format(self.id))
 
     def get_emboss_pepstats(self):
         """Run the EMBOSS pepstats program on the protein sequence.

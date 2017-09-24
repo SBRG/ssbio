@@ -423,9 +423,8 @@ class StructProp(Object):
         """
         # TODO: rename to get_msms_annotations
         if self.file_type != 'pdb':
-            log.error('{}: unable to run MSMS with "{}" file type. Please change file type to "pdb"'.format(self.id,
+            raise ValueError('{}: unable to run MSMS with "{}" file type. Please change file type to "pdb"'.format(self.id,
                                                                                                             self.file_type))
-            return
 
         parsed = self.parse_structure()
         if not parsed:
@@ -535,6 +534,7 @@ class StructProp(Object):
 
         Args:
             opacity (float): Opacity of the structure
+            recolor (bool): If structure should be recolored to silver
             gui (bool): If the NGLview GUI should show up
 
         Returns:
@@ -545,7 +545,11 @@ class StructProp(Object):
 
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
-        view = nv.show_structure_file(self.structure_path, gui=gui)
+        if self.file_type == 'mmtf' or self.file_type == 'mmtf.gz':
+            view = nv.NGLWidget()
+            view.add_component(self.structure_path)
+        else:
+            view = nv.show_structure_file(self.structure_path, gui=gui)
 
         if recolor:
             view.clear_representations()
@@ -581,13 +585,15 @@ class StructProp(Object):
         view = self.view_structure(opacity=structure_opacity, gui=gui)
 
         if isinstance(structure_resnums, list):
-            unique_mutations = list(set(structure_resnums))
+            structure_resnums = list(set(structure_resnums))
         elif isinstance(structure_resnums, int):
-            unique_mutations = ssbio.utils.force_list(structure_resnums)
+            structure_resnums = ssbio.utils.force_list(structure_resnums)
+        else:
+            raise ValueError
 
         # TODO: add color by letter_annotations!
 
-        colors = sns.color_palette("hls", len(unique_mutations)).as_hex()
+        colors = sns.color_palette("hls", len(structure_resnums)).as_hex()
 
         to_show_chains = '( '
         for c in chain:
@@ -596,7 +602,7 @@ class StructProp(Object):
         to_show_chains += ' )'
 
         to_show_res = '( '
-        for m in unique_mutations:
+        for m in structure_resnums:
             to_show_res += '{} or '.format(m)
         to_show_res = to_show_res.strip(' or ')
         to_show_res += ' )'
@@ -651,15 +657,17 @@ class StructProp(Object):
         view = self.view_structure(opacity=structure_opacity, gui=gui)
 
         if isinstance(structure_resnums, list):
-            unique_mutations = list(set(structure_resnums))
+            structure_resnums = list(set(structure_resnums))
         elif isinstance(structure_resnums, dict):
-            unique_mutations = list(structure_resnums.keys())
+            structure_resnums = list(structure_resnums.keys())
         elif isinstance(structure_resnums, int):
-            unique_mutations = ssbio.utils.force_list(structure_resnums)
+            structure_resnums = ssbio.utils.force_list(structure_resnums)
+        else:
+            raise ValueError
 
         # TODO: add color by letter_annotations!
 
-        colors = sns.color_palette("hls", len(unique_mutations)).as_hex()
+        colors = sns.color_palette("hls", len(structure_resnums)).as_hex()
 
         to_show_chains = '( '
         for c in chain:
@@ -667,7 +675,7 @@ class StructProp(Object):
         to_show_chains = to_show_chains.strip(' or ')
         to_show_chains += ' )'
 
-        for i, x in enumerate(unique_mutations):
+        for i, x in enumerate(structure_resnums):
             if isinstance(x, tuple):
                 to_show_res = '( '
                 for mut in x:
