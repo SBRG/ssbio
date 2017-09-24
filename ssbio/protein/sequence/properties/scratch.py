@@ -10,6 +10,9 @@ log = logging.getLogger(__name__)
 class SCRATCH():
     """Provide wrappers for running and parsing SCRATCH on a sequence file or sequence string.
 
+    To run from the command line:
+        ./run_SCRATCH-1D_predictors.sh  input_fasta  output_prefix  [num_threads]
+
     SCRATCH predicts:
         - Secondary structure
             - 3 classes (helix, strand, other) using SSpro

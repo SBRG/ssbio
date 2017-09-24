@@ -8,6 +8,7 @@ biopython>=1.69
 bioservices
 xmltodict
 mmtf-python
+msgpack
 awesome-slugify
 ipywidgets==5.2.2
 lxml
