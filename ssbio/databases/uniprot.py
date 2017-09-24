@@ -197,10 +197,13 @@ def parse_uniprot_xml_metadata(sr):
     infodict = {}
 
     infodict['alt_uniprots'] = list(set(sr.annotations['accessions']).difference([sr.id]))
-    infodict['gene_name'] = sr.annotations['gene_name_primary']
+    infodict['gene_name'] = None
+    if 'gene_name_primary' in sr.annotations:
+        infodict['gene_name'] = sr.annotations['gene_name_primary']
     infodict['description'] = sr.description
-    infodict['taxonomy'] = sr.annotations['organism']
-
+    infodict['taxonomy'] = None
+    if 'organism' in sr.annotations:
+        infodict['taxonomy'] = sr.annotations['organism']
     infodict['seq_version'] = sr.annotations['sequence_version']
     infodict['seq_date'] = sr.annotations['sequence_modified']
     infodict['entry_version'] = sr.annotations['version']
@@ -387,7 +390,9 @@ def uniprot_sites(uniprot_id):
 
     try:
         gff_df = pd.read_table(gff, sep='\t', skiprows=2, header=None)
-    except ValueError:
+    except ValueError as e:
+        log.error('Error retrieving feature table')
+        print(e)
         return pd.DataFrame()
 
     gff_df.drop([0, 1, 5, 6, 7, 9], axis=1, inplace=True)
