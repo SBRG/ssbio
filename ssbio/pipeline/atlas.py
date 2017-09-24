@@ -11,7 +11,7 @@ from Bio import SeqIO
 from cobra.core import DictList
 from slugify import Slugify
 
-import ssbio.cobra.utils
+import ssbio.core.modelpro
 import ssbio.databases.ncbi
 import ssbio.databases.patric
 import ssbio.protein.sequence.properties.residues
