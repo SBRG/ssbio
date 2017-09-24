@@ -5,33 +5,30 @@ import shutil
 from copy import copy
 
 import pandas as pd
-import requests
-import ssbio.protein.structure.properties.msms
-import ssbio.protein.structure.properties.quality
-import ssbio.protein.structure.properties.residues
 from Bio import SeqIO
-from Bio.PDB.PDBExceptions import PDBException
 from bioservices import KEGG
 from bioservices import UniProt
 from cobra.core import DictList
-from slugify import Slugify
 from six.moves.urllib.error import HTTPError
+from slugify import Slugify
 
-import ssbio.cobra.utils
+import ssbio.core.modelpro
 import ssbio.databases.kegg
 import ssbio.databases.pdb
 import ssbio.databases.uniprot
 import ssbio.protein.sequence.properties.residues
 import ssbio.protein.sequence.properties.tmhmm
 import ssbio.protein.sequence.utils.fasta
+import ssbio.protein.structure.properties.msms
+import ssbio.protein.structure.properties.quality
+import ssbio.protein.structure.properties.residues
 from ssbio import utils
-from ssbio.cobra.utils import ModelPro
 from ssbio.core.genepro import GenePro
+from ssbio.core.modelpro import ModelPro
 from ssbio.core.object import Object
 from ssbio.databases.kegg import KEGGProp
 from ssbio.databases.uniprot import UniProtProp
 from ssbio.protein.sequence.properties.scratch import SCRATCH
-from ssbio.protein.structure.homology.itasser.itasserprep import ITASSERPrep
 
 if utils.is_ipynb():
     from tqdm import tqdm_notebook as tqdm
@@ -83,8 +80,6 @@ class GEMPRO(Object):
             This will be the name of the main folder that is created in root_dir.
         pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
             choose a file type for files downloaded from the PDB
-        create_dirs (bool): If GEM-PRO directories should be created - if not,
-            most mapping functions need an output directory specified.
         root_dir (str): Path to where the folder named gem_name will be created.
             Default is current working directory.
         genome_path (str): Simple reference link to the genome FASTA file (CDS)
@@ -97,7 +92,7 @@ class GEMPRO(Object):
 
     """
 
-    def __init__(self, gem_name, pdb_file_type='cif', create_dirs=True, root_dir=None, genome_path=None,
+    def __init__(self, gem_name, pdb_file_type='cif', root_dir=None, genome_path=None,
                  gem=None,
                  gem_file_path=None, gem_file_type=None,
                  genes_list=None,
@@ -112,23 +107,19 @@ class GEMPRO(Object):
 
         # Create directories
         self._root_dir = None
-        if create_dirs:
-            if not root_dir:
-                root_dir = os.getcwd()
+        if root_dir:
             self.root_dir = root_dir
 
-        self.model = None
         # Load a model object
+        self.model = None
         if gem:
-            self._load_cobra_model(gem)
+            self.load_cobra_model(gem)
 
         # Or, load a GEM file
         elif gem_file_path and gem_file_type:
-            gem_manual = ssbio.cobra.utils.model_loader(gem_file_path=gem_file_path,
-                                                        gem_file_type=gem_file_type,
-                                                        pdb_file_type=pdb_file_type,
-                                                        genes_dir=self.genes_dir)
-            self._load_cobra_model(gem_manual)
+            gem = ssbio.core.modelpro.model_loader(gem_file_path=gem_file_path,
+                                                   gem_file_type=gem_file_type)
+            self.load_cobra_model(gem)
 
         # Or, load a list of gene IDs
         elif genes_list:
@@ -155,22 +146,31 @@ class GEMPRO(Object):
 
     @root_dir.setter
     def root_dir(self, path):
+        if not path:
+            raise ValueError('No path specified')
+
         if not op.exists(path):
             raise ValueError('{}: folder does not exist'.format(path))
 
+        if self._root_dir:
+            log.info('Changing root directory of GEM-PRO project "{}" from {} to {}'.format(self.id, self.root_dir, path))
+
+            if not op.exists(op.join(path, self.id)):
+                raise IOError('GEM-PRO project "{}" does not exist in folder {}'.format(self.id, path))
+        else:
+            log.info('Creating GEM-PRO project directory in folder {}'.format(path))
+
         self._root_dir = path
 
-        if path:
-            for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir]:
-                ssbio.utils.make_dir(d)
+        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir]:
+            ssbio.utils.make_dir(d)
 
-            log.info('{}: GEM-PRO project location'.format(self.base_dir))
+        log.info('{}: GEM-PRO project location'.format(self.base_dir))
 
-            # # Genes dir is now set in the genes.setter instead
-            # for g in self.genes:
-            #     g.root_dir = self.genes_dir
-        else:
-            log.warning('Root directory not set')
+        # Propagate changes to gene
+        if hasattr(self, 'genes'):
+            for g in self.genes:
+                g.root_dir = self.genes_dir
 
     @property
     def base_dir(self):
@@ -178,7 +178,6 @@ class GEMPRO(Object):
         if self.root_dir:
             return op.join(self.root_dir, self.id)
         else:
-            log.warning('Root directory not set')
             return None
 
     @property
@@ -187,7 +186,6 @@ class GEMPRO(Object):
         if self.root_dir:
             return op.join(self.base_dir, 'model')
         else:
-            log.warning('Root directory not set')
             return None
 
     @property
@@ -196,7 +194,6 @@ class GEMPRO(Object):
         if self.root_dir:
             return op.join(self.base_dir, 'data')
         else:
-            log.warning('Root directory not set')
             return None
 
     @property
@@ -205,10 +202,9 @@ class GEMPRO(Object):
         if self.root_dir:
             return op.join(self.base_dir, 'genes')
         else:
-            log.warning('Root directory not set')
             return None
 
-    def _load_cobra_model(self, model):
+    def load_cobra_model(self, model):
         """Load a COBRApy Model object into the GEM-PRO project.
 
         Args:
@@ -217,15 +213,16 @@ class GEMPRO(Object):
         """
         self.model = ModelPro(model)
         for g in self.model.genes:
-            g.root_dir = self.genes_dir
+            if self.genes_dir:
+                g.root_dir = self.genes_dir
             g.protein.pdb_file_type = self.pdb_file_type
         self.genes = self.model.genes
 
         log.info('{}: loaded model'.format(model.id))
         log.info('{}: number of reactions'.format(len(self.model.reactions)))
-        log.info('{}: number of reactions linked to a gene'.format(ssbio.cobra.utils.true_num_reactions(self.model)))
-        log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.cobra.utils.true_num_genes(self.model,
-                                                                                                       custom_spont_id=self.custom_spont_id)))
+        log.info('{}: number of reactions linked to a gene'.format(ssbio.core.modelpro.true_num_reactions(self.model)))
+        log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.core.modelpro.true_num_genes(self.model,
+                                                                                                         custom_spont_id=self.custom_spont_id)))
         log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
         log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
 
@@ -248,7 +245,7 @@ class GEMPRO(Object):
     def genes_with_a_representative_sequence(self):
         """DictList: All genes with a representative sequence"""
         tmp = DictList(x for x in self.genes if x.protein.representative_sequence)
-        return DictList(y for y in tmp if y.protein.representative_sequence.sequence_file or y.protein.representative_sequence.metadata_file)
+        return DictList(y for y in tmp if y.protein.representative_sequence.seq)
 
     @property
     def genes_with_a_representative_structure(self):
@@ -258,7 +255,7 @@ class GEMPRO(Object):
 
     @property
     def genes(self):
-        return ssbio.cobra.utils.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
+        return ssbio.core.modelpro.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
 
     @genes.setter
     def genes(self, genes_list):
@@ -638,7 +635,7 @@ class GEMPRO(Object):
         Annotations are stored in the protein's sequence at ``.annotations``
 
         """
-        for g in tqdm(self.genes):
+        for g in tqdm(self.genes_with_a_representative_sequence):
             g.protein.get_sequence_properties(representative_only=representatives_only)
 
     def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', num_cores=1,
@@ -817,11 +814,12 @@ class GEMPRO(Object):
         """
         counter = 0
 
-        for g in tqdm(self.genes):
+        for g in tqdm(self.genes_with_a_representative_sequence):
             # If all_genes=False, BLAST only genes without a uniprot -> pdb mapping
-            if g.protein.num_structures > 0 and not all_genes and not force_rerun:
-                log.debug('{}: skipping BLAST, {} structures already mapped and all_genes flag is False'.format(g.id,
-                                                                                                                g.protein.num_structures))
+            if g.protein.num_structures_experimental > 0 and not all_genes and not force_rerun:
+                log.debug('{}: skipping BLAST, {} experimental structures already mapped '
+                          'and all_genes flag is False'.format(g.id,
+                                                               g.protein.num_structures_experimental))
                 continue
 
             # BLAST the sequence to the PDB
@@ -1208,65 +1206,6 @@ class GEMPRO(Object):
 
     ### END STRUCTURE RELATED METHODS ###
     ####################################################################################################################
-
-    # def run_pipeline(self, sequence_mapping_engine='', structure_mapping_engine='', **kwargs):
-    #     """Run the entire GEM-PRO pipeline.
-    #
-    #     Options include:
-    #     ...
-    #
-    #     Returns:
-    #
-    #     """
-    #     current_sequence_mapping_engines = ['kegg', 'uniprot', 'all']
-    #     if sequence_mapping_engine not in current_sequence_mapping_engines:
-    #         raise ValueError('Sequence mapping engine not available')
-    #
-    #     if sequence_mapping_engine == 'kegg' or sequence_mapping_engine == 'all':
-    #         if 'kegg_organism_code' not in kwargs:
-    #             raise TypeError('kegg_organism_code needed')
-    #
-    #     if sequence_mapping_engine == 'uniprot' or sequence_mapping_engine == 'all':
-    #         if 'model_gene_source' not in kwargs:
-    #             raise TypeError('UniProt model_gene_source needed')
-    #
-    #     print('Running KEGG mapping...')
-    #     # TODO: better way of passing optional arguments to these things - yaml? There are too many if statements to check for things
-    #     if 'custom_gene_mapping' in kwargs:
-    #         self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'], custom_gene_mapping=kwargs['custom_gene_mapping'])
-    #     else:
-    #         self.kegg_mapping_and_metadata(kegg_organism_code=kwargs['kegg_organism_code'])
-    #
-    #     print('Running UniProt mapping...')
-    #     self.uniprot_mapping_and_metadata(model_gene_source=kwargs['model_gene_source'])
-    #
-    #     print('Setting representative sequences...')
-    #     self.set_representative_sequence()
-    #
-    #     current_structure_mapping_engines = ['uniprot', 'itasser', 'all', 'none'] # 'blast', 'manual_homology'
-    #     if structure_mapping_engine not in current_structure_mapping_engines:
-    #         raise ValueError('Structure mapping engine not available')
-    #
-    #     if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
-    #         if 'homology_raw_dir' not in kwargs:
-    #             raise TypeError('Path to homology models needed as homology_raw_dir')
-    #
-    #     if not structure_mapping_engine == 'none':
-    #         if 'always_use_homology' not in kwargs:
-    #             raise TypeError('Flag always_use_homology needed')
-    #
-    #     if structure_mapping_engine == 'uniprot' or structure_mapping_engine == 'all':
-    #         print('Mapping UniProt IDs to the PDB...')
-    #         self.map_uniprot_to_pdb()
-    #
-    #     if structure_mapping_engine == 'itasser' or structure_mapping_engine == 'all':
-    #         print('Copying I-TASSER models...')
-    #         self.get_itasser_models(homology_raw_dir=kwargs['homology_raw_dir'],
-    #                                 custom_itasser_name_mapping=kwargs['custom_itasser_name_mapping'])
-    #
-    #     if not structure_mapping_engine == 'none':
-    #         print('Setting representative structures...')
-    #         self.set_representative_structure(always_use_homology=kwargs['always_use_homology'])
 
     def __json_encode__(self):
         to_return = {}

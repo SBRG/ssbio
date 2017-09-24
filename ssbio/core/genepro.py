@@ -12,9 +12,15 @@ class GenePro(Gene):
 
     def __init__(self, id, name='', functional=True, root_dir=None, pdb_file_type='cif'):
         Gene.__init__(self, id=id, name=name, functional=functional)
-        self.protein = Protein(ident=id, root_dir=root_dir, pdb_file_type=pdb_file_type)
 
-        self.root_dir = root_dir
+        self.pdb_file_type = pdb_file_type
+
+        # Create directories
+        self._root_dir = None
+        if root_dir:
+            self.root_dir = root_dir
+
+        self.protein = Protein(ident=id, root_dir=self.gene_dir, pdb_file_type=self.pdb_file_type)
 
     @property
     def root_dir(self):
@@ -23,15 +29,24 @@ class GenePro(Gene):
 
     @root_dir.setter
     def root_dir(self, path):
+        if not path:
+            raise ValueError('No path specified')
+
+        if not op.exists(path):
+            raise ValueError('{}: folder does not exist'.format(path))
+
+        if self._root_dir:
+            log.debug('Changing root directory of Gene "{}" from {} to {}'.format(self.id, self.root_dir, path))
+
+            if not op.exists(op.join(path, self.id)):
+                raise IOError('Gene "{}" does not exist in folder {}'.format(self.id, path))
+
         self._root_dir = path
 
-        if path:
-            if not op.exists(path):
-                raise ValueError('{}: folder does not exist'.format(path))
+        ssbio.utils.make_dir(self.gene_dir)
 
-            ssbio.utils.make_dir(self.gene_dir)
-
-            # Additionally set the protein folder path
+        # Propagate changes to protein
+        if hasattr(self, 'protein'):
             self.protein.root_dir = self.gene_dir
 
     @property
@@ -40,18 +55,17 @@ class GenePro(Gene):
         if self.root_dir:
             return op.join(self.root_dir, self.id)
         else:
-            log.warning('Root directory not set')
             return None
 
     def reset_protein(self):
-        self.protein = Protein(self.id)
+        self.protein = Protein(self.id, root_dir=self.gene_dir, pdb_file_type=self.pdb_file_type)
 
     def __json_encode__(self):
         reqd_attribs = cobra.io.dict._REQUIRED_GENE_ATTRIBUTES
         optn_attribs = cobra.io.dict._OPTIONAL_GENE_ATTRIBUTES
         ordered_optn_attribs = cobra.io.dict._ORDERED_OPTIONAL_GENE_KEYS
-        optn_attribs.update({'root_dir': None})
-        ordered_optn_attribs.append('root_dir')
+        optn_attribs.update({'_root_dir': None})
+        ordered_optn_attribs.append('_root_dir')
         new_gene = {key: str(getattr(self, key))
                     for key in reqd_attribs}
         cobra.io.dict._update_optional(self, new_gene, optn_attribs, ordered_optn_attribs)
@@ -62,16 +76,5 @@ class GenePro(Gene):
         return new_gene
 
     def __json_decode__(self, **attrs):
-        Gene.__init__(self, id=attrs['id'])
-        self.protein = attrs['protein']
-
         for k, v in attrs.items():
-            # print(k)
-            if k == 'root_dir':
-                if op.exists(v):
-                    setattr(self, k, v)
-                else:
-                    log.debug('Directory does not exist, files will not be mapped')
-                    continue
-            if k not in ['protein', 'id', 'root_dir']:
-                setattr(self, k, v)
+            setattr(self, k, v)

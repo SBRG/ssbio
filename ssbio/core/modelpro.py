@@ -58,35 +58,28 @@ class ModelPro(Model):
                 setattr(self, k, v)
 
 
-def model_loader(gem_file_path, gem_file_type, pdb_file_type='cif', genes_dir=None):
+def model_loader(gem_file_path, gem_file_type):
     """Consolidated function to load a GEM using COBRApy. Specify the file type being loaded.
 
     Args:
         gem_file_path (str): Path to model file
-        gem_file_type (str): GEM model type - 'sbml' (or 'xml'), 'mat', or 'json' format
+        gem_file_type (str): GEM model type - ``sbml`` (or ``xml``), ``mat``, or ``json`` format
 
     Returns:
         COBRApy Model object.
 
     """
 
-    extension = op.splitext(gem_file_path)[1]
-
-    if gem_file_type.replace('.', '').lower() == 'xml' or gem_file_type.replace('.', '').lower() == 'sbml':
+    if gem_file_type.lower() == 'xml' or gem_file_type.lower() == 'sbml':
         model = read_sbml_model(gem_file_path)
-    elif extension.replace('.', '').lower() == 'mat':
+    elif gem_file_type.lower() == 'mat':
         model = load_matlab_model(gem_file_path)
-    elif extension.replace('.', '').lower() == 'json':
+    elif gem_file_type.lower() == 'json':
         model = load_json_model(gem_file_path)
     else:
-        raise ValueError('File type must be in SBML, MATLAB, or JSON formats.')
+        raise ValueError('File type must be "sbml", "xml", "mat", or "json".')
 
-    modelpro = ModelPro(model)
-    for g in modelpro.genes:
-        g.root_dir = genes_dir
-        g.protein.pdb_file_type = pdb_file_type
-
-    return modelpro
+    return model
 
 
 def is_spontaneous(gene, custom_id=None):
@@ -94,12 +87,13 @@ def is_spontaneous(gene, custom_id=None):
     
     Args:
         gene (Gene): COBRApy Gene
-        custom_id (str): Custom spontaneous ID if not matching regex
+        custom_id (str): Optional custom spontaneous ID if it does not match the regular expression ``[Ss](_|)0001``
 
     Returns:
         bool: If gene ID matches spontaneous ID
 
     """
+
     spont = re.compile("[Ss](_|)0001")
     if spont.match(gene.id):
         return True
@@ -113,7 +107,8 @@ def filter_out_spontaneous_genes(genes, custom_spont_id=None):
     """Return the DictList of genes that are not spontaneous in a model.
 
     Args:
-        model: COBRApy Model object
+        genes (DictList): Genes DictList
+        custom_spont_id (str): Optional custom spontaneous ID if it does not match the regular expression ``[Ss](_|)0001``
 
     Returns:
         DictList: genes excluding ones that are spontaneous
@@ -126,11 +121,17 @@ def filter_out_spontaneous_genes(genes, custom_spont_id=None):
 
     return new_genes
 
-def true_num_genes(model, custom_spont_id=None):
-    """Return the number of genes in a model ignoring spontaneously labeled genes
 
-    :param model: COBRApy Model object
-    :return int: Number of genes excluding spontaneous genes
+def true_num_genes(model, custom_spont_id=None):
+    """Return the number of genes in a model ignoring spontaneously labeled genes.
+
+    Args:
+        model (Model):
+        custom_spont_id (str): Optional custom spontaneous ID if it does not match the regular expression ``[Ss](_|)0001``
+
+    Returns:
+        int: Number of genes excluding spontaneous genes
+
     """
     true_num = 0
     for gene in model.genes:
@@ -140,6 +141,16 @@ def true_num_genes(model, custom_spont_id=None):
 
 
 def true_num_reactions(model, custom_spont_id=None):
+    """Return the number of reactions associated with a gene.
+
+    Args:
+        model (Model):
+        custom_spont_id (str): Optional custom spontaneous ID if it does not match the regular expression ``[Ss](_|)0001``
+
+    Returns:
+        int: Number of reactions associated with a gene
+
+    """
     true_num = 0
     for rxn in model.reactions:
         if len(rxn.genes) == 0:
