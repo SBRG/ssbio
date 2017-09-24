@@ -76,5 +76,7 @@ class GenePro(Gene):
         return new_gene
 
     def __json_decode__(self, **attrs):
+        Gene.__init__(self, id=attrs['id'])
         for k, v in attrs.items():
-            setattr(self, k, v)
+            if k not in ['id']:
+                setattr(self, k, v)
