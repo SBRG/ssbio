@@ -1,5 +1,6 @@
 import pytest
 import os.path as op
+import ssbio.utils
 from Bio import SeqIO
 from BCBio import GFF
 from Bio.Seq import Seq
@@ -187,8 +188,9 @@ class TestSeqPropWithId():
 
     def test_get_emboss_pepstats_success(self, seqprop_with_i):
         """Test that EMBOSS pepstats does run when a file has been written"""
-        seqprop_with_i.get_emboss_pepstats()
-        assert 'percent_charged' in seqprop_with_i.annotations
+        if ssbio.utils.program_exists('pepstats'):
+            seqprop_with_i.get_emboss_pepstats()
+            assert 'percent_charged' in seqprop_with_i.annotations
 
     def test_set_metadata_path(self, seqprop_with_i, metadata_path, metadata_file, test_files_sequences):
         """Test setting the metadata file"""
