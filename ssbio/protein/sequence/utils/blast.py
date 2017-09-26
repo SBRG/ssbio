@@ -152,8 +152,8 @@ def print_run_bidirectional_blast(reference, other_genome, dbtype, outdir):
     g_folder, g_name, g_ext = utils.split_folder_and_path(other_genome)
 
     # Reference vs genome
-    r_vs_g_name = r_name + '_vs_' + g_name + '_runblast'
-    r_vs_g = r_vs_g_name + '.out'
+    r_vs_g_name = r_name + '_vs_' + g_name
+    r_vs_g = r_vs_g_name + '_blast.out'
     if op.exists(op.join(outdir, r_vs_g)) and os.stat(op.join(outdir, r_vs_g)).st_size != 0:
         log.debug('{} vs {} BLAST already run'.format(r_name, g_name))
     else:
@@ -163,8 +163,8 @@ def print_run_bidirectional_blast(reference, other_genome, dbtype, outdir):
                                   walltime='00:15:00', queue='regular')
 
     # Genome vs reference
-    g_vs_r_name = g_name + '_vs_' + r_name + '_runblast'
-    g_vs_r = g_vs_r_name + '.out'
+    g_vs_r_name = g_name + '_vs_' + r_name
+    g_vs_r = g_vs_r_name + '_blast.out'
     if op.exists(op.join(outdir, g_vs_r)) and os.stat(op.join(outdir, g_vs_r)).st_size != 0:
         log.debug('{} vs {} BLAST already run'.format(g_name, r_name))
     else:
