@@ -45,6 +45,7 @@ bs_kegg = KEGG()
 
 
 class GEMPRO(Object):
+
     """Generic class to represent all information for a GEM-PRO project.
 
     Initialize the GEM-PRO project with a genome-scale model, a list of genes, or a dict of genes and sequences.
@@ -80,8 +81,8 @@ class GEMPRO(Object):
             This will be the name of the main folder that is created in root_dir.
         pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
             choose a file type for files downloaded from the PDB
-        root_dir (str): Path to where the folder named gem_name will be created.
-            Default is current working directory.
+        root_dir (str): Path to where the folder named after ``gem_name`` will be created. If not provided,
+            directories will not be created and output directories need to be specified for some steps
         genome_path (str): Simple reference link to the genome FASTA file (CDS)
         gem (Model): COBRApy Model object
         gem_file_path (str): Path to GEM file
@@ -141,7 +142,7 @@ class GEMPRO(Object):
 
     @property
     def root_dir(self):
-        """str: Directory where GEM-PRO project folder ``base_dir`` is located"""
+        """str: Directory where GEM-PRO project folder named after the attribute ``base_dir`` is located"""
         return self._root_dir
 
     @root_dir.setter
@@ -183,7 +184,7 @@ class GEMPRO(Object):
     @property
     def model_dir(self):
         """str: Directory where original GEMs and GEM-related files are stored"""
-        if self.root_dir:
+        if self.base_dir:
             return op.join(self.base_dir, 'model')
         else:
             return None
@@ -191,7 +192,7 @@ class GEMPRO(Object):
     @property
     def data_dir(self):
         """str: Directory where all data (dataframes and more) will be stored"""
-        if self.root_dir:
+        if self.base_dir:
             return op.join(self.base_dir, 'data')
         else:
             return None
@@ -199,7 +200,7 @@ class GEMPRO(Object):
     @property
     def genes_dir(self):
         """str: Directory where all gene specific information is stored"""
-        if self.root_dir:
+        if self.base_dir:
             return op.join(self.base_dir, 'genes')
         else:
             return None
@@ -658,7 +659,7 @@ class GEMPRO(Object):
         """
         if not self.genome_path:
             # Write all sequences as one file
-            all_seqs = self.write_representative_sequences_file(outname='{}_cds'.format(self.id))
+            all_seqs = self.write_representative_sequences_file()
 
         # Runs SCRATCH or loads existing results in results_dir
         scratch = SCRATCH(project_name=scratch_basename, seq_file=self.genome_path)
