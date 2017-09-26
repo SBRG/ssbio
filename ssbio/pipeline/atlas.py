@@ -452,7 +452,7 @@ class ATLAS(Object):
         else:
             for g in genes_to_remove:
                 strain_gempro.genes.get_by_id(g).functional = False
-            log.info('{}: marked {} genes as non functional'.format(strain_gempro.id, len(genes_to_remove)))
+            log.info('{}: marked {} genes as non-functional'.format(strain_gempro.id, len(genes_to_remove)))
 
     def _load_strain_sequences(self, strain_gempro):
         """Load strain sequences from the orthology matrix into the base model for comparisons, and into the
