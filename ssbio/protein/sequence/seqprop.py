@@ -90,6 +90,14 @@ class SeqProp(SeqRecord, Object):
         self.feature_file = None
         self._features = None
 
+        # Stuff from SeqRecord
+        self.name = None
+        self.description = None
+        self.dbxrefs = None
+        self.features = None
+        self.annotations = None
+        self._per_letter_annotations = None
+
         self._seq = None
         self.seq = seq
         SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
