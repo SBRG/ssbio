@@ -451,8 +451,7 @@ class ATLAS(Object):
         # Otherwise, just mark the genes as non-functional
         else:
             for g in genes_to_remove:
-                my_gene = strain_gempro.genes.get_by_id(g)
-                my_gene.functional = False
+                strain_gempro.genes.get_by_id(g).functional = False
             log.info('{}: marked {} genes as non functional'.format(strain_gempro.id, len(genes_to_remove)))
 
     def _load_strain_sequences(self, strain_gempro):
