@@ -492,8 +492,8 @@ def write_torque_script(command, outfile, walltime, queue, name, out, err, print
         script.write('#PBS -l walltime={}\n'.format(walltime))
         script.write('#PBS -q regular\n')
         script.write('#PBS -N {}\n'.format(name))
-        script.write('#PBS -o {}.out\n'.format(out))
-        script.write('#PBS -e {}.err\n'.format(err))
+        script.write('#PBS -o {}.o\n'.format(out))
+        script.write('#PBS -e {}.e\n'.format(err))
         script.write('cd ${PBS_O_WORKDIR}\n')
         script.write(command)
 

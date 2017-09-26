@@ -15,4 +15,4 @@ class TestATLAS(unittest.TestCase):
         my_gempro = GEMPRO(GEM_NAME, ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
 
         # Prepare your ATLAS analysis
-        self.atlas = ATLAS(atlas_name='atlas_test', base_gempro=my_gempro)
+        self.atlas = ATLAS(atlas_name='atlas_test', reference_gempro=my_gempro)

@@ -2,6 +2,14 @@ import os
 import subprocess
 import os.path as op
 from ssbio import utils
+try:
+    from IPython.display import clear_output
+    have_ipython = True
+    from tqdm import tqdm_notebook as tqdm
+except ImportError:
+    have_ipython = False
+    from tqdm import tqdm
+
 date = utils.Date()
 
 import logging
@@ -22,7 +30,7 @@ def run_makeblastdb(infile, dbtype, outdir=''):
         Paths to BLAST databases.
 
     """
-
+    # TODO: add force_rerun option
     # TODO: rewrite using utils function command
 
     # Output location
@@ -74,6 +82,7 @@ def run_bidirectional_blast(reference, other_genome, dbtype, outdir=''):
         (reference_vs_othergenome.out, othergenome_vs_reference.out)
 
     """
+    # TODO: add force_rerun option
 
     if dbtype == 'nucl':
         command = 'blastn'
@@ -120,6 +129,51 @@ def run_bidirectional_blast(reference, other_genome, dbtype, outdir=''):
     return r_vs_g, g_vs_r
 
 
+def print_run_bidirectional_blast(reference, other_genome, dbtype, outdir):
+    """Write torque submission files for running bidirectional blast on a server and print execution command.
+
+    Args:
+        reference (str): Path to "reference" genome, aka your "base strain"
+        other_genome (str): Path to other genome which will be BLASTed to the reference
+        dbtype (str): "nucl" or "prot" - what format your genome files are in
+        outdir (str): Path to folder where Torque scripts should be placed
+
+    """
+    # TODO: add force_rerun option
+
+    if dbtype == 'nucl':
+        command = 'blastn'
+    elif dbtype == 'prot':
+        command = 'blastp'
+    else:
+        raise ValueError('dbtype must be "nucl" or "prot"')
+
+    r_folder, r_name, r_ext = utils.split_folder_and_path(reference)
+    g_folder, g_name, g_ext = utils.split_folder_and_path(other_genome)
+
+    # Reference vs genome
+    r_vs_g_name = r_name + '_vs_' + g_name + '_runblast'
+    r_vs_g = r_vs_g_name + '.out'
+    if op.exists(op.join(outdir, r_vs_g)) and os.stat(op.join(outdir, r_vs_g)).st_size != 0:
+        log.debug('{} vs {} BLAST already run'.format(r_name, g_name))
+    else:
+        cmd = '{} -query {} -db {} -outfmt 6 -out {}'.format(command, reference, g_name, r_vs_g)
+        utils.write_torque_script(command=cmd, err=r_vs_g_name, out=r_vs_g_name, name=r_vs_g_name,
+                                  outfile=op.join(outdir, r_vs_g_name) + '.sh',
+                                  walltime='00:15:00', queue='regular')
+
+    # Genome vs reference
+    g_vs_r_name = g_name + '_vs_' + r_name + '_runblast'
+    g_vs_r = g_vs_r_name + '.out'
+    if op.exists(op.join(outdir, g_vs_r)) and os.stat(op.join(outdir, g_vs_r)).st_size != 0:
+        log.debug('{} vs {} BLAST already run'.format(g_name, r_name))
+    else:
+        cmd = '{} -query {} -db {} -outfmt 6 -out {}'.format(command, other_genome, r_name, g_vs_r)
+        utils.write_torque_script(command=cmd, err=g_vs_r_name, out=g_vs_r_name, name=g_vs_r_name,
+                                  outfile=op.join(outdir, g_vs_r_name) + '.sh',
+                                  walltime='00:15:00', queue='regular')
+
+
 def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, outdir=''):
     """Calculate the best bidirectional BLAST hits (BBH) and save a dataframe of results.
 
@@ -134,6 +188,7 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, ou
         Path to Pandas DataFrame of the BBH results.
 
     """
+    # TODO: add force_rerun option
 
     cols = ['gene', 'subject', 'PID', 'alnLength', 'mismatchCount', 'gapOpenCount', 'queryStart', 'queryEnd',
             'subjectStart', 'subjectEnd', 'eVal', 'bitScore']
@@ -146,13 +201,13 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, ou
         if r_name != r_name2:
             log.warning('{} != {}'.format(r_name, r_name2))
 
-    bbh1 = pd.read_csv(blast_results_1, sep='\t', names=cols)
-    bbh2 = pd.read_csv(blast_results_2, sep='\t', names=cols)
-
     outfile = op.join(outdir, '{}_vs_{}_bbh.csv'.format(r_name, g_name))
     if op.exists(outfile) and os.stat(outfile).st_size != 0:
         log.debug('{} vs {} BLAST BBHs already found at {}'.format(r_name, g_name, outfile))
         return outfile
+
+    bbh1 = pd.read_csv(blast_results_1, sep='\t', names=cols)
+    bbh2 = pd.read_csv(blast_results_2, sep='\t', names=cols)
 
     out = pd.DataFrame()
     log.debug('Finding BBHs for {} vs. {}'.format(r_name, g_name))
@@ -180,7 +235,7 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, ou
 
 
 def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None,
-                            filter_condition='OR', outname='', outdir=''):
+                            filter_condition='OR', outname='', outdir='', force_rerun=False):
     """Create an orthology matrix using best bidirectional BLAST hits (BBH) outputs.
 
     Args:
@@ -194,6 +249,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
             is less stringent, as you will be filtering for hits with (>80% PID or >30 bitscore or <0.0001 evalue).
         outname: Name of output file of orthology matrix
         outdir: Path to output directory
+        force_rerun (bool): Force recreation of the orthology matrix even if the outfile exists
 
     Returns:
         str: Path to orthologous genes matrix.
@@ -203,6 +259,9 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
         outfile = op.join(outdir, outname)
     else:
         outfile = op.join(outdir, '{}_orthology.csv'.format(r_name))
+
+    if op.exists(outfile) and os.stat(outfile).st_size != 0 and not force_rerun:
+        return outfile
 
     if not pid_cutoff and not bitscore_cutoff and not evalue_cutoff:
         log.warning('No cutoffs supplied, insignificant hits may be reported')
@@ -218,7 +277,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
         evalue_cutoff = float('Inf')
 
     out = pd.DataFrame()
-    for g_name, bbh_path in genome_to_bbh_files.items():
+    for g_name, bbh_path in tqdm(genome_to_bbh_files.items()):
 
         df_bbh = pd.read_csv(bbh_path, index_col=0)
         bidirectional = df_bbh[df_bbh.BBH == '<=>']
