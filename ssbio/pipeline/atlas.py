@@ -450,11 +450,9 @@ class ATLAS(Object):
                                                             len(strain_gempro.model._trimmed_reactions)))
         # Otherwise, just mark the genes as non-functional
         else:
-            counter = 0
             for g in genes_to_remove:
                 strain_gempro.genes.get_by_id(g).functional = False
-                counter += 1
-            log.info('{}: marked {} genes as non functional'.format(strain_gempro.id, counter))
+            log.info('{}: marked {} genes as non functional'.format(strain_gempro.id, len(genes_to_remove)))
 
     def _load_strain_sequences(self, strain_gempro):
         """Load strain sequences from the orthology matrix into the base model for comparisons, and into the
