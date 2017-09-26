@@ -427,7 +427,7 @@ class ATLAS(Object):
         # Filter out genes in genes_to_remove which do not show up in the model
         strain_genes = [x.id for x in strain_gempro.genes]
         genes_to_remove = list(set(genes_to_remove).intersection(set(strain_genes)))
-        # genes_to_remove.extend(self.missing_in_orthology_matrix)  # TODO: remove genes not in orthology matrix?
+        genes_to_remove.extend(self.missing_in_orthology_matrix)
 
         if len(genes_to_remove) == 0:
             log.info('{}: no genes marked non-functional'.format(strain_gempro.id))
