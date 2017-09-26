@@ -129,7 +129,7 @@ class Protein(Object):
         if self._root_dir:
             log.debug('Changing root directory of Protein "{}" from {} to {}'.format(self.id, self.root_dir, path))
 
-            if not op.exists(op.join(path, self.id)):
+            if not op.exists(op.join(path, self.id)) and not op.exists(op.join(path, self.id) + '_protein'):
                 raise IOError('Protein "{}" does not exist in folder {}'.format(self.id, path))
 
         self._root_dir = path
