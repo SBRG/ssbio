@@ -2,6 +2,7 @@ import logging
 import os
 import os.path as op
 import sys
+from copy import copy, deepcopy
 
 import cobra.flux_analysis
 import cobra.manipulation
@@ -41,206 +42,212 @@ log = logging.getLogger(__name__)
 
 
 class ATLAS(Object):
+
     """Class to represent an ATLAS workflow to carry out multi-strain comparisons
 
     Main steps are:
-    1. Strain-specific model construction based on orthologous genes & systems modeling
-    2. Phylogenetic analysis to pick out important genes
-    3. GEM-PRO of the "base strain"
-    4. Structure property calculation & integrated structural systems analysis
+
+    #. Strain-specific model construction based on orthologous genes & systems modeling
+    #. Phylogenetic analysis to pick out important genes
+    #. GEM-PRO of the "base strain"
+    #. Structure property calculation & integrated structural systems analysis
 
     Each step may generate a report and also request additional files if something is missing
+
     """
 
-    def __init__(self, atlas_name, base_gempro, base_genome_path=None, description=None):
+    def __init__(self, atlas_name, root_dir, reference_gempro, reference_genome_path=None, description=None):
         """Prepare a GEM-PRO model for ATLAS analysis
 
         Args:
             atlas_name (str): Name of your ATLAS project
-            base_gempro (GEMPRO): Completed GEM-PRO model
-            base_genome_path (str): Simple reference link to the genome FASTA file (CDS)
+            root_dir (str): Path to where the folder named after ``atlas_name`` will be created.
+            reference_gempro (GEMPRO): GEM-PRO model to use as the reference genome
+            reference_genome_path (str): Path to reference genome FASTA file
             description (str): Optional string to describe your project
+
         """
         Object.__init__(self, id=atlas_name, description=description)
-        self.atlas_strains = DictList()
 
-        # Load the GEM-PRO (could be a model, could just be a list of genes)
-        self.base_strain_gempro = base_gempro
+        # Create directories
+        self._root_dir = None
+        self.root_dir = root_dir
 
-        # Check if there is a genome file associated with this model - if not, write all sequences and use that
-        if not base_genome_path and not self.base_strain_gempro.genome_path:
-            self.base_strain_gempro.genome_path = self.base_strain_gempro.write_representative_sequences_file(outname='BASE_CDS')
-        else:
-            self.base_strain_gempro.genome_path = base_genome_path
-            # TODO: must check if base_genome gene IDs can be matched to the base model
-
-        # Prepare ATLAS directories
-        self.atlas_dir = None
-        self.atlas_model_dir = None
-        self.atlas_data_dir = None
-        self.atlas_sequence_dir = None
-        self.atlas_seq_genomes_dir = None
-        self.atlas_seq_genes_dir = None
-        self._create_dirs(self.base_strain_gempro.base_dir)
-
-        # Other attributes
+        self.strains = DictList()
         self.df_orthology_matrix = pd.DataFrame()
         # Mark if the orthology matrix has gene IDs (thus we need to retrieve seqs from the genome file) or if
         # it is in the orthology matrix itself
         self._orthology_matrix_has_sequences = False
 
-    def _create_dirs(self, root_dir):
-        """Internal method to create ATLAS directories.
+        # Load the GEM-PRO (could be a model, could just be a list of genes)
+        # Check if there is a genome file associated with this model - if not, write all sequences and use that
+        self.reference_gempro = reference_gempro
+        if not reference_genome_path and not self.reference_gempro.genome_path:
+            self.reference_gempro.genome_path = self.reference_gempro.write_representative_sequences_file(outname=self.reference_gempro.id)
+        else:
+            self.reference_gempro.genome_path = reference_genome_path
+            # TODO: must also check if reference_genome_path gene IDs can be matched to the reference_gempro
 
-        Args:
-            root_dir (str): Root directory to create a single new ATLAS project folder in
-
-        """
-        list_of_dirs = []
-
-        if not root_dir:
-            root_dir = os.getcwd()
-
-        if not op.exists(root_dir):
-            raise ValueError('{}: folder does not exist'.format(root_dir))
-
-        # atlas_dir - directory where all ATLAS analysis will be carried out
-        self.atlas_dir = op.join(root_dir, 'atlas')
-        list_of_dirs.append(self.atlas_dir)
-
-        # atlas_model_dir - directory where new strain specific models will be stored
-        self.atlas_model_dir = op.join(self.atlas_dir, 'models')
-        list_of_dirs.append(self.atlas_model_dir)
-
-        # atlas_data_dir - directory where all data will be stored
-        self.atlas_data_dir = op.join(self.atlas_dir, 'data')
-        list_of_dirs.append(self.atlas_data_dir)
-
-        # atlas_sequence_dir - sequence related files are stored here
-        self.atlas_sequence_dir = op.join(self.atlas_dir, 'sequences')
-        self.atlas_seq_genomes_dir = op.join(self.atlas_sequence_dir, 'by_organism')
-        self.atlas_seq_genes_dir = op.join(self.atlas_sequence_dir, 'by_gene')
-        list_of_dirs.extend([self.atlas_sequence_dir, self.atlas_seq_genomes_dir, self.atlas_seq_genes_dir])
-
-        # Make the dirs
-        for directory in list_of_dirs:
-            if not op.exists(directory):
-                os.makedirs(directory)
-                log.info('Created directory: {}'.format(directory))
-            else:
-                log.debug('Directory already exists: {}'.format(directory))
-
-        log.info('{}: ATLAS project files location'.format(self.atlas_dir))
-
-    def load_manual_orthology_matrix(self, df, clean_names=True,
-                                     remove_strains_with_no_orthology=True,
-                                     remove_strains_with_no_differences=False,
-                                     remove_genes_not_in_base_model=True):
-        """Load a manually curated orthology matrix to use in ATLAS. Genes = rows, strains = columns.
-
-        Args:
-            df (DataFrame): Pandas DataFrame with genes as the rows and strains as the columns
-            clean_names (bool): Remove unwanted characters from gene names and strain IDs
-            remove_strains_with_no_orthology (bool): Remove strains which have no orthologous genes found
-            remove_strains_with_no_differences (bool): Remove strains which have all the same genes as the base model.
-                Default is False because since orthology is found using a PID cutoff, all genes may be present but
-                differences may be on the sequence level.
-            remove_genes_not_in_base_model (bool): Remove genes from the orthology matrix which are not present in our
-                base model. This happens if we use a genome file for our model that has other genes in it.
-
-        """
-        self._orthology_matrix_has_sequences = True
-
-        if clean_names:
-            new_rows = [custom_slugify(x) for x in df.index]
-            new_cols = [custom_slugify(y) for y in df.columns]
-            df.index = new_rows
-            df.columns = new_cols
-
-        self.df_orthology_matrix = df
-
-        # Make the copies of the base model
-        for strain_id in tqdm(self.df_orthology_matrix.columns):
-            self._copy_base_gempro(new_id=strain_id)
-
-        # Filter the strains and orthology matrix
-        self._filter_with_orthology_matrix(remove_strains_with_no_orthology=remove_strains_with_no_orthology,
-                                           remove_strains_with_no_differences=remove_strains_with_no_differences,
-                                           remove_genes_not_in_base_model=remove_genes_not_in_base_model)
-
-    def _copy_base_gempro(self, new_id):
-        """Copy the base strain GEM-PRO into a new GEM-PRO with a specified ID.
-
-        Appends the model to the atlas_strains attribute.
-
-        Args:
-            new_id (str): New ID to be assigned to the copied model
-
-        Returns:
-            GEMPRO: copied GEM-PRO to represent the new strain
-
-        """
-        # Temporarily disable logging messages
-        logging.disable(logging.WARNING)
-        if self.base_strain_gempro.model:
+        # Also create an attribute
+        self._empty_reference_gempro = None
+        if self.reference_gempro.model:
             # If there is a SBML model associated with the GEMPRO, copy that model
-            copied_model = GEMPRO(gem_name=new_id, create_dirs=False, gem=self.base_strain_gempro.model.copy())
-            copied_model.model.id = new_id
-
+            self._empty_reference_gempro = GEMPRO(gem_name='Copied reference GEM-PRO', gem=self.reference_gempro.model.copy())
             # Reset the GenePro attributes
-            for x in copied_model.genes:
+            for x in self._empty_reference_gempro.genes:
                 x.reset_protein()
         else:
             # Otherwise, just copy the list of genes over and rename the IDs
-            strain_genes = [x.id for x in self.base_strain_gempro.genes]
-            copied_model = GEMPRO(gem_name=new_id, create_dirs=False, genes_list=strain_genes)
-        # Re-enable logging
-        logging.disable(logging.NOTSET)
+            strain_genes = [x.id for x in self.reference_gempro.genes]
+            if len(strain_genes) == 0:
+                raise ValueError('GEM-PRO has no genes, unable to run multi-strain analysis')
+            self._empty_reference_gempro = GEMPRO(gem_name='Copied reference GEM-PRO', genes_list=strain_genes)
 
-        self.atlas_strains.append(copied_model)
-        log.debug('{}: new model copied from base model'.format(new_id))
+    @property
+    def root_dir(self):
+        """str: Directory where ATLAS project folder named after the attribute ``base_dir`` is located"""
+        return self._root_dir
 
-        return self.atlas_strains.get_by_id(new_id)
+    @root_dir.setter
+    def root_dir(self, path):
+        if not path:
+            raise ValueError('No path specified')
 
-    def load_strain_ids_and_genomes(self, ids_to_genome_file):
-        """Load a dictionary of PATRIC IDs which point to the path of their respective genome files.
+        if not op.exists(path):
+            raise ValueError('{}: folder does not exist'.format(path))
 
-        Creates initial copies of the base strain model for each strain ID and stores them in self.atlas_strains
+        if self._root_dir:
+            log.info('Changing root directory of project "{}" from {} to {}'.format(self.id, self.root_dir, path))
+
+            if not op.exists(op.join(path, self.id)):
+                raise IOError('Project "{}" does not exist in folder {}'.format(self.id, path))
+        else:
+            log.info('Creating project directory in folder {}'.format(path))
+
+        self._root_dir = path
+
+        for d in [self.base_dir, self.model_dir, self.data_dir,
+                  self.sequences_dir, self.sequences_by_gene_dir, self.sequences_by_organism_dir]:
+            ssbio.utils.make_dir(d)
+
+        log.info('{}: project location'.format(self.base_dir))
+
+    @property
+    def base_dir(self):
+        """str: ATLAS project folder"""
+        if self.root_dir:
+            return op.join(self.root_dir, self.id)
+        else:
+            return None
+
+    @property
+    def model_dir(self):
+        """str: Directory where strain-specific GEMs are stored"""
+        if self.base_dir:
+            return op.join(self.base_dir, 'model')
+        else:
+            return None
+
+    @property
+    def data_dir(self):
+        """str: Directory where all data (dataframes and more) will be stored"""
+        if self.base_dir:
+            return op.join(self.base_dir, 'data')
+        else:
+            return None
+
+    @property
+    def sequences_dir(self):
+        """str: Base directory for genome protein sequences and alignments"""
+        if self.base_dir:
+            return op.join(self.base_dir, 'sequences')
+        else:
+            return None
+
+    @property
+    def sequences_by_gene_dir(self):
+        """str: Directory where all gene specific information and pairwise alignments are stored"""
+        if self.sequences_dir:
+            return op.join(self.sequences_dir, 'by_gene')
+        else:
+            return None
+
+    @property
+    def sequences_by_organism_dir(self):
+        """str: Directory where all strain specific genome and BLAST files are stored"""
+        if self.sequences_dir:
+            return op.join(self.sequences_dir, 'by_organism')
+        else:
+            return None
+
+    # def _copy_reference_gempro(self, new_id):
+    #     """Copy the base strain GEM-PRO into a new GEM-PRO with a specified ID.
+    #
+    #     Appends the model to the strains attribute.
+    #
+    #     Args:
+    #         new_id (str): New ID to be assigned to the copied model
+    #
+    #     Returns:
+    #         GEMPRO: copied GEM-PRO to represent the new strain
+    #
+    #     """
+    #     logging.disable(logging.WARNING)
+    #     if self.reference_gempro.model:
+    #         # If there is a SBML model associated with the GEMPRO, copy that model
+    #         copied_model = GEMPRO(gem_name=new_id, gem=self._model_to_copy.model.copy())
+    #         copied_model.model.id = new_id
+    #     else:
+    #         # Otherwise, just copy the list of genes over and rename the IDs
+    #         strain_genes = [x.id for x in self._model_to_copy.genes]
+    #         copied_model = GEMPRO(gem_name=new_id, genes_list=strain_genes)
+    #     # Re-enable logging
+    #     logging.disable(logging.NOTSET)
+    #
+    #     self.strains.append(copied_model)
+    #     log.debug('{}: new model copied from base model'.format(new_id))
+    #
+    #     return self.strains.get_by_id(new_id)
+
+    def load_strain(self, strain_id, strain_genome_file):
+        """Load a strain as a new GEM-PRO by its ID and associated genome file. Stored in the ``strains`` attribute.
 
         Args:
-            ids_to_genome_file (dict): Keys are PATRIC IDs (which will become your strain IDs) and
-                values are absolute paths to the FASTA file containing CDS regions
+            strain_id (str): Strain ID
+            strain_genome_file (str): Path to strain genome file
 
         """
-        for strain_id, genome_path in tqdm(ids_to_genome_file.items()):
-            strain_gp = self._copy_base_gempro(new_id=strain_id)
-            strain_gp.genome_path = genome_path
+        logging.disable(logging.WARNING)
+        strain_gp = GEMPRO(gem_name=strain_id, genome_path=strain_genome_file)
+        logging.disable(logging.NOTSET)
 
-    def download_genome_cds_patric(self, ids, force_rerun=False):
-        """Download genome files from PATRIC give a list of IDs
+        self.strains.append(strain_gp)
+        return self.strains.get_by_id(strain_id)
+
+    def download_patric_genomes(self, ids, force_rerun=False):
+        """Download genome files from PATRIC given a list of PATRIC genome IDs and load them as strains.
 
         Args:
             ids (str, list): PATRIC ID or list of PATRIC IDs
-            force_rerun: If genome files should be downloaded again even if they exist
+            force_rerun (bool): If genome files should be downloaded again even if they exist
 
         """
-        strains_to_fasta_file = {}
         ids = ssbio.utils.force_list(ids)
 
+        counter = 0
         log.info('Downloading sequences from PATRIC...')
         for patric_id in tqdm(ids):
             f = ssbio.databases.patric.download_coding_sequences(patric_id=patric_id, seqtype='protein',
-                                                                 outdir=self.atlas_seq_genomes_dir,
+                                                                 outdir=self.sequences_by_organism_dir,
                                                                  force_rerun=force_rerun)
             if f:
-                strains_to_fasta_file[patric_id] = f
+                self.load_strain(patric_id, f)
+                counter += 1
                 log.debug('{}: downloaded sequence'.format(patric_id))
             else:
                 log.warning('{}: unable to download sequence'.format(patric_id))
 
-        log.info('Copying base strain to create initial strain specific models...')
-        self.load_strain_ids_and_genomes(strains_to_fasta_file)
-        log.info('Created {} new strain GEM-PROs, accessible at "atlas_strains"'.format(len(strains_to_fasta_file)))
+        log.info('Created {} new strain GEM-PROs, accessible at "strains" attribute'.format(counter))
 
     def get_orthology_matrix(self, pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None, filter_condition='OR',
                              remove_strains_with_no_orthology=True,
@@ -270,50 +277,86 @@ class ATLAS(Object):
         # TODO: document and test other cutoffs
 
         # Get the path to the reference genome
-        r_file = self.base_strain_gempro.genome_path
+        r_file = self.reference_gempro.genome_path
 
         bbh_files = {}
 
-        for strain_model in tqdm(self.atlas_strains):
-            g_file = strain_model.genome_path
+        log.info('Running bidirectional BLAST and finding best bidirectional hits (BBH)...')
+        for strain_gempro in tqdm(self.strains):
+            g_file = strain_gempro.genome_path
 
             # Run bidirectional BLAST
-            log.debug('{} vs {}: Running bidirectional BLAST'.format(self.base_strain_gempro.id, strain_model.id))
-            r_vs_g, g_vs_r = ssbio.protein.sequence.utils.blast.run_bidirectional_blast(reference=r_file, other_genome=g_file,
+            log.debug('{} vs {}: Running bidirectional BLAST'.format(self.reference_gempro.id, strain_gempro.id))
+            r_vs_g, g_vs_r = ssbio.protein.sequence.utils.blast.run_bidirectional_blast(reference=r_file,
+                                                                                        other_genome=g_file,
                                                                                         dbtype='prot',
-                                                                                        outdir=self.atlas_seq_genomes_dir)
+                                                                                        outdir=self.sequences_by_organism_dir)
 
             # Using the BLAST files, find the BBH
-            log.debug('{} vs {}: Finding BBHs'.format(self.base_strain_gempro.id, strain_model.id))
+            log.debug('{} vs {}: Finding BBHs'.format(self.reference_gempro.id, strain_gempro.id))
             bbh = ssbio.protein.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
-                                                                   outdir=self.atlas_seq_genomes_dir)
-            bbh_files[strain_model.id] = bbh
+                                                                   outdir=self.sequences_by_organism_dir)
+            bbh_files[strain_gempro.id] = bbh
 
         # Make the orthologous genes matrix
-        log.debug('Creating orthology matrix')
-        ortho_matrix = ssbio.protein.sequence.utils.blast.create_orthology_matrix(r_name=self.base_strain_gempro.id,
+        log.info('Creating orthology matrix from BBHs...')
+        ortho_matrix = ssbio.protein.sequence.utils.blast.create_orthology_matrix(r_name=self.reference_gempro.id,
                                                                                   genome_to_bbh_files=bbh_files,
                                                                                   pid_cutoff=pid_cutoff,
                                                                                   bitscore_cutoff=bitscore_cutoff,
                                                                                   evalue_cutoff=evalue_cutoff,
                                                                                   filter_condition=filter_condition,
-                                                                                  outname='{}_{}_orthology.csv'.format(self.base_strain_gempro.id, 'prot'),
-                                                                                  outdir=self.atlas_data_dir)
+                                                                                  outname='{}_{}_orthology.csv'.format(self.reference_gempro.id, 'prot'),
+                                                                                  outdir=self.data_dir)
 
         log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
 
         # Filter the matrix to genes only in our analysis, and also check for strains with no differences or no orthologous genes
-        self._filter_with_orthology_matrix(remove_strains_with_no_orthology=remove_strains_with_no_orthology,
+        self._filter_orthology_matrix(remove_strains_with_no_orthology=remove_strains_with_no_orthology,
                                            remove_strains_with_no_differences=remove_strains_with_no_differences,
                                            remove_genes_not_in_base_model=remove_genes_not_in_base_model)
 
-        return self.df_orthology_matrix
+    # def load_manual_orthology_matrix(self, df, clean_names=True,
+    #                                  remove_strains_with_no_orthology=True,
+    #                                  remove_strains_with_no_differences=False,
+    #                                  remove_genes_not_in_base_model=True):
+    #     """Load a manually curated orthology matrix to use in ATLAS. Genes = rows, strains = columns.
+    #
+    #     Args:
+    #         df (DataFrame): Pandas DataFrame with genes as the rows and strains as the columns
+    #         clean_names (bool): Remove unwanted characters from gene names and strain IDs
+    #         remove_strains_with_no_orthology (bool): Remove strains which have no orthologous genes found
+    #         remove_strains_with_no_differences (bool): Remove strains which have all the same genes as the base model.
+    #             Default is False because since orthology is found using a PID cutoff, all genes may be present but
+    #             differences may be on the sequence level.
+    #         remove_genes_not_in_base_model (bool): Remove genes from the orthology matrix which are not present in our
+    #             base model. This happens if we use a genome file for our model that has other genes in it.
+    #
+    #     """
+    #     self._orthology_matrix_has_sequences = True
+    #
+    #     if clean_names:
+    #         new_rows = [custom_slugify(x) for x in df.index]
+    #         new_cols = [custom_slugify(y) for y in df.columns]
+    #         df.index = new_rows
+    #         df.columns = new_cols
+    #
+    #     self.df_orthology_matrix = df
+    #
+    #     # Make the copies of the base model
+    #     for strain_id in tqdm(self.df_orthology_matrix.columns):
+    #         self._copy_reference_gempro(new_id=strain_id)
+    #
+    #     # Filter the strains and orthology matrix
+    #     self._filter_orthology_matrix(remove_strains_with_no_orthology=remove_strains_with_no_orthology,
+    #                                        remove_strains_with_no_differences=remove_strains_with_no_differences,
+    #                                        remove_genes_not_in_base_model=remove_genes_not_in_base_model)
 
-    def _filter_with_orthology_matrix(self,
-                                      remove_strains_with_no_orthology=True,
-                                      remove_strains_with_no_differences=False,
-                                      remove_genes_not_in_base_model=True):
+    def _filter_orthology_matrix(self,
+                                 remove_strains_with_no_orthology=True,
+                                 remove_strains_with_no_differences=False,
+                                 remove_genes_not_in_base_model=True):
         """Filters the orthology matrix by removing genes not in our base model, and also
             removes strains from the analysis which have: 0 orthologous genes or no difference from the base strain.
 
@@ -330,7 +373,7 @@ class ATLAS(Object):
         if len(self.df_orthology_matrix) == 0:
             raise RuntimeError('Empty orthology matrix')
 
-        initial_num_strains = len(self.atlas_strains)
+        initial_num_strains = len(self.strains)
 
         # Adding names to the row and column of the orthology matrix
         self.df_orthology_matrix = self.df_orthology_matrix.rename_axis('gene').rename_axis("strain", axis="columns")
@@ -341,148 +384,155 @@ class ATLAS(Object):
             # This is probably because: the CDS FASTA file for the base strain did not contain the correct ID
             # for the gene and consequently was not included in the orthology matrix
             # Save these and report them
-            base_strain_gene_ids = [x.id for x in self.base_strain_gempro.genes]
-            self.missing_in_orthology_matrix = [x for x in base_strain_gene_ids if x not in self.df_orthology_matrix.index.tolist()]
-            self.missing_in_base_strain = [y for y in self.df_orthology_matrix.index.tolist() if y not in base_strain_gene_ids]
+            reference_strain_gene_ids = [x.id for x in self.reference_gempro.genes]
+            self.missing_in_orthology_matrix = [x for x in reference_strain_gene_ids if x not in self.df_orthology_matrix.index.tolist()]
+            self.missing_in_reference_strain = [y for y in self.df_orthology_matrix.index.tolist() if y not in reference_strain_gene_ids]
 
             # Filter the matrix for genes within our base model only
-            self.df_orthology_matrix = self.df_orthology_matrix[self.df_orthology_matrix.index.map(lambda x: x in base_strain_gene_ids)]
+            self.df_orthology_matrix = self.df_orthology_matrix[self.df_orthology_matrix.index.isin(reference_strain_gene_ids)]
             log.info('Filtered orthology matrix for genes present in base model')
             log.warning('{} genes are in your base model but not your orthology matrix, see the attribute "missing_in_orthology_matrix"'.format(len(self.missing_in_orthology_matrix)))
-            log.warning('{} genes are in the orthology matrix but not your base model, see the attribute "missing_in_base_strain"'.format(len(self.missing_in_base_strain)))
+            log.warning('{} genes are in the orthology matrix but not your base model, see the attribute "missing_in_reference_strain"'.format(len(self.missing_in_reference_strain)))
 
         # Strain filtering
-        for strain_model in self.atlas_strains.copy():
+        for strain_gempro in self.strains.copy():
             if remove_strains_with_no_orthology:
-                if strain_model.id not in self.df_orthology_matrix.columns:
-                    self.atlas_strains.remove(strain_model)
-                    log.info('{}: no orthologous genes found for this strain, removed from analysis.'.format(strain_model.id))
+                if strain_gempro.id not in self.df_orthology_matrix.columns:
+                    self.strains.remove(strain_gempro)
+                    log.info('{}: no orthologous genes found for this strain, removed from analysis.'.format(strain_gempro.id))
                     continue
-                elif self.df_orthology_matrix[strain_model.id].isnull().all():
-                    self.atlas_strains.remove(strain_model)
-                    log.info('{}: no orthologous genes found for this strain, removed from analysis.'.format(strain_model.id))
+                elif self.df_orthology_matrix[strain_gempro.id].isnull().all():
+                    self.strains.remove(strain_gempro)
+                    log.info('{}: no orthologous genes found for this strain, removed from analysis.'.format(strain_gempro.id))
                     continue
 
             if remove_strains_with_no_differences:
-                not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_model.id])][strain_model.id].index.tolist()
+                not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_gempro.id])][strain_gempro.id].index.tolist()
                 if len(not_in_strain) == 0:
-                    self.atlas_strains.remove(strain_model)
+                    self.strains.remove(strain_gempro)
                     log.info('{}: strain has no differences from the base, removed from analysis.')
                     continue
 
-        log.info('{} strains to be analyzed, {} strains removed'.format(len(self.atlas_strains), initial_num_strains-len(self.atlas_strains)))
+        log.info('{} strains to be analyzed, {} strains removed'.format(len(self.strains), initial_num_strains - len(self.strains)))
 
-    def _pare_down_model(self, gempro, genes_to_remove):
+    def _pare_down_model(self, strain_gempro, genes_to_remove):
         """Mark genes as non-functional in a GEM-PRO. If there is a COBRApy model associated with it, the
             COBRApy method delete_model_genes is utilized to delete genes.
 
         Args:
-            gempro (GEMPRO): GEMPRO object
+            strain_gempro (GEMPRO): GEMPRO object
             genes_to_remove (list): List of gene IDs to remove from the model
 
         """
         # Filter out genes in genes_to_remove which do not show up in the model
-        model_genes = [x.id for x in gempro.genes]
-        genes_to_remove = list(set(genes_to_remove).intersection(set(model_genes)))
-        genes_to_remove.extend(self.missing_in_orthology_matrix)
+        strain_genes = [x.id for x in strain_gempro.genes]
+        genes_to_remove = list(set(genes_to_remove).intersection(set(strain_genes)))
+        # genes_to_remove.extend(self.missing_in_orthology_matrix)  # TODO: remove genes not in orthology matrix?
 
         if len(genes_to_remove) == 0:
-            log.info('{}: no genes marked for removal'.format(gempro.id))
+            log.info('{}: no genes marked non-functional'.format(strain_gempro.id))
             return
         else:
-            log.debug('{}: {} genes marked for removal'.format(gempro.id, len(genes_to_remove)))
+            log.debug('{}: {} genes to be marked non-functional'.format(strain_gempro.id, len(genes_to_remove)))
 
         # If a COBRApy model exists, utilize the delete_model_genes method
-        if gempro.model:
-            gempro.model._trimmed = False
-            gempro.model._trimmed_genes = []
-            gempro.model._trimmed_reactions = {}
+        if strain_gempro.model:
+            strain_gempro.model._trimmed = False
+            strain_gempro.model._trimmed_genes = []
+            strain_gempro.model._trimmed_reactions = {}
 
             # Delete genes!
-            cobra.manipulation.delete_model_genes(gempro.model, genes_to_remove)
+            cobra.manipulation.delete_model_genes(strain_gempro.model, genes_to_remove)
 
-            if gempro.model._trimmed:
-                log.info('{}: deleted {} reactions, {} genes'.format(gempro.model.id,
-                                                                     len(gempro.model._trimmed_reactions),
-                                                                     len(gempro.model._trimmed_genes)))
+            if strain_gempro.model._trimmed:
+                log.info('{}: marked {} genes as non-functional, '
+                         'deactivating {} reactions'.format(strain_gempro.id, len(strain_gempro.model._trimmed_genes),
+                                                            len(strain_gempro.model._trimmed_reactions)))
         # Otherwise, just mark the genes as non-functional
         else:
             for g in genes_to_remove:
-                my_gene = gempro.genes.get_by_id(g)
+                my_gene = strain_gempro.genes.get_by_id(g)
                 my_gene.functional = False
-            log.info('{}: deleted {} genes'.format(gempro.id, len(genes_to_remove)))
+            log.info('{}: marked {} genes as non functional'.format(strain_gempro.id, len(genes_to_remove)))
 
-    def build_strain_specific_models(self):
-        """Using the orthologous genes matrix, modify the strain specific models based on if orthologous genes exist.
-
-        Also stores the sequences directly in the GEM-PRO protein sequences attribute for the strains.
-        """
-
-        if len(self.df_orthology_matrix) == 0:
-            raise RuntimeError('Empty orthology matrix')
-
-        # For each genome, create the strain specific model
-        for strain_model in tqdm(self.atlas_strains):
-            log.debug('{}: building strain specific model'.format(strain_model.id))
-
-            # Get a list of genes which do not have orthology in the strain
-            not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_model.id])][strain_model.id].index.tolist()
-
-            # Mark genes non-functional
-            self._pare_down_model(gempro=strain_model, genes_to_remove=not_in_strain)
-
-            # Load sequences into the base and strain models
-            self._load_strain_sequences(strain_model.id)
-
-        log.info('Created {} new strain-specific models and loaded in sequences'.format(len(self.atlas_strains)))
-
-    def _load_strain_sequences(self, strain_id):
+    def _load_strain_sequences(self, strain_gempro):
         """Load strain sequences from the orthology matrix into the base model for comparisons, and into the
             strain-specific model itself.
 
         """
-        strain_model = self.atlas_strains.get_by_id(strain_id)
-
         if self._orthology_matrix_has_sequences:  # Load directly from the orthology matrix if it contains sequences
-            strain_sequences = self.df_orthology_matrix[strain_id].to_dict()
+            strain_sequences = self.df_orthology_matrix[strain_gempro.id].to_dict()
         else:  # Otherwise load from the genome file if the orthology matrix contains gene IDs
             # Load the genome FASTA file
-            log.debug('{}: loading strain genome CDS file'.format(strain_model.genome_path))
-            strain_sequences = SeqIO.index(strain_model.genome_path, 'fasta')
+            log.debug('{}: loading strain genome CDS file'.format(strain_gempro.genome_path))
+            strain_sequences = SeqIO.index(strain_gempro.genome_path, 'fasta')
 
-        for strain_gene in strain_model.genes:
+        for strain_gene in strain_gempro.genes:
             if strain_gene.functional:
                 if self._orthology_matrix_has_sequences:
                     strain_gene_key = strain_gene.id
                 else:
                     # Pull the gene ID of the strain from the orthology matrix
-                    strain_gene_key = self.df_orthology_matrix.loc[strain_gene.id, strain_model.id]
-                    log.debug('{}: original gene ID in strain fasta file'.format(strain_gene_key))
+                    strain_gene_key = self.df_orthology_matrix.loc[strain_gene.id, strain_gempro.id]
+                    log.debug('{}: original gene ID to be pulled from strain fasta file'.format(strain_gene_key))
 
                 # Load into the base strain for comparisons
-                base_gene = self.base_strain_gempro.genes.get_by_id(strain_gene.id)
-                new_id = '{}_{}'.format(strain_gene.id, strain_id)
-                if base_gene.protein.sequences.has_id(new_id):
-                    log.debug('{}: sequence already loaded into base model'.format(new_id))
+                ref_gene = self.reference_gempro.genes.get_by_id(strain_gene.id)
+                new_id = '{}_{}'.format(strain_gene.id, strain_gempro.id)
+                if ref_gene.protein.sequences.has_id(new_id):
+                    log.debug('{}: sequence already loaded into reference model'.format(new_id))
                     continue
-                base_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
-                                                       set_as_representative=False)
-                log.debug('{}: loaded sequence into base model'.format(new_id))
+                ref_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
+                                                      set_as_representative=False)
+                log.debug('{}: loaded sequence into reference model'.format(new_id))
 
                 # Load into the strain GEM-PRO
                 strain_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
                                                          set_as_representative=True)
                 log.debug('{}: loaded sequence into strain model'.format(new_id))
 
+    def build_strain_specific_models(self):
+        """Using the orthologous genes matrix, create and modify the strain specific models based on if orthologous
+            genes exist.
+
+        Also store the sequences directly in the reference GEM-PRO protein sequence attribute for the strains.
+        """
+
+        if len(self.df_orthology_matrix) == 0:
+            raise RuntimeError('Empty orthology matrix')
+
+        # Create an emptied copy of the reference GEM-PRO
+        for strain_gempro in tqdm(self.strains):
+            log.debug('{}: building strain specific model'.format(strain_gempro.id))
+
+            # For each genome, load the metabolic model or genes from the reference GEM-PRO
+            logging.disable(logging.WARNING)
+            if self._empty_reference_gempro.model:
+                strain_gempro.load_cobra_model(self._empty_reference_gempro.model)
+            elif self._empty_reference_gempro.genes:
+                strain_gempro.genes = [x.id for x in self._empty_reference_gempro.genes]
+            logging.disable(logging.NOTSET)
+
+            # Get a list of genes which do not have orthology in the strain
+            not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_gempro.id])][strain_gempro.id].index.tolist()
+
+            # Mark genes non-functional
+            self._pare_down_model(strain_gempro=strain_gempro, genes_to_remove=not_in_strain)
+
+            # Load sequences into the base and strain models
+            self._load_strain_sequences(strain_gempro=strain_gempro)
+
+        log.info('Created {} new strain-specific models and loaded in sequences'.format(len(self.strains)))
+
     def align_orthologous_genes_pairwise(self, gapopen=10, gapextend=0.5):
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it."""
-        for base_gene in tqdm(self.base_strain_gempro.genes):
-            if len(base_gene.protein.sequences) > 1:
-                alignment_dir = op.join(self.atlas_seq_genes_dir, base_gene.id)
+        for ref_gene in tqdm(self.reference_gempro.genes):
+            if len(ref_gene.protein.sequences) > 1:
+                alignment_dir = op.join(self.sequences_by_gene_dir, ref_gene.id)
                 if not op.exists(alignment_dir):
                     os.mkdir(alignment_dir)
-                base_gene.protein.pairwise_align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend,
-                                                                             outdir=alignment_dir, parse=True)
+                ref_gene.protein.pairwise_align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend,
+                                                                            outdir=alignment_dir, parse=True)
 
     def align_orthologous_genes_multiple(self):
         """For each gene in the base strain, run a multiple alignment to all orthologous strain genes"""
@@ -496,7 +546,7 @@ class ATLAS(Object):
 
         """
         all_info = []
-        for g in self.base_strain_gempro.genes_with_a_representative_sequence:
+        for g in self.reference_gempro.genes_with_a_representative_sequence:
             info = {}
             info['Gene_ID'] = g.id
 
@@ -634,7 +684,7 @@ class ATLAS(Object):
                 'RepChain_percent_B-dssp', 'RepChain_percent_C-dssp', 'RepChain_percent_E-dssp',
                 'RepChain_percent_G-dssp', 'RepChain_percent_H-dssp', 'RepChain_percent_I-dssp',
                 'RepChain_percent_S-dssp', 'RepChain_percent_T-dssp', 'RepChain_SSBOND-biopython']
-        cols.extend([x.id for x in self.atlas_strains])
+        cols.extend([x.id for x in self.strains])
         df_atlas_summary = pd.DataFrame(all_info, columns=cols)
         # Drop columns that don't have anything in them
         df_atlas_summary.dropna(axis=1, how='all', inplace=True)
@@ -658,7 +708,7 @@ class ATLAS(Object):
         # TODO: number of strains with at least 1 mutations
         # TODO: number of strains with <5% mutated, 5-10%, etc
 
-        g = self.base_strain_gempro.genes.get_by_id(gene_id)
+        g = self.reference_gempro.genes.get_by_id(gene_id)
 
         single, fingerprint = g.protein.representative_sequence.sequence_mutation_summary()
 
@@ -759,7 +809,7 @@ class ATLAS(Object):
         import math
 
         views = []
-        for g in self.base_strain_gempro.genes:
+        for g in self.reference_gempro.genes:
             if g.protein.representative_structure:
                 view = g.protein.view_all_mutations(grouped=False, structure_opacity=0.5,
                                                     opacity_range=(0.6, 1), scale_range=(.5, 5))
