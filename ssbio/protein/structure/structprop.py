@@ -16,15 +16,32 @@ from ssbio.core.object import Object
 from ssbio.protein.structure.chainprop import ChainProp
 from ssbio.protein.structure.utils.structureio import StructureIO
 
-if ssbio.utils.is_ipynb():
-    import nglview as nv
 import seaborn as sns
 import ssbio.protein.structure.utils.cleanpdb
 log = logging.getLogger(__name__)
 
 
 class StructProp(Object):
-    """Class for protein structural properties."""
+
+    """Generic class to represent information for a protein structure.
+
+    Provides access to the 3D coordinates using a Biopython Structure object through the method ``parse_structure``.
+        The main functionality added is the ability to set and load directly from any supported structure and metadata
+        file. Additionally, the ``mapped_chains`` attribute allows for analysis of a subset of chains, which will map
+        to a gene of interest. Also provides methods through ``nglview`` to view the structure in a Jupyter notebook.
+
+    Attributes:
+        id (str): Unique identifier for this protein structure
+        name (str): Optional name for this structure
+        description (str): Optional description for this structure
+        is_experimental (bool): Flag to note if this structure is an experimental model or a homology model
+        chains (DictList): A DictList of chains have their sequence stored in them, along with residue-specific
+            annotations
+        mapped_chains (list): A simple list of chain IDs (strings) that will be used to subset analyses
+        file_type (str): Type of structure file
+        structure_file (str): Name of the structure file
+
+    """
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None,
                  is_experimental=False, structure_path=None, file_type=None):
@@ -37,7 +54,7 @@ class StructProp(Object):
             mapped_chains (str, list): A chain ID or IDs to indicate what chains should be analyzed
             is_experimental (bool): Flag to indicate if structure is an experimental or computational model
             structure_path (str): Path to structure file 
-            file_type (str): File type of structure file - ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``,
+            file_type (str): Type of structure file - ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``,
                 ``xml.gz``, ``mmtf``, ``mmtf.gz``
 
         """
@@ -66,28 +83,26 @@ class StructProp(Object):
 
     @property
     def structure_dir(self):
+        if not self._structure_dir:
+            raise OSError('No sequence folder set')
         return self._structure_dir
 
     @structure_dir.setter
     def structure_dir(self, path):
-        if not op.exists(path):
-            raise ValueError('{}: folder does not exist'.format(path))
+        if path and not op.exists(path):
+            raise OSError('{}: folder does not exist'.format(path))
 
         self._structure_dir = path
 
     @property
     def structure_path(self):
-        if self.structure_dir and self.structure_file:
-            path = op.join(self.structure_dir, self.structure_file)
-            if not op.exists(path):
-                raise ValueError('{}: file does not exist'.format(path))
-            return path
-        else:
-            if not self.structure_dir:
-                log.debug('{}: structure directory not set'.format(self.id))
-            if not self.structure_file:
-                log.debug('{}: structure file not available'.format(self.id))
-            return None
+        if not self.structure_file:
+            raise OSError('{}: structure file not available'.format(self.id))
+
+        path = op.join(self.structure_dir, self.structure_file)
+        if not op.exists(path):
+            raise ValueError('{}: file does not exist'.format(path))
+        return path
 
     def load_structure_path(self, structure_path, file_type):
         """Load a structure file and provide pointers to its location
@@ -149,6 +164,7 @@ class StructProp(Object):
             keep_res_only (str, list): Keep ONLY specified resnames, deletes everything else!
             add_chain_id_if_empty (str): Add a chain ID if not present
             keep_chains (str, list): Keep only these chains
+
         Returns:
             str: Path to cleaned PDB file
 
@@ -232,66 +248,6 @@ class StructProp(Object):
         for x in self.chains:
             x.reset_seq_record()
 
-    # ################################################################################################################
-    # ################################################################################################################
-    # ################################################################################################################
-    #
-    #
-    #
-    # def map_seqprop_resnums_to_mapped_chains(self, seqprop, resnums):
-    #     """Map a list of residue numbers present in a sequence to their corresponding structure residue numbers.
-    #
-    #     The method align_seqprop_to_structprop needs to be run before this to store the alignments in memory.
-    #
-    #     Args:
-    #         seqprop (SeqProp): SeqProp object
-    #         resnums (int, list): Residue number(s)
-    #
-    #     Returns:
-    #         dict: Mapping of chain IDs and their residue numbers which match the residue numbers that were input.
-    #
-    #     """
-    #     mapping_dict = {}
-    #
-    #     for chain_id in self.mapped_chains:
-    #         # Get the alignment for a chain
-    #         structure_id = '{}-{}'.format(self.id, chain_id)
-    #         aln_id = '{}_{}'.format(seqprop.id, structure_id)
-    #         aln = seqprop.structure_alignments.get_by_id(aln_id)
-    #
-    #         # Get the mapping to chain index
-    #         aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(aln[0], aln[1])
-    #         chain_resnums = aln_df[pd.notnull(aln_df.id_a_pos)].id_b_pos.tolist()
-    #
-    #         # Now map the resnums to this chain
-    #         resnums = ssbio.utils.force_list(resnums)
-    #         to_chain_index = {}
-    #         for x in resnums:
-    #             ix = chain_resnums[x - 1] - 1
-    #             if np.isnan(ix):
-    #                 log.warning('{}, {}: no equivalent residue found in structure sequence'.format(self.id, x))
-    #             else:
-    #                 to_chain_index[x] = int(ix)
-    #
-    #         chain = self.chains.get_by_id(chain_id)
-    #         chain_structure_mapping = chain.seq_record.letter_annotations['structure_resnums']
-    #         to_structure_resnums = {}
-    #         for k, v in to_chain_index.items():
-    #             rn = chain_structure_mapping[v]
-    #             if rn[1] == float('Inf'):
-    #                 log.warning(
-    #                     '{}-{}, {}: structure file does not contain coordinates for this residue'.format(self.id, chain_id, k))
-    #             else:
-    #                 to_structure_resnums[k] = rn
-    #
-    #         mapping_dict[chain_id] = to_structure_resnums
-    #
-    #     return mapping_dict
-    #
-    # ################################################################################################################
-    # ################################################################################################################
-    # ################################################################################################################
-
     def get_dict_with_chain(self, chain, only_keys=None, chain_keys=None, exclude_attributes=None, df_format=False):
         """get_dict method which incorporates attributes found in a specific chain. Does not overwrite any attributes
             in the original StructProp.
@@ -359,9 +315,19 @@ class StructProp(Object):
     def get_dssp_annotations(self, outdir, force_rerun=False):
         """Run DSSP on this structure and store the DSSP annotations in the corresponding ChainProp SeqRecords
 
+        Calculations are stored in the ChainProp's ``letter_annotations`` at the following keys:
+        * ``SS-dssp``
+        * ``RSA-dssp``
+        * ``ASA-dssp``
+        * ``PHI-dssp``
+        * ``PSI-dssp``
+
         Args:
             outdir (str): Path to where DSSP dataframe will be stored.
             force_rerun (bool): If DSSP results should be recalculated
+
+        TODO:
+            * Also parse global properties, like total accessible surface area. Don't think Biopython parses those?
 
         """
         parsed = self.parse_structure()
@@ -529,12 +495,12 @@ class StructProp(Object):
                 chain.seq_record.letter_annotations[all_props_renamed[prop]] = prop_list
             log.debug('{}: stored freesasa calculations in chain seq_record letter_annotations'.format(chain))
 
-    def view_structure(self, opacity=1.0, recolor=True, gui=False):
+    def view_structure(self, opacity=1.0, recolor=False, gui=False):
         """Use NGLviewer to display a structure in a Jupyter notebook
 
         Args:
             opacity (float): Opacity of the structure
-            recolor (bool): If structure should be recolored to silver
+            recolor (bool): If structure should be cleaned and recolored to silver
             gui (bool): If the NGLview GUI should show up
 
         Returns:
@@ -542,6 +508,9 @@ class StructProp(Object):
 
         """
         # TODO: show_structure_file does not work for MMTF files - need to check for that and load accordingly
+
+        if ssbio.utils.is_ipynb():
+            import nglview as nv
 
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
@@ -556,44 +525,28 @@ class StructProp(Object):
             view.add_cartoon(selection='protein', color='silver', opacity=opacity)
         return view
 
-    def view_structure_and_highlight_residues(self, structure_resnums, chain=None, color='red',
-                                              structure_opacity=0.5, gui=False):
-        """Input a residue number or numbers to view on the structure.
+    def add_residues_highlight_to_nglview(self, view, structure_resnums, chain=None, res_color='red'):
+        """Add a residue number or numbers to an NGLWidget view object.
 
         Args:
+            view (NGLWidget): NGLWidget view object
             structure_resnums (int, list): Residue number(s) to highlight, structure numbering
             chain (str, list): Chain ID or IDs of which residues are a part of. If not provided, all chains in the
-                mapped_chains attribute will be used. IMPORTANT: if that is also empty, all residues in all chains
-                matching the residue numbers will be shown, which may not always be correct.
-            color (str): Color to highlight with
-            structure_opacity (float): Opacity of the protein structure cartoon representation
-            gui (bool): If the NGLview GUI should show up
-
-        Returns:
-            NGLviewer object
+                mapped_chains attribute will be used. If that is also empty, and exception is raised.
+            res_color (str): Color to highlight residues with
 
         """
         if not chain:
             chain = self.mapped_chains
             if not chain:
-                parsed = self.parse_structure()
-                if not parsed:
-                    log.error('{}: unable to open structure to get chains'.format(self.id))
-                    return
-                log.warning('Showing all residue numbers on all chains, please input chain if desired')
-
-        view = self.view_structure(opacity=structure_opacity, gui=gui)
+                raise ValueError('Please input chain ID to display residue on')
 
         if isinstance(structure_resnums, list):
             structure_resnums = list(set(structure_resnums))
         elif isinstance(structure_resnums, int):
             structure_resnums = ssbio.utils.force_list(structure_resnums)
         else:
-            raise ValueError
-
-        # TODO: add color by letter_annotations!
-
-        colors = sns.color_palette("hls", len(structure_resnums)).as_hex()
+            raise ValueError('Input must either be a residue number of a list of residue numbers')
 
         to_show_chains = '( '
         for c in chain:
@@ -609,41 +562,31 @@ class StructProp(Object):
 
         log.info('Selection: {} and not hydrogen and {}'.format(to_show_chains, to_show_res))
 
-        view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res), color=color)
+        view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res), color=res_color)
 
-        return view
-
-    def view_structure_and_highlight_residues_scaled(self, structure_resnums, chain=None, color='red', unique_colors=False,
-                                                     structure_opacity=0.5, opacity_range=(0.5,1), scale_range=(.7, 10),
-                                                     gui=False):
-        """Input a list of residue numbers to view on the structure. Or input a dictionary of residue numbers to counts
-            to scale residues by counts (useful to view mutations).
+    def add_scaled_residues_highlight_to_nglview(self, view, structure_resnums, chain=None, color='red',
+                                                 unique_colors=False, opacity_range=(0.5,1), scale_range=(.7, 10)):
+        """Add a list of residue numbers (which may contain repeating residues) to a view, or add a dictionary of
+            residue numbers to counts. Size and opacity of added residues are scaled by counts.
 
         Args:
+            view (NGLWidget): NGLWidget view object
             structure_resnums (int, list, dict): Residue number(s) to highlight, or a dictionary of residue number to
                 frequency count
             chain (str, list): Chain ID or IDs of which residues are a part of. If not provided, all chains in the
-                mapped_chains attribute will be used. PLEASE NOTE: if that is also empty, all residues in all chains
-                matching the residue numbers will be shown.
-            color (str): Color to highlight with
+                mapped_chains attribute will be used. If that is also empty, and exception is raised.
+            color (str): Color to highlight residues with
             unique_colors (bool): If each mutation should be colored uniquely (will override color argument)
-            structure_opacity (float): Opacity of the protein structure cartoon representation
             opacity_range (tuple): Min/max opacity values (residues that have higher frequency counts will be opaque)
             scale_range (tuple): Min/max size values (residues that have higher frequency counts will be bigger)
-            gui (bool): If the NGLview GUI should show up
-
-        Returns:
-            NGLviewer object
 
         """
+        # TODO: likely to move these functions to a separate nglview/utils folder since they are not coupled to the structure
+        # TODO: add color by letter_annotations!
         if not chain:
             chain = self.mapped_chains
             if not chain:
-                parsed = self.parse_structure()
-                if not parsed:
-                    log.error('{}: unable to open structure to get chains'.format(self.id))
-                    return
-                log.warning('Showing all residue numbers on all chains, please input chain if desired')
+                raise ValueError('Please input chain ID to display residue on')
         else:
             chain = ssbio.utils.force_list(chain)
 
@@ -654,8 +597,6 @@ class StructProp(Object):
             opacity_dict = {x: max(opacity_range) for x in ssbio.utils.force_list(structure_resnums)}
             scale_dict = {x: max(scale_range) for x in ssbio.utils.force_list(structure_resnums)}
 
-        view = self.view_structure(opacity=structure_opacity, gui=gui)
-
         if isinstance(structure_resnums, list):
             structure_resnums = list(set(structure_resnums))
         elif isinstance(structure_resnums, dict):
@@ -663,9 +604,8 @@ class StructProp(Object):
         elif isinstance(structure_resnums, int):
             structure_resnums = ssbio.utils.force_list(structure_resnums)
         else:
-            raise ValueError
-
-        # TODO: add color by letter_annotations!
+            raise ValueError('Input must either be a list of residue numbers or a dictionary of residue numbers '
+                             'and their frequency.')
 
         colors = sns.color_palette("hls", len(structure_resnums)).as_hex()
 
@@ -693,8 +633,6 @@ class StructProp(Object):
             else:
                 view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res),
                                         color=color, opacity=opacity_dict[x], scale=scale_dict[x])
-
-        return view
 
     def __json_decode__(self, **attrs):
         for k, v in attrs.items():

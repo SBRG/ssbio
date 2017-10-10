@@ -659,7 +659,7 @@ class GEMPRO(Object):
         """
         if not self.genome_path:
             # Write all sequences as one file
-            all_seqs = self.write_representative_sequences_file()
+            all_seqs = self.write_representative_sequences_file(outname=self.id)
 
         # Runs SCRATCH or loads existing results in results_dir
         scratch = SCRATCH(project_name=scratch_basename, seq_file=self.genome_path)
@@ -948,7 +948,7 @@ class GEMPRO(Object):
             try:
                 itasser_prop = g.protein.load_itasser_folder(ident=hom_id, itasser_folder=orig_itasser_dir,
                                                              organize=True, outdir=outdir, organize_name=new_itasser_name,
-                                                             create_dfs=True, force_rerun=force_rerun)
+                                                             create_dfs=False, force_rerun=force_rerun)
             except OSError:
                 log.debug('{}: homology model folder unavailable'.format(g.id))
                 continue

@@ -344,10 +344,9 @@ class ITASSERProp(StructProp):
             bsites_inf_df['cluster_size'] = pd.to_numeric(bsites_inf_df.cluster_size, errors='coerce')
 
             self.df_bsites = bsites_inf_df
-            log.debug('Created binding site prediction DataFrame in attribute "df_bsites')
+            log.debug('Created binding site prediction DataFrame in attribute "df_bsites"')
 
         return pre_bsites_inf_df
-
 
     def parse_ec(self, infile, create_df=False):
         """Parse the EC.dat output file of COACH and returns a dataframe
