@@ -216,6 +216,19 @@ def split_folder_and_path(filepath):
     return dirname, filename_without_extension, extension
 
 
+def is_non_zero_file(fpath):
+    """Check if a file exists, and that it contains some kind of contents
+
+    Args:
+        fpath (str): Path to file
+
+    Returns:
+        bool: If file exists and contains contents
+
+    """
+    return op.isfile(fpath) and os.path.getsize(fpath) > 0
+
+
 def outfile_maker(inname, outext='.out', outname='', outdir='', append_to_name=''):
     """Create a default name for an output file based on the inname name, unless a output name is specified.
 
@@ -306,10 +319,10 @@ def force_rerun(flag, outfile):
         >>> force_rerun(flag=False, outfile='/not/existing/file.txt')
         True
 
-        >>> force_rerun(flag=True, outfile='/existing/file.txt')
+        >>> force_rerun(flag=True, outfile='./utils.py')
         True
 
-        >>> force_rerun(flag=False, outfile='/existing/file.txt')
+        >>> force_rerun(flag=False, outfile='./utils.py')
         False
 
     """
@@ -320,7 +333,7 @@ def force_rerun(flag, outfile):
     elif not flag and not op.exists(outfile):
         return True
     # If flag is False but filesize of output is 0, also run
-    elif not flag and not os.stat(outfile).st_size != 0:
+    elif not flag and not is_non_zero_file(outfile):
         return True
     # Otherwise, do not run
     else:

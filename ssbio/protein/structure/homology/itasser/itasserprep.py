@@ -85,7 +85,11 @@ class ITASSERPrep():
             self.java_home = '${JAVA_HOME}'
         else:
             self.java_home = java_home
-        self.job_scheduler_header = job_scheduler_header
+
+        if not job_scheduler_header:
+            self.job_scheduler_header = ''
+        else:
+            self.job_scheduler_header = job_scheduler_header
 
         if runtype == 'local' or runtype == 'torque':
             self.prep_script_local(itasser_loc=itasser_path,
