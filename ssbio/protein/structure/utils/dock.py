@@ -460,10 +460,11 @@ score_grid_prefix              {}_grid
         in_name = op.join(self.dock_dir, "{}_{}_flexdock.in".format(self.id, ligand_name))
         out_name = op.join(self.dock_dir, "{}_{}_flexdock.out".format(self.id, ligand_name))
 
-        conformers_out = '{}_{}_flexible_conformers.mol2'.format(self.id, ligand_name)
-        scored_out = '{}_{}_flexible_scored.mol2'.format(self.id, ligand_name)
+        conformers_out = '{}_{}_flexdock_conformers.mol2'.format(self.id, ligand_name)
+        scored_out = '{}_{}_flexdock_scored.mol2'.format(self.id, ligand_name)
+        ranked_out = '{}_{}_flexdock_ranked.mol2'.format(self.id, ligand_name)
 
-        if ssbio.utils.force_rerun(flag=force_rerun, outfile=conformers_out):
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=ranked_out):
             with open(in_name, "w") as f:
                 dock_text = """ligand_atom_file                                             {}
 limit_max_ligands                                            no
@@ -529,10 +530,10 @@ atom_model                                                   all
 vdw_defn_file                                                {}
 flex_defn_file                                               {}
 flex_drive_file                                              {}
-ligand_outfile_prefix                                        {}_{}_flexible
+ligand_outfile_prefix                                        {}_{}_flexdock
 write_orientations                                           no
 num_scored_conformers                                        20
-write_conformations                                          no
+write_conformations                                          yes
 cluster_conformations                                        yes
 rank_ligands                                                 yes
         """.format(ligand_path, op.basename(self.sphsel_path), op.splitext(op.basename(self.grid_path))[0],
@@ -545,14 +546,14 @@ rank_ligands                                                 yes
             cmd = "dock6 -i {} -o {} -v".format(in_name, out_name)
             os.system(cmd)
 
-        if ssbio.utils.is_non_zero_file(conformers_out):
+        if ssbio.utils.is_non_zero_file(ranked_out):
             self.dock_flexible_outfile = out_name
             self.dock_flexible_conformers_result = conformers_out
             self.dock_flexible_scored_result = scored_out
             log.debug('{}: successful docking!'.format(self.dock_flexible_outfile))
         else:
-            log.error('{}+{}: empty DOCK6 conformers file, execution error (or ligand failed to dock)'.format(self.id,
-                                                                                                              op.basename(ligand_path)))
+            log.error('{}+{}: empty DOCK6 ranked file, execution error (or ligand failed to dock)'.format(self.id,
+                                                                                                          op.basename(ligand_path)))
 
     def auto_flexdock(self, binding_residues, radius, ligand_path=None, force_rerun=False):
         """Run DOCK6 on a PDB file, given its binding residues and a radius around them.
