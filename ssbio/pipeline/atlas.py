@@ -478,12 +478,12 @@ class ATLAS(Object):
                 # # Load into the base strain for comparisons
                 ref_gene = self.reference_gempro.genes.get_by_id(strain_gene.id)
                 new_id = '{}_{}'.format(strain_gene.id, strain_gempro.id)
-                # if ref_gene.protein.sequences.has_id(new_id):
-                #     log.debug('{}: sequence already loaded into reference model'.format(new_id))
-                #     continue
-                # ref_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
-                #                                       set_as_representative=False)
-                # log.debug('{}: loaded sequence into reference model'.format(new_id))
+                if ref_gene.protein.sequences.has_id(new_id):
+                    log.debug('{}: sequence already loaded into reference model'.format(new_id))
+                    continue
+                ref_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
+                                                      set_as_representative=False)
+                log.debug('{}: loaded sequence into reference model'.format(new_id))
 
                 # Load into the strain GEM-PRO
                 strain_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
@@ -518,13 +518,12 @@ class ATLAS(Object):
             # Mark genes non-functional
             self._pare_down_model(strain_gempro=strain_gempro, genes_to_remove=not_in_strain)
 
-            if save_models:
-                cobra.io.save_json_model(model=strain_gempro.model, filename=op.join(self.model_dir, '{}.json'.format(strain_gempro.id)))
-
             # Load sequences into the base and strain models
             self._load_strain_sequences(strain_gempro=strain_gempro)
 
             if save_models:
+                cobra.io.save_json_model(model=strain_gempro.model,
+                                         filename=op.join(self.model_dir, '{}.json'.format(strain_gempro.id)))
                 strain_gempro.save_pickle(op.join(self.model_dir, '{}_gp.pckl'.format(strain_gempro.id)))
 
 
