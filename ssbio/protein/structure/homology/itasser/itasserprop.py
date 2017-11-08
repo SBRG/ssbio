@@ -419,6 +419,10 @@ def parse_coach_bsites_inf(infile):
         c-score of the algorithm's prediction, binding residues from single template
     Line 3: Statistics of ligands in the cluster
 
+    C-score information
+        "In our training data, a prediction with CSt40.35 has average false positive and false negative rates below
+        0.16 and 0.13, respectively." (https://zhanglab.ccmb.med.umich.edu/COACH/COACH.pdf)
+
     Args:
         infile (str): Path to Bsites.inf
 
