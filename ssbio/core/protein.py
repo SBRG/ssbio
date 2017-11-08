@@ -479,7 +479,18 @@ class Protein(Object):
         return self.sequences.get_by_id(ident)
 
     def set_representative_sequence(self, force_rerun=False):
-        """Consolidate sequences that were loaded and set a single representative sequence."""
+        """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative sequence.
+
+        Manually set representative sequences override all existing mappings. UniProt mappings override KEGG mappings
+        except when KEGG mappings have PDBs associated with them and UniProt doesn't.
+
+        Args:
+            force_rerun (bool): Set to True to recheck stored sequences
+
+        Returns:
+            SeqProp: Which sequence was set as representative
+
+        """
 
         if len(self.sequences) == 0:
             log.error('{}: no sequences mapped'.format(self.id))
@@ -539,19 +550,22 @@ class Protein(Object):
     def pairwise_align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None,
                                                    engine='needle', parse=True, force_rerun=False):
         """Align all sequences in the sequences attribute to the representative sequence.
+
         Stores the alignments the ``sequence_alignments`` DictList
 
         Args:
-            gapopen:
-            gapextend:
-            outdir:
-            engine:
-            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
-            force_rerun:
-
-        Returns:
+            gapopen (int): Only for `needle` - Gap open penalty is the score taken away when a gap is created
+            gapextend (float): Only for `needle` - Gap extension penalty is added to the standard gap penalty for each
+                base or residue in the gap
+            outdir (str): Only for `needle` - Path to output directory. Default is the protein sequence directory.
+            engine (str): `biopython` or `needle` - which pairwise alignment program to use
+            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an
+                annotation)
+            force_rerun (bool): Only for `needle` - Default False, set to True if you want to rerun the alignment
+                if outfile exists.
 
         """
+
         if not outdir:
             outdir = self.sequence_dir
             if not outdir:
@@ -697,7 +711,21 @@ class Protein(Object):
 
     def blast_representative_sequence_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
                                              outdir=None, force_rerun=False):
-        """BLAST repseq to PDB and return the list of new structures added, also saves df_pdb_blast"""
+        """BLAST the representative protein sequence to the PDB. Saves a raw BLAST result file (XML file).
+
+        Args:
+            seq_ident_cutoff (float, optional): Cutoff results based on percent coverage (in decimal form)
+            evalue (float, optional): Cutoff for the E-value - filters for significant hits. 0.001 is liberal,
+                0.0001 is stringent (default).
+            display_link (bool, optional): Set to True if links to the HTML results should be displayed
+            outdir (str): Path to output directory of downloaded XML files, must be set if protein directory
+                was not initialized
+            force_rerun (bool, optional): If existing BLAST results should not be used, set to True. Default is False
+
+        Returns:
+            list: List of new ``PDBProp``s added to the ``structures`` attribute
+
+        """
         # Check if a representative sequence was set
         if not self.representative_sequence:
             log.warning('{}: no representative sequence set, cannot BLAST'.format(self.id))
@@ -716,8 +744,10 @@ class Protein(Object):
                                                                force_rerun=force_rerun)
 
         new_pdbs = []
+
         # Add BLAST results to the list of structures
         if blast_results:
+
             # Filter for new BLASTed PDBs
             pdbs = [x['hit_pdb'].lower() for x in blast_results]
             new_pdbs = [y for y in pdbs if not self.structures.has_id(y)]

@@ -26,9 +26,9 @@ class StructProp(Object):
     """Generic class to represent information for a protein structure.
 
     Provides access to the 3D coordinates using a Biopython Structure object through the method ``parse_structure``.
-        The main functionality added is the ability to set and load directly from any supported structure and metadata
-        file. Additionally, the ``mapped_chains`` attribute allows for analysis of a subset of chains, which will map
-        to a gene of interest. Also provides methods through ``nglview`` to view the structure in a Jupyter notebook.
+    The main functionality added is the ability to set and load directly from any supported structure and metadata
+    file. Additionally, the ``mapped_chains`` attribute allows for analysis of a subset of chains, which will map
+    to a gene of interest. Also provides methods through ``nglview`` to view the structure in a Jupyter notebook.
 
     Attributes:
         id (str): Unique identifier for this protein structure
@@ -225,7 +225,13 @@ class StructProp(Object):
                 log.debug('{}: added to chains list'.format(c))
 
     def get_structure_seqs(self, model):
-        """Store chain sequences in the corresponding ChainProp objects in the chains attribute."""
+        """Gather chain sequences and store in their corresponding ``ChainProp`` objects in the ``chains`` attribute.
+
+        Args:
+            model (Model): Biopython Model object of the structure you would like to parse
+
+        """
+
         # Don't overwrite existing ChainProp objects
         dont_overwrite = []
         chains = list(model.get_chains())
@@ -319,11 +325,11 @@ class StructProp(Object):
         """Run DSSP on this structure and store the DSSP annotations in the corresponding ChainProp SeqRecords
 
         Calculations are stored in the ChainProp's ``letter_annotations`` at the following keys:
-        * ``SS-dssp``
-        * ``RSA-dssp``
-        * ``ASA-dssp``
-        * ``PHI-dssp``
-        * ``PSI-dssp``
+            * ``SS-dssp``
+            * ``RSA-dssp``
+            * ``ASA-dssp``
+            * ``PHI-dssp``
+            * ``PSI-dssp``
 
         Args:
             outdir (str): Path to where DSSP dataframe will be stored.

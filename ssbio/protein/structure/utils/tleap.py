@@ -36,8 +36,16 @@ done
     os.chmod(my_file, 0o755)
     return my_file
 
-def make_leaprc_file(wd):
-    frcmod = resource_filename('ssbio.etc', 'frcmod.ff99SB')
+def make_leaprc_file(wd, frcmod):
+    """
+
+    Args:
+        wd: Path to working directory
+        frcmod: Path to 'frcmod.ff99SB'
+
+    Returns:
+
+    """
 
     leaprc = """logFile leap.log
 #
@@ -236,7 +244,7 @@ relax wt
 savepdb wt temp_mod.pdb
 saveamberparm wt temp_mod.prmtop temp_mod.inpcrd
 quit
-""" % (frcmod)
+""" % frcmod
 
     my_file = op.join(wd, 'leaprc')
     with open(my_file, 'w') as f:

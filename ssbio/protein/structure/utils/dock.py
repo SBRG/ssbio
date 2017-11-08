@@ -584,35 +584,35 @@ rank_ligands                                                 yes
         if ligand_path:
             self.do_dock6_flexible(ligand_path=ligand_path, force_rerun=force_rerun)
 
-    def parse_results_mol2(self, mol2_outpath):
-        """Parse a DOCK6 mol2 output file, return a Pandas DataFrame of the results.
+def parse_results_mol2(mol2_outpath):
+    """Parse a DOCK6 mol2 output file, return a Pandas DataFrame of the results.
 
-        Args:
-            mol2_outpath (str): Path to mol2 output file
+    Args:
+        mol2_outpath (str): Path to mol2 output file
 
-        Returns:
-            DataFrame: Pandas DataFrame of the results
+    Returns:
+        DataFrame: Pandas DataFrame of the results
 
-        """
-        docked_ligands = pd.DataFrame()
+    """
+    docked_ligands = pd.DataFrame()
 
-        lines = [line.strip() for line in open(mol2_outpath, 'r')]
-        props = {}
+    lines = [line.strip() for line in open(mol2_outpath, 'r')]
+    props = {}
 
-        for i, line in enumerate(lines):
-            if line.startswith('########## Name:'):
-                ligand = line.strip().strip('##########').replace(' ', '').replace('\t', '').split(':')[1]
-                line = lines[i + 1]
-                props = {}
-                props['Ligand'] = ligand
-            if line.startswith('##########'):
-                splitter = line.strip().strip('##########').replace(' ', '').replace('\t', '').split(':')
-                props[splitter[0]] = float(splitter[1])
-            if line.startswith('@<TRIPOS>MOLECULE'):
-                if props:
-                    docked_ligands = docked_ligands.append(props, ignore_index=True)
+    for i, line in enumerate(lines):
+        if line.startswith('########## Name:'):
+            ligand = line.strip().strip('##########').replace(' ', '').replace('\t', '').split(':')[1]
+            line = lines[i + 1]
+            props = {}
+            props['Ligand'] = ligand
+        if line.startswith('##########'):
+            splitter = line.strip().strip('##########').replace(' ', '').replace('\t', '').split(':')
+            props[splitter[0]] = float(splitter[1])
+        if line.startswith('@<TRIPOS>MOLECULE'):
+            if props:
+                docked_ligands = docked_ligands.append(props, ignore_index=True)
 
-        return docked_ligands
+    return docked_ligands
 
 #     def do_dock6_rigid(self, ligand_path, force_rerun=False):
 #         ligand_name = os.path.basename(args.ligand).split('.')[0]

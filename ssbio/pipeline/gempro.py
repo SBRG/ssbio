@@ -553,10 +553,13 @@ class GEMPRO(Object):
         log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
 
     def set_representative_sequence(self, force_rerun=False):
-        """Combine information from KEGG, UniProt, and manual mappings. Saves a DataFrame of results.
+        """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative sequence.
 
-            Manual mappings override all existing mappings. UniProt mappings override KEGG mappings except
-            when KEGG mappings have PDBs associated with them and UniProt doesn't.
+        Manually set representative sequences override all existing mappings. UniProt mappings override KEGG mappings
+        except when KEGG mappings have PDBs associated with them and UniProt doesn't.
+
+        Args:
+            force_rerun (bool): Set to True to recheck stored sequences
 
         """
 
@@ -799,13 +802,12 @@ class GEMPRO(Object):
 
     def blast_seqs_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, all_genes=False, display_link=False,
                           outdir=None, force_rerun=False):
-        """BLAST each gene sequence to the PDB. Saves raw BLAST results (XML files).
-
-        Also creates a summary dataframe accessible by the attribute "df_pdb_blast".
+        """BLAST each representative protein sequence to the PDB. Saves raw BLAST results (XML files).
 
         Args:
             seq_ident_cutoff (float, optional): Cutoff results based on percent coverage (in decimal form)
-            evalue (float, optional): Cutoff for the E-value - filters for significant hits. 0.001 is liberal, 0.0001 is stringent (default).
+            evalue (float, optional): Cutoff for the E-value - filters for significant hits. 0.001 is liberal,
+                0.0001 is stringent (default).
             all_genes (bool): If all genes should be BLASTed, or only those without any structures currently mapped
             display_link (bool, optional): Set to True if links to the HTML results should be displayed
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
@@ -841,6 +843,8 @@ class GEMPRO(Object):
 
     @property
     def df_pdb_blast(self):
+        """Create a summary dataframe of PDB BLAST results"""
+
         df = pd.DataFrame()
         for g in self.genes_with_experimental_structures:
             protein_df = g.protein.df_pdb_blast.copy().reset_index()
