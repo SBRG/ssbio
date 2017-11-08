@@ -365,7 +365,7 @@ class GEMPRO(Object):
         for g in self.genes:
             kegg_mappings = g.protein.filter_sequences(KEGGProp)
             for kegg_prop in kegg_mappings:
-                kegg_dict = kegg_prop.get_dict(df_format=True, only_keys=df_cols)
+                kegg_dict = kegg_prop.get_dict(df_format=True, only_attributes=df_cols)
                 kegg_dict['gene'] = g.id
                 kegg_pre_df.append(kegg_dict)
 
@@ -492,7 +492,7 @@ class GEMPRO(Object):
         for g in self.genes:
             uniprot_mappings = g.protein.filter_sequences(UniProtProp)
             for uniprot_prop in uniprot_mappings:
-                uniprot_dict = uniprot_prop.get_dict(df_format=True, only_keys=df_cols)
+                uniprot_dict = uniprot_prop.get_dict(df_format=True, only_attributes=df_cols)
                 uniprot_dict['gene'] = g.id
                 uniprot_pre_df.append(uniprot_dict)
 
@@ -584,7 +584,7 @@ class GEMPRO(Object):
         df_cols = ['gene', 'uniprot', 'kegg', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
         for g in self.genes_with_a_representative_sequence:
-            gene_dict = g.protein.representative_sequence.get_dict(df_format=True, only_keys=df_cols)
+            gene_dict = g.protein.representative_sequence.get_dict(df_format=True, only_attributes=df_cols)
             gene_dict['gene'] = g.id
             seq_mapping_pre_df.append(gene_dict)
 
@@ -947,8 +947,9 @@ class GEMPRO(Object):
 
             try:
                 itasser_prop = g.protein.load_itasser_folder(ident=hom_id, itasser_folder=orig_itasser_dir,
-                                                             organize=True, outdir=outdir, organize_name=new_itasser_name,
-                                                             create_dfs=False, force_rerun=force_rerun)
+                                                             organize=True, outdir=outdir,
+                                                             organize_name=new_itasser_name,
+                                                             force_rerun=force_rerun)
             except OSError:
                 log.debug('{}: homology model folder unavailable'.format(g.id))
                 continue
@@ -1037,7 +1038,7 @@ class GEMPRO(Object):
         df_cols = ['gene', 'id', 'is_experimental', 'file_type', 'structure_file']
 
         for g in self.genes_with_a_representative_structure:
-            repdict = g.protein.representative_structure.get_dict(df_format=True, only_keys=df_cols)
+            repdict = g.protein.representative_structure.get_dict(df_format=True, only_attributes=df_cols)
             repdict['gene'] = g.id
             rep_struct_pre_df.append(repdict)
 

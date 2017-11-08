@@ -28,5 +28,5 @@ class TestObject(unittest.TestCase):
         self.assertEqual('dontadd', self.ob.dontadd)
 
     def test_get_dict(self):
-        gotdict = self.ob.get_dict(only_keys='id')
+        gotdict = self.ob.get_dict(only_attributes='id')
         self.assertEqual(gotdict, {'id':'idtester'})

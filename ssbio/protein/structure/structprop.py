@@ -108,11 +108,14 @@ class StructProp(Object):
         """Load a structure file and provide pointers to its location
 
         Args:
-            structure_path: Path to structure file
-            file_type: Type of structure file
+            structure_path (str): Path to structure file
+            file_type (str): Type of structure file
+
         """
+
         if not file_type:
             raise ValueError('File type must be specified')
+
         self.file_type = file_type
         self.structure_dir = op.dirname(structure_path)
         self.structure_file = op.basename(structure_path)
@@ -281,7 +284,7 @@ class StructProp(Object):
 
         exclude_attributes.extend(['mapped_chains', 'chains'])
 
-        final_dict = {k: v for k, v in Object.get_dict(self, only_keys=keys, exclude_attributes=exclude_attributes,
+        final_dict = {k: v for k, v in Object.get_dict(self, only_attributes=keys, exclude_attributes=exclude_attributes,
                                                        df_format=df_format).items()}
 
 
@@ -290,7 +293,7 @@ class StructProp(Object):
         if not chain_keys:
             chain_keys = [x for x in chain_prop.get_dict().keys() if x not in final_dict]
 
-        chain_dict = chain_prop.get_dict(only_keys=chain_keys, df_format=df_format)
+        chain_dict = chain_prop.get_dict(only_attributes=chain_keys, df_format=df_format)
         final_dict.update(chain_dict)
 
         return final_dict

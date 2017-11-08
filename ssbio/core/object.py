@@ -86,11 +86,11 @@ class Object(object):
                 else:
                     setattr(self, key, value)
 
-    def get_dict(self, only_keys=None, exclude_attributes=None, df_format=False):
+    def get_dict(self, only_attributes=None, exclude_attributes=None, df_format=False):
         """Get a dictionary of this object's attributes. Optional format for storage in a Pandas DataFrame.
 
         Args:
-            keys (str, list): Attributes that should be returned. If not provided, all are returned.
+            only_attributes (str, list): Attributes that should be returned. If not provided, all are returned.
             exclude_attributes (str, list): Attributes that should be excluded.
             df_format (bool): If dictionary values should be formatted for a dataframe
                 (everything possible is transformed into strings, int, or float -
@@ -102,10 +102,10 @@ class Object(object):
         """
 
         # Choose attributes to return, return everything in the object if a list is not specified
-        if not only_keys:
+        if not only_attributes:
             keys = list(self.__dict__.keys())
         else:
-            keys = ssbio.utils.force_list(only_keys)
+            keys = ssbio.utils.force_list(only_attributes)
 
         # Remove keys you don't want returned
         if exclude_attributes:
