@@ -939,7 +939,7 @@ class Protein(Object):
             self._representative_structure_setter(structprop=itasser, keep_chain=representative_chain, force_rerun=force_rerun)
 
         if organize:
-            if itasser.model_file:
+            if itasser.structure_file:
                 # The name of the actual pdb file will be $GENEID_model1.pdb
                 if not organize_name:
                     new_itasser_name = self.id + '_model1'
@@ -961,7 +961,7 @@ class Protein(Object):
 
         itasser_pre_df = []
 
-        df_cols = ['id', 'model_file', 'model_date', 'difficulty',
+        df_cols = ['id', 'structure_file', 'model_date', 'difficulty',
                    'top_template_pdb', 'top_template_chain', 'c_score',
                    'tm_score', 'tm_score_err', 'rmsd', 'rmsd_err',
                    'top_bsite_site_num', 'top_bsite_c_score', 'top_bsite_cluster_size', 'top_bsite_algorithm',
@@ -1443,9 +1443,8 @@ class Protein(Object):
                                              only_keys=self.__representative_structure_attributes,
                                              overwrite=True)
 
-        # Save the original PDB ID as an extra attribute
-        if structprop.is_experimental:
-            self.representative_structure.original_pdb_id = structprop.id
+        # Save the original structure ID as an extra attribute
+        self.representative_structure.original_structure_id = structprop.id
 
         # Also need to parse the clean structure and save its sequence..
         self.representative_structure.parse_structure()

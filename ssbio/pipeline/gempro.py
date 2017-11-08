@@ -953,8 +953,11 @@ class GEMPRO(Object):
             except OSError:
                 log.debug('{}: homology model folder unavailable'.format(g.id))
                 continue
+            except IOError:
+                log.debug('{}: homology model unavailable'.format(g.id))
+                continue
 
-            if itasser_prop.model_file:
+            if itasser_prop.structure_file:
                 counter += 1
             else:
                 log.debug('{}: homology model file unavailable, perhaps modelling did not finish'.format(g.id))

@@ -38,7 +38,7 @@ class ITASSERProp(StructProp):
 
         StructProp.__init__(self, ident, is_experimental=False)
 
-        self._files_to_copy = []
+        self._attrs_to_copy = []
 
         self.original_results_path = original_results_path
         self.model_to_use = model_to_use
@@ -47,7 +47,7 @@ class ITASSERProp(StructProp):
         self.model_date = None
         original_model_path = op.join(original_results_path, '{}.pdb'.format(model_to_use))
         if not op.exists(original_model_path):
-            log.warning('{}: no homology model generated'.format(original_model_path))
+            raise IOError('{}: no homology model generated'.format(original_model_path))
         else:
             self.load_structure_path(structure_path=original_model_path, file_type='pdb')
 
@@ -57,30 +57,30 @@ class ITASSERProp(StructProp):
         self.top_template_chain = None
 
         # Parse init.dat
-        self.init_dat_path = op.join(original_results_path, 'init.dat')
-        if op.exists(self.init_dat_path):
-            self.update(parse_init_dat(self.init_dat_path))
+        self._init_dat_path = op.join(original_results_path, 'init.dat')
+        if op.exists(self._init_dat_path):
+            self.update(parse_init_dat(self._init_dat_path))
 
         # Parse seq.dat
-        self.seq_dat_path = op.join(original_results_path, 'seq.dat')
-        if op.exists(self.seq_dat_path):
-            self._files_to_copy.append(self.seq_dat_path)
+        self._seq_dat_path = op.join(original_results_path, 'seq.dat')
+        if op.exists(self._seq_dat_path):
+            self._attrs_to_copy.append('_seq_dat_path')
             # TODO: parse seq.dat and store in modeling_results
-            self.update(parse_seq_dat(self.seq_dat_path))
+            self.update(parse_seq_dat(self._seq_dat_path))
 
         # Parse exp.dat
-        self.exp_dat_path = op.join(original_results_path, 'exp.dat')
-        if op.exists(self.exp_dat_path):
-            self._files_to_copy.append(self.exp_dat_path)
+        self._exp_dat_path = op.join(original_results_path, 'exp.dat')
+        if op.exists(self._exp_dat_path):
+            self._attrs_to_copy.append('_exp_dat_path')
             # TODO: parse exp.dat and store in modeling_results
-            self.update(parse_exp_dat(self.exp_dat_path))
+            self.update(parse_exp_dat(self._exp_dat_path))
 
         # Parse BFP.dat
-        self.bfp_dat_path = op.join(original_results_path, 'BFP.dat')
-        if op.exists(self.bfp_dat_path):
-            self._files_to_copy.append(self.bfp_dat_path)
+        self._bfp_dat_path = op.join(original_results_path, 'BFP.dat')
+        if op.exists(self._bfp_dat_path):
+            self._attrs_to_copy.append('_bfp_dat_path')
             # TODO: parse BFP.dat and store in modeling_results
-            self.update(parse_bfp_dat(self.bfp_dat_path))
+            self.update(parse_bfp_dat(self._bfp_dat_path))
 
         # Parse cscore
         self.c_score = None
@@ -88,10 +88,10 @@ class ITASSERProp(StructProp):
         self.tm_score_err = None
         self.rmsd = None
         self.rmsd_err = None
-        self.cscore_path = op.join(original_results_path, 'cscore')
-        if op.exists(self.cscore_path):
-            self._files_to_copy.append(self.cscore_path)
-            self.update(parse_cscore(self.cscore_path))
+        self._cscore_path = op.join(original_results_path, 'cscore')
+        if op.exists(self._cscore_path):
+            self._attrs_to_copy.append('_cscore_path')
+            self.update(parse_cscore(self._cscore_path))
 
 
         ### COACH RESULTS
@@ -102,57 +102,57 @@ class ITASSERProp(StructProp):
         self.coach_go_cc = []
 
         coach_folder = op.join(original_results_path, coach_results_folder)
-        self.coach_bsites_inf_path = op.join(coach_folder, 'Bsites.inf')
-        self.coach_ec_dat_path = op.join(coach_folder, 'EC.dat')
-        self.coach_go_mf_dat_path = op.join(coach_folder, 'GO_MF.dat')
-        self.coach_go_bp_dat_path = op.join(coach_folder, 'GO_BP.dat')
-        self.coach_go_cc_dat_path = op.join(coach_folder, 'GO_CC.dat')
+        self._coach_bsites_inf_path = op.join(coach_folder, 'Bsites.inf')
+        self._coach_ec_dat_path = op.join(coach_folder, 'EC.dat')
+        self._coach_go_mf_dat_path = op.join(coach_folder, 'GO_MF.dat')
+        self._coach_go_bp_dat_path = op.join(coach_folder, 'GO_BP.dat')
+        self._coach_go_cc_dat_path = op.join(coach_folder, 'GO_CC.dat')
 
         if op.isdir(coach_folder):
             # Parse Bsites.inf
-            if op.exists(self.coach_bsites_inf_path):
-                parsed_bsites = parse_coach_bsites_inf(self.coach_bsites_inf_path)
+            if op.exists(self._coach_bsites_inf_path):
+                parsed_bsites = parse_coach_bsites_inf(self._coach_bsites_inf_path)
                 if parsed_bsites:
-                    self._files_to_copy.append(self.coach_bsites_inf_path)
+                    self._attrs_to_copy.append('_coach_bsites_inf_path')
                     self.coach_bsites = parsed_bsites
 
             # Parse EC.dat
-            if op.exists(self.coach_ec_dat_path):
-                parsed_ec = parse_coach_ec(self.coach_ec_dat_path)
+            if op.exists(self._coach_ec_dat_path):
+                parsed_ec = parse_coach_ec(self._coach_ec_dat_path)
                 if parsed_ec:
-                    self._files_to_copy.append(self.coach_ec_dat_path)
+                    self._attrs_to_copy.append('_coach_ec_dat_path')
                     self.coach_ec = parsed_ec
 
             # Parse GO_MF.dat
-            if op.exists(self.coach_go_mf_dat_path):
-                parsed_go_mf = parse_coach_go(self.coach_go_mf_dat_path)
+            if op.exists(self._coach_go_mf_dat_path):
+                parsed_go_mf = parse_coach_go(self._coach_go_mf_dat_path)
                 if parsed_go_mf:
-                    self._files_to_copy.append(self.coach_go_mf_dat_path)
+                    self._attrs_to_copy.append('_coach_go_mf_dat_path')
                     self.coach_go_mf = parsed_go_mf
 
             # Parse GO_BP.dat
-            if op.exists(self.coach_go_bp_dat_path):
-                parsed_go_bp = parse_coach_go(self.coach_go_bp_dat_path)
+            if op.exists(self._coach_go_bp_dat_path):
+                parsed_go_bp = parse_coach_go(self._coach_go_bp_dat_path)
                 if parsed_go_bp:
-                    self._files_to_copy.append(self.coach_go_bp_dat_path)
+                    self._attrs_to_copy.append('_coach_go_bp_dat_path')
                     self.coach_go_bp = parsed_go_bp
 
             # Parse GO_CC.dat
-            if op.exists(self.coach_go_cc_dat_path):
-                parsed_go_cc = parse_coach_go(self.coach_go_cc_dat_path)
+            if op.exists(self._coach_go_cc_dat_path):
+                parsed_go_cc = parse_coach_go(self._coach_go_cc_dat_path)
                 if parsed_go_cc:
-                    self._files_to_copy.append(self.coach_go_cc_dat_path)
+                    self._attrs_to_copy.append('_coach_go_cc_dat_path')
                     self.coach_go_cc = parsed_go_cc
 
     def load_structure_path(self, structure_path, file_type='pdb'):
-        StructProp.load_structure_path(structure_path=structure_path, file_type=file_type)
+        StructProp.load_structure_path(self, structure_path=structure_path, file_type=file_type)
         # Additionally save model creation date
         self.model_date = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(self.structure_path)))
 
     def copy_results(self, copy_to_dir, rename_model_to=None, force_rerun=False):
         """Copy the raw information from I-TASSER modeling to a new folder.
 
-        Copies all files in the list _files_to_copy.
+        Copies all files in the list _attrs_to_copy.
 
         Args:
             copy_to_dir (str): Directory to copy the minimal set of results per sequence.
@@ -184,13 +184,15 @@ class ITASSERProp(StructProp):
             if not op.exists(dest_itasser_dir):
                 os.mkdir(dest_itasser_dir)
 
-            for old_file_path in self._files_to_copy:
+            for attr in self._attrs_to_copy:
+                old_file_path = getattr(self, attr)
                 new_file_path = op.join(dest_itasser_dir, op.basename(old_file_path))
                 if ssbio.utils.force_rerun(flag=force_rerun, outfile=new_file_path):
                     shutil.copy2(old_file_path, new_file_path)
                     log.debug('{}: copied from {}'.format(new_file_path, old_file_path))
                 else:
                     log.debug('{}: file already exists'.format(new_file_path))
+                setattr(self, attr, new_file_path)
 
     @property
     def df_coach_bsites(self):
@@ -211,8 +213,8 @@ class ITASSERProp(StructProp):
 
     @property
     def df_coach_ec(self):
-        if self.coach_ec_dat_path:
-            return parse_coach_ec_df(self.coach_ec_dat_path)
+        if self._coach_ec_dat_path:
+            return parse_coach_ec_df(self._coach_ec_dat_path)
         else:
             log.warning('Empty dataframe')
             return pd.DataFrame()
@@ -256,9 +258,9 @@ class ITASSERProp(StructProp):
             excluder = ssbio.utils.force_list(exclude_attributes)
             excluder.extend(to_exclude)
 
-        summary_dict = StructProp.get_dict(only_attributes=only_attributes,
-                                       exclude_attributes=excluder,
-                                       df_format=df_format)
+        summary_dict = StructProp.get_dict(self, only_attributes=only_attributes,
+                                           exclude_attributes=excluder,
+                                           df_format=df_format)
 
         if self.coach_bsites:
             tmp = {'top_bsite_' + k:v for k, v in self.coach_bsites[0].items()}
@@ -320,6 +322,8 @@ def parse_init_dat(infile):
     init_dict['top_template_pdb'] = top_template_pdb
     init_dict['top_template_chain'] = top_template_chain
 
+    return init_dict
+
 
 def parse_seq_dat(infile):
     """Parse the secondary structure predictions in seq.dat
@@ -331,8 +335,10 @@ def parse_seq_dat(infile):
         list: List of secondary structure predictions for all residues
 
     """
-    pass
+
     # TODO: parser for seq.dat
+    seq_dict = {}
+    return seq_dict
 
 
 def parse_exp_dat(infile):
@@ -345,8 +351,10 @@ def parse_exp_dat(infile):
         list: List of solvent accessibility predictions for all residues
 
     """
-    pass
+
     # TODO: parser for exp.dat
+    exp_dict = {}
+    return exp_dict
 
 
 def parse_bfp_dat(infile):
@@ -359,8 +367,10 @@ def parse_bfp_dat(infile):
         list: List of B-factor predictions for all residues
 
     """
-    pass
+
     # TODO: parser for BFP.dat
+    bfp_dict = {}
+    return bfp_dict
 
 
 def parse_cscore(infile):
