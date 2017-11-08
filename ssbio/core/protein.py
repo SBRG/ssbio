@@ -900,7 +900,7 @@ class Protein(Object):
         return self.structures.get_by_id(pdb_id)
 
     def load_itasser_folder(self, ident, itasser_folder, organize=False, outdir=None, organize_name=None,
-                            set_as_representative=False, representative_chain='X', create_dfs=False, force_rerun=False):
+                            set_as_representative=False, representative_chain='X', force_rerun=False):
         """Load the results folder from an I-TASSER run (local, not from the server), copy structure files over, and create summary dataframes.
 
         Args:
@@ -911,7 +911,6 @@ class Protein(Object):
             organize_name (str): Basename of files to rename results to. If not provided, will use id attribute.
             set_as_representative: If this structure should be set as the representative structure
             representative_chain (str): If ``set_as_representative`` is ``True``, provide the representative chain ID
-            create_dfs: If summary dataframes should be created
             force_rerun (bool): If the PDB should be reloaded if it is already in the list of structures
 
         Returns:
@@ -933,7 +932,7 @@ class Protein(Object):
                 itasser = self.structures.get_by_id(ident)
 
         if not self.structures.has_id(ident):
-            itasser = ITASSERProp(ident, itasser_folder, create_dfs=create_dfs)
+            itasser = ITASSERProp(ident, itasser_folder)
             self.structures.append(itasser)
 
         if set_as_representative:
@@ -953,8 +952,6 @@ class Protein(Object):
 
                 # Copy the model1.pdb and also create summary dataframes
                 itasser.copy_results(copy_to_dir=outdir, rename_model_to=new_itasser_name, force_rerun=force_rerun)
-                if create_dfs:
-                    itasser.save_dataframes(outdir=dest_itasser_extra_dir)
 
         return self.structures.get_by_id(ident)
 
@@ -979,7 +976,7 @@ class Protein(Object):
 
         for p in self.get_homology_models():
             # Summary dataframe
-            new_homology_dict = p.get_dict(df_format=True, only_keys=df_cols)
+            new_homology_dict = p.get_dict(df_format=True, only_attributes=df_cols)
             itasser_pre_df.append(new_homology_dict)
 
         df = pd.DataFrame.from_records(itasser_pre_df, columns=df_cols).set_index('id')
@@ -1268,7 +1265,7 @@ class Protein(Object):
                 structprop, and chain_id do not need to be defined.
 
         Returns:
-            dict: Mapping of resnums to structure residue IDs
+            dict: Mapping of sequence residue numbers to structure residue numbers
 
         """
         resnums = ssbio.utils.force_list(resnums)
@@ -1323,6 +1320,77 @@ class Protein(Object):
                               '{structprop_resid}{structprop_resnum}'.format(**format_data))
 
         return final_mapping
+
+    def map_structprop_resnums_to_seqprop_resnums(self, resnums, structprop=None, chain_id=None, seqprop=None,
+                                                  use_representatives=False):
+        """Map a residue number in the structprop+chain to the seqprop's residue number.
+
+        Args:
+            resnums (int, list): Residue numbers in the structure
+            structprop (StructProp): StructProp object
+            chain_id (str): Chain ID to map from
+            seqprop (SeqProp): SeqProp object
+            use_representatives (bool): If the representative sequence and structure should be used. If True, seqprop,
+                structprop, and chain_id do not need to be defined.
+
+        Returns:
+            dict: Mapping of structure residue numbers to sequence residue numbers
+
+        """
+        pass
+        # resnums = ssbio.utils.force_list(resnums)
+        #
+        # if use_representatives:
+        #     seqprop = self.representative_sequence
+        #     structprop = self.representative_structure
+        #     chain_id = self.representative_chain
+        # else:
+        #     if not seqprop or not structprop or not chain_id:
+        #         raise ValueError('Please specify sequence, structure, and chain ID')
+        #
+        # mapping_to_repchain_index = self.map_seqprop_resnums_to_structprop_chain_index(resnums=resnums,
+        #                                                                                seqprop=seqprop,
+        #                                                                                structprop=structprop,
+        #                                                                                chain_id=chain_id,
+        #                                                                                use_representatives=use_representatives)
+        #
+        # chain = structprop.chains.get_by_id(chain_id)
+        # chain_structure_resnum_mapping = chain.seq_record.letter_annotations['structure_resnums']
+        #
+        # final_mapping = {}
+        # for k, v in mapping_to_repchain_index.items():
+        #     k = int(k)
+        #     rn = chain_structure_resnum_mapping[v]
+        #
+        #     if rn == float('Inf'):
+        #         log.warning('{}-{}, {}: structure file does not contain coordinates for this residue'.format(structprop.id,
+        #                                                                                                      chain_id,
+        #                                                                                                      k))
+        #     else:
+        #         rn = int(rn)
+        #         final_mapping[k] = rn
+        #
+        #         # Additionally report if residues are the same - they could be different in the structure though
+        #         format_data = {'seqprop_id'       : seqprop.id,
+        #                        'seqprop_resid'    : seqprop[k - 1],
+        #                        'seqprop_resnum'   : k,
+        #                        'structprop_id'    : structprop.id,
+        #                        'structprop_chid'  : chain_id,
+        #                        'structprop_resid' : chain.seq_record[rn - 1],
+        #                        'structprop_resnum': rn}
+        #
+        #         if seqprop[k-1] != chain.seq_record[rn-1]:
+        #             log.warning('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} does not match to '
+        #                         'structure {structprop_id}-{structprop_chid} residue '
+        #                         '{structprop_resid}{structprop_resnum}. NOTE: this may be due to '
+        #                         'structural differences'.format(**format_data))
+        #         else:
+        #             log.debug('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} is mapped to '
+        #                       'structure {structprop_id}-{structprop_chid} residue '
+        #                       '{structprop_resid}{structprop_resnum}'.format(**format_data))
+        #
+        # return final_mapping
+
 
     def _representative_structure_setter(self, structprop, keep_chain, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None, force_rerun=False):
@@ -1561,7 +1629,7 @@ class Protein(Object):
             # TODO: homology models are not ordered in any other way other than how they are loaded,
             # rethink this for multiple homology models
             for homology in all_models:
-                if not homology.structure_path:
+                if not homology.structure_file:
                     log.debug('{}: no homology structure file'.format(self.id))
                     continue
 
@@ -1785,33 +1853,34 @@ class Protein(Object):
         all_info['seq_resnum'] = seq_resnum
         all_info['seq_residue'] = str(seq_features.seq)
 
-        # Get structure properties
-        mapping_to_structure_resnum = self.map_seqprop_resnums_to_structprop_resnums(resnums=seq_resnum,
-                                                                                     seqprop=seqprop,
-                                                                                     structprop=structprop,
-                                                                                     chain_id=chain_id,
-                                                                                     use_representatives=use_representatives)
+        if structprop:
+            # Get structure properties
+            mapping_to_structure_resnum = self.map_seqprop_resnums_to_structprop_resnums(resnums=seq_resnum,
+                                                                                         seqprop=seqprop,
+                                                                                         structprop=structprop,
+                                                                                         chain_id=chain_id,
+                                                                                         use_representatives=use_representatives)
 
-        # Try finding the residue in the structure
-        if f.location.end.position in mapping_to_structure_resnum:
-            struct_resnum = mapping_to_structure_resnum[f.location.end.position]
-            struct_f = SeqFeature(FeatureLocation(struct_resnum-1, struct_resnum))
+            # Try finding the residue in the structure
+            if f.location.end.position in mapping_to_structure_resnum:
+                struct_resnum = mapping_to_structure_resnum[f.location.end.position]
+                struct_f = SeqFeature(FeatureLocation(struct_resnum-1, struct_resnum))
 
-            struct_seq_features = struct_f.extract(chain.seq_record)
-            struct_info = ssbio.utils.clean_single_dict(indict=struct_seq_features.letter_annotations,
-                                                        prepend_to_keys='struct_',
-                                                        remove_keys_containing='structure_resnums')
-            struct_info['struct_resnum'] = struct_resnum
-            struct_info['struct_residue'] = str(struct_seq_features.seq)
-            all_info.update(struct_info)
+                struct_seq_features = struct_f.extract(chain.seq_record)
+                struct_info = ssbio.utils.clean_single_dict(indict=struct_seq_features.letter_annotations,
+                                                            prepend_to_keys='struct_',
+                                                            remove_keys_containing='structure_resnums')
+                struct_info['struct_resnum'] = struct_resnum
+                struct_info['struct_residue'] = str(struct_seq_features.seq)
+                all_info.update(struct_info)
 
-            # Warn if residue differs from sequence
-            if seq_features.seq != struct_seq_features.seq:
-                log.warning('Sequence residue ({}{}) does not match structure residue ({}{}). '
-                            'This may simply be due to differences in the structure'.format(seq_features.seq,
-                                                                                            seq_resnum,
-                                                                                            struct_seq_features.seq,
-                                                                                            struct_resnum))
+                # Warn if residue differs from sequence
+                if seq_features.seq != struct_seq_features.seq:
+                    log.warning('Sequence residue ({}{}) does not match structure residue ({}{}). '
+                                'This may simply be due to differences in the structure'.format(seq_features.seq,
+                                                                                                seq_resnum,
+                                                                                                struct_seq_features.seq,
+                                                                                                struct_resnum))
 
         return all_info
 
@@ -1953,7 +2022,7 @@ class Protein(Object):
 
             # Display other single residues
             if f.location.end - 1 == f.location.start:
-                if f.type.lower() == 'sequence variant':
+                if f.type.lower() == 'sequence variant' or f.type.lower() == 'mutagenesis site':
                     continue
                 impres = self.map_seqprop_resnums_to_structprop_resnums(resnums=f.location.end,
                                                                         seqprop=seqprop,

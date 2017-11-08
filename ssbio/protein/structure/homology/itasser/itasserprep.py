@@ -30,6 +30,7 @@ class ITASSERPrep():
             light: If simulations should be limited to 5 runs
             runtype: How you will be running I-TASSER - local, slurm, or torque
             print_exec: If the execution script should be printed out
+            java_home: Path to Java executable
             binding_site_pred: If binding site predictions should be run
             ec_pred: If EC number predictions should be run
             go_pred: If GO term predictions should be run
