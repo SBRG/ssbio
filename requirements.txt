@@ -18,3 +18,4 @@ matplotlib
 beautifulsoup4==4.5.3
 nbsphinx
 bcbio-gff
+biopandas
