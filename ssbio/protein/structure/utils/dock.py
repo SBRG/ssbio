@@ -459,9 +459,9 @@ score_grid_prefix              {}_grid
         in_name = op.join(self.dock_dir, "{}_{}_flexdock.in".format(self.id, ligand_name))
         out_name = op.join(self.dock_dir, "{}_{}_flexdock.out".format(self.id, ligand_name))
 
-        conformers_out = '{}_{}_flexdock_conformers.mol2'.format(self.id, ligand_name)
-        scored_out = '{}_{}_flexdock_scored.mol2'.format(self.id, ligand_name)
-        ranked_out = '{}_{}_flexdock_ranked.mol2'.format(self.id, ligand_name)
+        conformers_out = op.join(self.dock_dir, '{}_{}_flexdock_conformers.mol2'.format(self.id, ligand_name))
+        scored_out = op.join(self.dock_dir, '{}_{}_flexdock_scored.mol2'.format(self.id, ligand_name))
+        ranked_out = op.join(self.dock_dir, '{}_{}_flexdock_ranked.mol2'.format(self.id, ligand_name))
 
         if ssbio.utils.force_rerun(flag=force_rerun, outfile=ranked_out):
             with open(in_name, "w") as f:
