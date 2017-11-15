@@ -1,0 +1,1 @@
+.. include ../ssbio/README.rst
