@@ -374,7 +374,7 @@ def uniprot_ec(uniprot_id):
 
 
 def uniprot_sites(uniprot_id):
-    """Retrive a dictionary of UniProt sites
+    """Retrieve a list of UniProt sites parsed from the feature file
 
     Sites are defined here: http://www.uniprot.org/help/site and here: http://www.uniprot.org/help/function_section
 
@@ -388,17 +388,23 @@ def uniprot_sites(uniprot_id):
     r = requests.post('http://www.uniprot.org/uniprot/%s.gff' % uniprot_id)
     gff = StringIO(r.content.decode('utf-8'))
 
-    try:
-        gff_df = pd.read_table(gff, sep='\t', skiprows=2, header=None)
-    except ValueError as e:
-        log.error('Error retrieving feature table')
-        print(e)
-        return pd.DataFrame()
+    feats = list(GFF.parse(gff))
+    if len(feats) > 1:
+        log.warning('Too many sequences in GFF')
+    else:
+        return feats[0].features
 
-    gff_df.drop([0, 1, 5, 6, 7, 9], axis=1, inplace=True)
-    gff_df.columns = ['type', 'seq_start', 'seq_end', 'notes']
-
-    return gff_df
+    # try:
+    #     gff_df = pd.read_table(gff, sep='\t', skiprows=2, header=None)
+    # except ValueError as e:
+    #     log.error('Error retrieving feature table')
+    #     print(e)
+    #     return pd.DataFrame()
+    #
+    # gff_df.drop([0, 1, 5, 6, 7, 9], axis=1, inplace=True)
+    # gff_df.columns = ['type', 'seq_start', 'seq_end', 'notes']
+    #
+    # return gff_df
 
 
 def download_uniprot_file(uniprot_id, filetype, outdir='', force_rerun=False):
