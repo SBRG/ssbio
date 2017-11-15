@@ -19,6 +19,7 @@
 #
 import os
 import sys
+from mock import MagicMock
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
@@ -28,6 +29,7 @@ source_parsers = {'.md': CommonMarkParser, }
 source_suffix = ['.rst', '.md']
 
 class Mock(object):
+    __all__ = []
     def __init__(self, *args, **kwargs):
         return
 
