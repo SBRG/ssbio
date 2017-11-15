@@ -259,7 +259,7 @@ class StructProp(Object):
 
     def get_dict_with_chain(self, chain, only_keys=None, chain_keys=None, exclude_attributes=None, df_format=False):
         """get_dict method which incorporates attributes found in a specific chain. Does not overwrite any attributes
-            in the original StructProp.
+        in the original StructProp.
 
         Args:
             chain:
@@ -325,6 +325,7 @@ class StructProp(Object):
         """Run DSSP on this structure and store the DSSP annotations in the corresponding ChainProp SeqRecords
 
         Calculations are stored in the ChainProp's ``letter_annotations`` at the following keys:
+
             * ``SS-dssp``
             * ``RSA-dssp``
             * ``ASA-dssp``
@@ -437,7 +438,7 @@ class StructProp(Object):
             log.debug('{}: stored residue depths in chain seq_record letter_annotations'.format(chain))
 
     def get_freesasa_annotations(self, outdir, include_hetatms=False, force_rerun=False):
-        """Run freesasa on this structure and store the calculated properties in the corresponding ChainProp SeqRecords
+        """Run ``freesasa`` on this structure and store the calculated properties in the corresponding ChainProps
         """
         if self.file_type != 'pdb':
             log.error('{}: unable to run freesasa with "{}" file type. Please change file type to "pdb"'.format(self.id,

@@ -19,6 +19,7 @@ class ITASSERProp(StructProp):
     """Parse all available information for a local I-TASSER modeling run.
 
     Initializes a class to collect I-TASSER modeling information and optionally copy results to a new directory.
+    SEE: https://zhanglab.ccmb.med.umich.edu/papers/2015_1.pdf for detailed information.
 
     Args:
         ident (str): ID of I-TASSER modeling run
@@ -420,7 +421,7 @@ def parse_coach_bsites_inf(infile):
     Line 3: Statistics of ligands in the cluster
 
     C-score information
-        "In our training data, a prediction with CSt40.35 has average false positive and false negative rates below
+        "In our training data, a prediction with C-score>0.35 has average false positive and false negative rates below
         0.16 and 0.13, respectively." (https://zhanglab.ccmb.med.umich.edu/COACH/COACH.pdf)
 
     Args:

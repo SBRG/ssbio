@@ -7,7 +7,18 @@ import logging
 log = logging.getLogger(__name__)
 
 class GenePro(Gene):
-    """Extends the COBRAPy Gene object to add GEM-PRO annotations in the form of a Protein attribute
+
+    """Extends the COBRAPy Gene object to add GEM-PRO annotations in the form of a Protein attribute.
+
+    Additionally adds optional directory paths for files.
+
+    Args:
+        id (str): ID for the gene
+        name (str): Name of the gene
+        functional (bool): If this gene is functional in the linked genome-scale model
+        root_dir (str):
+        pdb_file_type (str):
+
     """
 
     def __init__(self, id, name='', functional=True, root_dir=None, pdb_file_type='cif'):

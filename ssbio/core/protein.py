@@ -94,6 +94,8 @@ class Protein(Object):
         Object.__init__(self, id=ident, description=description)
 
         self.pdb_file_type = pdb_file_type
+        """str: ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - choose a file 
+        type for files downloaded from the PDB"""
 
         # Create directories
         self._root_dir = None
