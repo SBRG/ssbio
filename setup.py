@@ -18,6 +18,6 @@ setup(
         #          'ssbio/protein/structure/utils/mutatepdb.py',
         #          'ssbio/protein/structure/utils/tleap.py'],
         #          'ssbio/protein/structure/properties/msms.py'],
-        long_description=open('README.md').read(),
+        long_description=open('README.rst').read(),
         install_requires=required
 )
