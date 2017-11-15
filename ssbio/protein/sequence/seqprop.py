@@ -67,6 +67,7 @@ class SeqProp(SeqRecord, Object):
             feature_path (str): Absolute or relative path to feature (GFF) file
 
         """
+        __metaclass__ = SeqRecord
 
         Object.__init__(self, id=id, description=description)
 
