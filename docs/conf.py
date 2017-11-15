@@ -22,6 +22,43 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
 
+# MOCK STUFF
+from recommonmark.parser import CommonMarkParser
+source_parsers = {'.md': CommonMarkParser}
+source_suffix = ['.rst', '.md']
+
+class Mock(object):
+    __all__ = []
+    def __init__(self, *args, **kwargs):
+        return
+
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
+    @classmethod
+    def __getattr__(cls, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        else:
+            return Mock()
+
+MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
+                'glpk', 'gurobipy', 'gurobipy.GRB', 'cplex', 'pp', 'libsbml',
+                'cplex.exceptions', 'tabulate', 'argparse', 'pandas',
+                'nglview', 'matplotlib', 'numpy.linalg', 'biopython', 'bioservices', 'seaborn',
+                'Bio', 'Bio.PDB', 'Bio.PDB.PDBExceptions', 'Bio.Seq', 'xmltodict', 'Bio.SeqRecord',
+                'Bio.SeqUtils.ProtParam', 'Bio.PDB.Polypeptide', 'Bio.SeqIO', 'Bio.PDB.MMCIF2Dict',
+                'mmtf-python', 'ipywidgets', 'qgrid', 'cobra', 'cobra.core', 'Bio.Alphabet',
+                'cobra.io', 'cobra.io.json', 'cobra.io.dict',
+                'Bio.SubsMat','Bio.Align','Bio.Emboss.Applications','Bio.PDB.Polypeptide','Bio.PDB.HSExposure',
+                'Bio.PDB.DSSP','Bio.PDB.PDBIO','Bio.PDB.PDBParser','Bio.PDB.mmtf', 'Bio.PDB.MMCIFParser', 'Bio.SeqFeature',
+                'matplotlib.colors', 'matplotlib.pyplot',
+                'lxml', 'json_tricks', 'tqdm', 'json_tricks.np', 'json_tricks.nonp']
+
+
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = Mock()
+
 
 # -- General configuration ------------------------------------------------
 
