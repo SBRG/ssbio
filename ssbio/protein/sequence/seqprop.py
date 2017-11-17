@@ -21,10 +21,8 @@ custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
 
-class SeqRecordAdapter(SeqRecord):
-    def __init__(self, **kwargs):
-        print('init seqrecordadapter')
-        super(SeqRecordAdapter, self).__init__(**kwargs)
+class MetaFix(type(SeqRecord), Object):
+    pass
 
 
 class SeqProp(SeqRecord, Object):
@@ -73,13 +71,11 @@ class SeqProp(SeqRecord, Object):
             feature_path (str): Absolute or relative path to feature (GFF) file
 
         """
+        __metaclass__ = MetaFix
 
-        # Object.__init__(self, id=id, description=description)
+        Object.__init__(self, id=id, description=description)
 
         # Top level database identifiers
-        self.id = id
-        self.name = name
-        self.description = description
         self.bigg = None
         self.kegg = None
         self.refseq = None
@@ -109,8 +105,7 @@ class SeqProp(SeqRecord, Object):
 
         self._seq = None
         self.seq = seq
-        # SeqRecordAdapter.__init__(self, seq=self.seq, id=id, name=name, description=description)
-        super(SeqProp, self).__init__(seq=self.seq, id=id, name=name, description=description)
+        SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
 
         if sequence_path:
             self.sequence_path = sequence_path

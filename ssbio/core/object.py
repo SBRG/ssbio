@@ -10,7 +10,6 @@ class Object(object):
     """Cobra core object with additional methods to update and get attributes"""
 
     def __init__(self, id=None, description=None):
-        print('init object')
         self.id = id
         self.description = description
         self.notes = {}
