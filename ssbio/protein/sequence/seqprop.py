@@ -21,11 +21,12 @@ custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
 
-class MetaFix(SeqRecord, Object):
-    pass
+class SeqRecordAdapter(SeqRecord):
+    def __init__(self, **kwargs):
+        super(SeqRecordAdapter, self).__init__(**kwargs)
 
 
-class SeqProp(SeqRecord, Object):
+class SeqProp(SeqRecordAdapter, Object):
 
     """Generic class to represent information for a protein sequence.
 
@@ -71,7 +72,6 @@ class SeqProp(SeqRecord, Object):
             feature_path (str): Absolute or relative path to feature (GFF) file
 
         """
-        __metaclass__ = MetaFix
 
         Object.__init__(self, id=id, description=description)
 
@@ -105,7 +105,7 @@ class SeqProp(SeqRecord, Object):
 
         self._seq = None
         self.seq = seq
-        SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
+        SeqRecordAdapter.__init__(self, seq=self.seq, id=id, name=name, description=description)
 
         if sequence_path:
             self.sequence_path = sequence_path

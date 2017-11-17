@@ -23,7 +23,7 @@ class DOCK(Object):
 
         """
 
-        Object.__init__(self, id=structure_id, description='DOCK6 preparation')
+        super(DOCK, self).__init__(id=structure_id, description='DOCK6 preparation')
         self._root_dir = None
         self.structure_path = pdb_file
 
