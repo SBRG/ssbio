@@ -25,7 +25,7 @@ class MetaFix(type(SeqRecord), Object):
     pass
 
 
-class SeqProp(Object, SeqRecord):
+class SeqProp(SeqRecord, Object):
 
     """Generic class to represent information for a protein sequence.
 
@@ -73,8 +73,8 @@ class SeqProp(Object, SeqRecord):
         """
         __metaclass__ = MetaFix
 
-        Object.__init__(self, id=id, description=description)
 
+        self.id = id
         # Top level database identifiers
         self.bigg = None
         self.kegg = None
@@ -106,6 +106,7 @@ class SeqProp(Object, SeqRecord):
         self._seq = None
         self.seq = seq
         SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
+        Object.__init__(self, id=id, description=description)
 
         if sequence_path:
             self.sequence_path = sequence_path
