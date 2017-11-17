@@ -73,9 +73,8 @@ class SeqProp(SeqRecord, Object):
         """
         __metaclass__ = MetaFix
 
-        Object.__init__(self, id=id, description=description)
-
         # Top level database identifiers
+        self.id = id
         self.bigg = None
         self.kegg = None
         self.refseq = None
@@ -106,6 +105,7 @@ class SeqProp(SeqRecord, Object):
         self._seq = None
         self.seq = seq
         SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
+        Object.__init__(self, id=id, description=description)
 
         if sequence_path:
             self.sequence_path = sequence_path
