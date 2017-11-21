@@ -14,3 +14,9 @@ Python API
 
 .. automodule:: ssbio.protein.structure.structprop
     :members:
+
+.. automodule:: ssbio.databases.pdb
+    :members:
+
+.. automodule:: ssbio.databases.uniprot
+    :members:
