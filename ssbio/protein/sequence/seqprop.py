@@ -104,8 +104,6 @@ class SeqProp(SeqRecord):
         self.annotations = None
         self._per_letter_annotations = None
 
-        # SeqRecord.__init__(self, seq=self.seq, id=id, name=name, description=description)
-        # Object.__init__(self, id=id, description=description)
         self._seq = None
         self.seq = seq
 

@@ -33,12 +33,6 @@ from ssbio.protein.structure.homology.itasser.itasserprep import ITASSERPrep
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
-"""protein.py
-
-Todo:
-    * Implement structural alignment objects
-
-"""
 
 class Protein(Object):
 
@@ -60,7 +54,10 @@ class Protein(Object):
         root_dir (str): Path to where the folder named by this protein's ID will be created.
             Default is current working directory.
         pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-        choose a file type for files downloaded from the PDB
+            choose a file type for files downloaded from the PDB
+
+    Todo:
+        - Implement structural alignment objects
     
     """
 
@@ -69,7 +66,7 @@ class Protein(Object):
     __representative_structure_attributes = ['is_experimental', 'reference_seq_top_coverage', 'date', 'description',
                                              'resolution','taxonomy_name']
 
-    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='cif'):
+    def __init__(self, ident, description=None, root_dir=None, pdb_file_type='mmtf'):
         """Initialize a Protein object.
 
         A Protein contains sequences, structures, and a single representative sequence and structure.
