@@ -54,22 +54,13 @@ class Protein(Object):
     #. Provide summaries of alignments and mutations seen
     #. Map between residue numbers of sequences and structures
 
-    Attributes:
-        id (str): Unique identifier for this protein
+    Args:
+        ident (str): Unique identifier for this protein
         description (str): Optional description for this protein
-        sequences (DictList): Stored amino acids which are related to this protein
-        structures (DictList): Stored protein structures which are related to this protein
-        representative_sequence (SeqProp): Sequence set to represent this protein
-        representative_structure (StructProp): Structure set to represent this protein, optionally in monomeric form
-        representative_chain (str): Chain ID in the representative structure which best represents a sequence
-        representative_chain_seq_coverage (float): Percent identity of sequence coverage for the representative chain
-        sequence_alignments (DictList): Pairwise or multiple sequence alignments stored as 
-            ``Bio.Align.MultipleSeqAlignment`` objects
-        structure_alignments (DictList): Pairwise or multiple structure alignments - incomplete implementation
         root_dir (str): Path to where the folder named by this protein's ID will be created.
             Default is current working directory.
-        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
-            choose a file type for files downloaded from the PDB
+        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
+        choose a file type for files downloaded from the PDB
     
     """
 
@@ -83,13 +74,6 @@ class Protein(Object):
 
         A Protein contains sequences, structures, and a single representative sequence and structure.
 
-        Args:
-            ident (str): Unique identifier for this protein
-            description (str): Optional description for this protein
-            root_dir (str): Path to where the folder named by this protein's ID will be created.
-                Default is current working directory.
-            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
-            choose a file type for files downloaded from the PDB
         """
         Object.__init__(self, id=ident, description=description)
 
@@ -104,21 +88,30 @@ class Protein(Object):
 
         # Sequences
         self.sequences = DictList()
+        """DictList: Stored amino acids which are related to this protein"""
         self.representative_sequence = None
+        """SeqProp: Sequence set to represent this protein"""
 
         # Structures
         self.structures = DictList()
+        """DictList: Stored protein structures which are related to this protein"""
         self.representative_structure = None
+        """StructProp: Structure set to represent this protein, optionally in monomeric form"""
         self.representative_chain = None
+        """str: Chain ID in the representative structure which best represents a sequence"""
         self.representative_chain_seq_coverage = 0
+        """float: Percent identity of sequence coverage for the representative chain"""
 
         # Alignments
         self.sequence_alignments = DictList()
+        """DictList: Pairwise or multiple sequence alignments stored as ``Bio.Align.MultipleSeqAlignment`` objects"""
         self.structure_alignments = DictList()
+        """DictList: Pairwise or multiple structure alignments - currently a placeholder"""
 
     @property
     def root_dir(self):
-        """str: Directory where Protein project folder is located"""
+        """str: Path to where the folder named by this protein's ID will be created. Default is current working
+        directory."""
         return self._root_dir
 
     @root_dir.setter
