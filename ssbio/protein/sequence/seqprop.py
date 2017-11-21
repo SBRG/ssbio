@@ -21,13 +21,7 @@ custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
 
-class ObjSeqRec(object):
-    def __init__(self, id, description, seq, name):
-        Object.__init__(self, id=id, description=description)
-        SeqRecord.__init__(self, seq=seq, id=id, name=name, description=description)
-
-
-class SeqProp(ObjSeqRec, SeqRecord, Object):
+class SeqProp(Object, SeqRecord):
 
     """Generic class to represent information for a protein sequence.
 

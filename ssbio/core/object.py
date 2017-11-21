@@ -9,7 +9,8 @@ log = logging.getLogger(__name__)
 class Object(object):
     """Cobra core object with additional methods to update and get attributes"""
 
-    def __init__(self, id=None, description=None):
+    def __init__(self, id=None, description=None, *args, **kwargs):
+        super(Object, self).__init__(*args, **kwargs)
         self.id = id
         self.description = description
         self.notes = {}
