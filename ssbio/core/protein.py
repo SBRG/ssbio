@@ -40,11 +40,12 @@ class Protein(Object):
 
     The main utilities of this class are to:
     
-    #. Load, parse, and store multiple sources of the same or similar (ie. from different strains) \
+    #. Load, parse, and store the same (ie. from different database sources) or similar (ie. from different strains) \
         protein sequences as ``SeqProp`` objects in the ``sequences`` attribute
     #. Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` \
         objects in the ``structures`` attribute
-    #. Calculate, store, and access sequence alignments to stored sequences or structures
+    #. Set a single representative sequence and structure
+    #. Calculate, store, and access pairwise sequence alignments to the representative sequence or structure
     #. Provide summaries of alignments and mutations seen
     #. Map between residue numbers of sequences and structures
 
@@ -67,11 +68,6 @@ class Protein(Object):
                                              'resolution','taxonomy_name']
 
     def __init__(self, ident, description=None, root_dir=None, pdb_file_type='mmtf'):
-        """Initialize a Protein object.
-
-        A Protein contains sequences, structures, and a single representative sequence and structure.
-
-        """
         Object.__init__(self, id=ident, description=description)
 
         self.pdb_file_type = pdb_file_type
@@ -85,7 +81,7 @@ class Protein(Object):
 
         # Sequences
         self.sequences = DictList()
-        """DictList: Stored amino acids which are related to this protein"""
+        """DictList: Stored protein sequences which are related to this protein"""
         self.representative_sequence = None
         """SeqProp: Sequence set to represent this protein"""
 
@@ -93,7 +89,7 @@ class Protein(Object):
         self.structures = DictList()
         """DictList: Stored protein structures which are related to this protein"""
         self.representative_structure = None
-        """StructProp: Structure set to represent this protein, optionally in monomeric form"""
+        """StructProp: Structure set to represent this protein, usually in monomeric form"""
         self.representative_chain = None
         """str: Chain ID in the representative structure which best represents a sequence"""
         self.representative_chain_seq_coverage = 0
@@ -250,7 +246,7 @@ class Protein(Object):
         Args:
             kegg_id (str): KEGG ID
             kegg_organism_code (str): KEGG organism code to prepend to the kegg_id if not part of it already.
-                Example: ``eco:b1244``, eco is the organism code
+                Example: ``eco:b1244``, ``eco`` is the organism code
             kegg_seq_file (str): Path to KEGG FASTA file
             kegg_metadata_file (str): Path to KEGG metadata file (raw KEGG format)
             set_as_representative (bool): If this KEGG ID should be set as the representative sequence
@@ -322,7 +318,7 @@ class Protein(Object):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
         
         Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
-            Metadata files will be downloaded as XML files.
+        Metadata files will be downloaded as XML files.
         
         Args:
             uniprot_id (str): UniProt ID/ACC
@@ -334,7 +330,7 @@ class Protein(Object):
             force_rerun (bool): If files should be redownloaded and metadata reloaded
 
         Returns:
-            UniProtProp: sequence that was loaded into the sequences attribute
+            UniProtProp: Sequence that was loaded into the ``sequences`` attribute
 
         """
         if download:
@@ -391,15 +387,19 @@ class Protein(Object):
         return self.sequences.get_by_id(uniprot_id)
 
     def load_manual_sequence_file(self, ident, seq_file, copy_file=False, outdir=None, set_as_representative=False):
-        """Load a manual sequence given as a FASTA file and optionally set it as the representative sequence.
+        """Load a manual sequence, given as a FASTA file and optionally set it as the representative sequence.
         Also store it in the sequences attribute.
 
         Args:
-            ident:
-            seq_file:
-            copy_file:
-            outdir:
-            set_as_representative:
+            ident (str): Sequence ID
+            seq_file (str): Path to sequence FASTA file
+            copy_file (bool): If the FASTA file should be copied to the protein's sequences folder or the ``outdir``, if
+                protein folder has not been set
+            outdir (str): Path to output directory
+            set_as_representative (bool): If this sequence should be set as the representative one
+
+        Returns:
+            SeqProp: Sequence that was loaded into the ``sequences`` attribute
 
         """
         if copy_file:
@@ -418,7 +418,7 @@ class Protein(Object):
 
         return self.sequences.get_by_id(ident)
 
-    def load_manual_sequence(self, seq, ident=None, write_fasta_file=False, outname=None, outdir=None,
+    def load_manual_sequence(self, seq, ident=None, write_fasta_file=False, outdir=None,
                              set_as_representative=False, force_rewrite=False):
         """Load a manual sequence given as a string and optionally set it as the representative sequence.
         Also store it in the sequences attribute.
@@ -427,25 +427,21 @@ class Protein(Object):
             seq (str, Seq, SeqRecord): Sequence string, Biopython Seq or SeqRecord object
             ident (str): Optional identifier for the sequence, required if seq is a string. Also will override existing
                 IDs in Seq or SeqRecord objects if set.
-            write_fasta_file:
-            outname:
-            outdir:
-            set_as_representative:
-            force_rewrite:
+            write_fasta_file (bool): If this sequence should be written out to a FASTA file
+            outdir (str): Path to output directory
+            set_as_representative (bool): If this sequence should be set as the representative one
+            force_rewrite (bool): If the FASTA file should be overwritten if it already exists
 
         Returns:
+            SeqProp: Sequence that was loaded into the ``sequences`` attribute
 
         """
-
-        if not outname:
-            outname = ident
-
         if write_fasta_file:
             if not outdir:
                 outdir = self.sequence_dir
                 if not outdir:
                     raise ValueError('Output directory must be specified')
-            outfile = op.join(outdir, '{}.faa'.format(outname))
+            outfile = op.join(outdir, '{}.faa'.format(ident))
         else:
             outfile = None
 
@@ -471,7 +467,8 @@ class Protein(Object):
         return self.sequences.get_by_id(ident)
 
     def set_representative_sequence(self, force_rerun=False):
-        """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative sequence.
+        """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative
+        sequence.
 
         Manually set representative sequences override all existing mappings. UniProt mappings override KEGG mappings
         except when KEGG mappings have PDBs associated with them and UniProt doesn't.
@@ -541,20 +538,22 @@ class Protein(Object):
 
     def pairwise_align_sequences_to_representative(self, gapopen=10, gapextend=0.5, outdir=None,
                                                    engine='needle', parse=True, force_rerun=False):
-        """Align all sequences in the sequences attribute to the representative sequence.
-
-        Stores the alignments the ``sequence_alignments`` DictList
+        """Pairwise all sequences in the sequences attribute to the representative sequence. Stores the alignments
+        in the ``sequence_alignments`` DictList attribute.
 
         Args:
-            gapopen (int): Only for `needle` - Gap open penalty is the score taken away when a gap is created
-            gapextend (float): Only for `needle` - Gap extension penalty is added to the standard gap penalty for each
-                base or residue in the gap
-            outdir (str): Only for `needle` - Path to output directory. Default is the protein sequence directory.
-            engine (str): `biopython` or `needle` - which pairwise alignment program to use
+            gapopen (int): Only for ``engine='needle'`` - Gap open penalty is the score taken away when a gap is created
+            gapextend (float): Only for ``engine='needle'`` - Gap extension penalty is added to the standard gap penalty
+                for each base or residue in the gap
+            outdir (str): Only for ``engine='needle'`` - Path to output directory. Default is the protein sequence
+                directory.
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
             parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an
                 annotation)
-            force_rerun (bool): Only for `needle` - Default False, set to True if you want to rerun the alignment
-                if outfile exists.
+            force_rerun (bool): Only for ``engine='needle'`` - Default False, set to True if you want to rerun the
+                alignment if outfile exists.
 
         """
 
@@ -609,7 +608,7 @@ class Protein(Object):
 
     def get_sequence_properties(self, representative_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
-        Annotations are stored in the protein's respective SeqProp objects at ``.annotations``
+        Results are stored in the protein's respective SeqProp objects at ``.annotations``
         
         Args:
             representative_only (bool): If analysis should only be run on the representative sequence
@@ -643,8 +642,8 @@ class Protein(Object):
                     s.get_emboss_pepstats()
 
     def prep_itasser_modeling(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
-                            execute_from_dir=None, print_exec=False, **kwargs):
-        """Prepare to run I-TASSER homology modeling for a sequence.
+                              execute_from_dir=None, print_exec=False, **kwargs):
+        """Prepare to run I-TASSER homology modeling for the representative sequence.
 
         Args:
             itasser_installation (str): Path to I-TASSER folder, i.e. ``~/software/I-TASSER4.4``
@@ -655,13 +654,12 @@ class Protein(Object):
                 models to another location such as a supercomputer for running
             all_genes (bool): If all genes should be prepped, or only those without any mapped structures
             print_exec (bool): If the execution statement should be printed to run modelling
-            **kwargs:
 
         Todo:
-            * kwargs - extra options for SLURM or Torque execution
+            * Document kwargs - extra options for I-TASSER, SLURM or Torque execution
+            * Allow modeling of any sequence in sequences attribute, select by ID or provide SeqProp?
 
         """
-        # TODO: kwargs for slurm/torque options
 
         if not create_in_dir:
             if not self.structure_dir:
@@ -712,10 +710,10 @@ class Protein(Object):
             display_link (bool, optional): Set to True if links to the HTML results should be displayed
             outdir (str): Path to output directory of downloaded XML files, must be set if protein directory
                 was not initialized
-            force_rerun (bool, optional): If existing BLAST results should not be used, set to True. Default is False
+            force_rerun (bool, optional): If existing BLAST results should not be used, set to True. Default is False.
 
         Returns:
-            list: List of new ``PDBProp``s added to the ``structures`` attribute
+            list: List of new ``PDBProp`` objects added to the ``structures`` attribute
 
         """
         # Check if a representative sequence was set
@@ -764,8 +762,7 @@ class Protein(Object):
 
     @property
     def df_pdb_blast(self):
-        """Get a dataframe of PDB BLAST results"""
-
+        """DataFrame: Get a dataframe of PDB BLAST results"""
         blast_results_pre_df = []
 
         for p in self.get_experimental_structures():
@@ -784,6 +781,7 @@ class Protein(Object):
 
     def map_uniprot_to_pdb(self, seq_ident_cutoff=0.0, outdir=None, force_rerun=False):
         """Map the representative sequence's UniProt ID to PDB IDs using the PDBe "Best Structures" API.
+        Will save a JSON file of the results to the protein sequences folder.
 
         Args:
             seq_ident_cutoff (float): Sequence identity cutoff in decimal form
@@ -791,7 +789,7 @@ class Protein(Object):
             force_rerun (bool): Force re-downloading of JSON results if they already exist
 
         Returns:
-            list: A rank-ordered list of PDB IDs that map to the UniProt ID
+            list: A rank-ordered list of PDBProp objects that map to the UniProt ID
 
         """
         if not self.representative_sequence:
@@ -852,7 +850,7 @@ class Protein(Object):
 
     @property
     def df_pdb_ranking(self):
-        """Get a dataframe of UniProt -> best structure in PDB results"""
+        """DataFrame: Get a dataframe of UniProt -> best structure in PDB results"""
 
         best_structures_pre_df = []
 
@@ -923,11 +921,12 @@ class Protein(Object):
 
     def load_itasser_folder(self, ident, itasser_folder, organize=False, outdir=None, organize_name=None,
                             set_as_representative=False, representative_chain='X', force_rerun=False):
-        """Load the results folder from an I-TASSER run (local, not from the server), copy structure files over, and create summary dataframes.
+        """Load the results folder from an I-TASSER run (local, not from the website) and copy relevant files over to
+        the protein structures directory.
 
         Args:
-            ident: I-TASSER ID
-            itasser_folder: Path to results folder
+            ident (str): I-TASSER ID
+            itasser_folder (str): Path to results folder
             organize (bool): If select files from modeling should be copied to the Protein directory
             outdir (str): Path to directory where files will be copied and organized to
             organize_name (str): Basename of files to rename results to. If not provided, will use id attribute.
@@ -979,7 +978,7 @@ class Protein(Object):
 
     @property
     def df_homology_models(self):
-        """Get a dataframe of homology models"""
+        """DataFrame: Get a dataframe of I-TASSER homology model results"""
 
         itasser_pre_df = []
 
@@ -1005,7 +1004,21 @@ class Protein(Object):
         return ssbio.utils.clean_df(df)
 
     def pdb_downloader_and_metadata(self, outdir=None, pdb_file_type=None, force_rerun=False):
-        """Download experimental structures"""
+        """Download ALL mapped experimental structures to the protein structures directory.
+
+        Args:
+            outdir (str): Path to output directory, if protein structures directory not set or other output directory is
+                desired
+            pdb_file_type (str): Type of PDB file to download, if not already set or other format is desired
+            force_rerun (bool): If files should be re-downloaded if they already exist
+
+        Returns:
+            list: List of PDB IDs that were downloaded
+
+        Todo:
+            * Parse mmtf or PDB file for header information, rather than always getting the cif file for header info
+
+        """
         if not outdir:
             outdir = self.structure_dir
             if not outdir:
@@ -1033,7 +1046,7 @@ class Protein(Object):
 
     @property
     def df_pdb_metadata(self):
-        """Get a dataframe of PDB metadata (PDBs have to be downloaded first)"""
+        """DataFrame: Get a dataframe of PDB metadata (PDBs have to be downloaded first)"""
         if self.num_structures == 0:
             log.error('No experimental PDB structures have been mapped to protein')
             return pd.DataFrame()
@@ -1061,9 +1074,10 @@ class Protein(Object):
                                     **kwargs):
         """Run and store alignments of a SeqProp to chains in the ``mapped_chains`` attribute of a StructProp.
 
-        Alignments are stored in the sequence_alignments attribute, with the IDs formatted
-            as <SeqProp_ID>_<StructProp_ID>-<Chain_ID>. Although it is more intuitive to align to individual 
-            ChainProps, StructProps should be loaded as little as possible to reduce run times.
+        Alignments are stored in the sequence_alignments attribute, with the IDs formatted as
+        ``<SeqProp_ID>_<StructProp_ID>-<Chain_ID>``. Although it is more intuitive to align to individual ChainProps,
+        StructProps should be loaded as little as possible to reduce run times so the alignment is done to the entire
+        structure.
 
         Args:
             seqprop (SeqProp): SeqProp object with a loaded sequence
@@ -1071,13 +1085,17 @@ class Protein(Object):
             chains (str, list): Chain ID or IDs to map to. If not specified, ``mapped_chains`` attribute is inspected
                 for chains. If no chains there, all chains will be aligned to.
             outdir (str): Directory to output sequence alignment files (only if running with needle)
-            engine (str): Which pairwise alignment tool to use ("needle" or "biopython")
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
             parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
             force_rerun (bool): If alignments should be rerun
             **kwargs: Other alignment options
+
+        Todo:
+            * Document **kwargs for alignment options
             
         """
-        # TODO: **kwargs for alignment options
 
         if not outdir:
             outdir = self.sequence_dir
@@ -1173,9 +1191,9 @@ class Protein(Object):
                 there are none present, ``chains_to_check`` can be specified, otherwise all chains are checked.
             chains_to_check (str, list): Chain ID or IDs to check for sequence coverage quality
             seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
-            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
-                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
-                5 to 95 will be checked for modifications.
+            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be
+                ignored when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only
+                residues 5 to 95 will be checked for modifications.
             allow_mutants (bool): If mutations should be allowed or checked for
             allow_deletions (bool): If deletions should be allowed or checked for
             allow_insertions (bool): If insertions should be allowed or checked for
@@ -1224,11 +1242,10 @@ class Protein(Object):
             log.debug('{}: no chains meet quality checks'.format(structprop.id))
             return None
 
-    def map_seqprop_resnums_to_structprop_chain_index(self, resnums, seqprop=None, structprop=None, chain_id=None,
-                                                      use_representatives=False):
-        """Map a residue number in the seqprop to the mapping index in the structprop/chain_id
-
-        Use this to get the indices of the chain to then get structure residue number.
+    def _map_seqprop_resnums_to_structprop_chain_index(self, resnums, seqprop=None, structprop=None, chain_id=None,
+                                                       use_representatives=False):
+        """Map a residue number in any SeqProp to the mapping index in the StructProp + chain ID. This does not provide
+        a mapping to residue number, only a mapping to the index which then can be mapped to the structure resnum!
 
         Args:
             resnums (int, list): Residue numbers in the sequence
@@ -1276,7 +1293,7 @@ class Protein(Object):
 
     def map_seqprop_resnums_to_structprop_resnums(self, resnums, seqprop=None, structprop=None, chain_id=None,
                                                   use_representatives=False):
-        """Map a residue number in the seqprop to the structure's residue number for a specified chain.
+        """Map a residue number in any SeqProp to the structure's residue number for a specified chain.
 
         Args:
             resnums (int, list): Residue numbers in the sequence
@@ -1300,11 +1317,11 @@ class Protein(Object):
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
 
-        mapping_to_repchain_index = self.map_seqprop_resnums_to_structprop_chain_index(resnums=resnums,
-                                                                                       seqprop=seqprop,
-                                                                                       structprop=structprop,
-                                                                                       chain_id=chain_id,
-                                                                                       use_representatives=use_representatives)
+        mapping_to_repchain_index = self._map_seqprop_resnums_to_structprop_chain_index(resnums=resnums,
+                                                                                        seqprop=seqprop,
+                                                                                        structprop=structprop,
+                                                                                        chain_id=chain_id,
+                                                                                        use_representatives=use_representatives)
 
         chain = structprop.chains.get_by_id(chain_id)
         chain_structure_resnum_mapping = chain.seq_record.letter_annotations['structure_resnums']
@@ -1345,7 +1362,7 @@ class Protein(Object):
 
     def map_structprop_resnums_to_seqprop_resnums(self, resnums, structprop=None, chain_id=None, seqprop=None,
                                                   use_representatives=False):
-        """Map a residue number in the structprop+chain to the seqprop's residue number.
+        """Map a residue number in any StructProp + chain ID to any SeqProp's residue number.
 
         Args:
             resnums (int, list): Residue numbers in the structure
@@ -1360,6 +1377,7 @@ class Protein(Object):
 
         """
         pass
+        # TODO: implementation
         # resnums = ssbio.utils.force_list(resnums)
         #
         # if use_representatives:
@@ -1412,7 +1430,6 @@ class Protein(Object):
         #                       '{structprop_resid}{structprop_resnum}'.format(**format_data))
         #
         # return final_mapping
-
 
     def _representative_structure_setter(self, structprop, keep_chain, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None, force_rerun=False):
@@ -1478,19 +1495,19 @@ class Protein(Object):
                                      engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
-                                     allow_insertions=False, allow_unresolved=True, clean=True,
-                                     keep_chemicals=None,
+                                     allow_insertions=False, allow_unresolved=True,
+                                     clean=True, keep_chemicals=None,
                                      force_rerun=False):
-        """Set a representative structure from a structure in self.structures
+        """Set a representative structure from a structure in the structures attribute.
 
         Args:
             seq_outdir (str): Path to output directory of sequence alignment files
             struct_outdir (str): Path to output directory of structure files
-            pdb_file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - PDB structure file type that
-                should be downloaded
-            engine (str): "needle" or "biopython" - which pairwise sequence alignment engine should be used
-                needle is the standard EMBOSS tool to run pairwise alignments
-                biopython is Biopython's implementation of needle. Results can differ!
+            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
+            choose a file type for files downloaded from the PDB
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
             always_use_homology (bool): If homology models should always be set as the representative structure
             rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
             seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
@@ -1506,9 +1523,8 @@ class Protein(Object):
             force_rerun (bool): If sequence to structure alignment should be rerun
 
         Returns:
-            StructProp: Representative structure from the list of structures.
-
-            This is a not a map to the original structure, it is copied from its reference.
+            StructProp: Representative structure from the list of structures. This is a not a map to the original
+            structure, it is copied and optionally cleaned from the original one.
 
         """
         log.debug('{}: setting representative structure'.format(self.id))
@@ -1696,15 +1712,16 @@ class Protein(Object):
 
     def get_dssp_annotations(self, representative_only=True, force_rerun=False):
         """Run DSSP on structures and store calculations.
-        Annotations are stored in the protein structure's chain sequence at:
-        ``seq_record.letter_annotations['*-dssp']``
 
-        Todo:
-            * Some errors arise from storing annotations for nonstandard amino acids, need to run DSSP separately for those
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-dssp']``
             
         Args:
             representative_only (bool): If analysis should only be run on the representative structure
             force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        Todo:
+            * Some errors arise from storing annotations for nonstandard amino acids, need to run DSSP separately for those
 
         """
         if representative_only:
@@ -1738,8 +1755,9 @@ class Protein(Object):
 
     def get_msms_annotations(self, representative_only=True, force_rerun=False):
         """Run MSMS on structures and store calculations.
+
         Annotations are stored in the protein structure's chain sequence at:
-        ``seq_record.letter_annotations['*-msms']``
+        ``<chain_prop>.seq_record.letter_annotations['*-msms']``
         
         Args:
             representative_only (bool): If analysis should only be run on the representative structure
@@ -1768,8 +1786,9 @@ class Protein(Object):
 
     def get_freesasa_annotations(self, include_hetatms=False, representative_only=True, force_rerun=False):
         """Run freesasa on structures and store calculations.
+
         Annotations are stored in the protein structure's chain sequence at:
-        ``seq_record.letter_annotations['*-freesasa']``
+        ``<chain_prop>.seq_record.letter_annotations['*-freesasa']``
 
         Args:
             include_hetatms (bool): If HETATMs should be included in calculations. Defaults to ``False``.
@@ -1801,8 +1820,9 @@ class Protein(Object):
 
     def find_disulfide_bridges(self, representative_only=True):
         """Run Biopython's disulfide bridge finder and store found bridges.
+
         Annotations are stored in the protein structure's chain sequence at:
-        ``seq_record.annotations['SSBOND-biopython']``
+        ``<chain_prop>.seq_record.annotations['SSBOND-biopython']``
         
         Args:
             representative_only (bool): If analysis should only be run on the representative structure
@@ -1825,11 +1845,11 @@ class Protein(Object):
 
     def get_residue_annotations(self, seq_resnum, seqprop=None, structprop=None, chain_id=None,
                                 use_representatives=False):
-        """Get all residue-level annotations stored in the SeqProp letter_annotations field for a given residue number
+        """Get all residue-level annotations stored in the SeqProp ``letter_annotations`` field for a given residue number.
 
         Uses the representative sequence, structure, and chain ID stored by default. If other properties from other
-            structures are desired, input the proper IDs. An alignment for the given sequence to the structure must
-            be present in the sequence_alignments list.
+        structures are desired, input the proper IDs. An alignment for the given sequence to the structure must
+        be present in the sequence_alignments list.
 
         Args:
             seq_resnum (int): Residue number in the sequence
@@ -1911,15 +1931,25 @@ class Protein(Object):
         Returns 2 dictionaries, single_counter and fingerprint_counter.
 
         single_counter:
-            Dictionary of {point mutation: list of genes/strains}
-            Example: {('A', 24, 'V'): ['Strain1', 'Strain2', 'Strain4'],
-                      ('R', 33, 'T'): ['Strain2']}
+            Dictionary of ``{point mutation: list of genes/strains}``
+            Example::
+
+                {
+                    ('A', 24, 'V'): ['Strain1', 'Strain2', 'Strain4'],
+                    ('R', 33, 'T'): ['Strain2']
+                }
+
             Here, we report which genes/strains have the single point mutation.
 
         fingerprint_counter:
-            Dictionary of {mutation group: list of genes/strains}
-            Example: {(('A', 24, 'V'), ('R', 33, 'T')): ['Strain2'],
-                      (('A', 24, 'V')): ['Strain1', 'Strain4']}
+            Dictionary of ``{mutation group: list of genes/strains}``
+            Example::
+
+                {
+                    (('A', 24, 'V'), ('R', 33, 'T')): ['Strain2'],
+                    (('A', 24, 'V')): ['Strain1', 'Strain4']
+                }
+
             Here, we report which genes/strains have the specific combinations (or "fingerprints") of point mutations
             
         Args:
@@ -1968,8 +1998,8 @@ class Protein(Object):
         """Add select features from the selected SeqProp object to an NGLWidget view object.
 
         Currently parsing for:
-        * Single residue features (ie. metal binding sites)
-        * Disulfide bonds
+            * Single residue features (ie. metal binding sites)
+            * Disulfide bonds
 
         Args:
             view (NGLWidget): NGLWidget view object
@@ -2061,7 +2091,7 @@ class Protein(Object):
                                  grouped=False, color='red', unique_colors=True,
                                  opacity_range=(0.8,1), scale_range=(1,5)):
         """Add representations to an NGLWidget view object for residues that are mutated in the
-            ``sequence_alignments`` attribute.
+        ``sequence_alignments`` attribute.
 
         Args:
             view (NGLWidget): NGLWidget view object
@@ -2150,7 +2180,7 @@ class Protein(Object):
                                    seqprop=None, structprop=None, chain_id=None, use_representatives=False,
                                    color='red', opacity_range=(0.8, 1), scale_range=(1, 5)):
         """Add representations to an NGLWidget view object for residues that are mutated in the
-            ``sequence_alignments`` attribute.
+        ``sequence_alignments`` attribute.
 
         Args:
             view (NGLWidget): NGLWidget view object
