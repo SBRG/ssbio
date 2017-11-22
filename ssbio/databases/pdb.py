@@ -360,40 +360,40 @@ def map_uniprot_resnum_to_pdb(uniprot_resnum, chain_id, sifts_file):
 def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0.0, force_rerun=False):
     """Use the PDBe REST service to query for the best PDB structures for a UniProt ID.
 
-        More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
-        Link used to retrieve results: https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession
-        The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and, if the same, resolution.
+    More information found here: https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
+    Link used to retrieve results: https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/:accession
+    The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and, if the same, resolution.
 
-        Here is the ranking algorithm described by the PDB paper:
-        https://nar.oxfordjournals.org/content/44/D1/D385.full
+    Here is the ranking algorithm described by the PDB paper:
+    https://nar.oxfordjournals.org/content/44/D1/D385.full
 
-        "Finally, a single quality indicator is also calculated for each entry by taking the harmonic average
-        of all the percentile scores representing model and model-data-fit quality measures and then subtracting
-        10 times the numerical value of the resolution (in Angstrom) of the entry to ensure that resolution plays
-        a role in characterising the quality of a structure. This single empirical 'quality measure' value is used
-        by the PDBe query system to sort results and identify the 'best' structure in a given context. At present,
-        entries determined by methods other than X-ray crystallography do not have similar data quality information
-        available and are not considered as 'best structures'."
+    "Finally, a single quality indicator is also calculated for each entry by taking the harmonic average
+    of all the percentile scores representing model and model-data-fit quality measures and then subtracting
+    10 times the numerical value of the resolution (in Angstrom) of the entry to ensure that resolution plays
+    a role in characterising the quality of a structure. This single empirical 'quality measure' value is used
+    by the PDBe query system to sort results and identify the 'best' structure in a given context. At present,
+    entries determined by methods other than X-ray crystallography do not have similar data quality information
+    available and are not considered as 'best structures'."
 
-        Args:
-            uniprot_id (str): UniProt Accession ID
-            outname (str): Basename of the output file of JSON results
-            outdir (str): Path to output directory of JSON results
-            seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
-            force_rerun (bool): Obtain best structures mapping ignoring previously downloaded results
+    Args:
+        uniprot_id (str): UniProt Accession ID
+        outname (str): Basename of the output file of JSON results
+        outdir (str): Path to output directory of JSON results
+        seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
+        force_rerun (bool): Obtain best structures mapping ignoring previously downloaded results
 
-        Returns:
-            list: Rank-ordered list of dictionaries representing chain-specific PDB entries. Keys are:
-                pdb_id: the PDB ID which maps to the UniProt ID
-                chain_id: the specific chain of the PDB which maps to the UniProt ID
-                coverage: the percent coverage of the entire UniProt sequence
-                resolution: the resolution of the structure
-                start: the structure residue number which maps to the start of the mapped sequence
-                end: the structure residue number which maps to the end of the mapped sequence
-                unp_start: the sequence residue number which maps to the structure start
-                unp_end: the sequence residue number which maps to the structure end
-                experimental_method: type of experiment used to determine structure
-                tax_id: taxonomic ID of the protein's original organism
+    Returns:
+        list: Rank-ordered list of dictionaries representing chain-specific PDB entries. Keys are:
+            * pdb_id: the PDB ID which maps to the UniProt ID
+            * chain_id: the specific chain of the PDB which maps to the UniProt ID
+            * coverage: the percent coverage of the entire UniProt sequence
+            * resolution: the resolution of the structure
+            * start: the structure residue number which maps to the start of the mapped sequence
+            * end: the structure residue number which maps to the end of the mapped sequence
+            * unp_start: the sequence residue number which maps to the structure start
+            * unp_end: the sequence residue number which maps to the structure end
+            * experimental_method: type of experiment used to determine structure
+            * tax_id: taxonomic ID of the protein's original organism
 
     """
     outfile = ''
@@ -413,7 +413,7 @@ def best_structures(uniprot_id, outname=None, outdir=None, seq_ident_cutoff=0.0,
     if not ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         with open(outfile, 'r') as f:
             raw_data = json.load(f)
-        log.debug('{}: Loaded existing json file'.format(uniprot_id))
+        log.debug('{}: loaded existing json file'.format(uniprot_id))
 
     # Otherwise run the web request
     else:

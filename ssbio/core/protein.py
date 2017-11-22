@@ -783,6 +783,10 @@ class Protein(Object):
         """Map the representative sequence's UniProt ID to PDB IDs using the PDBe "Best Structures" API.
         Will save a JSON file of the results to the protein sequences folder.
 
+        The "Best structures" API is available at https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
+        The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
+        if the same, resolution.
+
         Args:
             seq_ident_cutoff (float): Sequence identity cutoff in decimal form
             outdir (str): Output directory to cache JSON results of search
@@ -1500,11 +1504,21 @@ class Protein(Object):
                                      force_rerun=False):
         """Set a representative structure from a structure in the structures attribute.
 
+        Each gene can have a combination of the following, which will be analyzed to set a representative structure.
+            * Homology model(s)
+            * Ranked PDBs
+            * BLASTed PDBs
+
+        If the ``always_use_homology`` flag is true, homology models are always set as representative when they exist.
+        If there are multiple homology models, we rank by the percent sequence coverage.
+
         Args:
-            seq_outdir (str): Path to output directory of sequence alignment files
-            struct_outdir (str): Path to output directory of structure files
+            seq_outdir (str): Path to output directory of sequence alignment files, must be set if Protein directory
+                was not created initially
+            struct_outdir (str): Path to output directory of structure files, must be set if Protein directory
+                was not created initially
             pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-            choose a file type for files downloaded from the PDB
+                choose a file type for files downloaded from the PDB
             engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
                 ``needle`` is the standard EMBOSS tool to run pairwise alignments.
                 ``biopython`` is Biopython's implementation of needle. Results can differ!

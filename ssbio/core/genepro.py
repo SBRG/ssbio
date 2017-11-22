@@ -21,7 +21,7 @@ class GenePro(Gene):
 
     """
 
-    def __init__(self, id, name='', functional=True, root_dir=None, pdb_file_type='cif'):
+    def __init__(self, id, name='', functional=True, root_dir=None, pdb_file_type='mmtf'):
         Gene.__init__(self, id=id, name=name, functional=functional)
 
         self.pdb_file_type = pdb_file_type

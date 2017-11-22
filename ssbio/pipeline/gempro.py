@@ -753,66 +753,6 @@ class GEMPRO(Object):
 
     ####################################################################################################################
     ### STRUCTURE RELATED METHODS ###
-    def map_uniprot_to_pdb(self, seq_ident_cutoff=0.0, outdir=None, force_rerun=False):
-        """Map UniProt IDs to a ranked list of PDB structures available.
-
-        Uses the "Best structures" API availble from https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
-        The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
-        if the same, resolution.
-
-        Args:
-            seq_ident_cutoff (float): Cutoff results based on percent coverage (in decimal form)
-            outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
-                were not created initially
-            force_rerun (bool): Obtain best structures mapping ignoring previously downloaded results
-
-        """
-
-        # First get all UniProt IDs and check if they have PDBs
-        all_representative_uniprots = []
-        for g in self.genes_with_a_representative_sequence:
-            uniprot_id = g.protein.representative_sequence.uniprot
-            if uniprot_id:
-                # TODO: add warning or something for isoform ids?
-                if '-' in uniprot_id:
-                    uniprot_id = uniprot_id.split('-')[0]
-                all_representative_uniprots.append(uniprot_id)
-        log.info('Mapping UniProt IDs --> PDB IDs...')
-        uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
-
-        counter = 0
-        # Now run the best_structures API for all genes
-        for g in tqdm(self.genes_with_a_representative_sequence):
-            uniprot_id = g.protein.representative_sequence.uniprot
-            if uniprot_id:
-                if '-' in uniprot_id:
-                    uniprot_id = uniprot_id.split('-')[0]
-                if uniprot_id in uniprots_to_pdbs:
-                    best_structures = g.protein.map_uniprot_to_pdb(seq_ident_cutoff=seq_ident_cutoff, outdir=outdir, force_rerun=force_rerun)
-                    if best_structures:
-                        counter += 1
-                        log.debug('{}: {} PDBs mapped'.format(g.id, len(best_structures)))
-                else:
-                    log.debug('{}, {}: no PDBs available'.format(g.id, uniprot_id))
-
-        log.info('{}/{}: number of genes with at least one experimental structure'.format(len(self.genes_with_experimental_structures),
-                                                                                          len(self.genes)))
-        log.info('Completed UniProt --> best PDB mapping. See the "df_pdb_ranking" attribute for a summary dataframe.')
-
-    @property
-    def df_pdb_ranking(self):
-        df = pd.DataFrame()
-        for g in self.genes_with_experimental_structures:
-            protein_df = g.protein.df_pdb_ranking.copy().reset_index()
-            if not protein_df.empty:
-                protein_df['gene'] = g.id
-                df = df.append(protein_df)
-        if df.empty:
-            log.warning('Empty dataframe')
-            return df
-        else:
-            return ssbio.utils.clean_df(df.set_index('gene'))
-
     def blast_seqs_to_pdb(self, seq_ident_cutoff=0, evalue=0.0001, all_genes=False, display_link=False,
                           outdir=None, force_rerun=False):
         """BLAST each representative protein sequence to the PDB. Saves raw BLAST results (XML files).
@@ -856,7 +796,7 @@ class GEMPRO(Object):
 
     @property
     def df_pdb_blast(self):
-        """Create a summary dataframe of PDB BLAST results"""
+        """DataFrame: Get a dataframe of PDB BLAST results"""
 
         df = pd.DataFrame()
         for g in self.genes_with_experimental_structures:
@@ -869,6 +809,75 @@ class GEMPRO(Object):
             return df
         else:
             return ssbio.utils.clean_df(df.set_index('gene'))
+
+    def map_uniprot_to_pdb(self, seq_ident_cutoff=0.0, outdir=None, force_rerun=False):
+        """Map all representative sequences' UniProt ID to PDB IDs using the PDBe "Best Structures" API.
+        Will save a JSON file of the results to each protein's ``sequences`` folder.
+
+        The "Best structures" API is available at https://www.ebi.ac.uk/pdbe/api/doc/sifts.html
+        The list of PDB structures mapping to a UniProt accession sorted by coverage of the protein and,
+        if the same, resolution.
+
+        Args:
+            seq_ident_cutoff (float): Sequence identity cutoff in decimal form
+            outdir (str): Output directory to cache JSON results of search
+            force_rerun (bool): Force re-downloading of JSON results if they already exist
+
+        Returns:
+            list: A rank-ordered list of PDBProp objects that map to the UniProt ID
+
+        """
+
+        # First get all UniProt IDs and check if they have PDBs
+        all_representative_uniprots = []
+        for g in self.genes_with_a_representative_sequence:
+            uniprot_id = g.protein.representative_sequence.uniprot
+            if uniprot_id:
+                # TODO: add warning or something for isoform ids?
+                if '-' in uniprot_id:
+                    uniprot_id = uniprot_id.split('-')[0]
+                all_representative_uniprots.append(uniprot_id)
+        log.info('Mapping UniProt IDs --> PDB IDs...')
+        uniprots_to_pdbs = bs_unip.mapping(fr='ACC', to='PDB_ID', query=all_representative_uniprots)
+
+        counter = 0
+        # Now run the best_structures API for all genes
+        for g in tqdm(self.genes_with_a_representative_sequence):
+            uniprot_id = g.protein.representative_sequence.uniprot
+            if uniprot_id:
+                if '-' in uniprot_id:
+                    uniprot_id = uniprot_id.split('-')[0]
+                if uniprot_id in uniprots_to_pdbs:
+                    best_structures = g.protein.map_uniprot_to_pdb(seq_ident_cutoff=seq_ident_cutoff, outdir=outdir, force_rerun=force_rerun)
+                    if best_structures:
+                        counter += 1
+                        log.debug('{}: {} PDBs mapped'.format(g.id, len(best_structures)))
+                else:
+                    log.debug('{}, {}: no PDBs available'.format(g.id, uniprot_id))
+
+        log.info('{}/{}: number of genes with at least one experimental structure'.format(len(self.genes_with_experimental_structures),
+                                                                                          len(self.genes)))
+        log.info('Completed UniProt --> best PDB mapping. See the "df_pdb_ranking" attribute for a summary dataframe.')
+
+    @property
+    def df_pdb_ranking(self):
+        """DataFrame: Get a dataframe of UniProt -> best structure in PDB results"""
+        df = pd.DataFrame()
+        for g in self.genes_with_experimental_structures:
+            protein_df = g.protein.df_pdb_ranking.copy().reset_index()
+            if not protein_df.empty:
+                protein_df['gene'] = g.id
+                df = df.append(protein_df)
+        if df.empty:
+            log.warning('Empty dataframe')
+            return df
+        else:
+            return ssbio.utils.clean_df(df.set_index('gene'))
+
+    @property
+    def missing_pdb_structures(self):
+        """list: List of genes with no mapping to any experimental PDB structure."""
+        return [x.id for x in self.genes if not self.genes_with_experimental_structures.has_id(x.id)]
 
     def get_manual_homology_models(self, input_dict, outdir=None, clean=True, force_rerun=False):
         """Copy homology models to the GEM-PRO project.
@@ -983,6 +992,7 @@ class GEMPRO(Object):
 
     @property
     def df_homology_models(self):
+        """DataFrame: Get a dataframe of I-TASSER homology model results"""
         df = pd.DataFrame()
         for g in self.genes_with_homology_models:
             protein_df = g.protein.df_homology_models.copy().reset_index()
@@ -995,13 +1005,19 @@ class GEMPRO(Object):
         else:
             return ssbio.utils.clean_df(df.set_index('gene'))
 
+    @property
+    def missing_homology_models(self):
+        """list: List of genes with no mapping to any homology models."""
+        return [x.id for x in self.genes if not self.genes_with_homology_models.has_id(x.id)]
+
     def set_representative_structure(self, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
                                      engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True,
-                                     force_rerun=False):
-        """Set the representative protein structure for a gene.
+                                     clean=True, force_rerun=False):
+        """Set all representative structure for proteins from a structure in the structures attribute.
+
         Each gene can have a combination of the following, which will be analyzed to set a representative structure.
             * Homology model(s)
             * Ranked PDBs
@@ -1015,11 +1031,11 @@ class GEMPRO(Object):
                 were not created initially
             struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories
                 were not created initially
-            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``,
-                ``mmtf.gz`` - PDB structure file type that should be downloaded
-            engine (str): ``needle`` or ``biopython`` - which pairwise sequence alignment engine should be used
-                needle is the standard EMBOSS tool to run pairwise alignments
-                biopython is Biopython's implementation of needle. Results can differ!
+            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
+                choose a file type for files downloaded from the PDB
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
             always_use_homology (bool): If homology models should always be set as the representative structure
             rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
             seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
@@ -1030,6 +1046,7 @@ class GEMPRO(Object):
             allow_deletions (bool): If deletions should be allowed or checked for
             allow_insertions (bool): If insertions should be allowed or checked for
             allow_unresolved (bool): If unresolved residues should be allowed or checked for
+            clean (bool): If structures should be cleaned
             force_rerun (bool): If sequence to structure alignment should be rerun
 
         """
@@ -1046,6 +1063,7 @@ class GEMPRO(Object):
                                                                allow_deletions=allow_deletions,
                                                                allow_insertions=allow_insertions,
                                                                allow_unresolved=allow_unresolved,
+                                                               clean=clean,
                                                                force_rerun=force_rerun)
 
         log.info('{}/{}: number of genes with a representative structure'.format(len(self.genes_with_a_representative_structure),
@@ -1054,6 +1072,7 @@ class GEMPRO(Object):
 
     @property
     def df_representative_structures(self):
+        """DataFrame: Get a dataframe of representative protein structure information."""
         rep_struct_pre_df = []
         df_cols = ['gene', 'id', 'is_experimental', 'file_type', 'structure_file']
 
@@ -1071,9 +1090,10 @@ class GEMPRO(Object):
 
     @property
     def missing_representative_structure(self):
+        """list: List of genes with no mapping to a representative structure."""
         return [x.id for x in self.genes if not self.genes_with_a_representative_structure.has_id(x.id)]
 
-    def prep_itasser_models(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
+    def prep_itasser_modeling(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
                             execute_from_dir=None, all_genes=False, print_exec=False, **kwargs):
         """Prepare to run I-TASSER homology modeling for genes without structures, or all genes.
 
@@ -1086,14 +1106,12 @@ class GEMPRO(Object):
                 models to another location such as a supercomputer for running
             all_genes (bool): If all genes should be prepped, or only those without any mapped structures
             print_exec (bool): If the execution statement should be printed to run modelling
-            **kwargs:
 
         Todo:
-            * kwargs - extra options for SLURM or Torque execution
+            * Document kwargs - extra options for I-TASSER, SLURM or Torque execution
+            * Allow modeling of any sequence in sequences attribute, select by ID or provide SeqProp?
 
         """
-        # TODO: kwargs for slurm/torque options
-
         if not create_in_dir:
             if not self.data_dir:
                 raise ValueError('Output directory must be specified')
@@ -1124,14 +1142,13 @@ class GEMPRO(Object):
                                                                                        self.homology_models_dir))
 
     def pdb_downloader_and_metadata(self, outdir=None, pdb_file_type=None, force_rerun=False):
-        """Download all structures which have been mapped to our genes.
+        """Download ALL mapped experimental structures to each protein's structures directory.
 
         Args:
-            outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
-                were not created initially
-            pdb_file_type (str): pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz - PDB structure file type that
-                should be downloaded
-            force_rerun (bool): If you want to overwrite any existing mappings and files
+            outdir (str): Path to output directory, if GEM-PRO directories were not set or other output directory is
+                desired
+            pdb_file_type (str): Type of PDB file to download, if not already set or other format is desired
+            force_rerun (bool): If files should be re-downloaded if they already exist
 
         """
 
@@ -1150,7 +1167,7 @@ class GEMPRO(Object):
 
     @property
     def df_pdb_metadata(self):
-        """DataFrame: Parse PDB file headers and create a metadata table"""
+        """DataFrame: Get a dataframe of PDB metadata (PDBs have to be downloaded first)."""
         df = pd.DataFrame()
         for g in self.genes_with_experimental_structures:
             # Get per protein DataFrame
@@ -1165,7 +1182,7 @@ class GEMPRO(Object):
 
     @property
     def df_proteins(self):
-        """DataFrame: Get a summary dataframe of all proteins in the model"""
+        """DataFrame: Get a summary dataframe of all proteins in the project."""
         pre_df = []
         df_cols = ['gene', 'id', 'sequences', 'num_sequences', 'representative_sequence', 'num_structures',
                    'experimental_structures', 'num_experimental_structures',
@@ -1187,27 +1204,43 @@ class GEMPRO(Object):
             return ssbio.utils.clean_df(df)
 
     def get_dssp_annotations(self, representatives_only=True, force_rerun=False):
-        """Run DSSP on all protein structures and store calculations.
-        Annotations are stored in each protein structure's chain sequence at:
-        ``seq_record.letter_annotations['*-dssp']``
-        
+        """Run DSSP on structures and store calculations.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-dssp']``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
         """
         for g in tqdm(self.genes):
             g.protein.get_dssp_annotations(representative_only=representatives_only, force_rerun=force_rerun)
 
     def get_msms_annotations(self, representatives_only=True, force_rerun=False):
-        """Run MSMS on all protein structures and store calculations.
-        Annotations are stored in each protein structure's chain sequence at:
-        ``seq_record.letter_annotations['*-msms']``
+        """Run MSMS on structures and store calculations.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-msms']``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
 
         """
         for g in tqdm(self.genes):
             g.protein.get_msms_annotations(representative_only=representatives_only, force_rerun=force_rerun)
 
     def get_freesasa_annotations(self, include_hetatms=False, representatives_only=True, force_rerun=False):
-        """Run freesasa on all protein structures and store calculations.
-        Annotations are stored in each protein structure's chain sequence at:
-        ``seq_record.letter_annotations['*-freesasa']``
+        """Run freesasa on structures and store calculations.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-freesasa']``
+
+        Args:
+            include_hetatms (bool): If HETATMs should be included in calculations. Defaults to ``False``.
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
 
         """
         for g in tqdm(self.genes):
@@ -1215,16 +1248,18 @@ class GEMPRO(Object):
                                                representative_only=representatives_only,
                                                force_rerun=force_rerun)
 
-
-    def get_disulfide_bridges(self, representatives_only=True):
+    def find_disulfide_bridges(self, representatives_only=True):
         """Run Biopython's disulfide bridge finder and store found bridges.
-        Annotations are stored in each protein structure's chain sequence at:
-        ``seq_record.annotations['SSBOND-biopython']``
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.annotations['SSBOND-biopython']``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
 
         """
         for g in tqdm(self.genes):
             g.protein.find_disulfide_bridges(representative_only=representatives_only)
-
 
     ### END STRUCTURE RELATED METHODS ###
     ####################################################################################################################
@@ -1245,8 +1280,3 @@ class GEMPRO(Object):
             self.genes = DictList(self.genes)
         else:
             self.genes = self.model.genes
-
-
-if __name__ == '__main__':
-    pass
-    # TODO: Run the GEM-PRO pipeline!
