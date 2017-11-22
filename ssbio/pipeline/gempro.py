@@ -54,24 +54,29 @@ class GEMPRO(Object):
     Main methods provided are:
 
     #. Mapping of sequence IDs
+
         * With KEGG mapper
         * With UniProt mapper
         * Allowing manual gene ID --> protein sequence entry
         * Allowing manual gene ID --> UniProt ID
 
     #. Consolidating sequence IDs and setting a representative sequence
+
         * Currently these are set based on available PDB IDs
 
     #. Mapping of representative sequence --> structures
+
         * With UniProt --> ranking of PDB structures
         * BLAST representative sequence --> PDB database
 
     #. Homology modeling
+
         * Mapping to existing models
         * Preparation for running I-TASSER
         * Parsing I-TASSER runs
 
     #. Running QC/QA on structures and setting a representative structure
+
         * Various cutoffs (mutations, insertions, deletions) can be set to filter structures
 
     Each step will also generate reports as Pandas DataFrames and also output various logging messages.
