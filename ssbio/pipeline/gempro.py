@@ -714,7 +714,7 @@ class GEMPRO(Object):
         
         This is a basic function to parse pre-run TMHMM results. Run TMHMM from the 
         web service (http://www.cbs.dtu.dk/services/TMHMM/) by doing the following:
-            1. Write all representative sequences in the GEM-PRO using the function :py:func:``write_representative_sequences_file``
+            1. Write all representative sequences in the GEM-PRO using the function ``write_representative_sequences_file``
             2. Upload the file to http://www.cbs.dtu.dk/services/TMHMM/ and choose "Extensive, no graphics" as the output
             3. Copy and paste the results (ignoring the top header and above "HELP with output formats") into a file and save it
             4. Run this function on that file
@@ -1019,6 +1019,7 @@ class GEMPRO(Object):
         """Set all representative structure for proteins from a structure in the structures attribute.
 
         Each gene can have a combination of the following, which will be analyzed to set a representative structure.
+
             * Homology model(s)
             * Ranked PDBs
             * BLASTed PDBs
