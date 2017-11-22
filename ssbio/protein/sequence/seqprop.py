@@ -370,7 +370,53 @@ class SeqProp(SeqRecord):
         Object.update(self, newdata=newdata, overwrite=overwrite, only_keys=only_keys)
 
     def get_dict(self, only_attributes=None, exclude_attributes=None, df_format=False):
-        Object.get_dict(self, only_attributes=only_attributes, exclude_attributes=exclude_attributes, df_format=df_format)
+        """Get a dictionary of this object's attributes. Optional format for storage in a Pandas DataFrame.
+
+        Args:
+            only_attributes (str, list): Attributes that should be returned. If not provided, all are returned.
+            exclude_attributes (str, list): Attributes that should be excluded.
+            df_format (bool): If dictionary values should be formatted for a dataframe
+                (everything possible is transformed into strings, int, or float -
+                if something can't be transformed it is excluded)
+
+        Returns:
+            dict: Dictionary of attributes
+
+        """
+
+        # Choose attributes to return, return everything in the object if a list is not specified
+        if not only_attributes:
+            keys = list(self.__dict__.keys())
+        else:
+            keys = ssbio.utils.force_list(only_attributes)
+
+        # Remove keys you don't want returned
+        if exclude_attributes:
+            exclude_attributes = ssbio.utils.force_list(exclude_attributes)
+            for x in exclude_attributes:
+                if x in keys:
+                    keys.remove(x)
+
+        # Copy attributes into a new dictionary
+        df_dict = {}
+        for k, orig_v in self.__dict__.items():
+            if k in keys:
+                v = deepcopy(orig_v)
+                if df_format:
+                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v,
+                                                                                                  float) and not isinstance(
+                            v, bool):
+                        try:
+                            df_dict[k] = ssbio.utils.force_string(deepcopy(v))
+                        except TypeError:
+                            log.warning('{}: excluding attribute from dict, cannot transform into string'.format(k))
+                    elif not v and not isinstance(v, int) and not isinstance(v, float):
+                        df_dict[k] = None
+                    else:
+                        df_dict[k] = deepcopy(v)
+                else:
+                    df_dict[k] = deepcopy(v)
+        return df_dict
 
     def save_dataframes(self, outdir, prefix='df_'):
         Object.save_dataframes(self, outdir=outdir, prefix=prefix)
