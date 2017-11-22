@@ -90,10 +90,11 @@ class GEMPRO(Object):
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
         description (str): Optional string to describe your project
+        custom_spont_id (str): ID of spontaneous gene
 
     """
 
-    def __init__(self, gem_name, pdb_file_type='cif', root_dir=None, genome_path=None,
+    def __init__(self, gem_name, pdb_file_type='mmtf', root_dir=None, genome_path=None,
                  gem=None,
                  gem_file_path=None, gem_file_type=None,
                  genes_list=None,
@@ -191,7 +192,7 @@ class GEMPRO(Object):
 
     @property
     def data_dir(self):
-        """str: Directory where all data (dataframes and more) will be stored"""
+        """str: Directory where all data are stored"""
         if self.base_dir:
             return op.join(self.base_dir, 'data')
         else:
@@ -229,7 +230,7 @@ class GEMPRO(Object):
 
     @property
     def genes_with_structures(self):
-        """DictList: All genes with any available protein structures"""
+        """DictList: All genes with any mapped protein structures"""
         return DictList(x for x in self.genes if x.protein.num_structures > 0)
 
     @property
@@ -256,6 +257,7 @@ class GEMPRO(Object):
 
     @property
     def genes(self):
+        """DictList: All genes excluding spontaneous ones"""
         return ssbio.core.modelpro.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
 
     @genes.setter
@@ -280,7 +282,7 @@ class GEMPRO(Object):
             self._genes = genes_list
 
     def add_genes_by_id(self, genes_list):
-        """Add gene IDs manually into our GEM-PRO project.
+        """Add gene IDs manually into the GEM-PRO project.
 
         Args:
             genes_list (list): List of gene IDs as strings.
@@ -359,6 +361,7 @@ class GEMPRO(Object):
 
     @property
     def df_kegg_metadata(self):
+        """DataFrame: Pandas DataFrame of KEGG metadata per protein."""
         kegg_pre_df = []
         df_cols = ['gene', 'kegg', 'refseq', 'uniprot', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
@@ -379,6 +382,7 @@ class GEMPRO(Object):
 
     @property
     def missing_kegg_mapping(self):
+        """list: List of genes with no mapping to KEGG."""
         kegg_missing = []
         for g in self.genes:
             keggs = g.protein.filter_sequences(KEGGProp)
@@ -484,6 +488,7 @@ class GEMPRO(Object):
 
     @property
     def df_uniprot_metadata(self):
+        """DataFrame: Pandas DataFrame of UniProt metadata per protein."""
         uniprot_pre_df = []
         df_cols = ['gene', 'uniprot', 'reviewed', 'gene_name', 'kegg', 'refseq', 'num_pdbs', 'pdbs', 'ec_number',
                    'pfam', 'seq_len', 'description', 'entry_date', 'entry_version', 'seq_date', 'seq_version',
@@ -505,6 +510,7 @@ class GEMPRO(Object):
 
     @property
     def missing_uniprot_mapping(self):
+        """list: List of genes with no mapping to UniProt."""
         uniprot_missing = []
         for g in self.genes:
             ups = g.protein.filter_sequences(UniProtProp)
@@ -583,6 +589,8 @@ class GEMPRO(Object):
 
     @property
     def df_representative_sequences(self):
+        """DataFrame: Pandas DataFrame of representative sequence information per protein."""
+
         seq_mapping_pre_df = []
         df_cols = ['gene', 'uniprot', 'kegg', 'num_pdbs', 'pdbs', 'seq_len', 'sequence_file', 'metadata_file']
 
@@ -600,6 +608,7 @@ class GEMPRO(Object):
 
     @property
     def missing_representative_sequence(self):
+        """list: List of genes with no mapping to a representative sequence."""
         return [x.id for x in self.genes if not self.genes_with_a_representative_sequence.has_id(x.id)]
 
     def write_representative_sequences_file(self, outname, outdir=None, set_ids_from_model=True):
@@ -635,17 +644,20 @@ class GEMPRO(Object):
         return self.genome_path
 
     def get_sequence_properties(self, representatives_only=True):
-        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
-        Annotations are stored in the protein's sequence at ``.annotations``
+        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of all protein sequences.
+        Results are stored in the protein's respective SeqProp objects at ``.annotations``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative sequences
 
         """
-        for g in tqdm(self.genes_with_a_representative_sequence):
+        for g in tqdm(self.genes):
             g.protein.get_sequence_properties(representative_only=representatives_only)
 
     def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', num_cores=1,
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
         """Run and parse ``SCRATCH`` results to predict secondary structure and solvent accessibility.
-        Annotations are stored in the gene protein's representative sequence at:
+        Annotations are stored in the protein's representative sequence at:
             * ``.annotations``
             * ``.letter_annotations``
 
@@ -654,6 +666,7 @@ class GEMPRO(Object):
             results_dir (str): Path to SCRATCH results folder, which will have the files (scratch.ss, scratch.ss8,
                 scratch.acc, scratch.acc20)
             scratch_basename (str): Basename of the SCRATCH results ('scratch' is default)
+            num_cores (int): Number of cores to use to parallelize SCRATCH run
             exposed_buried_cutoff (int): Cutoff of exposed/buried for the acc20 predictions
             custom_gene_mapping (dict): Default parsing of SCRATCH output files is to look for the model gene IDs. If
                 your output files contain IDs which differ from the model gene IDs, use this dictionary to map model
@@ -701,8 +714,8 @@ class GEMPRO(Object):
         
         This is a basic function to parse pre-run TMHMM results. Run TMHMM from the 
         web service (http://www.cbs.dtu.dk/services/TMHMM/) by doing the following:
-            1. Write all representative sequences in the GEM-PRO using the function ``write_representative_sequences_file``
-            2. Upload the file to ``http://www.cbs.dtu.dk/services/TMHMM/`` and choose "Extensive, no graphics" as the output
+            1. Write all representative sequences in the GEM-PRO using the function :py:func:``write_representative_sequences_file``
+            2. Upload the file to http://www.cbs.dtu.dk/services/TMHMM/ and choose "Extensive, no graphics" as the output
             3. Copy and paste the results (ignoring the top header and above "HELP with output formats") into a file and save it
             4. Run this function on that file
 
@@ -713,7 +726,7 @@ class GEMPRO(Object):
                 gene IDs to result file IDs. Dictionary keys must match model genes.
 
         """
-        # TODO: refactor to Protein class
+        # TODO: refactor to Protein class?
         tmhmm_dict = ssbio.protein.sequence.properties.tmhmm.parse_tmhmm_long(tmhmm_results)
 
         counter = 0
