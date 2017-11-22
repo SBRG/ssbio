@@ -456,7 +456,7 @@ class ATLAS(Object):
 
     def _load_strain_sequences(self, strain_gempro):
         """Load strain sequences from the orthology matrix into the base model for comparisons, and into the
-            strain-specific model itself.
+        strain-specific model itself.
 
         """
         if self._orthology_matrix_has_sequences:  # Load directly from the orthology matrix if it contains sequences

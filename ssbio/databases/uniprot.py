@@ -22,6 +22,31 @@ log = logging.getLogger(__name__)
 bsup = bioservices.uniprot.UniProt()
 
 
+# See the UniProt XML specification for these http://www.uniprot.org/docs/uniprot.xsd
+# Also see http://www.uniprot.org/help/sequence_annotation for categories
+longname_all_features = ["active site", "binding site", "calcium-binding region", "chain", "coiled-coil region",
+                         "compositionally biased region", "cross-link", "disulfide bond", "DNA-binding region",
+                         "domain", "glycosylation site", "helix", "initiator methionine", "lipid moiety-binding region",
+                         "metal ion-binding site", "modified residue", "mutagenesis site", "non-consecutive residues",
+                         "non-terminal residue", "nucleotide phosphate-binding region", "peptide", "propeptide",
+                         "region of interest", "repeat", "non-standard amino acid", "sequence conflict",
+                         "sequence variant", "short sequence motif", "signal peptide", "site", "splice variant",
+                         "strand", "topological domain", "transit peptide", "transmembrane region", "turn",
+                         "unsure residue", "zinc finger region", "intramembrane region"]
+longname_molecule_processing = ["initiator methionine", "signal peptide", "transit peptide", "propeptide", "chain",
+                                "peptide"]
+longname_regions = ['repeat','calcium-binding region','compositionally biased region','nucleotide phosphate-binding region',
+                    'topological domain','intramembrane region','coiled-coil region','zinc finger region','domain',
+                    'short sequence motif','DNA-binding region','region of interest','transmembrane region']
+longname_sites = ["active site", "binding site", "metal ion-binding site", "site"]
+longname_amino_acid_modifications = ["non-standard amino acid", "modified residue", "lipid moiety-binding region",
+                                     "glycosylation site", "disulfide bond", "cross-link"]
+longname_natural_variations = ["sequence variant", "splice variant"]
+longname_experimental_info = ["mutagenesis site", "unsure residue", "sequence conflict", "non-consecutive residues",
+                              "non-terminal residue"]
+longname_secondary_structure = ["helix", "turn", "strand"]
+
+
 class UniProtProp(SeqProp):
     """Generic class to store information on a UniProt entry, extended from a SeqProp object.
 

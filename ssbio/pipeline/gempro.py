@@ -148,7 +148,7 @@ class GEMPRO(Object):
 
     @property
     def root_dir(self):
-        """str: Directory where GEM-PRO project folder named after the attribute ``base_dir`` is located"""
+        """str: Directory where GEM-PRO project folder named after the attribute ``base_dir`` is located."""
         return self._root_dir
 
     @root_dir.setter
@@ -181,7 +181,7 @@ class GEMPRO(Object):
 
     @property
     def base_dir(self):
-        """str: GEM-PRO project folder"""
+        """str: GEM-PRO project folder."""
         if self.root_dir:
             return op.join(self.root_dir, self.id)
         else:
@@ -189,7 +189,7 @@ class GEMPRO(Object):
 
     @property
     def model_dir(self):
-        """str: Directory where original GEMs and GEM-related files are stored"""
+        """str: Directory where original GEMs and GEM-related files are stored."""
         if self.base_dir:
             return op.join(self.base_dir, 'model')
         else:
@@ -197,7 +197,7 @@ class GEMPRO(Object):
 
     @property
     def data_dir(self):
-        """str: Directory where all data are stored"""
+        """str: Directory where all data are stored."""
         if self.base_dir:
             return op.join(self.base_dir, 'data')
         else:
@@ -205,7 +205,7 @@ class GEMPRO(Object):
 
     @property
     def genes_dir(self):
-        """str: Directory where all gene specific information is stored"""
+        """str: Directory where all gene specific information is stored."""
         if self.base_dir:
             return op.join(self.base_dir, 'genes')
         else:
@@ -235,34 +235,34 @@ class GEMPRO(Object):
 
     @property
     def genes_with_structures(self):
-        """DictList: All genes with any mapped protein structures"""
+        """DictList: All genes with any mapped protein structures."""
         return DictList(x for x in self.genes if x.protein.num_structures > 0)
 
     @property
     def genes_with_experimental_structures(self):
-        """DictList: All genes that have at least one experimental structure"""
+        """DictList: All genes that have at least one experimental structure."""
         return DictList(x for x in self.genes_with_structures if x.protein.num_structures_experimental > 0)
 
     @property
     def genes_with_homology_models(self):
-        """DictList: All genes that have at least one homology model"""
+        """DictList: All genes that have at least one homology model."""
         return DictList(x for x in self.genes_with_structures if x.protein.num_structures_homology > 0)
 
     @property
     def genes_with_a_representative_sequence(self):
-        """DictList: All genes with a representative sequence"""
+        """DictList: All genes with a representative sequence."""
         tmp = DictList(x for x in self.genes if x.protein.representative_sequence)
         return DictList(y for y in tmp if y.protein.representative_sequence.seq)
 
     @property
     def genes_with_a_representative_structure(self):
-        """DictList: All genes with a representative protein structure"""
+        """DictList: All genes with a representative protein structure."""
         tmp = DictList(x for x in self.genes if x.protein.representative_structure)
         return DictList(y for y in tmp if y.protein.representative_structure.structure_file)
 
     @property
     def genes(self):
-        """DictList: All genes excluding spontaneous ones"""
+        """DictList: All genes excluding spontaneous ones."""
         return ssbio.core.modelpro.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
 
     @genes.setter
