@@ -505,10 +505,11 @@ class StructProp(Object):
                 chain.seq_record.letter_annotations[all_props_renamed[prop]] = prop_list
             log.debug('{}: stored freesasa calculations in chain seq_record letter_annotations'.format(chain))
 
-    def view_structure(self, opacity=1.0, recolor=False, gui=False):
+    def view_structure(self, only_chains=None, opacity=1.0, recolor=False, gui=False):
         """Use NGLviewer to display a structure in a Jupyter notebook
 
         Args:
+            only_chains (str, list): Chain ID or IDs to display
             opacity (float): Opacity of the structure
             recolor (bool): If structure should be cleaned and recolored to silver
             gui (bool): If the NGLview GUI should show up
@@ -521,9 +522,19 @@ class StructProp(Object):
 
         if ssbio.utils.is_ipynb():
             import nglview as nv
+        else:
+            raise EnvironmentError('Unable to display structure - not running in a Jupyter notebook environment')
 
         if not self.structure_path:
             raise ValueError("Structure file not loaded")
+
+        only_chains = ssbio.utils.force_list(only_chains)
+        to_show_chains = '( '
+        for c in only_chains:
+            to_show_chains += ':{} or'.format(c)
+        to_show_chains = to_show_chains.strip(' or ')
+        to_show_chains += ' )'
+
         if self.file_type == 'mmtf' or self.file_type == 'mmtf.gz':
             view = nv.NGLWidget()
             view.add_component(self.structure_path)
@@ -532,7 +543,14 @@ class StructProp(Object):
 
         if recolor:
             view.clear_representations()
-            view.add_cartoon(selection='protein', color='silver', opacity=opacity)
+            if only_chains:
+                view.add_cartoon(selection='{} and (not hydrogen)'.format(to_show_chains), color='silver', opacity=opacity)
+            else:
+                view.add_cartoon(selection='protein', color='silver', opacity=opacity)
+        elif only_chains:
+            view.clear_representations()
+            view.add_cartoon(selection='{} and (not hydrogen)'.format(to_show_chains), color='silver', opacity=opacity)
+
         return view
 
     def add_residues_highlight_to_nglview(self, view, structure_resnums, chain=None, res_color='red'):
