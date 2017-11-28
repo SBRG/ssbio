@@ -3,6 +3,7 @@
 Python API
 ==========
 
+.. toctree::
 .. automodule:: ssbio.pipeline.gempro
     :members:
 
