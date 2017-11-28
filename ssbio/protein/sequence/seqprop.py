@@ -1,3 +1,8 @@
+"""
+StructProp
+======
+"""
+
 import os.path as op
 import pandas as pd
 import requests

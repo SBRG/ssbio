@@ -1,3 +1,8 @@
+"""
+PDBProp
+======
+"""
+
 import gzip
 import json
 import logging

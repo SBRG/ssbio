@@ -1,3 +1,8 @@
+"""
+StructProp
+======
+"""
+
 import logging
 import os.path as op
 

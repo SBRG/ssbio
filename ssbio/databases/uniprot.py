@@ -1,3 +1,8 @@
+"""
+UniProtProp
+======
+"""
+
 import os.path as op
 import re
 import warnings

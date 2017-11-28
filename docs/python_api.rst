@@ -6,7 +6,6 @@ Python API
 Information on select functions, classes, or methods.
 
 .. toctree::
-    :glob:
 
 .. automodule:: ssbio.pipeline.gempro
     :members:
