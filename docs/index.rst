@@ -1,7 +1,7 @@
-.. include ../README.rst
+.. include:: ../README.rst
 
-Index
-========
+Table of Contents
+=================
 
 .. toctree::
    :glob:
@@ -14,4 +14,9 @@ Index
    atlas
    python_api
 
+Indices and tables
+==================
+
 * :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
