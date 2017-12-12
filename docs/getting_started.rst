@@ -31,7 +31,7 @@ This section will give a very brief background on some systems biology topics.
 
 COBRA models & COBRApy
 ----------------------
-`COBRA`_ models & COBRApy_
+COBRA_ models & COBRApy_
 
 
 Reading
