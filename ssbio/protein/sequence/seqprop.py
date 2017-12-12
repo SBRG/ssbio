@@ -489,6 +489,9 @@ class SeqProp(SeqRecord):
             except KeyError as e:
                 log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
                 return
+            except ValueError as e:
+                log.error('{}: unable to run ProteinAnalysis module, {}'.format(self.id, e))
+                return
             self.annotations.update(pepstats)
         else:
             raise ValueError('{}: no sequence available, unable to run ProteinAnalysis'.format(self.id))
