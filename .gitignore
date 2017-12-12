@@ -94,3 +94,5 @@ docs/_templates/
 
 # Not sure if I can include these files
 ssbio/etc/
+/docs/source/
+/docs/notebooks/.ipynb_checkpoints/
