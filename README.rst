@@ -55,13 +55,13 @@ Then install ssbio:
 Dependencies
 ------------
 
-See: `Software Installations <https://github.com/SBRG/ssbio/wiki/Software-Installations>`_ for additional programs to install. Most of these additional programs are used to predict or calculate properties of proteins.
+See: `Software Installations`_ for additional programs to install. Most of these additional programs are used to predict or calculate properties of proteins.
 
 
 Tutorials
 =========
 
-Check out some Jupyter notebook tutorials at :ref:`protein` and :ref:`gempro`.
+Check out some Jupyter notebook tutorials for a single Protein_ and or for many in a GEM-PRO_ model.
 
 
 Citation
@@ -70,3 +70,6 @@ Citation
 The manuscript for the ``ssbio`` package can be found and cited at [1]_.
 
 .. [1] Mih, N. et al. ssbio: A Python Framework for Structural Systems Biology. bioRxiv 165506 (2017). doi:10.1101/165506
+.. _Software Installations: https://github.com/SBRG/ssbio/wiki/Software-Installations
+.. _Protein: http://ssbio.readthedocs.io/en/latest/protein.html
+.. _GEM-PRO: http://ssbio.readthedocs.io/en/latest/gempro.html

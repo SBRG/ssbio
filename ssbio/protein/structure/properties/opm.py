@@ -40,7 +40,19 @@ import ssbio.utils
 
 ## SEE: https://structure.dynamic.ucsd.edu:9998/notebooks/projects_unsynced/sandbox/PPM_server_test.ipynb
 
+
 def run_ppm_server(pdb_file, outfile, force_rerun=False):
+    """Run the PPM server from OPM to predict transmembrane residues.
+
+    Args:
+        pdb_file (str): Path to PDB file
+        outfile (str): Path to output HTML results file
+        force_rerun (bool): Flag to rerun PPM if HTML results file already exists
+
+    Returns:
+        dict: Dictionary of information from the PPM run, including a link to download the membrane protein file
+
+    """
     if ssbio.utils.force_rerun(outfile=outfile, flag=force_rerun):
         url = 'http://sunshine.phar.umich.edu/upload_file.php'
         files = {'userfile': open(pdb_file, 'rb')}

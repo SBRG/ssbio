@@ -183,6 +183,8 @@ class Protein(Object):
     @property
     def protein_statistics(self):
         """Get a dictionary of basic statistics describing this protein"""
+
+        # TODO: can i use get_dict here instead
         d = {}
 
         d['id'] = self.id
@@ -190,6 +192,9 @@ class Protein(Object):
         d['num_sequences'] = self.num_sequences
         if self.representative_sequence:
             d['representative_sequence'] = self.representative_sequence.id
+            d['repseq_gene_name'] = self.representative_sequence.gene_name
+            d['repseq_uniprot'] = self.representative_sequence.uniprot
+            d['repseq_description'] = self.representative_sequence.description
         d['num_structures'] = self.num_structures
         d['experimental_structures'] = [x.id for x in self.get_experimental_structures()]
         d['num_experimental_structures'] = self.num_structures_experimental
@@ -199,6 +204,9 @@ class Protein(Object):
             d['representative_structure'] = self.representative_structure.id
             d['representative_chain'] = self.representative_chain
             d['representative_chain_seq_coverage'] = self.representative_chain_seq_coverage
+            d['repstruct_description'] = self.description
+            if self.representative_structure.is_experimental:
+                d['repstruct_resolution'] = self.representative_structure.resolution
         d['num_sequence_alignments'] = len(self.sequence_alignments)
         d['num_structure_alignments'] = len(self.structure_alignments)
 

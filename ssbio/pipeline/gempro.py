@@ -93,24 +93,21 @@ class GEMPRO(Object):
             choose a file type for files downloaded from the PDB
         root_dir (str): Path to where the folder named after ``gem_name`` will be created. If not provided,
             directories will not be created and output directories need to be specified for some steps
-        genome_path (str): Simple reference link to the genome FASTA file (CDS)
         gem (Model): COBRApy Model object
         gem_file_path (str): Path to GEM file
         gem_file_type (str): GEM model type - ``sbml`` (or ``xml``), ``mat``, or ``json`` formats
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
+        genome_path (str): Genome FASTA file of protein coding sequences
         description (str): Optional string to describe your project
         custom_spont_id (str): ID of spontaneous gene
 
     """
 
-    def __init__(self, gem_name, pdb_file_type='mmtf', root_dir=None, genome_path=None,
-                 gem=None,
-                 gem_file_path=None, gem_file_type=None,
-                 genes_list=None,
-                 genes_and_sequences=None,
-                 description=None,
-                 custom_spont_id=None):
+    def __init__(self, gem_name, pdb_file_type='mmtf', root_dir=None,
+                 gem=None, gem_file_path=None, gem_file_type=None,
+                 genes_list=None, genes_and_sequences=None, genome_path=None,
+                 description=None, custom_spont_id=None):
         Object.__init__(self, id=gem_name, description=description)
 
         self.custom_spont_id = custom_spont_id
@@ -122,6 +119,7 @@ class GEMPRO(Object):
         if root_dir:
             self.root_dir = root_dir
 
+        # TODO: add some checks
         # Load a model object
         self.model = None
         if gem:
@@ -140,14 +138,18 @@ class GEMPRO(Object):
         # Or, load a dictionary of genes and their sequences
         elif genes_and_sequences:
             self.genes = list(genes_and_sequences.keys())
+            self.manual_seq_mapping(genes_and_sequences)
+
+        # Or, load the provided FASTA file
+        elif genome_path:
+            tmp = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
+            self.genes = list(tmp.keys())
+            self.manual_seq_mapping(tmp)
 
         # If neither a model or genes are input, you can still add IDs with method add_genes_by_id later
         else:
             self.genes = []
             log.warning('No model or genes input')
-
-        if genes_and_sequences:
-            self.manual_seq_mapping(genes_and_sequences)
 
         log.info('{}: number of genes'.format(len(self.genes)))
 
@@ -412,7 +414,7 @@ class GEMPRO(Object):
 
         Args:
             model_gene_source (str): the database source of your model gene IDs.
-                See: http://www.uniprot.org/help/programmatic_access.
+                See: http://www.uniprot.org/help/api_idmapping
                 Common model gene sources are:
                     * Ensembl Genomes - ``ENSEMBLGENOME_ID`` (i.e. E. coli b-numbers)
                     * Entrez Gene (GeneID) - ``P_ENTREZGENEID``
@@ -1195,10 +1197,12 @@ class GEMPRO(Object):
     def df_proteins(self):
         """DataFrame: Get a summary dataframe of all proteins in the project."""
         pre_df = []
-        df_cols = ['gene', 'id', 'sequences', 'num_sequences', 'representative_sequence', 'num_structures',
-                   'experimental_structures', 'num_experimental_structures',
+        df_cols = ['gene', 'id', 'sequences', 'num_sequences', 'representative_sequence',
+                   'repseq_gene_name', 'repseq_uniprot', 'repseq_description',
+                   'num_structures', 'experimental_structures', 'num_experimental_structures',
                    'homology_models', 'num_homology_models',
                    'representative_structure', 'representative_chain', 'representative_chain_seq_coverage',
+                   'repstruct_description', 'repstruct_resolution',
                    'num_sequence_alignments', 'num_structure_alignments']
 
         for g in self.genes:
