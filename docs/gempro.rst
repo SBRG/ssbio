@@ -20,9 +20,9 @@ Introduction
 
 The GEM-PRO pipeline is focused on annotating genome-scale models with protein structure information. Any SBML model can be used as input to the pipeline, although it is not required to have a one. Here are the possible starting points for using the pipeline:
 
-#. An SBML model in `SBML` (`.sbml`, `.xml`), or `MATLAB` (`.mat`) formats
-#. A list of gene IDs (`['b0001', 'b0002', ...]`)
-#. A dictionary of gene IDs and their sequences (`{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}`)
+#. An SBML model in ``SBML`` (``.sbml``, ``.xml``), or ``MATLAB`` (``.mat``) formats
+#. A list of gene IDs (``['b0001', 'b0002', ...]``)
+#. A dictionary of gene IDs and their sequences (``{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}``)
 
 A GEM-PRO object can be thought of at a high-level as simply an annotation project. Creating a new project with any of the above starting points will create a new folder where protein sequences and structures will be downloaded to.
 
