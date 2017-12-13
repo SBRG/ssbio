@@ -1,5 +1,6 @@
 .. include:: ../README.rst
 
+
 Table of Contents
 =================
 
@@ -8,11 +9,10 @@ Table of Contents
    :maxdepth: 3
 
    getting_started
-   structure
-   protein
    gempro
-   atlas
+   protein
    python_api
+
 
 Indices and tables
 ==================
