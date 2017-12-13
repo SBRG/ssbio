@@ -1,6 +1,6 @@
 """
 Protein
-======
+=======
 """
 
 import logging

@@ -1,6 +1,6 @@
 """
-StructProp
-======
+SeqProp
+=======
 """
 
 import os.path as op
