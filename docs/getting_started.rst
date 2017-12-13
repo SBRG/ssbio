@@ -15,7 +15,11 @@ The basics
 
 A top-down perspective
 ----------------------
-.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Metabolic_Metro_Map.svg/500px-Metabolic_Metro_Map.svg.png
+.. figure:: ./assets/metabolic_metro_map.png
+   :scale: 50 %
+   :alt: Metabolic Metro Map
+
+   By Chakazul (Own work) [CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)], via Wikimedia Commons
 
 
 A bottom-up perspective
