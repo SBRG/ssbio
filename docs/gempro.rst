@@ -20,9 +20,9 @@ Introduction
 
 The GEM-PRO pipeline is focused on annotating genome-scale models with protein structure information. Any SBML model can be used as input to the pipeline, although it is not required to have a one. Here are the possible starting points for using the pipeline:
 
-* An SBML model in `SBML` (`.sbml`, `.xml`), or `MATLAB` (`.mat`) formats
-* A list of gene IDs (`['b0001', 'b0002', ...]`)
-* A dictionary of gene IDs and their sequences (`{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}`)
+#. An SBML model in `SBML` (`.sbml`, `.xml`), or `MATLAB` (`.mat`) formats
+#. A list of gene IDs (`['b0001', 'b0002', ...]`)
+#. A dictionary of gene IDs and their sequences (`{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}`)
 
 A GEM-PRO object can be thought of at a high-level as simply an annotation project. Creating a new project with any of the above starting points will create a new folder where protein sequences and structures will be downloaded to.
 
@@ -30,13 +30,13 @@ A GEM-PRO object can be thought of at a high-level as simply an annotation proje
 Features
 ========
 
-#. Automated mapping of sequence IDs
-#. Consolidating sequence IDs and setting a representative sequence
-#. Mapping of representative sequence --> structures
-#. Preparation of files for homology modeling (currently for I-TASSER_)
-#. Running QC/QA on structures and setting a representative structure
-#. Automation of protein sequence and structure property calculation
-#. Creation of Pandas DataFrame summaries directly from downloaded metadata
+* Automated mapping of sequence IDs
+* Consolidating sequence IDs and setting a representative sequence
+* Mapping of representative sequence --> structures
+* Preparation of files for homology modeling (currently for I-TASSER_)
+* Running QC/QA on structures and setting a representative structure
+* Automation of protein sequence and structure property calculation
+* Creation of Pandas DataFrame summaries directly from downloaded metadata
 
 
 COBRApy model additions
@@ -48,16 +48,17 @@ COBRApy model additions
 
 Let's take a look at a GEM loaded with ``ssbio`` and what additions exist compared to a GEM loaded with COBRApy_. In the figure above, the text in grey indicates objects that exist in a ``COBRApy`` ``Model`` object, and in blue, the attributes added when loading with ``ssbio``. Please note that the ``Complex`` object is still under development and currently non-functional.
 
-COBRApy:
---------
+COBRApy
+-------
 
 Under construction...
 
-ssbio:
-------
+ssbio
+-----
 
 Under construction...
 
+.. see: https://structure.dynamic.ucsd.edu:9998/notebooks/projects_unsynced/sandbox/171212-ssbio_random.ipynb
         .. my_gene_id = 'geneABC'
         .. my_protein = my_model.genes.get_by_id(my_gene_id).protein
         .. my_protein.sequences  # Contains a list of stored amino-acid sequences

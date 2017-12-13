@@ -24,12 +24,12 @@ This section will give an overview of the methods that can be executed for the P
 Features
 ========
 
-#. Load, parse, and store the same (ie. from different database sources) or similar (ie. from different strains) protein sequences as ``SeqProp`` objects in the ``sequences`` attribute
-#. Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` objects in the ``structures`` attribute
-#. Set a single representative sequence and structure
-#. Calculate, store, and access pairwise sequence alignments to the representative sequence or structure
-#. Provide summaries of alignments and mutations seen
-#. Map between residue numbers of sequences and structures
+* Load, parse, and store the same (ie. from different database sources) or similar (ie. from different strains) protein sequences as ``SeqProp`` objects in the ``sequences`` attribute
+* Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` objects in the ``structures`` attribute
+* Set a single representative sequence and structure
+* Calculate, store, and access pairwise sequence alignments to the representative sequence or structure
+* Provide summaries of alignments and mutations seen
+* Map between residue numbers of sequences and structures
 
 
 Object attributes
