@@ -46,7 +46,7 @@ COBRApy model additions
     :align: center
     :alt: The GEM-PRO Class
 
-Let's take a look at a GEM loaded with ``ssbio`` and what additions exist compared to a GEM loaded with COBRApy_. In the figure above, the text in grey indicates objects that exist in a ``COBRApy`` ``Model`` object, and in blue, the attributes added when loading with ``ssbio``. Please note that the ``Complex`` object is still under development and currently non-functional.
+Let's take a look at a GEM loaded with *ssbio* and what additions exist compared to a GEM loaded with COBRApy_. In the figure above, the text in grey indicates objects that exist in a ``COBRApy`` ``Model`` object, and in blue, the attributes added when loading with *ssbio*. Please note that the ``Complex`` object is still under development and currently non-functional.
 
 COBRApy
 -------
