@@ -67,10 +67,10 @@ Modules & submodules
 
 *ssbio* is organized into the following submodules for defined purposes. Please see the :ref:`python_api` for function documentation.
 
-#. ``ssbio.databases``: modules that heavily depend on the Bioservices_ package [3]_ and custom code to enable pulling information from web services such as UniProt, KEGG, and the PDB, and to directly convert that information into sequence and structure objects to load into a protein.
-#. ``ssbio.protein.sequence``: modules which allow a user to execute and parse sequence-based utilities such as sequence alignment algorithms or structural feature predictors.
-#. ``ssbio.protein.structure``: modules that mirror the sequence module but instead work with structural information to calculate properties, and also to streamline the generation of homology models as well as to prepare structures for molecular modeling tools such as docking or molecular dynamics.
-#. ``ssbio.pipeline.gempro``: a pipeline that simplifies the execution of these tools per protein while placing them into the context of a genome-scale model.
+* ``ssbio.databases``: modules that heavily depend on the Bioservices_ package [3]_ and custom code to enable pulling information from web services such as UniProt, KEGG, and the PDB, and to directly convert that information into sequence and structure objects to load into a protein.
+* ``ssbio.protein.sequence``: modules which allow a user to execute and parse sequence-based utilities such as sequence alignment algorithms or structural feature predictors.
+* ``ssbio.protein.structure``: modules that mirror the sequence module but instead work with structural information to calculate properties, and also to streamline the generation of homology models as well as to prepare structures for molecular modeling tools such as docking or molecular dynamics.
+* ``ssbio.pipeline.gempro``: a pipeline that simplifies the execution of these tools per protein while placing them into the context of a genome-scale model.
 
 
 References
