@@ -69,7 +69,10 @@ Citation
 
 The manuscript for the ``ssbio`` package can be found and cited at [1]_.
 
-.. [1] Mih, N. et al. ssbio: A Python Framework for Structural Systems Biology. bioRxiv 165506 (2017). doi:10.1101/165506
+.. [1] Mih N, Brunk E, Chen K, Catoiu E, Sastry A, Kavvas E, et al. ssbio: A Python Framework for Structural Systems Biology. bioRxiv. 2017. p. 165506. doi:10.1101/165506
+
+
+.. Links
 .. _Software Installations: https://github.com/SBRG/ssbio/wiki/Software-Installations
 .. _Protein: http://ssbio.readthedocs.io/en/latest/protein.html
 .. _GEM-PRO: http://ssbio.readthedocs.io/en/latest/gempro.html

@@ -58,7 +58,7 @@ class GEMPRO(Object):
 
     Main methods provided are:
 
-    #. Mapping of sequence IDs
+    #. Automated mapping of sequence IDs
 
         * With KEGG mapper
         * With UniProt mapper
@@ -74,7 +74,7 @@ class GEMPRO(Object):
         * With UniProt --> ranking of PDB structures
         * BLAST representative sequence --> PDB database
 
-    #. Homology modeling
+    #. Preparation of files for homology modeling (currently for I-TASSER)
 
         * Mapping to existing models
         * Preparation for running I-TASSER
@@ -84,7 +84,9 @@ class GEMPRO(Object):
 
         * Various cutoffs (mutations, insertions, deletions) can be set to filter structures
 
-    Each step will also generate reports as Pandas DataFrames and also output various logging messages.
+    #. Automation of protein sequence and structure property calculation
+
+    #. Creation of Pandas DataFrame summaries directly from downloaded metadata
 
     Args:
         gem_name (str): The name of your GEM or just your project in general.
