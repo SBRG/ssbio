@@ -49,6 +49,7 @@ From a structures perspective
 Structural biology is broadly concerned with elucidating and understanding the structure and function of proteins and other macromolecules. Ribbons, molecules, and chemical interactions are the name of the game here:
 
 .. figure:: ./assets/protein_conf_change_serpin.png
+   :scale: 100 %
    :alt: Serpin protein conformational change
    :align: center
 
