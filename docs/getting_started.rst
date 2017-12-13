@@ -4,7 +4,6 @@
 Getting Started
 ***************
 
-
 Introduction
 ============
 This section will give a quick outline of the design of ``ssbio`` and the scientific topics behind it.
@@ -12,8 +11,15 @@ This section will give a quick outline of the design of ``ssbio`` and the scient
 
 The basics
 ==========
-``ssbio`` was developed with simplicity in mind, and also as a direct extension of COBRApy_. Furthermore, we didn't want to reinvent the wheel wherever possible, and thus Biopython_ classes and modules are used wherever possible.
+``ssbio`` was developed with simplicity in mind, and also as a direct extension of COBRApy_. Furthermore, we didn't want to reinvent the wheel wherever possible, and thus Biopython_ classes and modules are used wherever possible. To best explain the utility of the package, we will explain its features from 2 different viewpoints: 1) as a systems biologist used to looking at the "big picture", ie. from the top-down; and 2) as a structural biologist where the "devil is in the details", ie. from the bottom-up.
 
+A top-down perspective
+----------------------
+.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Metabolic_Metro_Map.svg/500px-Metabolic_Metro_Map.svg.png
+
+
+A bottom-up perspective
+-----------------------
 
 Structural biology
 ==================
