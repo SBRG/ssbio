@@ -65,7 +65,7 @@ See :ref:`protein` for a detailed explanation of this object, Jupyter notebook t
 Modules & submodules
 ====================
 
-ssbio is organized into the following submodules for defined purposes. Please see the :ref:`python_api` for function documentation.
+*ssbio* is organized into the following submodules for defined purposes. Please see the :ref:`python_api` for function documentation.
 
 #. ``ssbio.databases``: modules that heavily depend on the Bioservices_ package [3]_ and custom code to enable pulling information from web services such as UniProt, KEGG, and the PDB, and to directly convert that information into sequence and structure objects to load into a protein.
 #. ``ssbio.protein.sequence``: modules which allow a user to execute and parse sequence-based utilities such as sequence alignment algorithms or structural feature predictors.
