@@ -34,7 +34,7 @@ Systems biology is broadly concerned with the modeling and understanding of comp
    :alt: Metabolic Metro Map
    :align: center
 
-   A "metabolic metro map". By Dctrzl, changed work of Chakazul [`CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>`_], via `Wikimedia Commons <https://commons.wikimedia.org/wiki/File:Metabolic_Metro_Map.svg>`_
+   A "metabolic metro map". By Dctrzl, changed work of Chakazul [`CC BY-SA 4.0`_], via `Wikimedia Commons 1`_
 
 This map details the reactions needed to sustain the metabolic function of a cell. Typically, nodes will represent enzymes, and edges the metabolites they act upon (this is reversed in some graphical representations). There can be hundreds or thousands of reactions being modeled at once, *in silico*. These models can be stored in a single file, such as the Systems Biology Markup Language (SBML_). *ssbio* can load SBML models, and so far we have mainly used it in the further annotation of genome-scale metabolic models, or GEMs. The goal of GEMs is to provide a comprehensive annotation of all the metabolic enzymes encoded within a genome, along with a generating a computable model (such as at a steady state, using constraint-based modeling methods, a.k.a. COBRA_). That brings us to our first class: the ``GEMPRO`` object.
 
@@ -53,7 +53,7 @@ Structural biology is broadly concerned with elucidating and understanding the s
    :alt: Serpin protein conformational change
    :align: center
 
-   A protein undergoing conformational changes. By Thomas Shafee (Own work) [`CC BY 4.0 <http://creativecommons.org/licenses/by/4.0>`_], via `Wikimedia Commons <https://commons.wikimedia.org/wiki/File%3ASerpin_latent_state_(unannotated).png>`_
+   A protein undergoing conformational changes. By Thomas Shafee (Own work) [`CC BY 4.0`_], via `Wikimedia Commons 2`_
 
 An abundance of information is stored within structural data, and we believe that it should not be ignored even when looking at thousands of proteins at once within a systems model. To that end, the ``Protein`` object aims to integrate analyses on the level of a single protein's sequence (and related sequences) along with its available structures.
 
@@ -89,3 +89,7 @@ References
 .. _Bioservices: http://bioservices.readthedocs.io/en/master/
 .. _SBML: http://sbml.org/Main_Page
 .. _I-TASSER: https://zhanglab.ccmb.med.umich.edu/I-TASSER/
+.. _Wikimedia Commons 1: https://commons.wikimedia.org/wiki/File:Metabolic_Metro_Map.svg
+.. _CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0
+.. _Wikimedia Commons 2: https://commons.wikimedia.org/wiki/File%3ASerpin_latent_state_(unannotated).png
+.. _CC BY 4.0: http://creativecommons.org/licenses/by/4.0
