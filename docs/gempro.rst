@@ -45,6 +45,7 @@ COBRApy model additions
 .. image:: ./assets/ssbioGEMPROClass.png
     :align: center
     :alt: The GEM-PRO Class
+    :scale: 60 %
 
 Let's take a look at a GEM loaded with *ssbio* and what additions exist compared to a GEM loaded with COBRApy_. In the figure above, the text in grey indicates objects that exist in a ``COBRApy`` ``Model`` object, and in blue, the attributes added when loading with *ssbio*. Please note that the ``Complex`` object is still under development and currently non-functional.
 
@@ -73,6 +74,7 @@ Use cases
 .. image:: ./assets/ssbioGEMPROuses.png
     :align: center
     :alt: Uses of a GEM-PRO
+    :scale: 60 %
 
 When would you create or use a GEM-PRO? The added context of manually curated network interactions to protein structures enables different scales of analyses. For instance...
 

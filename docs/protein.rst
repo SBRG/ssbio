@@ -38,6 +38,7 @@ Object attributes
 .. image:: ./assets/ssbioProteinClass.png
     :align: center
     :alt: The Protein Class
+    :scale: 60 %
 
 
 Further reading
