@@ -26,5 +26,6 @@ External programs
    :glob:
    :maxdepth: 1
 
-   amylpred
-   itasser
+   instructions/itasser
+   instructions/foldrate
+   instructions/amylpred

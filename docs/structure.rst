@@ -27,4 +27,5 @@ External programs
    :glob:
    :maxdepth: 1
 
-   msms
+   instructions/msms
+   instructions/freesasa
