@@ -4,7 +4,7 @@
 MSMS
 **********************************
 
-.. image:: ./assets/ssbioStructPropsresdepths.png
+.. image:: ../assets/ssbioStructPropsresdepths.png
     :align: center
     :alt: Residue depths
     :scale: 60 %

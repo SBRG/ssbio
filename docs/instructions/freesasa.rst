@@ -4,7 +4,7 @@
 freesasa
 **********************************
 
-.. image:: ./assets/ssbioStructPropssasa.png
+.. image:: ../assets/ssbioStructPropssasa.png
     :align: center
     :alt: SASA
     :scale: 60 %
@@ -58,7 +58,7 @@ FAQs
 
 * How do I cite freesasa?
 
-    - Roy A, Kucukural A & Zhang Y (2010) freesasa: a unified platform for automated protein structure and function prediction. Nat. Protoc. 5: 725–738 Available at: http://dx.doi.org/10.1038/nprot.2010.5
+    - Mitternacht S (2016) FreeSASA: An open source C library for solvent accessible surface area calculations. F1000Res. 5: 189 Available at: http://dx.doi.org/10.12688/f1000research.7931.1
 
 * I'm having issues running freesasa...
 
@@ -75,3 +75,4 @@ API
 .. Links
 .. _freesasa home page: http://freesasa.github.io/
 .. _freesasa Github: https://github.com/mittinatten/freesasa
+.. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting
