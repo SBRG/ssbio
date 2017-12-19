@@ -19,7 +19,7 @@ For an example of usage of these parameters in a genome-scale model:
 """
 
 __author__ = 'Ke Chen'
-__email__ = "kec003@eng.ucsd.edu"
+__email__ = "kec003@ucsd.edu"
 
 import math
 import scipy.constants

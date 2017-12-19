@@ -553,7 +553,26 @@ class SeqProp(SeqRecord):
         # Get sequence properties
         return f.extract(self).letter_annotations
 
-    def get_aggregation_propensity(self, outdir, email, password, cutoff_v=5, cutoff_n=5, run_amylmuts=False):
+    def get_aggregation_propensity(self, email, password, cutoff_v=5, cutoff_n=5, run_amylmuts=False, outdir=None):
+        """Run the AMYLPRED2 web server to calculate the aggregation propensity of this protein sequence, which is
+        the number of aggregation-prone segments on the unfolded protein sequence.
+
+        Stores statistics in the ``annotations`` attribute. See :mod:`~ssbio.protein.sequence.properties.aggregation_propensity`.
+
+        Args:
+            email (str):
+            password (str):
+            cutoff_v (int):
+            cutoff_n (int):
+            run_amylmuts (bool):
+            outdir (str):
+
+        """
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
         import ssbio.protein.sequence.properties.aggregation_propensity as agg
         agg_predictions = agg.AMYLPRED(email=email, password=password)
         result = agg_predictions.get_aggregation_propensity(seq=self, outdir=outdir,
