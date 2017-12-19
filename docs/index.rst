@@ -13,7 +13,6 @@ Table of Contents
    protein
    .. structure
    sequence
-   amylpred
    python_api
 
 
