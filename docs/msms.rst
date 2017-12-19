@@ -1,4 +1,4 @@
-.. _itasser:
+.. _msms:
 
 **********************************
 MSMS
@@ -77,7 +77,7 @@ API
 
 .. automodule:: ssbio.protein.structure.properties.msms
     :members:
-    
+
 
 .. Links
 .. _MSMS home page: http://mgl.scripps.edu/people/sanner/html/msms_home.html

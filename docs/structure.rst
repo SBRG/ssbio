@@ -19,3 +19,12 @@ Tutorials
 
    notebooks/StructProp*
    notebooks/PDBProp*
+
+
+External programs
+=================
+.. toctree::
+   :glob:
+   :maxdepth: 1
+
+   msms
