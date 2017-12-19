@@ -479,10 +479,8 @@ class SeqProp(SeqRecord):
         self.feature_path = outfile
 
     def get_biopython_pepstats(self):
-        """Run Biopython's built in ProteinAnalysis module.
+        """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""
 
-        Stores statistics in the ``annotations`` attribute.
-        """
         if self.seq:
             try:
                 pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq)
@@ -554,3 +552,11 @@ class SeqProp(SeqRecord):
 
         # Get sequence properties
         return f.extract(self).letter_annotations
+
+    def get_aggregation_propensity(self, outdir, email, password, cutoff_v=5, cutoff_n=5, run_amylmuts=False):
+        import ssbio.protein.sequence.properties.aggregation_propensity as agg
+        agg_predictions = agg.AMYLPRED(email=email, password=password)
+        result = agg_predictions.get_aggregation_propensity(seq=self, outdir=outdir,
+                                                            cutoff_v=cutoff_v, cutoff_n=cutoff_n,
+                                                            run_amylmuts=run_amylmuts)
+        self.annotations['aggprop-amylpred'] = result

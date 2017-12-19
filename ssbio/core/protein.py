@@ -2025,6 +2025,7 @@ class Protein(Object):
         """Add select features from the selected SeqProp object to an NGLWidget view object.
 
         Currently parsing for:
+
             * Single residue features (ie. metal binding sites)
             * Disulfide bonds
 

@@ -2,31 +2,51 @@
 AMYLPRED2 - Aggregation Propensity
 ==================================
 
+Instructions
+------------
+
+#. Create an account on the webserver at: http://aias.biol.uoa.gr/AMYLPRED2/register.php
+#. Create a new AMYLPRED object with your email and password initialized along with it.
+#. Run `get_aggregation_propensity` on a protein sequence.
+
+FAQs
+----
+
+* How can I install AMYLPRED2?
+    * AMYLPRED2 is only available as a web server, here: http://aias.biol.uoa.gr/AMYLPRED2/register.php. *ssbio*
+    provides a wrapper for the web server and allows you to submit protein sequences to it along with caching
+    the output files.
+
+* What is aggregation propensity?
+    * The number of aggregation-prone segments on an unfolded protein sequence.
+
+* How do I cite this?
+    * Tsolis AC, Papandreou NC, Iconomidou VA & Hamodrakas SJ (2013) A consensus method for the prediction of
+    'aggregation-prone' peptides in globular proteins. PLoS One 8: e54175 Available at:
+    http://dx.doi.org/10.1371/journal.pone.0054175
+
+* How can this parameter be used on a genome-scale?
+    * See: Chen K, Gao Y, Mih N, O’Brien EJ, Yang L & Palsson BO (2017) Thermosensitivity of growth is determined by
+    chaperone-mediated proteome reallocation. Proceedings of the National Academy of Sciences 114: 11548–11553
+    Available at: http://www.pnas.org/content/114/43/11548.abstract
+
+Description
+-----------
+
 This module provides a function to predict the aggregation propensity of proteins, specifically the number
-    of aggregation-prone segments on an unfolded protein sequence. The main method is a web wrapper for the
-    AMYLPRED2 web server available at http://aias.biol.uoa.gr/AMYLPRED2/. In order to obtain the best balance between
-    sensitivity and specificity, we follow the author’s guidelines to consider every 5 consecutive residues agreed
-    among at least 5 methods contributing 1 to the aggregation propensity
-
-This method is adapted from:
-
-    Tsolis, A. C., Papandreou, N. C., Iconomidou, V. A., & Hamodrakas, S. J. (2013). 'A consensus method for the
-        prediction of "aggregation-prone" peptides in globular proteins', PloS one, 8/1: e54175.
-        DOI: 10.1371/journal.pone.0054175
-
-For an example of usage of this parameter in a genome-scale model:
-
-    Chen, K., Gao, Y., Mih, N., O'Brien, E., Yang, L., Palsson, B.O. (2017).
-        'Thermo-sensitivity of growth is determined by chaperone-mediated proteome re-allocation.',
-        Submitted to PNAS.
+of aggregation-prone segments on an unfolded protein sequence. In order to obtain the best balance between
+sensitivity and specificity, we follow the author's guidelines to consider every 5 consecutive residues agreed
+among at least 5 methods contributing 1 to the aggregation propensity.
 
 """
 
 from __future__ import print_function
 
 __author__ = 'Ke Chen'
-__email__ = "kec003@eng.ucsd.edu"
+__email__ = "kec003@ucsd.edu"
 
+import os
+import os.path as op
 import glob
 import time
 import requests
@@ -64,42 +84,50 @@ class AMYLPRED:
 
         self.email = email
         self.password = password
+        self.method_results = {}
 
-    def get_aggregation_propensity(self, seq, cutoff_v=5, cutoff_n=5):
-        """Predict aggregation propensity.
+    def get_aggregation_propensity(self, seq, outdir, cutoff_v=5, cutoff_n=5, run_amylmuts=False):
+        """Run the AMYLPRED2 web server for a protein sequence and get the consensus result for aggregation propensity.
 
         Args:
             seq (str, Seq, SeqRecord): Amino acid sequence
+            outdir (str): Directory to where output files should be saved
             cutoff_v (int): The minimal number of methods that agree on a residue being a aggregation-prone residue
             cutoff_n (int): The minimal number of consecutive residues to be considered as a 'stretch' of 
                 aggregation-prone region
+            run_amylmuts (bool): If AMYLMUTS method should be run, default False. AMYLMUTS is optional as it is the most
+                time consuming and generates a slightly different result every submission.
 
         Returns:
-            int: Aggregation propensity
+            int: Aggregation propensity - the number of aggregation-prone segments on an unfolded protein sequence
 
         """
 
         seq = ssbio.protein.sequence.utils.cast_to_str(seq)
 
-        output = self.consensus_aggregation(seq)
-        agg_index, agg_conf = self.write_propensity(len(seq), output, cutoff_v=cutoff_v, cutoff_n=cutoff_n)
+        results = self.run_amylpred2(seq=seq, outdir=outdir, run_amylmuts=run_amylmuts)
+        agg_index, agg_conf = self.parse_for_consensus_aggregation(N=len(seq), results=results, cutoff_v=cutoff_v, cutoff_n=cutoff_n)
 
         return agg_index
 
-    def consensus_aggregation(self, seq, outfile, run_amylmuts=False):
-        """Run the AMYLPRED2 web server for an amino acid sequence. 
-        
-        AMYLMUTS is an optional method to run as it is the most time consuming and generates a slightly different
-            result every submission.
-        
+    def run_amylpred2(self, seq, outdir, run_amylmuts=False):
+        """Run all methods on the AMYLPRED2 web server for an amino acid sequence and gather results.
+
+        Result files are cached in ``/path/to/outdir/AMYLPRED2_results``.
+
         Args:
             seq (str): Amino acid sequence as a string
             outdir (str): Directory to where output files should be saved
             run_amylmuts (bool): If AMYLMUTS method should be run, default False
 
         Returns:
+            dict: Result for each method run
 
         """
+        outdir_amylpred = op.join(outdir, 'AMYLPRED2_results')
+        if not op.exists(outdir_amylpred):
+            os.mkdir(outdir_amylpred)
+
         url = "http://aias.biol.uoa.gr/AMYLPRED2/login.php"
         cj = CookieJar()
         opener = build_opener(HTTPCookieProcessor(cj))
@@ -119,10 +147,8 @@ class AMYLPRED:
         timeCounts = 0
 
         for met in methods:
-            # TODO: utilize saved file as cached resultr
-
             # First check if there is an existing results file
-            existing_results = glob.glob('*_{}.txt'.format(met))
+            existing_results = glob.glob(op.join(outdir_amylpred, '*_{}.txt'.format(met)))
             if existing_results:
                 results_file = existing_results[0]
             else:
@@ -151,22 +177,25 @@ class AMYLPRED:
                     else:
                         response = requests.get(url_result)
                         break
-                results_file = "{}_{}.txt".format(url_result.split('/')[-1].strip('.txt'), met)
+                results_file = op.join(outdir_amylpred, "{}_{}.txt".format(url_result.split('/')[-1].strip('.txt'), met))
                 with open(results_file, "wb") as handle:
                     for data in response.iter_content():
                         handle.write(data)
+                print("")
 
-            print("")
-            method, hits = self.get_method_hits(results_file, met)
+            method, hits = self.parse_method_results(results_file, met)
             # if method.lower() == met.lower():
             output[met] = hits
             # elif method == 'Beta-strand contiguity' and met == 'BSC':
             # output[met]=hits
             # elif method == 'Hexapeptide Conf. Energy' and met == 'CONFENERGY':
-        print("Time Spent: %d seconds" % timeCounts)
+        if timeCounts != 0:
+            print("Time spent: %d seconds" % timeCounts)
         return output
 
-    def get_method_hits(self, results_file, met):
+    def parse_method_results(self, results_file, met):
+        """Parse the output of a AMYLPRED2 result file."""
+
         result = str(open(results_file).read())
         ind_s = str.find(result, 'HITS')
         ind_e = str.find(result, '**NOTE')
@@ -188,59 +217,62 @@ class AMYLPRED:
         else:
             return met, hits_resid
 
-    def get_aggregation_index(self, output, cutoff_v, cutoff_n):
+    def aggregation_index(self, output, cutoff_v, cutoff_n):
         # all index for all aggregation potential > cutoff_v
-        IDX = [i for i in range(0, len(output)) if output[i] >= cutoff_v]
+        idx = [i for i in range(0, len(output)) if output[i] >= cutoff_v]
         # hold number of continueous aa with aggregation potential > cutoff_v
         # for each continueous stretch
-        Agg_index = []
-        IDX_for_summation = []
-        if IDX:
+        agg_index = []
+        idx_for_summation = []
+        if idx:
             # start index for each stretch
-            start_IDX = [IDX[0]]
+            start_idx = [idx[0]]
             i = 0
             counter = 0
-            while i < len(IDX) - 1:
-                if IDX[i] + 1 == IDX[i + 1]:
+            while i < len(idx) - 1:
+                if idx[i] + 1 == idx[i + 1]:
                     counter += 1
                 else:
-                    Agg_index.append(counter + 1)
-                    start_IDX.append(IDX[i + 1])
+                    agg_index.append(counter + 1)
+                    start_idx.append(idx[i + 1])
                     counter = 0
                 i += 1
-                if i == len(IDX) - 1: Agg_index.append(counter + 1)
-            IDX2 = [i for i in range(0, len(Agg_index)) if Agg_index[i] >= cutoff_n]
-            for i in IDX2:
-                IDX_for_summation.extend(range(start_IDX[i], Agg_index[i] + start_IDX[i]))
+                if i == len(idx) - 1: agg_index.append(counter + 1)
+            idx2 = [i for i in range(0, len(agg_index)) if agg_index[i] >= cutoff_n]
+            for i in idx2:
+                idx_for_summation.extend(range(start_idx[i], agg_index[i] + start_idx[i]))
             sum = 0
-            for i in IDX_for_summation:
+            for i in idx_for_summation:
                 sum += output[i]
             sum_all = 0
         else:
-            IDX2 = []
+            idx2 = []
             sum = 0
-        if len(IDX_for_summation) == 0:
-            return len(IDX2), 0
+        if len(idx_for_summation) == 0:
+            return len(idx2), 0
         else:
-            return len(IDX2), sum / float(len(IDX_for_summation))
+            return len(idx2), sum / float(len(idx_for_summation))
 
-    def write_propensity(self, N, output, cutoff_v=5, cutoff_n=5):
-        Hits_res_count = {}
-        for met in output.keys():
-            for res in output[met]:
-                if res in Hits_res_count.keys():
-                    Hits_res_count[res] += 1
+    def parse_for_consensus_aggregation(self, N, results, cutoff_v=5, cutoff_n=5):
+        if len(results) == 0:
+            raise ValueError('No results were found!')
+
+        hits_res_count = {}
+        for met in results.keys():
+            for res in results[met]:
+                if res in hits_res_count.keys():
+                    hits_res_count[res] += 1
                 else:
-                    Hits_res_count[res] = 1
+                    hits_res_count[res] = 1
 
         AGG_Propensity = []
         output2 = []
         for i in range(1, int(N) + 1):
-            if i in Hits_res_count.keys():
-                output2.append(Hits_res_count[i])
+            if i in hits_res_count.keys():
+                output2.append(hits_res_count[i])
             else:
                 output2.append(0.0)
-        agg_index, agg_conf = self.get_aggregation_index(output2, cutoff_v, cutoff_n)
+        agg_index, agg_conf = self.aggregation_index(output2, cutoff_v, cutoff_n)
         # These are parameters that you can explore, "5,5" means
         # 5 consecutive residues agreed among at least 5 methods
         # is considered contributing 1 to the aggregation propensity

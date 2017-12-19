@@ -12,7 +12,8 @@ Table of Contents
    gempro
    protein
    .. structure
-   .. sequence
+   sequence
+   amylpred
    python_api
 
 

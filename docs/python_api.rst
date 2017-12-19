@@ -13,10 +13,10 @@ Information on select functions, classes, or methods.
 .. automodule:: ssbio.core.protein
     :members:
 
-.. automodule:: ssbio.protein.sequence.seqprop
+.. automodule:: ssbio.protein.structure.structprop
     :members:
 
-.. automodule:: ssbio.protein.structure.structprop
+.. automodule:: ssbio.protein.sequence.seqprop
     :members:
 
 .. automodule:: ssbio.databases.pdb
