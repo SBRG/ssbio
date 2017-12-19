@@ -1,8 +1,3 @@
-"""
-AMYLPRED2
-=========
-"""
-
 from __future__ import print_function
 
 __author__ = 'Ke Chen'
@@ -35,9 +30,28 @@ except ImportError:
 
 
 class AMYLPRED:
+
+    """Class to submit sequences to AMYLPRED2 (http://aias.biol.uoa.gr/AMYLPRED2/).
+
+    Instructions:
+
+        #. Create an account on the webserver at the `AMYLPRED2 registration link`_.
+        #. Create a new AMYLPRED object with your email and password initialized along with it.
+        #. Run ``get_aggregation_propensity`` on a protein sequence.
+
+    Attributes:
+        email (str): Account email
+        password (Seq): Account password
+
+    Todo:
+        - Properly implement force_rerun and caching functions
+
+    .. _AMYLPRED2 registration link: http://aias.biol.uoa.gr/AMYLPRED2/register.php
+
+    """
+
     def __init__(self, email, password):
-        """AMYLPRED2 requires registration at http://aias.biol.uoa.gr/AMYLPRED2/. Set your email and password 
-            used to login here.
+        """Initialize the AMYLPRED object with your email and password used to login here.
         
         Args:
             email (str): Account email 
@@ -47,7 +61,6 @@ class AMYLPRED:
 
         self.email = email
         self.password = password
-        self.method_results = {}
 
     def get_aggregation_propensity(self, seq, outdir, cutoff_v=5, cutoff_n=5, run_amylmuts=False):
         """Run the AMYLPRED2 web server for a protein sequence and get the consensus result for aggregation propensity.
