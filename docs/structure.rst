@@ -14,18 +14,20 @@ Tutorials
 =========
 
 .. toctree::
-   :glob:
-   :maxdepth: 1
+    :glob:
+    :maxdepth: 1
 
-   notebooks/StructProp*
-   notebooks/PDBProp*
-
+    notebooks/StructProp*
+    notebooks/PDBProp*
+            
 
 External programs
 =================
 .. toctree::
-   :glob:
-   :maxdepth: 1
+    :glob:
+    :maxdepth: 1
 
-   instructions/msms
-   instructions/freesasa
+    instructions/dssp
+    instructions/stride
+    instructions/msms
+    instructions/freesasa

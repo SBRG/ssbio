@@ -14,18 +14,20 @@ Tutorials
 =========
 
 .. toctree::
-   :glob:
-   :maxdepth: 1
+    :glob:
+    :maxdepth: 1
 
-   notebooks/SeqProp*
+    notebooks/SeqProp*
 
 
 External programs
 =================
 .. toctree::
-   :glob:
-   :maxdepth: 1
+    :glob:
+    :maxdepth: 1
 
-   instructions/itasser
-   instructions/foldrate
-   instructions/amylpred
+    instructions/emboss
+    instructions/scratch
+    instructions/foldrate
+    instructions/amylpred
+    instructions/itasser
