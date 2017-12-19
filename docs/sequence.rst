@@ -27,3 +27,4 @@ External programs
    :maxdepth: 1
 
    amylpred
+   itasser
