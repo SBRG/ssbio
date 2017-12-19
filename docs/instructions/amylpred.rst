@@ -7,7 +7,8 @@ AMYLPRED2 - Aggregation Propensity
 Description
 ===========
 
-* Home page: AMYLPRED2_
+* `AMYLPRED2 home page`_
+* `AMYLPRED2 registration link`_
 
 This module provides a function to predict the aggregation propensity of proteins, specifically the number
 of aggregation-prone segments on an unfolded protein sequence. AMYLPRED2 is a consensus method of different methods.
@@ -56,5 +57,5 @@ API
 
 
 .. Links
-.. _AMYLPRED2: http://aias.biol.uoa.gr/AMYLPRED2/
+.. _AMYLPRED2 home page: http://aias.biol.uoa.gr/AMYLPRED2/
 .. _AMYLPRED2 registration link: http://aias.biol.uoa.gr/AMYLPRED2/register.php

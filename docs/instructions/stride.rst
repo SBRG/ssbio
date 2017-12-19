@@ -24,9 +24,6 @@ Instructions
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-* `Instructions for installing on Mac`_
-* `Instructions for installing on Mac (alternate)`_
-
 #. Download the source from the `STRIDE download page`_
 
 #. Build the program from source:

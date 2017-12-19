@@ -14,7 +14,6 @@ Description
 ===========
 
 * `DSSP home page`_
-* `DSSP Github`_
 
 DSSP is...
 

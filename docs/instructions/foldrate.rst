@@ -7,7 +7,7 @@ FOLD-RATE - Kinetic Folding Rate
 Description
 ===========
 
-Home page: FOLD-RATE_
+* `FOLD-RATE home page`_
 
 This module provides a function to predict the kinetic folding rate (k_f) given an amino acid sequence and its
 structural classficiation (alpha/beta/mixed).
@@ -63,4 +63,4 @@ API
 
 
 .. Links
-.. _FOLD-RATE: http://www.iitm.ac.in/bioinfo/fold-rate/
+.. _FOLD-RATE home page: http://www.iitm.ac.in/bioinfo/fold-rate/

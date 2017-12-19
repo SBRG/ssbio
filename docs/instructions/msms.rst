@@ -26,11 +26,11 @@ Instructions
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-1. Download from here: http://mgltools.scripps.edu/downloads#msms, under the header "MSMS 2.6.X - Current Release"
+#. Download from here: http://mgltools.scripps.edu/downloads#msms, under the header "MSMS 2.6.X - Current Release"
 
-2. Under "MSMS 2.6.X - Current Release" download the "Unix/Linux i86_64" version - if this doesn't work though you'll want to try the "Unix/Linux i86" version later.
+#. Under "MSMS 2.6.X - Current Release" download the "Unix/Linux i86_64" version - if this doesn't work though you'll want to try the "Unix/Linux i86" version later.
 
-3. Download it, unarchive it to your library path:
+#. Download it, unarchive it to your library path:
    
    .. code-block:: console
 
@@ -38,14 +38,14 @@ Instructions
         cd /usr/local/lib/msms
         sudo tar zxvf /path/to/your/downloaded/file/msms_i86Linux2_2.6.1.tar.gz
 
-4. Symlink the binaries (or alternatively, add the two locations to your PATH):
+#. Symlink the binaries (or alternatively, add the two locations to your PATH):
 
     .. code-block:: console
 
         sudo ln -s /usr/local/lib/msms/msms.i86Linux2.2.6.1 /usr/local/bin/msms
         sudo ln -s /usr/local/lib/msms/pdb_to_xyzr* /usr/local/bin
 
-5. Fix a bug in the pdb_to_xyzr file (see: http://mailman.open-bio.org/pipermail/biopython/2015-November/015787.html):
+#. Fix a bug in the pdb_to_xyzr file (see: http://mailman.open-bio.org/pipermail/biopython/2015-November/015787.html):
    
     .. code-block:: console
 
@@ -63,9 +63,9 @@ Instructions
 
         numfile = "/usr/local/lib/msms/atmtypenumbers"
 
-6. Repeat step 5 for the file ``/usr/local/lib/msms/pdb_to_xyzrn``
+#. Repeat step 5 for the file ``/usr/local/lib/msms/pdb_to_xyzrn``
 
-7. Now try running ``msms`` in the terminal, it should say:
+#. Now try running ``msms`` in the terminal, it should say:
    
     .. code-block:: console
 
