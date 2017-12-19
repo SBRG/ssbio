@@ -11,6 +11,8 @@ Table of Contents
    getting_started
    gempro
    protein
+   .. structure
+   .. sequence
    python_api
 
 

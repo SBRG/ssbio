@@ -1,22 +1,27 @@
-"""This module provides a function to predict the aggregation propensity of proteins, specifically the number 
-    of aggregation-prone segments on an unfolded protein sequence. The main method is a web wrapper for the 
-    AMYLPRED2 web server available at http://aias.biol.uoa.gr/AMYLPRED2/. In order to obtain the best balance between 
-    sensitivity and specificity, we follow the author’s guidelines to consider every 5 consecutive residues agreed 
+"""
+AMYLPRED2 - Aggregation Propensity
+==================================
+
+This module provides a function to predict the aggregation propensity of proteins, specifically the number
+    of aggregation-prone segments on an unfolded protein sequence. The main method is a web wrapper for the
+    AMYLPRED2 web server available at http://aias.biol.uoa.gr/AMYLPRED2/. In order to obtain the best balance between
+    sensitivity and specificity, we follow the author’s guidelines to consider every 5 consecutive residues agreed
     among at least 5 methods contributing 1 to the aggregation propensity
 
 This method is adapted from:
 
-    Tsolis, A. C., Papandreou, N. C., Iconomidou, V. A., & Hamodrakas, S. J. (2013). 'A consensus method for the 
-        prediction of "aggregation-prone" peptides in globular proteins', PloS one, 8/1: e54175. 
+    Tsolis, A. C., Papandreou, N. C., Iconomidou, V. A., & Hamodrakas, S. J. (2013). 'A consensus method for the
+        prediction of "aggregation-prone" peptides in globular proteins', PloS one, 8/1: e54175.
         DOI: 10.1371/journal.pone.0054175
 
 For an example of usage of this parameter in a genome-scale model:
 
-    Chen, K., Gao, Y., Mih, N., O'Brien, E., Yang, L., Palsson, B.O. (2017). 
+    Chen, K., Gao, Y., Mih, N., O'Brien, E., Yang, L., Palsson, B.O. (2017).
         'Thermo-sensitivity of growth is determined by chaperone-mediated proteome re-allocation.',
         Submitted to PNAS.
 
 """
+
 from __future__ import print_function
 
 __author__ = 'Ke Chen'
@@ -25,7 +30,6 @@ __email__ = "kec003@eng.ucsd.edu"
 import glob
 import time
 import requests
-import os.path as op
 import ssbio.protein.sequence.utils
 
 # TODO: replace urllib usage with six library
@@ -245,6 +249,7 @@ class AMYLPRED:
 
 # TODO: clean up execution script to run on FASTA file(s)
 # if __name__ == '__main__':
+#     import os.path as op
 #     from ssbio import utils
 #     date = utils.Date()
 #     # load inputs from command line
