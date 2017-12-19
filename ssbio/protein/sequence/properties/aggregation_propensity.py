@@ -13,22 +13,26 @@ FAQs
 ----
 
 * How can I install AMYLPRED2?
+
     * AMYLPRED2 is only available as a web server, here: http://aias.biol.uoa.gr/AMYLPRED2/register.php. *ssbio*
-    provides a wrapper for the web server and allows you to submit protein sequences to it along with caching
-    the output files.
+      provides a wrapper for the web server and allows you to submit protein sequences to it along with caching
+      the output files.
 
 * What is aggregation propensity?
+
     * The number of aggregation-prone segments on an unfolded protein sequence.
 
 * How do I cite this?
+
     * Tsolis AC, Papandreou NC, Iconomidou VA & Hamodrakas SJ (2013) A consensus method for the prediction of
-    'aggregation-prone' peptides in globular proteins. PLoS One 8: e54175 Available at:
-    http://dx.doi.org/10.1371/journal.pone.0054175
+      'aggregation-prone' peptides in globular proteins. PLoS One 8: e54175 Available at:
+      http://dx.doi.org/10.1371/journal.pone.0054175
 
 * How can this parameter be used on a genome-scale?
+
     * See: Chen K, Gao Y, Mih N, O’Brien EJ, Yang L & Palsson BO (2017) Thermosensitivity of growth is determined by
-    chaperone-mediated proteome reallocation. Proceedings of the National Academy of Sciences 114: 11548–11553
-    Available at: http://www.pnas.org/content/114/43/11548.abstract
+      chaperone-mediated proteome reallocation. Proceedings of the National Academy of Sciences 114: 11548–11553
+      Available at: http://www.pnas.org/content/114/43/11548.abstract
 
 Description
 -----------
