@@ -33,14 +33,13 @@ Instructions
 
 #. Now, I-TASSER can be run according to the README under section 4
 #. To enable GO term predictions...
-    .. TODO
     #) under construction...
 
-#. Tip: to update template libraries, create a new command in your crontab (first run ``crontab -e``:
+#. Tip: to update template libraries, create a new command in your crontab (first run ``crontab -e``), and make sure to replace ``<USERNAME>`` with your username:
 
     .. code-block:: console
 
-        0 4 * * 1,5 nathan /path/to/I-TASSER4.4/download_lib.pl -libdir /path/to/ITLIB
+        0 4 * * 1,5 <USERNAME> /path/to/I-TASSER4.4/download_lib.pl -libdir /path/to/ITLIB
 
    That will run the library update at 4 am every Monday and Friday.
 
@@ -52,7 +51,7 @@ FAQs
 
     - A predicted 3D structure model of a protein sequence. Models can be template-based, when they are based on an existing experimental structure; or *ab initio*, generated without a template. Generally, *ab initio* models are much less reliable.
 
-* Can I just run I-TASSER using their web server and parse those results with ``ssbio``?
+* Can I just run I-TASSER using their web server and parse those results with *ssbio*?
 
     - Not yet, but you can manually input the model1.pdb file as a new structure for now.
 
@@ -61,7 +60,6 @@ FAQs
     - Roy A, Kucukural A & Zhang Y (2010) I-TASSER: a unified platform for automated protein structure and function prediction. Nat. Protoc. 5: 725–738 Available at: http://dx.doi.org/10.1038/nprot.2010.5
       
 * How do I run I-TASSER with TORQUE or Slurm job schedulers?
-    .. TODO
     - under construction...
 
 * I'm having issues running I-TASSER...
