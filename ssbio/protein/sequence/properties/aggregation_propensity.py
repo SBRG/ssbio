@@ -12,17 +12,17 @@ Instructions
 FAQs
 ----
 
+* What is aggregation propensity?
+
+    * The number of aggregation-prone segments on an unfolded protein sequence.
+
 * How can I install AMYLPRED2?
 
     * AMYLPRED2 is only available as a web server, here: http://aias.biol.uoa.gr/AMYLPRED2/register.php. *ssbio*
       provides a wrapper for the web server and allows you to submit protein sequences to it along with caching
       the output files.
 
-* What is aggregation propensity?
-
-    * The number of aggregation-prone segments on an unfolded protein sequence.
-
-* How do I cite this?
+* How do I cite AMYLPRED2?
 
     * Tsolis AC, Papandreou NC, Iconomidou VA & Hamodrakas SJ (2013) A consensus method for the prediction of
       'aggregation-prone' peptides in globular proteins. PLoS One 8: e54175 Available at:
