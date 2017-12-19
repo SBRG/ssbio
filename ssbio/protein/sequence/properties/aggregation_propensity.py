@@ -43,8 +43,11 @@ FAQs
       chaperone-mediated proteome reallocation. Proceedings of the National Academy of Sciences 114: 11548–11553
       Available at: http://www.pnas.org/content/114/43/11548.abstract
 
-.. Links
+API
+---
+.. API will show up below...
 
+.. Links
 .. _AMYLPRED2: http://aias.biol.uoa.gr/AMYLPRED2/
 .. _AMYLPRED2 registration link: http://aias.biol.uoa.gr/AMYLPRED2/register.php
 
