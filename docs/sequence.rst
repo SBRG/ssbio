@@ -5,6 +5,11 @@ The SeqProp Class
 *******************
 
 
+Introduction
+============
+This section will give an overview of the methods that can be executed for a single protein sequence.
+
+
 Tutorials
 =========
 
@@ -22,8 +27,3 @@ External programs
    :maxdepth: 1
 
    amylpred
-
-
-Introduction
-============
-This section will give an overview of the methods that can be executed for a single protein sequence.

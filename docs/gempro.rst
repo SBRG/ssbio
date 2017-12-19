@@ -5,16 +5,6 @@ The GEM-PRO Pipeline
 ********************
 
 
-Tutorials
-=========
-
-.. toctree::
-   :glob:
-   :maxdepth: 1
-
-   notebooks/GEM-PRO*
-
-
 Introduction
 ============
 
@@ -25,6 +15,16 @@ The GEM-PRO pipeline is focused on annotating genome-scale models with protein s
 #. A dictionary of gene IDs and their sequences (``{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}``)
 
 A GEM-PRO object can be thought of at a high-level as simply an annotation project. Creating a new project with any of the above starting points will create a new folder where protein sequences and structures will be downloaded to.
+
+
+Tutorials
+=========
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+
+   notebooks/GEM-PRO*
 
 
 Features
