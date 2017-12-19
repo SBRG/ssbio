@@ -1,19 +1,19 @@
-******************
-The ATLAS Pipeline
-******************
+.. ******************
+.. The ATLAS Pipeline
+.. ******************
 
 
-Tutorials
-=========
+.. Tutorials
+.. =========
 
-.. toctree::
-   :glob:
-   :maxdepth: 1
+.. .. toctree::
+..    :glob:
+..    :maxdepth: 1
 
-   notebooks/ATLAS*
+..    notebooks/ATLAS*
 
 
-Introduction
-============
+.. Introduction
+.. ============
 
-The ATLAS pipeline is focused on the comparison of multiple strains or species.
+.. The ATLAS pipeline is focused on the comparison of multiple strains or species.
