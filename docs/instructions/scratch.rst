@@ -4,7 +4,7 @@
 SCRATCH
 **********************************
 
-.. image:: ../assets/ssbioStructPropssecstruct.png
+.. image:: ../assets/ssbioStructPropsscratch.png
     :align: center
     :alt: Secondary structure
     :scale: 60 %
@@ -16,7 +16,7 @@ Description
 * `SCRATCH home page`_
 * `SCRATCH download page (for SSpro and ACCpro)`_
 
-SCRATCH is...
+SCRATCH is a suite of tools to predict many types of structural properties directly from sequence. *ssbio* contains wrappers to execute and parse results from *SSpro*/*SSpro8* - predictors of secondary structure, and *ACCpro*/*ACCpro20* - predictors of solvent accessibility.
 
 
 Instructions

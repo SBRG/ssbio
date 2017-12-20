@@ -1,8 +1,8 @@
 .. _emboss:
 
-**********************************
+******
 EMBOSS
-**********************************
+******
 
 
 Description
@@ -11,7 +11,7 @@ Description
 * `EMBOSS home page`_
 * `EMBOSS source code`_
 
-EMBOSS is...
+EMBOSS is the European Molecular Biology Open Software Suite. EMBOSS contains a wide array of general purpose bioinformatics programs. For the GEM-PRO pipeline, we mainly need the *needle* pairwise alignment tool (although this can be replaced with Biopython's built-in pairwise alignment function), and the *pepstats* protein sequence statistics tool.
 
 
 Instructions (Ubuntu)

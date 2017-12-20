@@ -4,7 +4,7 @@
 DSSP
 **********************************
 
-.. image:: ../assets/ssbioStructPropssecstruct.png
+.. image:: ../assets/ssbioStructPropsdssp.png
     :align: center
     :alt: Secondary structure
     :scale: 60 %
