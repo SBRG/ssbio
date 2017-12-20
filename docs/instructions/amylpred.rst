@@ -21,7 +21,7 @@ Instructions
 
 #. Create an account on the webserver at the `AMYLPRED2 registration link`_.
 #. Create a new AMYLPRED object with your email and password initialized along with it.
-#. Run ``get_aggregation_propensity`` on a protein sequence.
+#. Run :meth:`ssbio.protein.sequence.properties.aggregation_propensity.AMYLPRED.get_aggregation_propensity` on a protein sequence.
 
 
 FAQs

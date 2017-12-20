@@ -31,3 +31,4 @@ External programs
     instructions/stride
     instructions/msms
     instructions/freesasa
+    instructions/opm
