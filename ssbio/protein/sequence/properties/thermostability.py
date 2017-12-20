@@ -163,7 +163,7 @@ def get_dG_at_T(seq, temp):
         (tuple): tuple containing:
 
             dG (float) Free energy of unfolding dG (cal/mol)
-            keq (float): equilibrium constant Keq
+            keq (float): Equilibrium constant Keq
             method (str): Method used to calculate
             
     """

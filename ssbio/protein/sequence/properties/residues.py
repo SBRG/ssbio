@@ -70,22 +70,22 @@ def biopython_protein_analysis(inseq):
     analysed_seq = ProteinAnalysis(inseq)
 
     info_dict = {}
-    # info_dict['amino_acids_content'] = analysed_seq.count_amino_acids()
-    info_dict['amino_acids_percent'] = analysed_seq.get_amino_acids_percent()
-    # info_dict['length'] = analysed_seq.length
-    info_dict['monoisotopic'] = analysed_seq.monoisotopic
-    info_dict['molecular_weight'] = analysed_seq.molecular_weight()
-    info_dict['aromaticity'] = analysed_seq.aromaticity()
-    info_dict['instability_index'] = analysed_seq.instability_index()
+    # info_dict['amino_acids_content-biop'] = analysed_seq.count_amino_acids()
+    info_dict['amino_acids_percent-biop'] = analysed_seq.get_amino_acids_percent()
+    # info_dict['length-biop'] = analysed_seq.length
+    info_dict['monoisotopic-biop'] = analysed_seq.monoisotopic
+    info_dict['molecular_weight-biop'] = analysed_seq.molecular_weight()
+    info_dict['aromaticity-biop'] = analysed_seq.aromaticity()
+    info_dict['instability_index-biop'] = analysed_seq.instability_index()
     # TODO: What is flexibility?
-    # info_dict['flexibility'] = analysed_seq.flexibility()
-    info_dict['isoelectric_point'] = analysed_seq.isoelectric_point()
+    # info_dict['flexibility-biop'] = analysed_seq.flexibility()
+    info_dict['isoelectric_point-biop'] = analysed_seq.isoelectric_point()
 
     # Separated secondary_structure_fraction into each definition
-    # info_dict['secondary_structure_fraction'] = analysed_seq.secondary_structure_fraction()
-    info_dict['percent_helix_naive'] = analysed_seq.secondary_structure_fraction()[0]
-    info_dict['percent_turn_naive'] = analysed_seq.secondary_structure_fraction()[1]
-    info_dict['percent_strand_naive'] = analysed_seq.secondary_structure_fraction()[2]
+    # info_dict['secondary_structure_fraction-biop'] = analysed_seq.secondary_structure_fraction()
+    info_dict['percent_helix_naive-biop'] = analysed_seq.secondary_structure_fraction()[0]
+    info_dict['percent_turn_naive-biop'] = analysed_seq.secondary_structure_fraction()[1]
+    info_dict['percent_strand_naive-biop'] = analysed_seq.secondary_structure_fraction()[2]
 
     return info_dict
 
@@ -142,7 +142,7 @@ def emboss_pepstats_parser(infile):
         num = cleaninfo[2]
         percent = float(cleaninfo[-1]) / float(100)
 
-        info_dict['percent_' + prop.lower()] = percent
+        info_dict['percent_' + prop.lower() + '-pepstats'] = percent
 
     return info_dict
 

@@ -575,11 +575,11 @@ class SeqProp(SeqRecord):
                                                             run_amylmuts=run_amylmuts)
         self.annotations['aggprop-amylpred'] = result
 
-    def get_kinetic_folding_rate(self, secstruct):
+    def get_kinetic_folding_rate(self, secstruct, at_temp=None):
         """Run the FOLD-RATE web server to calculate the kinetic folding rate given an amino acid sequence and its
         structural classficiation (alpha/beta/mixed)
 
-        Stores statistics in the ``annotations`` attribute, under the key `kinetic_folding_rate-foldrate`.
+        Stores statistics in the ``annotations`` attribute, under the key `kinetic_folding_rate_<TEMP>-foldrate`.
 
         See :func:`ssbio.protein.sequence.properties.kinetic_folding_rate.get_foldrate` for instructions and details.
 
@@ -588,4 +588,23 @@ class SeqProp(SeqRecord):
         import ssbio.protein.sequence.properties.kinetic_folding_rate as kfr
 
         rate = kfr.get_foldrate(seq=self, secstruct=secstruct)
-        self.annotations['kinetic_folding_rate-foldrate'] = rate
+        self.annotations['kinetic_folding_rate_37.0_C-foldrate'] = rate
+
+        if at_temp:
+            new_rate = kfr.get_foldrate_at_temp(ref_rate=rate, new_temp=at_temp)
+            self.annotations['kinetic_folding_rate_{}_C-foldrate'.format(at_temp)] = new_rate
+
+    def get_thermostability(self, at_temp):
+        """Run the thermostability calculator using either the Dill or Oobatake methods.
+
+        Stores calculated (dG, Keq) tuple in the ``annotations`` attribute, under the key
+        `thermostability_<TEMP>-<METHOD_USED>`.
+
+        See :func:`ssbio.protein.sequence.properties.thermostability.get_dG_at_T` for instructions and details.
+
+        """
+
+        import ssbio.protein.sequence.properties.thermostability as ts
+
+        dG = ts.get_dG_at_T(seq=self, temp=at_temp)
+        self.annotations['thermostability_{}_C-{}'.format(at_temp, dG[2].lower())] = (dG[0], dG[1])

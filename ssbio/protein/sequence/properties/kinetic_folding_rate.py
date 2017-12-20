@@ -26,7 +26,7 @@ r_cal = scipy.constants.R / scipy.constants.calorie
 
 def get_foldrate(seq, secstruct):
     """Submit sequence and structural class to FOLD-RATE calculator (http://www.iitm.ac.in/bioinfo/fold-rate/)
-        to calculate kinetic folding rate.
+    to calculate kinetic folding rate.
 
     Args:
         seq (str, Seq, SeqRecord): Amino acid sequence
@@ -56,17 +56,16 @@ def get_foldrate(seq, secstruct):
     return rate
 
 
-def get_folding_rate_for_seq(seq, secstruct, temp, refT=37.0):
+def get_foldrate_at_temp(ref_rate, new_temp, ref_temp=37.0):
     """Scale the predicted kinetic folding rate of a protein to temperature T, based on the relationship ln(k_f)∝1/T
 
     Args:
-        seq (str, Seq, SeqRecord): Amino acid sequence
-        secstruct (str): Structural class: ``all-alpha``, ``all-beta``, ``mixed``, or ``unknown``
-        temp (float): Temperature in degrees C
-        refT (float): Reference temperature, default to 37 C
+        ref_rate (float): Kinetic folding rate calculated from the function :func:`~ssbio.protein.sequence.properties.kinetic_folding_rate.get_foldrate`
+        new_temp (float): Temperature in degrees C
+        ref_temp (float): Reference temperature, default to 37 C
 
     Returns:
-        float: Kinetic folding rate k_f at temperature T.
+        float: Kinetic folding rate k_f at temperature T
 
     """
 
@@ -74,10 +73,9 @@ def get_folding_rate_for_seq(seq, secstruct, temp, refT=37.0):
     slope = 22000
 
     # Get folding rate for the reference temperature
-    ref_rate = get_foldrate(seq, secstruct)
-    preFactor = float(ref_rate) + slope / (float(refT) + 273.15)
+    preFactor = float(ref_rate) + slope / (float(ref_temp) + 273.15)
 
     # Calculate folding rate at desired temperature
-    rate = math.exp(preFactor - slope / (float(temp) + 273.15))
+    rate = math.exp(preFactor - slope / (float(new_temp) + 273.15))
 
     return rate
