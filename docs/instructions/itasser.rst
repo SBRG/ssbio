@@ -29,9 +29,11 @@ Instructions
 #. Head to the `I-TASSER download`_ page and register for an license (academic only) to get a password emailed to you
 #. Log in to the `I-TASSER download`_ page and download the archive
 #. Unpack the software archive into a convenient directory - a library should also be downloaded to this directory
-#. Run download_lib.pl to then download the library files - this will take some time::
+#. Run download_lib.pl to then download the library files - this will take some time:
 
-    /path/to/<I-TASSER_directory>/download_lib.pl -libdir ITLIB
+    .. code-block:: console
+
+        $ /path/to/<I-TASSER_directory>/download_lib.pl -libdir ITLIB
 
 #. Now, I-TASSER can be run according to the README under section 4
 #. To enable GO term predictions...

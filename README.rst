@@ -2,14 +2,14 @@
 ssbio: A Framework for Structural Systems Biology
 *************************************************
 
+
 Introduction
 ============
 
 This Python package provides a collection of tools for people with questions in the realm of structural systems biology. The main goals of this package are to:
 
-#. Provide an easy way to map genes to their encoded proteins sequences and structures
-#. Directly link structures to genome-scale SBML models
-#. Prepare structures for downstream analyses, such as their use in molecular modeling software
+#. Provide an easy way to map hundreds or thousands of genes to their encoded protein sequences and structures
+#. Directly link protein structures to genome-scale metabolic models
 #. Demonstrate fully-featured Python scientific analysis environments in Jupyter notebooks
 
 Example questions you can (start to) answer with this package:
@@ -19,43 +19,39 @@ Example questions you can (start to) answer with this package:
 - Where, in a metabolic network, do these proteins work?
 - Where do popular mutations show up on a protein?
 - How can I compare the structural features of entire proteomes?
-- How can I zoom in and visualize the interactions happening in the cell at the molecular level?
 - How do structural properties correlate with my experimental datasets?
-- How can I improve the contents of my model with structural data?
-- and more...
+- How can I improve the contents of my metabolic model with structural data?
+
 
 Installation
 ============
 
-First install NGLview using pip:
+First install NGLview using pip, then install ssbio
 
-.. code-block:: bash
+.. code-block:: console
 
-    pip install nglview
+    $ pip install nglview
+    $ jupyter-nbextension enable nglview --py --sys-prefix
+    $ pip install ssbio
 
-Then install ssbio:
+Updating
+--------
 
-.. code-block:: bash
+.. code-block:: console
 
-    pip install ssbio
+    $ pip install ssbio --upgrade
 
-**Updating**
+Uninstalling
+------------
 
-.. code-block:: bash
+.. code-block:: console
 
-    pip install ssbio --upgrade
-
-**Uninstalling**
-
-.. code-block:: bash
-
-    pip uninstall ssbio
-
+    $ pip uninstall ssbio
 
 Dependencies
 ------------
 
-See: `Software Installations`_ for additional programs to install. Most of these additional programs are used to predict or calculate properties of proteins.
+See: Software_ for a table of external programs to install, along with the functionality that they add. Most of these additional programs are used to predict or calculate properties of proteins, and are only required if you desire to calculate the described properties.
 
 
 Tutorials
@@ -76,3 +72,4 @@ The manuscript for the ``ssbio`` package can be found and cited at [1]_.
 .. _Software Installations: https://github.com/SBRG/ssbio/wiki/Software-Installations
 .. _Protein: http://ssbio.readthedocs.io/en/latest/protein.html
 .. _GEM-PRO: http://ssbio.readthedocs.io/en/latest/gempro.html
+.. _Software: http://ssbio.readthedocs.io/en/latest/software.html
