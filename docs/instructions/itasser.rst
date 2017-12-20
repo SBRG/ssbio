@@ -33,7 +33,7 @@ Instructions
 
     .. code-block:: console
 
-        $ /path/to/<I-TASSER_directory>/download_lib.pl -libdir ITLIB
+        /path/to/<I-TASSER_directory>/download_lib.pl -libdir ITLIB
 
 #. Now, I-TASSER can be run according to the README under section 4
 #. To enable GO term predictions...

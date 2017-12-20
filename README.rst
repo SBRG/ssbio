@@ -30,23 +30,23 @@ First install NGLview using pip, then install ssbio
 
 .. code-block:: console
 
-    $ pip install nglview
-    $ jupyter-nbextension enable nglview --py --sys-prefix
-    $ pip install ssbio
+    pip install nglview
+    jupyter-nbextension enable nglview --py --sys-prefix
+    pip install ssbio
 
 Updating
 --------
 
 .. code-block:: console
 
-    $ pip install ssbio --upgrade
+    pip install ssbio --upgrade
 
 Uninstalling
 ------------
 
 .. code-block:: console
 
-    $ pip uninstall ssbio
+    pip uninstall ssbio
 
 Dependencies
 ------------
