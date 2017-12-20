@@ -30,4 +30,5 @@ External programs
     instructions/scratch
     instructions/foldrate
     instructions/amylpred
+    instructions/tmhmm
     instructions/itasser
