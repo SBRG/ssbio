@@ -9,21 +9,22 @@ Description
 ===========
 
 * `FATCAT home page`_
-* `FATCAT source code`_
+* `jFATCAT Java version`_
+* `jFATCAT download page`_
 
-FATCAT is...
+FATCAT is a structural alignment tool that allows you to determine the similarity of a pair of protein structures.
+
+.. warning:: Parsing FATCAT results is currently incomplete and will only return TM-scores as of now - but not all dis
 
 
-Instructions (Ubuntu)
-=====================
+Instructions
+============
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-#. Install the FATCAT..
-
-    .. code-block:: console
-    
-        <code>
+#. Download the Java port of FATCAT from the `jFATCAT download page`_, under the section "Older file downloads" with the filename "protein-comparison-tool\_<DATE>.tar.gz"
+#. Extract it to a place where you store software
+#. Run :func:`ssbio.protein.structure.properties.fatcat.run_fatcat` on two structures, pointing to the path of the *runFATCAT.sh* script
 
 
 FAQs
@@ -31,7 +32,7 @@ FAQs
 
 * How do I cite FATCAT?
 
-    - <citation>
+    - Ye Y & Godzik A (2003) Flexible structure alignment by chaining aligned fragment pairs allowing twists. Bioinformatics 19 Suppl 2: ii246–55 Available at: https://www.ncbi.nlm.nih.gov/pubmed/14534198
       
 * I'm having issues running FATCAT...
 
@@ -41,11 +42,12 @@ FAQs
 API
 ===
 
-.. automodule:: ssbio.protein.path.to.FATCAT
+.. automodule:: ssbio.protein.structure.properties.fatcat
     :members:
 
 
 .. Links
-.. _FATCAT home page: http://FATCAT.sourceforge.net/
-.. _FATCAT source code: http://FATCAT.sourceforge.net/download/#Stable
+.. _FATCAT home page: http://fatcat.sanfordburnham.org/
+.. _jFATCAT Java version: http://source.rcsb.org/
+.. _jFATCAT download page: http://source.rcsb.org/download.jsp
 .. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting

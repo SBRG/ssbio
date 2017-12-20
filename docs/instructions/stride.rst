@@ -45,15 +45,21 @@ Instructions (Unix)
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
 #. Download the source from the `STRIDE download page`_
-
-#. Build the program from source:
+   
+#. Create a new folder named "stride" in a place where you store software and extract the source into it
 
     .. code-block:: console
 
-        mkdir stride
-        cp stride.tar.gz stride
-        cd stride
+        mkdir /path/to/software/stride
+        cp /path/to/downloaded/stride.tar.gz /path/to/software/stride
+        cd /path/to/software/stride
         tar -zxf stride.tar.gz
+
+#. Build the program from source and copy its binary:
+
+    .. code-block:: console
+        
+        cd /path/to/software/stride
         make
         cp stride /usr/local/bin
 

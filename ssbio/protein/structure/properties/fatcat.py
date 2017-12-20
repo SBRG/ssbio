@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import itertools
 from tqdm import tqdm
 import numpy as np
+import os
 import pandas as pd
 
 __author__ = "Anand Sastry"
@@ -17,8 +18,9 @@ def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=
         structure_path_1 (str): Path to PDB file 
         structure_path_2 (str): Path to PDB file 
         fatcat_sh (str): Path to "runFATCAT.sh" executable script
-        outdir (str): Path to where FATCAT XML output files will be saved 
-        silent (bool): If command to run FATCAT should be printed to stdout
+        outdir (str): Path to where FATCAT XML output files will be saved
+        silent (bool): If stdout should be silenced from showing up in Python console output
+        print_cmd (bool): If command to run FATCAT should be printed to stdout
         force_rerun (bool): If FATCAT should be run even if XML output files already exist 
 
     Returns:
@@ -27,6 +29,9 @@ def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=
     """
     filename1 = op.splitext(op.basename(structure_path_1))[0]
     filename2 = op.splitext(op.basename(structure_path_2))[0]
+
+    if not op.exists(outdir):
+        os.mkdir(outdir)
     outfile = op.join(outdir, filename1 + '__' + filename2 + '.xml')
 
     # Run FATCAT on the structures, print the XML of the result to stdout

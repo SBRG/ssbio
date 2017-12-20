@@ -19,6 +19,7 @@ Tutorials
 
     notebooks/StructProp*
     notebooks/PDBProp*
+    notebooks/FATCAT*
             
 
 External programs
