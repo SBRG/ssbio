@@ -35,6 +35,7 @@ Instructions
 
 #. Now, I-TASSER can be run according to the README under section 4
 #. To enable GO term predictions...
+
     #) under construction...
 
 #. Tip: to update template libraries, create a new command in your crontab (first run ``crontab -e``), and make sure to replace ``<USERNAME>`` with your username:
@@ -62,6 +63,7 @@ FAQs
     - Roy A, Kucukural A & Zhang Y (2010) I-TASSER: a unified platform for automated protein structure and function prediction. Nat. Protoc. 5: 725–738 Available at: http://dx.doi.org/10.1038/nprot.2010.5
       
 * How do I run I-TASSER with TORQUE or Slurm job schedulers?
+
     - under construction...
 
 * I'm having issues running I-TASSER...
