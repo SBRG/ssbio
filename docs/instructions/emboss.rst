@@ -50,6 +50,10 @@ FAQs
 * How do I cite EMBOSS?
 
     - Rice P, Longden I & Bleasby A (2000) EMBOSS: the European Molecular Biology Open Software Suite. Trends Genet. 16: 276–277 Available at: http://www.ncbi.nlm.nih.gov/pubmed/10827456
+      
+* I'm having issues running EMBOSS programs...
+
+    - See the `ssbio wiki`_ for (hopefully) some solutions - or add yours in when you find the answer!
 
 
 API
@@ -62,3 +66,4 @@ API
 .. Links
 .. _EMBOSS home page: http://emboss.sourceforge.net/
 .. _EMBOSS source code: http://emboss.sourceforge.net/download/#Stable
+.. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting

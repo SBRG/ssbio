@@ -48,6 +48,10 @@ FAQs
       chaperone-mediated proteome reallocation. Proceedings of the National Academy of Sciences 114: 11548–11553
       Available at: http://www.pnas.org/content/114/43/11548.abstract
 
+* I'm having issues running AMYLPRED2...
+
+    - See the `ssbio wiki`_ for (hopefully) some solutions - or add yours in when you find the answer!
+
 
 API
 ===
@@ -59,3 +63,4 @@ API
 .. Links
 .. _AMYLPRED2 home page: http://aias.biol.uoa.gr/AMYLPRED2/
 .. _AMYLPRED2 registration link: http://aias.biol.uoa.gr/AMYLPRED2/register.php
+.. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting

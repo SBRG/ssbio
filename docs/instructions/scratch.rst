@@ -48,6 +48,10 @@ FAQs
 * How do I cite SCRATCH?
 
     - Cheng J, Randall AZ, Sweredoski MJ & Baldi P (2005) SCRATCH: a protein structure and structural feature prediction server. Nucleic Acids Res. 33: W72–6 Available at: http://dx.doi.org/10.1093/nar/gki396
+      
+* I'm having issues running STRIDE...
+
+    - See the `ssbio wiki`_ for (hopefully) some solutions - or add yours in when you find the answer!
 
 
 API
@@ -60,3 +64,4 @@ API
 .. Links
 .. _SCRATCH home page: http://scratch.proteomics.ics.uci.edu/
 .. _SCRATCH download page (for SSpro and ACCpro): http://download.igb.uci.edu/#sspro
+.. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting

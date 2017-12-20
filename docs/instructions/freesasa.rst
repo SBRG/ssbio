@@ -16,15 +16,15 @@ Description
 * `FreeSASA home page`_
 * `FreeSASA Github`_
 
-FreeSASA is...
+FreeSASA is an open source library written in C for calculating solvent accessible surface areas of a protein. FreeSASA also contains Python bidings, and the plan is to include these bindings with *ssbio* in the future.
 
 
-Instructions
-============
+Instructions (Unix)
+===================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system with a Python installation through Anaconda3.
 
-.. note:: FreeSASA Python bindings do not work with Python 3 - ssbio provides wrappers for the command line executable
+.. note:: FreeSASA Python bindings are slightly difficult to install with Python 3 - ssbio provides wrappers for the command line executable instead
 
 
 #. Download the latest tarball (see `FreeSASA home page`_), expand it and run
@@ -34,17 +34,17 @@ Instructions
         ./configure --enable-python-bindings CFLAGS="-fPIC -O2"
         make
 
-#. Edit the freesasa-2.0/bindings/Makefile, lines 805, 809, 815 to change
+#. If you have a user-specific Python executable (ie. through Anaconda), edit the freesasa-2.0/bindings/Makefile, lines 805, 809, 815 to change:
 
     .. code-block:: console
         
         python setup.py [...]
 
-    to
+    to (type `which python` to get the path to enter): 
 
     .. code-block:: console
 
-        /path/to/anaconda/python setup.py [...]
+        /path/to/your/anaconda/python setup.py [...]
 
 #. Install with
 

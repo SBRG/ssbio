@@ -6,7 +6,7 @@ DSSP
 
 .. image:: ../assets/ssbioStructPropsdssp.png
     :align: center
-    :alt: Secondary structure
+    :alt: DSSP calculations
     :scale: 60 %
 
 
@@ -15,16 +15,33 @@ Description
 
 * `DSSP home page`_
 
-DSSP is...
+DSSP (*D*efine *S*econdary *S*tructure of *P*roteins) is the standard method used to assign secondary structure annotations to a protein structure. DSSP utilizes the atomic coordinates of a structure to assign the structure codes, which are:
+
++------+-------------+
+| Code | Description |
++======+=============+
+| H    | Alpha helix |
++------+-------------+
+| B    | Beta bridge |
++------+-------------+
+| E    | Strand      |
++------+-------------+
+| G    | Helix-3     |
++------+-------------+
+| I    | Helix-5     |
++------+-------------+
+| T    | Turn        |
++------+-------------+
+| S    | Bend        |
++------+-------------+
+
+Furthermore, DSSP calculates geometric properties such as the phi and psi angles between residues and solvent accessibilities. *ssbio* provides wrappers around the Biopython DSSP module to execute and parse DSSP results, as well as converting the information into a Pandas DataFrame format with calculated relative solvent accessbilities (see :mod:`ssbio.protein.structure.properties.dssp` for details).
 
 
-Instructions
-============
+Instructions (Ubuntu)
+=====================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
-
-* `Instructions for installing on Mac`_
-* `Instructions for installing on Mac (alternate)`_
 
 #. Install the DSSP package
     
@@ -39,6 +56,13 @@ Instructions
         sudo ln -s /usr/bin/mkdssp /usr/bin/dssp
 
 #. Then you should be able to run ``dssp`` in your terminal
+   
+
+Instructions (Mac OSX)
+======================
+
+* `Instructions for installing on Mac`_
+* `Instructions for installing on Mac (alternate)`_
 
 
 FAQs
@@ -47,6 +71,10 @@ FAQs
 * How do I cite DSSP?
 
     - Kabsch W & Sander C (1983) DSSP: definition of secondary structure of proteins given a set of 3D coordinates. Biopolymers 22: 2577–2637
+      
+* I'm having issues running DSSP...
+
+    - See the `ssbio wiki`_ for (hopefully) some solutions - or add yours in when you find the answer!
 
 
 API

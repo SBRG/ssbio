@@ -1,8 +1,8 @@
 .. _msms:
 
-**********************************
+****
 MSMS
-**********************************
+****
 
 .. image:: ../assets/ssbioStructPropsresdepths.png
     :align: center
@@ -85,6 +85,10 @@ FAQs
 * How long does it take to run?
 
     - Depending on the size of the protein structure, the program can take up to a couple minutes to execute.
+      
+* I'm having issues running MSMS...
+
+    - See the `ssbio wiki`_ for (hopefully) some solutions - or add yours in when you find the answer!
 
 
 API
@@ -99,3 +103,4 @@ API
 .. _Download: http://mgltools.scripps.edu/downloads#msms
 .. _Manual: http://mgl.scripps.edu/people/sanner/html/msms_man.html
 .. _Manuscript: http://mgl.scripps.edu/people/sanner/html/papers/msmsTextAndFigs.pdf
+.. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting

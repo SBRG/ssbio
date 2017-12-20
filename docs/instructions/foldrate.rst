@@ -54,6 +54,10 @@ FAQs
       chaperone-mediated proteome reallocation. Proceedings of the National Academy of Sciences 114: 11548–11553
       Available at: http://www.pnas.org/content/114/43/11548.abstract
 
+* I'm having issues running FOLD-RATE...
+
+    - See the `ssbio wiki`_ for (hopefully) some solutions - or add yours in when you find the answer!
+
 
 API
 ---
@@ -63,3 +67,4 @@ API
 
 .. Links
 .. _FOLD-RATE home page: http://www.iitm.ac.in/bioinfo/fold-rate/
+.. _ssbio wiki: https://github.com/SBRG/ssbio/wiki/Troubleshooting
