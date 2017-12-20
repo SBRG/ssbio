@@ -234,3 +234,5 @@ texinfo_documents = [
 
 
 
+def setup(app):
+    app.add_stylesheet('_static/theme_overrides.css')
