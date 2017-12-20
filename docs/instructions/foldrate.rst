@@ -17,7 +17,7 @@ Instructions
 
 #. Obtain your protein's sequence
 #. Determine the main secondary structure composition of the protein (``all-alpha``, ``all-beta``, ``mixed``, or ``unknown``)
-#. Input the sequence and secondary structure composition into the function ``get_foldrate``
+#. Input the sequence and secondary structure composition into the function :func:`ssbio.protein.sequence.properties.kinetic_folding_rate.get_foldrate`
 
 
 FAQs

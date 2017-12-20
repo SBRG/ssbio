@@ -574,3 +574,18 @@ class SeqProp(SeqRecord):
                                                             cutoff_v=cutoff_v, cutoff_n=cutoff_n,
                                                             run_amylmuts=run_amylmuts)
         self.annotations['aggprop-amylpred'] = result
+
+    def get_kinetic_folding_rate(self, secstruct):
+        """Run the FOLD-RATE web server to calculate the kinetic folding rate given an amino acid sequence and its
+        structural classficiation (alpha/beta/mixed)
+
+        Stores statistics in the ``annotations`` attribute, under the key `kinetic_folding_rate-foldrate`.
+
+        See :func:`ssbio.protein.sequence.properties.kinetic_folding_rate.get_foldrate` for instructions and details.
+
+        """
+
+        import ssbio.protein.sequence.properties.kinetic_folding_rate as kfr
+
+        rate = kfr.get_foldrate(seq=self, secstruct=secstruct)
+        self.annotations['kinetic_folding_rate-foldrate'] = rate
