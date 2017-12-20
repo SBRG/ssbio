@@ -31,4 +31,5 @@ External programs
     instructions/stride
     instructions/msms
     instructions/freesasa
+    instructions/fatcat
     instructions/opm
