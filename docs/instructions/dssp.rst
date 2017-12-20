@@ -15,7 +15,7 @@ Description
 
 * `DSSP home page`_
 
-DSSP (**D**efine **S**econdary **S**tructure of **P**roteins) is the standard method used to assign secondary structure annotations to a protein structure. DSSP utilizes the atomic coordinates of a structure to assign the structure codes, which are:
+DSSP (**D**\ efine **S**\ econdary **S**\ tructure of **P**\ roteins) is the standard method used to assign secondary structure annotations to a protein structure. DSSP utilizes the atomic coordinates of a structure to assign the structure codes, which are:
 
 +------+-------------+
 | Code | Description |

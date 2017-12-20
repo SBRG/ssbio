@@ -17,7 +17,7 @@ Description
 * `STRIDE download page`_
 * `STRIDE documentation`_
 
-STRIDE (**St**ructural **ide**ntification) is a program used to assign secondary structure annotations to a protein structure. STRIDE has slightly more complex criteria to assign codes compared to dssp_. STRIDE utilizes the atomic coordinates of a structure to assign the structure codes, which are:
+STRIDE (**St**\ ructural **ide**\ ntification) is a program used to assign secondary structure annotations to a protein structure. STRIDE has slightly more complex criteria to assign codes compared to dssp_. STRIDE utilizes the atomic coordinates of a structure to assign the structure codes, which are:
 
 +--------+--------------------------+
 | Code   | Description              |

@@ -9,7 +9,7 @@ Description
 
 * `FOLD-RATE home page`_
 
-This module provides a function to predict the **kinetic folding rate** (k\ :sup:`f`) given an amino acid sequence and its structural classficiation (alpha/beta/mixed).
+This module provides a function to predict the **kinetic folding rate** (k\ :sub:`f`) given an amino acid sequence and its structural classficiation (alpha/beta/mixed).
 
 
 Instructions

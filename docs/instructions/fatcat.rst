@@ -14,7 +14,7 @@ Description
 
 FATCAT is a structural alignment tool that allows you to determine the similarity of a pair of protein structures.
 
-.. warning:: Parsing FATCAT results is currently incomplete and will only return TM-scores as of now - but not all dis
+.. warning:: Parsing FATCAT results is currently incomplete and will only return TM-scores as of now - but TM-scores only show up in development versions of jFATCAT
 
 
 Instructions
