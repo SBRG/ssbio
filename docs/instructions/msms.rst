@@ -21,14 +21,12 @@ Description
 MSMS computes solvent excluded surfaces on a protein structure. Generally, MSMS is used to calculate residue depths (in Angstroms) from the surface of a protein, using a PDB file as an input. *ssbio* provides wrappers through Biopython to run MSMS as well as store the depths in an associated ``StructProp`` object.
 
 
-Instructions
-============
+Instructions (Unix)
+===================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-#. Download from here: http://mgltools.scripps.edu/downloads#msms, under the header "MSMS 2.6.X - Current Release"
-
-#. Under "MSMS 2.6.X - Current Release" download the "Unix/Linux i86_64" version - if this doesn't work though you'll want to try the "Unix/Linux i86" version later.
+#. Head to the Download_ page, and under the header "MSMS 2.6.X - Current Release" download the "Unix/Linux i86_64" version - if this doesn't work though you'll want to try the "Unix/Linux i86" version later.
 
 #. Download it, unarchive it to your library path:
    
@@ -49,19 +47,19 @@ Instructions
    
     .. code-block:: console
 
-        sudo gedit /usr/local/lib/msms/pdb_to_xyzr
+        $ sudo gedit /usr/local/lib/msms/pdb_to_xyzr
 
     at line 34, change:
 
     .. code-block:: console
 
-        numfile = "./atmtypenumbers"
+        $ numfile = "./atmtypenumbers"
 
     to:
 
     .. code-block:: console
 
-        numfile = "/usr/local/lib/msms/atmtypenumbers"
+        > numfile = "/usr/local/lib/msms/atmtypenumbers"
 
 #. Repeat step 5 for the file ``/usr/local/lib/msms/pdb_to_xyzrn``
 
