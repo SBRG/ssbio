@@ -63,13 +63,12 @@ Check out some Jupyter notebook tutorials for a single Protein_ and or for many 
 Citation
 ========
 
-The manuscript for the ``ssbio`` package can be found and cited at [1]_.
+The manuscript for the *ssbio* package can be found and cited at [1]_.
 
 .. [1] Mih N, Brunk E, Chen K, Catoiu E, Sastry A, Kavvas E, Monk JM, Zhang Z, Palsson BO. ssbio: A Python Framework for Structural Systems Biology. bioRxiv. 2017. p. 165506. https://doi.org/10.1101/165506
 
 
 .. Links
-.. _Software Installations: https://github.com/SBRG/ssbio/wiki/Software-Installations
 .. _Protein: http://ssbio.readthedocs.io/en/latest/protein.html
 .. _GEM-PRO: http://ssbio.readthedocs.io/en/latest/gempro.html
 .. _Software: http://ssbio.readthedocs.io/en/latest/software.html
