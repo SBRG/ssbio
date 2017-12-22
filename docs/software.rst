@@ -76,6 +76,8 @@ Software
      - Second header
      - Third header
    * - Some text
+       continued on
+       | a different line?
      - Some text
      - A list:
          * foo
