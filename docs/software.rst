@@ -70,26 +70,26 @@ Software
 
 
 .. list-table:: Example table
-   :header-rows: 1
+    :header-rows: 1
 
-   * - First header
-     - Second header
-     - Third header
-   * - Some text \n
-       continued on \n
-       |  a different line? \n
-       noooooooo
-     - Some text
-     - A list:
-         * foo
-         * bar
-         * baz
-   * - Second row
-     - More cells
-     - etc.
-   * - ...
-     - ...
-     - ...
+    * - First header
+      - Second header
+      - Third header
+    * - Some text \n
+        continued on \n
+        |  a different line? \n
+        noooooooo
+      - Some text
+      - A list:
+            * foo
+            * bar
+            * baz
+    * - Second row
+      - More cells
+      - etc.
+    * - ...
+      - ...
+      - ...
 
 
 .. _Biopython Structure: http://biopython.org/wiki/The_Biopython_Structural_Bioinformatics_FAQ
