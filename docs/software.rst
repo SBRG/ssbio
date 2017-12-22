@@ -75,9 +75,10 @@ Software
    * - First header
      - Second header
      - Third header
-   * - Some text
-       continued on
-       | a different line?
+   * - Some text \n
+       continued on \n
+       | a different line? \n
+       noooooooo
      - Some text
      - A list:
          * foo
