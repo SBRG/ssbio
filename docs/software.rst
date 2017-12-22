@@ -77,7 +77,7 @@ Software
      - Third header
    * - Some text \n
        continued on \n
-       | a different line? \n
+       |  a different line? \n
        noooooooo
      - Some text
      - A list:
