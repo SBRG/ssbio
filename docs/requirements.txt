@@ -7,3 +7,4 @@ pyexcel-xls>=0.4.0
 pyexcel-odsr>=0.4.0
 pyexcel-handsontable
 docutils
+https://github.com/pyexcel/sphinxcontrib-excel/archive/master.zip
