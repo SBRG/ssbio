@@ -92,6 +92,8 @@ Software
       - ...
 
 
+.. pyexcel-table:: TABLE_S1.xlsx
+
 .. _Biopython Structure: http://biopython.org/wiki/The_Biopython_Structural_Bioinformatics_FAQ
 .. _Biopython ProteinAnalysis: http://biopython.org/wiki/ProtParam
 .. _Biopython pairwise2: http://biopython.org/DIST/docs/api/Bio.pairwise2-module.html
