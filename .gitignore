@@ -90,7 +90,6 @@ docs/_build_html/
 
 # Test outputs
 ssbio/test/test_files/out/
-docs/_templates/
 
 # Not sure if I can include these files
 ssbio/etc/
