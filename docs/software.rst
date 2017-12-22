@@ -10,7 +10,7 @@ Software
 
 
 +-------------------------------------------------------+------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------+----------------------------------------------------------------------------------+------------------------------+------------------------------+------------------------------+
-| Analysis level                                        | Function type                      | Name                                             | Function                                                                     | Internal Python class used and functions provided                                | External software to install | Web server                   | Alternate external software  |
+| Analysis level                                        | Function type                      | Name                                             | Function                                                                     | Internal Python class used :raw-html:`<br />` and functions provided             | External software to install | Web server                   | Alternate external software  |
 +=======================================================+====================================+==================================================+==============================================================================+==================================================================================+==============================+==============================+==============================+
 | Network model or :raw-html:`<br />` a set of proteins | Pipeline                           | GEM-PRO                                          | Pipeline to automatically map gene IDs, protein :raw-html:`<br />`           | :doc:`gempro`                                                                    |                              |                              |                              |
 |                                                       |                                    |                                                  | sequences, or GEMs to available experimental structures. :raw-html:`<br />`  |                                                                                  |                              |                              |                              |
@@ -72,7 +72,8 @@ Software
 +-------------------------------------------------------+------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------+----------------------------------------------------------------------------------+------------------------------+------------------------------+------------------------------+
 
 
-
+.. raw:: html
+   :file: table_test.html
 
 .. _Biopython Structure: http://biopython.org/wiki/The_Biopython_Structural_Bioinformatics_FAQ
 .. _Biopython ProteinAnalysis: http://biopython.org/wiki/ProtParam
