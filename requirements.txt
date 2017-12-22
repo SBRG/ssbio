@@ -20,3 +20,4 @@ nbsphinx
 bcbio-gff
 biopandas
 webcolors
+https://github.com/pyexcel/sphinxcontrib-excel/archive/master.zip
