@@ -8,7 +8,7 @@ The StructProp Class
 .. image:: ./assets/ssbio_protein_props_structprops.png
     :align: center
     :alt: The StructProp Class
-    :scale: 60 %
+    :scale: 30 %
 
 
 Introduction

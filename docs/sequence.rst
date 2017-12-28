@@ -8,7 +8,7 @@ The SeqProp Class
 .. image:: ./assets/ssbio_protein_props_seqprops.png
     :align: center
     :alt: The SeqProp Class
-    :scale: 60 %
+    :scale: 40 %
 
 
 Introduction

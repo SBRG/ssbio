@@ -11,7 +11,7 @@ Introduction
 This section will give a quick outline of the design of *ssbio* and the scientific topics behind it. If you would like to read a pre-print version of the manuscript, please see [1]_.
 
 .. figure:: ./assets/ssbio_fig1.png
-   :scale: 60 %
+   :scale: 40 %
    :alt: ssbio general outline
    :align: center
 
@@ -30,7 +30,7 @@ From a systems perspective
 Systems biology is broadly concerned with the modeling and understanding of complex biological systems. What you may be taught in biochemistry 101 at this level will usually be reflected in a kind of interaction map, such as metabolic map shown here:
 
 .. figure:: ./assets/metabolic_metro_map.png
-   :scale: 60 %
+   :scale: 50 %
    :alt: Metabolic Metro Map
    :align: center
 
@@ -49,7 +49,7 @@ From a structures perspective
 Structural biology is broadly concerned with elucidating and understanding the structure and function of proteins and other macromolecules. Ribbons, molecules, and chemical interactions are the name of the game here:
 
 .. figure:: ./assets/protein_conf_change_serpin.png
-   :scale: 100 %
+   :scale: 70 %
    :alt: Serpin protein conformational change
    :align: center
 

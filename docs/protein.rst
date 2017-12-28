@@ -7,7 +7,7 @@ The Protein Class
 .. image:: ./assets/ssbio_protein_class.png
     :align: center
     :alt: The Protein Class
-    :scale: 60 %
+    :scale: 40 %
 
 
 Introduction
