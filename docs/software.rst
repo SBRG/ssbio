@@ -77,27 +77,18 @@ Structural similarity
 Various structure properties
 ----------------------------
 
-.. toctree::
-    :maxdepth: 1
-
-    :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
+- :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
               
 Quality
 -------
 
-.. toctree::
-    :maxdepth: 1
-
-    :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
+- :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
               
 Structure cleaning, mutating
 ----------------------------
 
-.. toctree::
-    :maxdepth: 1
-
-    :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
-    :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
+- :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
+- :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
           
 Protein sequence predictions
 ============================
@@ -121,10 +112,7 @@ Solvent accessibilities
 Thermostability
 ---------------
 
-.. toctree::
-    :maxdepth: 1
-
-    :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
+- :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
               
 Transmembrane domains
 ---------------------
