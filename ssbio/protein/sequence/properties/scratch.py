@@ -12,7 +12,7 @@ class SCRATCH():
 
     To run from the command line:
 
-        ./run_SCRATCH-1D_predictors.sh  input_fasta  output_prefix  [num_threads]
+            ./run_SCRATCH-1D_predictors.sh  input_fasta  output_prefix  [num_threads]
 
     SCRATCH predicts:
 

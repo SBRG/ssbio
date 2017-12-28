@@ -29,77 +29,134 @@ Transmembrane orientations
 
     instructions/opm
                
-- Kinetic folding rate
+Kinetic folding rate
+--------------------
 
-    + :doc:`instructions/foldrate`    
+.. toctree::
+    :maxdepth: 1
 
-Calculations
-------------
+    instructions/foldrate
 
-- Secondary structure
+Protein structure calculations
+==============================
 
-    + :doc:`instructions/dssp` 
-    + :doc:`instructions/stride`
+Secondary structure
+-------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    instructions/dssp 
+    instructions/stride
               
-- Solvent accessibilities
+Solvent accessibilities
+-----------------------
 
-    + :doc:`instructions/dssp`
-    + :doc:`instructions/freesasa`
+.. toctree::
+    :maxdepth: 1
+
+    instructions/dssp
+    instructions/freesasa
               
-- Residue depths
+Residue depths
+--------------
 
-    + :doc:`instructions/msms`
+.. toctree::
+    :maxdepth: 1
+
+    instructions/msms
               
-- Structural similarity
+Structural similarity
+---------------------
 
-    + :doc:`instructions/fatcat`
+.. toctree::
+    :maxdepth: 1
+
+    instructions/fatcat
               
-- Various structure properties
+Various structure properties
+----------------------------
 
-    + :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
+.. toctree::
+    :maxdepth: 1
+
+    :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
               
-- Quality
+Quality
+-------
 
-    + :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
+.. toctree::
+    :maxdepth: 1
+
+    :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
               
-- Structure cleaning, mutating
+Structure cleaning, mutating
+----------------------------
 
-    + :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
-    + :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
+.. toctree::
+    :maxdepth: 1
+
+    :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
+    :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
           
-Protein sequence
-================
+Protein sequence predictions
+============================
 
-Predictions
------------
+Secondary structure
+-------------------
 
-- Secondary structure
+.. toctree::
+    :maxdepth: 1
 
-    + :doc:`instructions/scratch`
+    instructions/scratch
               
-- Solvent accessibilities
+Solvent accessibilities
+-----------------------
 
-    + :doc:`instructions/scratch`
+.. toctree::
+    :maxdepth: 1
+
+    instructions/scratch
               
-- Thermostability
+Thermostability
+---------------
 
-    + :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
+.. toctree::
+    :maxdepth: 1
+
+    :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
               
-- Transmembrane domains
+Transmembrane domains
+---------------------
 
-    + :doc:`instructions/tmhmm`
+.. toctree::
+    :maxdepth: 1
+
+    instructions/tmhmm
               
-- Aggregation propensity
+Aggregation propensity
+----------------------
 
-    + :doc:`instructions/amylpred`
+.. toctree::
+    :maxdepth: 1
 
-Calculations
-------------
+    instructions/amylpred
 
-- Various sequence properties
+Protein sequence calculations
+=============================
 
-    + :doc:`instructions/emboss` *pepstats*
+Various sequence properties
+---------------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    instructions/emboss *pepstats*
               
-- Sequence alignment
+Sequence alignment
+------------------
 
-    + :doc:`instructions/emboss` *needle*
+.. toctree::
+    :maxdepth: 1
+
+    instructions/emboss *needle*
