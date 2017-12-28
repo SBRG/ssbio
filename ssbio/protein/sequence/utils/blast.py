@@ -1,3 +1,8 @@
+"""
+Sequence BLAST
+==============
+"""
+
 import os
 import subprocess
 import os.path as op

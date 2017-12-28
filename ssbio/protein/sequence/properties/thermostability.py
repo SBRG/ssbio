@@ -1,4 +1,8 @@
-"""This module provides functions to predict thermostability parameters (specifically the free energy of unfolding dG) 
+"""
+Thermostability
+===============
+
+This module provides functions to predict thermostability parameters (specifically the free energy of unfolding dG)
     of an amino acid sequence.
 
 These methods are adapted from:

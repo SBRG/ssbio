@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+"""
+MutatePDB
+=========
+"""
+
 import argparse
 import tempfile
 

@@ -1,3 +1,8 @@
+"""
+Sequence Alignment
+==================
+"""
+
 import logging
 import os.path as op
 import subprocess
