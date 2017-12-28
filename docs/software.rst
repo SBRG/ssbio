@@ -80,18 +80,18 @@ Structural similarity
 Various structure properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-^ :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
+- :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
               
 Quality
 ^^^^^^^
 
-^ :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
+- :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
               
 Structure cleaning, mutating
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-^ :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
-^ :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
+- :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
+- :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
   
 
 -------------------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ Solvent accessibilities
 Thermostability
 ^^^^^^^^^^^^^^^
 
-^ :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
+- :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
               
 Transmembrane domains
 ^^^^^^^^^^^^^^^^^^^^^
