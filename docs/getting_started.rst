@@ -10,7 +10,7 @@ Introduction
 
 This section will give a quick outline of the design of *ssbio* and the scientific topics behind it. If you would like to read a pre-print version of the manuscript, please see [1]_.
 
-.. figure:: ./assets/ssbioFig1.png
+.. figure:: ./assets/ssbio_fig1.png
    :scale: 60 %
    :alt: ssbio general outline
    :align: center

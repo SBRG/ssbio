@@ -4,7 +4,7 @@
 STRIDE
 ******
 
-.. image:: ../assets/ssbioStructPropssecstruct.png
+.. image:: ../assets/ssbio_protein_props_secstruct.png
     :align: center
     :alt: Secondary structure
     :scale: 60 %

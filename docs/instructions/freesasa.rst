@@ -4,7 +4,7 @@
 FreeSASA
 **********************************
 
-.. image:: ../assets/ssbioStructPropssasa.png
+.. image:: ../assets/ssbio_protein_props_sasa.png
     :align: center
     :alt: SASA
     :scale: 60 %

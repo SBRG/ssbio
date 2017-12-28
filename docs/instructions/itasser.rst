@@ -4,7 +4,7 @@
 I-TASSER
 **********************************
 
-.. image:: ../assets/ssbioStructPropshomology.png
+.. image:: ../assets/ssbio_protein_props_homology.png
     :align: center
     :alt: Homology modeling
     :scale: 60 %

@@ -4,7 +4,7 @@
 SCRATCH
 **********************************
 
-.. image:: ../assets/ssbioStructPropsscratch.png
+.. image:: ../assets/ssbio_protein_props_scratch.png
     :align: center
     :alt: Secondary structure
     :scale: 60 %

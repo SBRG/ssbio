@@ -5,6 +5,12 @@ The StructProp Class
 ********************
 
 
+.. image:: ./assets/ssbio_protein_props_structprops.png
+    :align: center
+    :alt: The StructProp Class
+    :scale: 60 %
+
+
 Introduction
 ============
 This section will give an overview of the methods that can be executed for a single protein structure.
@@ -29,8 +35,8 @@ Available functions
    :format: html
 
 
-Sequence & structure-based prediction
--------------------------------------
+Sequence & structure-based predictions
+--------------------------------------
 
 +-------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------+------------------------------+-----------------------------------------------------------+
 | Function                                        | Description                                                                                                                                                                                                                                                 | Internal Python class :raw-html:`<br />` used and functions provided                                    | External software :raw-html:`<br />` to install | Web server                   | Alternate external :raw-html:`<br />` software to install |
@@ -44,8 +50,8 @@ Sequence & structure-based prediction
 +-------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------+------------------------------+-----------------------------------------------------------+
 
 
-Structure-based calculation or function
----------------------------------------
+Structure-based calculations or functions
+-----------------------------------------
 
 +-------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------+------------------------------+-----------------------------------------------------------+
 | Function                                        | Description                                                                                                                                                                                                                                                 | Internal Python class :raw-html:`<br />` used and functions provided                                    | External software :raw-html:`<br />` to install | Web server                   | Alternate external :raw-html:`<br />` software to install |
@@ -68,9 +74,9 @@ Structure-based calculation or function
 | Various structure :raw-html:`<br />` properties | Basic properties of the structure, such :raw-html:`<br />` as distance measurements between residues :raw-html:`<br />` or number of disulfide bridges                                                                                                      | - `Biopython Struct`_                                                                                   |                                                 |                              |                                                           |
 |                                                 |                                                                                                                                                                                                                                                             | - :mod:`structure residues module <ssbio.protein.structure.properties.residues>`                        |                                                 |                              |                                                           |
 +-------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------+------------------------------+-----------------------------------------------------------+
-| Structure cleaning, :raw-html:`<br />` mutating | Custom functions to allow for the preparation :raw-html:`<br />` of structure files for molecular modeling, with :raw-html:`<br />` options to remove hydrogens/waters/heteroatoms, :raw-html:`<br />` select specific chains, or mutate specific residues. | - `Biopython Select`_                                                                                   |                                                 | AmberTools_                  |                                                           |
+| Structure cleaning, :raw-html:`<br />` mutating | Custom functions to allow for the preparation :raw-html:`<br />` of structure files for molecular modeling, with :raw-html:`<br />` options to remove hydrogens/waters/heteroatoms, :raw-html:`<br />` select specific chains, or mutate specific residues. | - `Biopython Select`_                                                                                   | AmberTools_                                     |                              |                                                           |
 |                                                 |                                                                                                                                                                                                                                                             | - :mod:`cleanpdb module<ssbio.protein.structure.utils.cleanpdb>`                                        |                                                 |                              |                                                           |
-|                                                 |                                                                                                                                                                                                                                                             | - :mod:`mutatepdbmodule <ssbio.protein.structure.utils.mutatepdb>`                                      |                                                 |                              |                                                           |
+|                                                 |                                                                                                                                                                                                                                                             | - :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`                                     |                                                 |                              |                                                           |
 +-------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+-------------------------------------------------+------------------------------+-----------------------------------------------------------+
 
 

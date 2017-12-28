@@ -4,7 +4,7 @@
 DSSP
 **********************************
 
-.. image:: ../assets/ssbioStructPropsdssp.png
+.. image:: ../assets/ssbio_protein_props_dssp.png
     :align: center
     :alt: DSSP calculations
     :scale: 60 %

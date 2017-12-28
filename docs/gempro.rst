@@ -42,7 +42,7 @@ Features
 COBRApy model additions
 =======================
 
-.. image:: ./assets/ssbioGEMPROClass.png
+.. image:: ./assets/ssbio_gempro_class.png
     :align: center
     :alt: The GEM-PRO Class
     :scale: 60 %
@@ -71,7 +71,7 @@ Under construction...
 Use cases
 =========
 
-.. image:: ./assets/ssbioGEMPROuses.png
+.. image:: ./assets/ssbio_fig1_C.png
     :align: center
     :alt: Uses of a GEM-PRO
     :scale: 60 %

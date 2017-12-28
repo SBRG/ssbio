@@ -4,6 +4,11 @@
 The Protein Class
 *****************
 
+.. image:: ./assets/ssbio_protein_class.png
+    :align: center
+    :alt: The Protein Class
+    :scale: 60 %
+
 
 Introduction
 ============
@@ -30,15 +35,6 @@ Features
 * Calculate, store, and access pairwise sequence alignments to the representative sequence or structure
 * Provide summaries of alignments and mutations seen
 * Map between residue numbers of sequences and structures
-
-
-Object attributes
-=================
-
-.. image:: ./assets/ssbioProteinClass.png
-    :align: center
-    :alt: The Protein Class
-    :scale: 60 %
 
 
 Further reading
