@@ -7,7 +7,7 @@ DSSP
 .. image:: ../assets/ssbio_protein_props_dssp.png
     :align: center
     :alt: DSSP calculations
-    :scale: 60 %
+    :scale: 30 %
 
 
 Description

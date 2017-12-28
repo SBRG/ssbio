@@ -7,7 +7,7 @@ MSMS
 .. image:: ../assets/ssbio_protein_props_resdepths.png
     :align: center
     :alt: Residue depths
-    :scale: 60 %
+    :scale: 30 %
 
 
 Description

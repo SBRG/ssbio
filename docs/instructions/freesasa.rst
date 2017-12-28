@@ -7,7 +7,7 @@ FreeSASA
 .. image:: ../assets/ssbio_protein_props_sasa.png
     :align: center
     :alt: SASA
-    :scale: 60 %
+    :scale: 30 %
 
 
 Description

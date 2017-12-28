@@ -1,8 +1,21 @@
 .. _software:
 
-*****************
-Table of Software
-*****************
+********
+Software
+********
+
+List
+====
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+
+   instructions/*
+
+
+Table
+=====
 
 .. role:: raw-html(raw)
    :format: html
