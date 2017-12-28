@@ -9,85 +9,91 @@ This section provides a simple list of external software that may be required to
 Tables describing functionalities of these software packages in relation to their input, as well as links to internal wrappers and parses are found on :ref:`sequence` and :ref:`structure` pages.
 
 
-- Protein structure
+Protein structure
+=================
 
-    + Predictions
+Predictions
+-----------
 
-        * Homology modeling
+- Homology modeling
 
-            - :doc:`instructions/itasser` 
-              
-        * Transmembrane orientations
+    + :doc:`instructions/itasser` 
+      
+- Transmembrane orientations
 
-            - :doc:`instructions/opm`
+    + :doc:`instructions/opm`
                
-        * Kinetic folding rate
+- Kinetic folding rate
 
-            - :doc:`instructions/foldrate`
+    + :doc:`instructions/foldrate`    
 
-    + Calculations
+Calculations
+------------
 
-        * Secondary structure
+- Secondary structure
 
-            - :doc:`instructions/dssp` 
-            - :doc:`instructions/stride`
+    + :doc:`instructions/dssp` 
+    + :doc:`instructions/stride`
               
-        * Solvent accessibilities
+- Solvent accessibilities
 
-            - :doc:`instructions/dssp`
-            - :doc:`instructions/freesasa`
+    + :doc:`instructions/dssp`
+    + :doc:`instructions/freesasa`
               
-        * Residue depths
+- Residue depths
 
-            - :doc:`instructions/msms`
+    + :doc:`instructions/msms`
               
-        * Structural similarity
+- Structural similarity
 
-            - :doc:`instructions/fatcat`
+    + :doc:`instructions/fatcat`
               
-        * Various structure properties
+- Various structure properties
 
-            - :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
+    + :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
               
-        * Quality
+- Quality
 
-            - :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
+    + :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
               
-        * Structure cleaning, mutating
+- Structure cleaning, mutating
 
-            - :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
-            - :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
+    + :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
+    + :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
           
-- Protein sequence
+Protein sequence
+================
 
-    + Predictions
+Predictions
+-----------
 
-        * Secondary structure
+- Secondary structure
 
-            - :doc:`instructions/scratch`
+    + :doc:`instructions/scratch`
               
-        * Solvent accessibilities
+- Solvent accessibilities
 
-            - :doc:`instructions/scratch`
+    + :doc:`instructions/scratch`
               
-        * Thermostability
+- Thermostability
 
-            - :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
+    + :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
               
-        * Transmembrane domains
+- Transmembrane domains
 
-            - :doc:`instructions/tmhmm`
+    + :doc:`instructions/tmhmm`
               
-        * Aggregation propensity
+- Aggregation propensity
 
-            - :doc:`instructions/amylpred`
+    + :doc:`instructions/amylpred`
 
-    + Calculations
+Calculations
+------------
 
-        * Various sequence properties
+- Various sequence properties
 
-            - :doc:`instructions/emboss` *pepstats*
+    + :doc:`instructions/emboss` *pepstats*
               
-        * Sequence alignment
+- Sequence alignment
 
-            - :doc:`instructions/emboss` *needle*
+    + :doc:`instructions/emboss` *needle*
