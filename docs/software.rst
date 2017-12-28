@@ -9,24 +9,25 @@ This section provides a simple list of external software that may be required to
 Tables describing functionalities of these software packages in relation to their input, as well as links to internal wrappers and parses are found on :ref:`sequence` and :ref:`structure` pages.
 
 
-Protein structure
-=================
-
-Predictions
------------
+Protein structure predictions
+=============================
 
 Homology modeling
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   instructions/itasser
-      
+    instructions/itasser
+
+
 Transmembrane orientations
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
-- :doc:`instructions/opm`
+.. toctree::
+    :maxdepth: 1
+
+    instructions/opm
                
 - Kinetic folding rate
 
