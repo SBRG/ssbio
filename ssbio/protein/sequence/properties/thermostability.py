@@ -29,13 +29,10 @@ import math
 import scipy.constants
 import ssbio.protein.sequence.utils
 
-# R (molar gas constant) in calories
-r_cal = scipy.constants.R / scipy.constants.calorie
-
 # Oobatake dG constants
 ## dG and dCp from Table 8 in Oobatake paper.
 ## dG,dH in unit kcal/mol
-## dCp,dS in unit cal/mol.K
+## dCp,dS in unit cal/mol.Ks
 oobatake_dictionary = {}
 oobatake_dictionary['A'] = {'dG': -0.02, 'dCp': 14.22, 'dH': 0.51, 'dS': 1.82}
 oobatake_dictionary['C'] = {'dG': 1.08, 'dCp': 9.41, 'dH': 5.21, 'dS': 13.85}
@@ -171,6 +168,8 @@ def get_dG_at_T(seq, temp):
             method (str): Method used to calculate
             
     """
+    # R (molar gas constant) in calories
+    r_cal = scipy.constants.R / scipy.constants.calorie
 
     seq = ssbio.protein.sequence.utils.cast_to_str(seq)
 
