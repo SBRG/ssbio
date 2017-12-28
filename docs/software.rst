@@ -15,13 +15,18 @@ Protein structure
 Predictions
 -----------
 
-- Homology modeling
+Homology modeling
+^^^^^^^^^^^^^^^^^
 
-    + :doc:`instructions/itasser` 
+.. toctree::
+   :maxdepth: 1
+
+   instructions/itasser
       
-- Transmembrane orientations
+Transmembrane orientations
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    + :doc:`instructions/opm`
+- :doc:`instructions/opm`
                
 - Kinetic folding rate
 
