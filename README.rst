@@ -51,7 +51,7 @@ Uninstalling
 Dependencies
 ------------
 
-See: Software_ for a table of external programs to install, along with the functionality that they add. Most of these additional programs are used to predict or calculate properties of proteins, and are only required if you desire to calculate the described properties.
+See: Software_ for a list of external programs to install, along with the functionality that they add. Most of these additional programs are used to predict or calculate properties of proteins, and are only required if you desire to calculate the described properties.
 
 
 Tutorials
