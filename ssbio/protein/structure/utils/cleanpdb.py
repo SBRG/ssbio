@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 
 
 class CleanPDB(PDB.Select):
-    """Selection rules to clean a PDB file
+
+    """Selection rules to clean a PDB entry.
 
     These rules aim to:
     - Add missing chain identifiers to a PDB file
@@ -22,6 +23,7 @@ class CleanPDB(PDB.Select):
     - Remove alternate atom locations
     - Add atom occupancies
     - Add B (temperature) factors (default Biopython behavior)
+
     """
 
     def __init__(self, remove_atom_alt=True, keep_atom_alt_id='A', remove_atom_hydrogen=True, add_atom_occ=True,

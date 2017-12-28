@@ -27,6 +27,7 @@ from recommonmark.parser import CommonMarkParser
 source_parsers = {'.md': CommonMarkParser}
 source_suffix = ['.rst', '.md']
 
+
 class Mock(object):
     __all__ = []
     def __init__(self, *args, **kwargs):
@@ -41,6 +42,10 @@ class Mock(object):
             return '/dev/null'
         else:
             return Mock()
+
+    def __div__(self, other):
+        return Mock()
+
 
 MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats', 'scipy.constants',
                 'glpk', 'gurobipy', 'gurobipy.GRB', 'cplex', 'pp', 'libsbml',
