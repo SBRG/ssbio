@@ -10,45 +10,84 @@ Tables describing functionalities of these software packages in relation to thei
 
 
 - Protein structure
+
     + Predictions
+
         * Homology modeling
+
             - :doc:`instructions/itasser` 
+              
         * Transmembrane orientations
+
             - :doc:`instructions/opm`
+               
         * Kinetic folding rate
+
             - :doc:`instructions/foldrate`
+
     + Calculations
+
         * Secondary structure
+
             - :doc:`instructions/dssp` 
             - :doc:`instructions/stride`
+              
         * Solvent accessibilities
+
             - :doc:`instructions/dssp`
             - :doc:`instructions/freesasa`
+              
         * Residue depths
+
             - :doc:`instructions/msms`
+              
         * Structural similarity
+
             - :doc:`instructions/fatcat`
+              
         * Various structure properties
+
             - :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
+              
         * Quality
+
             - :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
+              
         * Structure cleaning, mutating
+
             - :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
             - :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
+          
 - Protein sequence
+
     + Predictions
+
         * Secondary structure
+
             - :doc:`instructions/scratch`
+              
         * Solvent accessibilities
+
             - :doc:`instructions/scratch`
+              
         * Thermostability
+
             - :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
+              
         * Transmembrane domains
+
             - :doc:`instructions/tmhmm`
+              
         * Aggregation propensity
+
             - :doc:`instructions/amylpred`
+
     + Calculations
+
         * Various sequence properties
+
             - :doc:`instructions/emboss` *pepstats*
+              
         * Sequence alignment
+
             - :doc:`instructions/emboss` *needle*
