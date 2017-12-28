@@ -8,7 +8,7 @@ Information on select functions, classes, or methods.
 
 .. toctree::
 
-`ssbio.databases`
+``ssbio.databases``
 -----------------
 
 .. automodule:: ssbio.databases.pdb
@@ -26,7 +26,7 @@ Information on select functions, classes, or methods.
 .. automodule:: ssbio.databases.kegg
     :members:
 
-`ssbio.protein.structure.utils`
+``ssbio.protein.structure.utils``
 -------------------------------
 
 .. automodule:: ssbio.protein.structure.utils.cleanpdb
@@ -38,13 +38,13 @@ Information on select functions, classes, or methods.
 .. automodule:: ssbio.protein.structure.utils.dock
     :members:
 
-`ssbio.protein.structure.properties`
+``ssbio.protein.structure.properties``
 ------------------------------------
 
 .. automodule:: ssbio.protein.structure.properties.residues
     :members:
 
-`ssbio.protein.sequence.utils`
+``ssbio.protein.sequence.utils``
 ------------------------------
 
 .. automodule:: ssbio.protein.sequence.utils.alignment
@@ -53,7 +53,7 @@ Information on select functions, classes, or methods.
 .. automodule:: ssbio.protein.sequence.utils.blast
     :members:
 
-`ssbio.protein.sequence.properties`
+``ssbio.protein.sequence.properties``
 -----------------------------------
 
 .. automodule:: ssbio.protein.sequence.properties.thermostability
