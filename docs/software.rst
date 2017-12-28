@@ -139,12 +139,14 @@ Various sequence properties
 .. toctree::
     :maxdepth: 1
 
-    instructions/emboss *pepstats*
+    *EMBOSS pepstats* <instructions/emboss>
               
 Sequence alignment
 ------------------
 
+- :doc:`instructions/emboss` *needle*
+- 
 .. toctree::
     :maxdepth: 1
 
-    instructions/emboss *needle*
+    *EMBOSS needle*<instructions/emboss>
