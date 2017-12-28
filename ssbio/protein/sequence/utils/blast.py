@@ -5,8 +5,10 @@ Sequence BLAST
 
 import os
 import subprocess
+import pandas as pd
 import os.path as op
 from ssbio import utils
+import logging
 try:
     from IPython.display import clear_output
     have_ipython = True
@@ -16,11 +18,7 @@ except ImportError:
     from tqdm import tqdm
 
 date = utils.Date()
-
-import logging
 log = logging.getLogger(__name__)
-
-import pandas as pd
 
 
 def run_makeblastdb(infile, dbtype, outdir=''):
