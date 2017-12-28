@@ -30,7 +30,7 @@ Instructions (Unix)
 
 #. Download it, unarchive it to your library path:
    
-   .. code-block:: console
+    .. code-block:: console
 
         sudo mkdir /usr/local/lib/msms
         cd /usr/local/lib/msms

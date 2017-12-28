@@ -12,7 +12,7 @@ Description
 * `OPM web server`_
 * `OPM web server instructions and description of results`_
 
-OPM is a program to predict the location of transmembrane planes in protein structures, utilizing the atomic coordinates. *ssbio* provides a wrapper to submit PDB files to the web server, cache, and parse the results
+OPM is a program to predict the location of transmembrane planes in protein structures, utilizing the atomic coordinates. *ssbio* provides a wrapper to submit PDB files to the web server, cache, and parse the results.
 
 
 Instructions
@@ -26,8 +26,7 @@ FAQs
 
 * How can I install OPM?
 
-    * OPM is only available as a web server. *ssbio* provides a wrapper for the web server and allows you to
-      submit protein structures to it along with caching the output files.
+    - OPM is only available as a web server. *ssbio* provides a wrapper for the web server and allows you to submit protein structures to it along with caching the output files.
 
 * How do I cite OPM?
 

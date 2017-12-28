@@ -24,6 +24,11 @@ Tutorials
 
 External programs
 =================
+
+
+Structure properties
+--------------------
+
 .. toctree::
     :glob:
     :maxdepth: 1
@@ -32,5 +37,13 @@ External programs
     instructions/stride
     instructions/msms
     instructions/freesasa
+
+Structure-based predictions
+---------------------------
+
+.. toctree::
+    :glob:
+    :maxdepth: 1
+
     instructions/fatcat
     instructions/opm

@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 
 class Protein(Object):
 
-    """Store information on a protein that represents the translated unit of a gene.
+    """Store information about a protein, which represents the monomeric translated unit of a gene.
 
     The main utilities of this class are to:
     

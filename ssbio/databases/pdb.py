@@ -28,7 +28,13 @@ log = logging.getLogger(__name__)
 
 
 class PDBProp(StructProp):
-    """Class to parse through PDB properties"""
+
+    """Store information about a protein structure from the Protein Data Bank.
+
+    Extends the :class:`~ssbio.protein.structure.structprop.StructProp` class to allow initialization of the structure
+    by its PDB ID, and then enabling downloads of the structure file as well as parsing its metadata.
+
+    """
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None):
         StructProp.__init__(self, ident, description=description, chains=chains, mapped_chains=mapped_chains,
@@ -574,6 +580,7 @@ def _property_table():
     r = requests.get(url)
     p = pd.read_csv(StringIO(r.text)).set_index('structureId')
     return p
+
 
 def get_resolution(pdb_id):
     """Quick way to get the resolution of a PDB ID using the table of results from the REST service
