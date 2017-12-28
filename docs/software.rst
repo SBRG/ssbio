@@ -4,12 +4,8 @@
 Software
 ********
 
-
 .. role:: raw-html(raw)
    :format: html
-
-.. :raw-html:`<br />`
-
 
 Analysis level: network model or a set of proteins
 --------------------------------------------------
