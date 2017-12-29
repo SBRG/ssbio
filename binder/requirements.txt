@@ -3,4 +3,3 @@ ssbio
 ipywidgets
 jupyter_contrib_nbextensions
 requests_cache==0.4.13
-bioservices==1.5.0
