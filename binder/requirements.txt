@@ -1,2 +1,4 @@
 nglview
 ssbio
+ipywidgets
+jupyter_contrib_nbextensions

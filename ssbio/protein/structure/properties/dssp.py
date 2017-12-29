@@ -1,33 +1,17 @@
-import logging
-from collections import defaultdict
-
 import pandas as pd
+import logging
+import ssbio.utils
+from collections import defaultdict
+from six import iteritems
 from Bio import PDB
 from Bio.PDB.DSSP import dssp_dict_from_pdb_file
 from Bio.PDB.DSSP import residue_max_acc
 from Bio.PDB.Polypeptide import aa1
 from Bio.PDB.Polypeptide import one_to_three
-from six import iteritems
-
-import ssbio.utils
-
 log = logging.getLogger(__name__)
 
 
-def get_dssp_df(model, pdb_file, outfile=None, outdir=None, outext='_dssp.df', force_rerun=False):
-    """
-
-    Args:
-        model:
-        pdb_file:
-        outfile:
-        outdir:
-        outext:
-        force_rerun:
-
-    Returns:
-
-    """
+def get_dssp_df(model, pdb_file, dssp_exec='dssp', outfile=None, outdir=None, outext='_dssp.df', force_rerun=False):
     # Create the output file name
     outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
 
@@ -35,7 +19,7 @@ def get_dssp_df(model, pdb_file, outfile=None, outdir=None, outext='_dssp.df', f
         try:
             # TODO: errors with non-standard residues, ie. MSE in 4Q6U or 1nfr
             # TODO: write command line executor for DSSP and parser for raw DSSP results
-            dssp = PDB.DSSP(model, pdb_file)
+            dssp = PDB.DSSP(model=model, in_file=pdb_file, dssp=dssp_exec)
         except KeyError:
             return pd.DataFrame()
 
@@ -83,7 +67,7 @@ def get_dssp_df_on_file(pdb_file, outfile=None, outdir=None, outext='_dssp.df', 
     """Run DSSP directly on a structure file with the Biopython method Bio.PDB.DSSP.dssp_dict_from_pdb_file
 
     Avoids errors like: PDBException: Structure/DSSP mismatch at <Residue MSE het=  resseq=19 icode= >
-        by not matching information to the structure file (DSSP fills in the ID "X" for unknown residues)
+    by not matching information to the structure file (DSSP fills in the ID "X" for unknown residues)
 
     Args:
         pdb_file: Path to PDB file
@@ -93,7 +77,7 @@ def get_dssp_df_on_file(pdb_file, outfile=None, outdir=None, outext='_dssp.df', 
         force_rerun: If DSSP should be rerun if the outfile exists
 
     Returns:
-        Pandas DataFrame: DSSP results, summarized
+        DataFrame: DSSP results summarized
 
     """
     # TODO: function unfinished
@@ -142,6 +126,7 @@ def get_dssp_df_on_file(pdb_file, outfile=None, outdir=None, outext='_dssp.df', 
         df = pd.read_csv(outfile, index_col=0)
 
     return df
+
 
 def secondary_structure_summary(dssp_df):
     """Summarize the secondary structure content of the DSSP dataframe for each chain.
@@ -332,12 +317,3 @@ def get_ss_class(pdb_file, dssp_file, chain):
         classification = 'mixed'
 
     return classification
-
-
-if __name__ == '__main__':
-    import glob
-    files = glob.glob('../test_files/structures/*')
-    # print(files)
-    for f in files:
-        print(f)
-        # print(all_dssp_props(f))
