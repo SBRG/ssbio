@@ -19,10 +19,6 @@ import math
 import scipy.constants
 import ssbio.protein.sequence.utils
 
-# R (molar gas constant) in calories
-r_j = scipy.constants.R
-r_cal = scipy.constants.R / scipy.constants.calorie
-
 
 def get_foldrate(seq, secstruct):
     """Submit sequence and structural class to FOLD-RATE calculator (http://www.iitm.ac.in/bioinfo/fold-rate/)

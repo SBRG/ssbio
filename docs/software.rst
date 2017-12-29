@@ -4,7 +4,7 @@
 Software
 ********
 
-This section provides a simple list of external software that may be required to carry out specific computations on a protein sequence or structure. This list only contains software that is wrapped with *ssbio* - there may be other programs that carry out these same functions, and do it better (or worse)!
+This section provides a simple list of external software that may be required to carry out specific computations on a protein sequence or structure. This list only contains software that is wrapped with *ssbio* -- there may be other programs that carry out these same functions, and do it better (or worse)!
 
 Tables describing functionalities of these software packages in relation to their input, as well as links to internal wrappers and parses are found on :ref:`sequence` and :ref:`structure` pages.
 
@@ -16,7 +16,7 @@ Protein structure predictions
 =============================
 
 Homology modeling
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. toctree::
     :maxdepth: 1
@@ -25,7 +25,7 @@ Homology modeling
 
 
 Transmembrane orientations
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 .. toctree::
     :maxdepth: 1
@@ -33,7 +33,7 @@ Transmembrane orientations
     instructions/opm
                
 Kinetic folding rate
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 .. toctree::
     :maxdepth: 1
@@ -44,7 +44,7 @@ Protein structure calculations
 ==============================
 
 Secondary structure
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 .. toctree::
     :maxdepth: 1
@@ -53,7 +53,7 @@ Secondary structure
     instructions/stride
               
 Solvent accessibilities
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 .. toctree::
     :maxdepth: 1
@@ -62,7 +62,7 @@ Solvent accessibilities
     instructions/freesasa
               
 Residue depths
-^^^^^^^^^^^^^^
+--------------
 
 .. toctree::
     :maxdepth: 1
@@ -70,7 +70,7 @@ Residue depths
     instructions/msms
               
 Structural similarity
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 .. toctree::
     :maxdepth: 1
@@ -78,17 +78,17 @@ Structural similarity
     instructions/fatcat
               
 Various structure properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 - :mod:`structure residues module <ssbio.protein.structure.properties.residues>`
               
 Quality
-^^^^^^^
+-------
 
 - :func:`set_representative_structure function <ssbio.core.protein.Protein.set_representative_structure>`
               
 Structure cleaning, mutating
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 - :mod:`cleanpdb module <ssbio.protein.structure.utils.cleanpdb>`
 - :mod:`mutatepdb module <ssbio.protein.structure.utils.mutatepdb>`
@@ -101,7 +101,7 @@ Protein sequence predictions
 ============================
 
 Secondary structure
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 .. toctree::
     :maxdepth: 1
@@ -109,7 +109,7 @@ Secondary structure
     instructions/scratch
               
 Solvent accessibilities
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 .. toctree::
     :maxdepth: 1
@@ -117,12 +117,12 @@ Solvent accessibilities
     instructions/scratch
               
 Thermostability
-^^^^^^^^^^^^^^^
+---------------
 
 - :mod:`thermostability module <ssbio.protein.sequence.properties.thermostability>` 
               
 Transmembrane domains
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 .. toctree::
     :maxdepth: 1
@@ -130,7 +130,7 @@ Transmembrane domains
     instructions/tmhmm
               
 Aggregation propensity
-^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 .. toctree::
     :maxdepth: 1
@@ -141,7 +141,7 @@ Protein sequence calculations
 =============================
 
 Various sequence properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
 .. toctree::
     :maxdepth: 1
@@ -149,7 +149,7 @@ Various sequence properties
     EMBOSS pepstats <instructions/emboss>
               
 Sequence alignment
-^^^^^^^^^^^^^^^^^^
+------------------
 
 .. toctree::
     :maxdepth: 1
