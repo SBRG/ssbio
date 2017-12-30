@@ -24,12 +24,13 @@ Instructions
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-#. **Read the README on the** `I-TASSER Suite`_ **page for the most up-to-date instructions**
+.. note:: Read the README on the** `I-TASSER Suite`_ **page for the most up-to-date instructions
+
 #. Make sure you have Java installed and it can be run from the command line with ``java``
 #. Head to the `I-TASSER download`_ page and register for an license (academic only) to get a password emailed to you
 #. Log in to the `I-TASSER download`_ page and download the archive
 #. Unpack the software archive into a convenient directory - a library should also be downloaded to this directory
-#. Run download_lib.pl to then download the library files - this will take some time:
+#. Run ``download_lib.pl`` to then download the library files - this will take some time:
 
     .. code-block:: console
 
