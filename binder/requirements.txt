@@ -1,5 +1,0 @@
-nglview
-ssbio
-ipywidgets
-jupyter_contrib_nbextensions
-requests_cache==0.4.13

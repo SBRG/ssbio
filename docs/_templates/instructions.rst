@@ -14,8 +14,8 @@ Description
 PROGRAM is...
 
 
-Instructions (Ubuntu)
-=====================
+Installation instructions (Ubuntu)
+==================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -24,6 +24,24 @@ Instructions (Ubuntu)
     .. code-block:: console
     
         <code>
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
 
 
 FAQs
