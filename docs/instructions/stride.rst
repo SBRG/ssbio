@@ -39,8 +39,8 @@ STRIDE (**St**\ ructural **ide**\ ntification) is a program used to assign secon
 
 
 
-Instructions (Unix)
-===================
+Installation instructions (Unix)
+================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -65,6 +65,24 @@ Instructions (Unix)
 
 #. Then you should be able to run ``stride`` in your terminal
 
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
+  
 
 FAQs
 ====

@@ -19,12 +19,12 @@ Description
 I-TASSER (Iterative Threading ASSEmbly Refinement) is a program for protein homology modeling and functional prediction from a protein sequence. The I-TASSER suite provides numerous other tools such as for ligand-binding site predictions, model refinement, secondary structure predictions, B-factor estimations, and more. *ssbio* mainly provides tools to run and parse I-TASSER homology modeling results, as well as COACH consensus binding site predictions (optionally with EC number and GO term predictions). Also, scripts are provided to automate homology modeling on a large scale using TORQUE_ or Slurm_ job schedulers in a cluster computing environment.
 
 
-Instructions
-============
+Installation instructions
+=========================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-.. note:: Read the README on the** `I-TASSER Suite`_ **page for the most up-to-date instructions
+.. note:: Read the README on the `I-TASSER Suite`_ page for the most up-to-date instructions
 
 #. Make sure you have Java installed and it can be run from the command line with ``java``
 #. Head to the `I-TASSER download`_ page and register for an license (academic only) to get a password emailed to you
@@ -48,6 +48,24 @@ Instructions
         0 4 * * 1,5 <USERNAME> /path/to/I-TASSER4.4/download_lib.pl -libdir /path/to/ITLIB
 
    That will run the library update at 4 am every Monday and Friday.
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
 
 
 FAQs

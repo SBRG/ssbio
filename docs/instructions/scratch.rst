@@ -19,8 +19,8 @@ Description
 SCRATCH is a suite of tools to predict many types of structural properties directly from sequence. *ssbio* contains wrappers to execute and parse results from *SSpro*/*SSpro8* - predictors of secondary structure, and *ACCpro*/*ACCpro20* - predictors of solvent accessibility.
 
 
-Instructions
-============
+Installation instructions (Ubuntu)
+==================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -42,6 +42,24 @@ Instructions
 #. *ssbio* also provides command line wrappers to run it and parse the results, see :mod:`ssbio.protein.sequence.properties.scratch` for details.
 
 
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
+  
+  
 FAQs
 ====
 

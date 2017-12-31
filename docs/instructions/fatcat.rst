@@ -17,14 +17,31 @@ FATCAT is a structural alignment tool that allows you to determine the similarit
 .. warning:: Parsing FATCAT results is currently incomplete and will only return TM-scores as of now - but TM-scores only show up in development versions of jFATCAT
 
 
-Instructions
-============
+Installation instructions
+=========================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
 #. Download the Java port of FATCAT from the `jFATCAT download page`_, under the section "Older file downloads" with the filename "protein-comparison-tool\_<DATE>.tar.gz"
 #. Extract it to a place where you store software
-#. Run :func:`ssbio.protein.structure.properties.fatcat.run_fatcat` on two structures, pointing to the path of the *runFATCAT.sh* script
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.fatcat.run_fatcat`. Run it on two structures, pointing to the path of the *runFATCAT.sh* script.
 
 
 FAQs

@@ -15,8 +15,8 @@ Description
 TMHMM is a program to predict the location of transmembrane helices in proteins, directly from sequence. *ssbio* provides a wrapper to execute and parse the "long" output format of TMHMM.
 
 
-Instructions (Unix)
-===================
+Installation instructions (Unix)
+================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -30,11 +30,26 @@ Instructions (Unix)
     #. Make sure you have an executable version of *decodeanhmm* in the bin directory.
     #. Include the directory containing tmhmm in your path (how do I add something to my :ref:`dummiesunix-path`?)
     #. Read the TMHMM2.0.guide.html
-    #. Run the program by doing the following:
-       
-        .. code-block:: console
 
-            tmhmm my_sequences.fasta
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own, execute the following command with your protein sequences contained in a FASTA file:
+       
+    .. code-block:: console
+
+        tmhmm my_sequences.fasta
+
+With *ssbio*
+------------
+
+.. todo::
+
+    * To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
 
 
 FAQs

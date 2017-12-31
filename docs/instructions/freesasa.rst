@@ -19,8 +19,8 @@ Description
 FreeSASA is an open source library written in C for calculating solvent accessible surface areas of a protein. FreeSASA also contains Python bidings, and the plan is to include these bindings with *ssbio* in the future.
 
 
-Instructions (Unix)
-===================
+Installation instructions (Unix)
+================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system with a Python installation through Anaconda3.
 
@@ -51,6 +51,24 @@ Instructions (Unix)
     .. code-block:: console
     
         sudo make install
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
 
 
 FAQs

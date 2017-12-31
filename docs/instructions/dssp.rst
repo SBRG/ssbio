@@ -38,8 +38,8 @@ DSSP (**D**\ efine **S**\ econdary **S**\ tructure of **P**\ roteins) is the sta
 Furthermore, DSSP calculates geometric properties such as the phi and psi angles between residues and solvent accessibilities. *ssbio* provides wrappers around the Biopython DSSP module to execute and parse DSSP results, as well as converting the information into a Pandas DataFrame format with calculated relative solvent accessbilities (see :mod:`ssbio.protein.structure.properties.dssp` for details).
 
 
-Instructions (Ubuntu)
-=====================
+Installation instructions (Ubuntu)
+==================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -58,11 +58,29 @@ Instructions (Ubuntu)
 #. Then you should be able to run ``dssp`` in your terminal
    
 
-Instructions (Mac OSX)
-======================
+Installation instructions (Mac OSX)
+===================================
 
 * `Instructions for installing on Mac`_
 * `Instructions for installing on Mac (alternate)`_
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        dssp -i <path_to_pdb_file> -o <new_path_to_output_file>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.dssp.get_dssp_df_on_file`
 
 
 FAQs

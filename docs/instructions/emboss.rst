@@ -14,8 +14,8 @@ Description
 EMBOSS is the European Molecular Biology Open Software Suite. EMBOSS contains a wide array of general purpose bioinformatics programs. For the GEM-PRO pipeline, we mainly need the *needle* pairwise alignment tool (although this can be replaced with Biopython's built-in pairwise alignment function), and the *pepstats* protein sequence statistics tool.
 
 
-Instructions (Ubuntu)
-=====================
+Installation instructions (Ubuntu)
+==================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -32,8 +32,8 @@ Instructions (Ubuntu)
         needle
 
 
-Instructions (Mac OSX, other Unix)
-==================================
+Installation instructions (Mac OSX, other Unix)
+===============================================
 
 #. Just install after downloading the `EMBOSS source code`_
    
@@ -42,6 +42,30 @@ Instructions (Mac OSX, other Unix)
        ./configure
        make
        sudo make install
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+.. todo::
+
+    * To run the program on its own in the shell...
+     
+        .. code-block:: console
+
+            needle    
+
+With *ssbio*
+------------
+
+.. todo::
+
+    * To run the program using the ssbio Python wrapper, see: 
+        
+        - :func:`ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta`
 
 
 FAQs

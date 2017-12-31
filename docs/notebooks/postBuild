@@ -1,0 +1,18 @@
+# Reinstall pip to fix weird pip vendor issue
+python -m pip uninstall -y pip setuptools
+wget https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
+
+# Enable jupyter nbextensions
+jupyter contrib nbextension install --user
+jupyter nbextension enable --py widgetsnbextension
+jupyter nbextension enable python-markdown/main
+jupyter nbextension enable --py widgetsnbextension --sys-prefix
+
+# Install MSMS
+wget http://mgltools.scripps.edu/downloads/tars/releases/MSMSRELEASE/REL2.6.1/msms_i86_64Linux2_2.6.1.tar.gz
+mkdir msms
+cd msms
+tar -zxvf ../msms_i86_64Linux2_2.6.1.tar.gz
+echo "export PATH=$PATH:$HOME/msms/" >> /etc/profile
+source /etc/profile

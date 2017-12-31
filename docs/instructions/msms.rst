@@ -21,8 +21,8 @@ Description
 MSMS computes solvent excluded surfaces on a protein structure. Generally, MSMS is used to calculate residue depths (in Angstroms) from the surface of a protein, using a PDB file as an input. *ssbio* provides wrappers through Biopython to run MSMS as well as store the depths in an associated ``StructProp`` object.
 
 
-Instructions (Unix)
-===================
+Installation instructions (Unix)
+================================
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
@@ -34,7 +34,7 @@ Instructions (Unix)
 
         sudo mkdir /usr/local/lib/msms
         cd /usr/local/lib/msms
-        sudo tar zxvf /path/to/your/downloaded/file/msms_i86Linux2_2.6.1.tar.gz
+        tar zxvf /path/to/your/downloaded/file/msms_i86_64Linux2_2.6.1.tar.gz
 
 #. Symlink the binaries (or alternatively, add the two locations to your PATH):
 
@@ -72,6 +72,24 @@ Instructions (Unix)
         Copyright M.F. Sanner (1994)
         Compilation flags -O2 -DVERBOSE -DTIMING
         MSMS: No input stream specified
+
+
+Program execution
+=================
+
+In the shell
+------------
+
+* To run the program on its own in the shell...
+   
+    .. code-block:: console
+
+        <code>
+
+With *ssbio*
+------------
+
+* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
 
 
 FAQs
