@@ -28,7 +28,8 @@ Try it without installing
 
 .. note:: Binder notebooks are still in beta, but they mostly work! Most external programs are preinstalled in the Binder notebooks except I-TASSER and TMHMM due to licensing restrictions.
 
-.. image:: https://mybinder.org/badge.svg :target: https://mybinder.org/v2/gh/SBRG/ssbio/master
+.. image:: https://mybinder.org/badge.svg
+    :target: https://mybinder.org/v2/gh/SBRG/ssbio/master
 
 
 Installation
