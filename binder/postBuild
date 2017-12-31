@@ -7,6 +7,6 @@ rm get-pip.py
 # Enable jupyter nbextensions
 jupyter contrib nbextension install --user
 jupyter nbextension enable --py widgetsnbextension
-jupyter nbextension enable python-markdown/main
-jupyter nbextension enable --py widgetsnbextension --sys-prefix
-
+jupyter nbextension enable --py --sys-prefix widgetsnbextension
+jupyter nbextension enable --py --sys-prefix nglview
+nglview enable
