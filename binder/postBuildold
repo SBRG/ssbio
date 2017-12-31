@@ -1,0 +1,59 @@
+# Reinstall pip to fix weird pip vendor issue
+python -m pip uninstall -y pip setuptools
+wget https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
+rm get-pip.py
+
+# Enable jupyter nbextensions
+jupyter contrib nbextension install --user
+jupyter nbextension enable --py widgetsnbextension
+jupyter nbextension enable python-markdown/main
+jupyter nbextension enable --py widgetsnbextension --sys-prefix
+
+# Software directory
+mkdir software
+cd software
+
+# Install MSMS
+# See: https://github.com/moby/moby/issues/684 for some potential solutions
+# Also see for an existing container with msms: http://biocontainers.pro/registry/#/showImages?domain=quay&repository=msms&starred=false&modified=04%2F09%2F2016
+mkdir ~/software/msms
+cd ~/software/msms
+wget http://mgltools.scripps.edu/downloads/tars/releases/MSMSRELEASE/REL2.6.1/msms_i86_64Linux2_2.6.1.tar.gz
+tar -zxf msms_i86_64Linux2_2.6.1.tar.gz
+ln -s $HOME/software/msms/msms.x86_64Linux2.2.6.1 /srv/venv/bin/msms
+
+# Install STRIDE
+mkdir ~/software/stride
+cd ~/software/stride
+wget http://webclu.bio.wzw.tum.de/stride/stride.tar.gz
+tar -zxf stride.tar.gz
+make
+ln -s $HOME/software/stride/stride /srv/venv/bin/stride
+
+# Install FreeSASA
+mkdir ~/software/freesasa
+cd ~/software/freesasa
+wget http://freesasa.github.io/freesasa-2.0.2.tar.gz
+tar -zxf freesasa-2.0.2.tar.gz
+cd freesasa-2.0.2
+./configure --disable-json --disable-xml
+make
+ln -s $HOME/software/freesasa/freesasa-2.0.2/src/freesasa /srv/venv/bin/freesasa
+
+# Install SCRATCH
+mkdir ~/software/scratch
+cd ~/software/scratch
+wget http://download.igb.uci.edu/SCRATCH-1D_1.1.tar.gz
+tar -zxf SCRATCH-1D_1.1.tar.gz
+cd SCRATCH-1D_1.1
+perl install.pl
+ln -s $HOME/software/scratch/SCRATCH-1D_1.1/bin/run_SCRATCH-1D_predictors.sh /srv/venv/bin/scratch
+
+# Install FATCAT
+mkdir ~/software/fatcat
+cd ~/software/fatcat
+wget http://source.rcsb.org/download/protein-comparison-tool_20150211.tar.gz
+tar -zxf protein-comparison-tool_20150211.tar.gz
+cd biojava-protein-comparison-tool-4.0.0
+ln -s $HOME/software/fatcat/biojava-protein-comparison-tool-4.0.0/runFATCAT.sh /srv/venv/bin/fatcat
