@@ -1,6 +1,6 @@
 nglview
 ssbio
-ipywidgets
+ipywidgets>=7.0.0
 jupyter_contrib_nbextensions
 requests_cache==0.4.13
 requests
