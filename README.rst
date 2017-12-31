@@ -29,7 +29,10 @@ Try it without installing
 .. image:: https://mybinder.org/badge.svg
     :target: https://mybinder.org/v2/gh/SBRG/ssbio/master
 
-.. note:: Binder notebooks are still in beta, but they mostly work! Most external programs are preinstalled in the Binder notebooks except I-TASSER and TMHMM due to licensing restrictions.
+.. role:: raw-html(raw)
+   :format: html
+
+:raw-html:`<aside class="notice">Binder notebooks are still in beta, but they mostly work! Third-party programs are also preinstalled in the Binder notebooks except I-TASSER and TMHMM due to licensing restrictions.</aside>`
 
 
 Installation
