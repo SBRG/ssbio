@@ -32,7 +32,7 @@ Program execution
 In the shell
 ------------
 
-* To run the program on its own in the shell...
+To run the program on its own in the shell...
    
     .. code-block:: console
 
@@ -41,7 +41,7 @@ In the shell
 With *ssbio*
 ------------
 
-* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
+To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
 
 
 FAQs

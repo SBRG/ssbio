@@ -28,8 +28,10 @@ Installation instructions (Ubuntu)
 
     .. code-block:: console
 
+        mkdir /path/to/my/software/scratch
+        cd /path/to/my/software/scratch
         wget http://download.igb.uci.edu/SCRATCH-1D_1.1.tar.gz
-        tar -xvzf SCRATCH-1D_1.1.tar.gz
+        tar -zxf SCRATCH-1D_1.1.tar.gz
         cd SCRATCH-1D_1.1
         perl install.pl
 
@@ -37,9 +39,9 @@ Installation instructions (Ubuntu)
     
     .. code-block:: console
 
-        ./run_SCRATCH-1D_predictors.sh  input_fasta  output_prefix  [num_threads]
+        
 
-#. *ssbio* also provides command line wrappers to run it and parse the results, see :mod:`ssbio.protein.sequence.properties.scratch` for details.
+#. *ssbio* also provides command line wrappers to run it and parse the results, see  for details.
 
 
 Program execution
@@ -48,18 +50,18 @@ Program execution
 In the shell
 ------------
 
-* To run the program on its own in the shell...
+To run the program on its own in the shell...
    
     .. code-block:: console
 
-        <code>
+        /path/to/my/software/scratch/SCRATCH-1D_1.1/bin/run_SCRATCH-1D_predictors.sh  input_fasta  output_prefix  [num_threads]
 
 With *ssbio*
 ------------
 
-* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
+To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.sequence.properties.scratch.SCRATCH.run_scratch`
   
-  
+
 FAQs
 ====
 

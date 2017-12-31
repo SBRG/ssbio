@@ -17,7 +17,7 @@ Description
 * `STRIDE download page`_
 * `STRIDE documentation`_
 
-STRIDE (**St**\ ructural **ide**\ ntification) is a program used to assign secondary structure annotations to a protein structure. STRIDE has slightly more complex criteria to assign codes compared to dssp_. STRIDE utilizes the atomic coordinates of a structure to assign the structure codes, which are:
+STRIDE (**St**\ ructural **ide**\ ntification) is a program used to assign secondary structure annotations to a protein structure. STRIDE has slightly more complex criteria to assign codes compared to :ref:`dssp`. STRIDE utilizes the atomic coordinates of a structure to assign the structure codes, which are:
 
 +--------+--------------------------+
 | Code   | Description              |
@@ -63,8 +63,6 @@ Installation instructions (Unix)
         make
         cp stride /usr/local/bin
 
-#. Then you should be able to run ``stride`` in your terminal
-
 
 Program execution
 =================
@@ -72,16 +70,16 @@ Program execution
 In the shell
 ------------
 
-* To run the program on its own in the shell...
+To run the program on its own in the shell...
    
     .. code-block:: console
 
-        <code>
+        stride
 
 With *ssbio*
 ------------
 
-* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
+To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
   
 
 FAQs

@@ -50,22 +50,18 @@ Program execution
 In the shell
 ------------
 
-.. todo::
-
-    * To run the program on its own in the shell...
+To run the program on its own in the shell...
      
-        .. code-block:: console
+    .. code-block:: console
 
-            needle    
+        needle    
 
 With *ssbio*
 ------------
 
-.. todo::
-
-    * To run the program using the ssbio Python wrapper, see: 
+To run the program using the ssbio Python wrapper, see: 
         
-        - :func:`ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta`
+    - :func:`ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta`
 
 
 FAQs

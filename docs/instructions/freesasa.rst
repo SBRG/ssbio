@@ -31,20 +31,8 @@ Installation instructions (Unix)
     
     .. code-block:: console
 
-        ./configure --enable-python-bindings CFLAGS="-fPIC -O2"
+        ./configure --disable-json --disable-xml
         make
-
-#. If you have a user-specific Python executable (ie. through Anaconda), edit the freesasa-2.0/bindings/Makefile, lines 805, 809, 815 to change:
-
-    .. code-block:: console
-        
-        python setup.py [...]
-
-    to (type `which python` to get the path to enter): 
-
-    .. code-block:: console
-
-        /path/to/your/anaconda/python setup.py [...]
 
 #. Install with
 
@@ -59,16 +47,16 @@ Program execution
 In the shell
 ------------
 
-* To run the program on its own in the shell...
+To run the program on its own in the shell...
    
     .. code-block:: console
 
-        <code>
+        freesasa
 
 With *ssbio*
 ------------
 
-* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.path.to.wrapper`
+To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.freesasa.run_freesasa`
 
 
 FAQs

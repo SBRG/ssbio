@@ -22,7 +22,8 @@ Installation instructions
 
 .. note:: These instructions were created on an Ubuntu 17.04 system.
 
-#. Download the Java port of FATCAT from the `jFATCAT download page`_, under the section "Older file downloads" with the filename "protein-comparison-tool\_<DATE>.tar.gz"
+#. Make sure Java is installed on your system and can be run with the command ``java``
+#. Download the Java port of FATCAT from the `jFATCAT download page`_, under the section "Older file downloads" with the filename ``protein-comparison-tool\_<DATE>.tar.gz``, with the most recent date.
 #. Extract it to a place where you store software
 
 
@@ -32,16 +33,16 @@ Program execution
 In the shell
 ------------
 
-* To run the program on its own in the shell...
+To run the program on its own in the shell...
    
     .. code-block:: console
 
-        <code>
+        /path/to/software/fatcat/runFATCAT.sh
 
 With *ssbio*
 ------------
 
-* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.fatcat.run_fatcat`. Run it on two structures, pointing to the path of the *runFATCAT.sh* script.
+To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.fatcat.run_fatcat`. Run it on two structures, pointing to the path of the *runFATCAT.sh* script.
 
 
 FAQs

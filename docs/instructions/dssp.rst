@@ -71,7 +71,7 @@ Program execution
 In the shell
 ------------
 
-* To run the program on its own in the shell...
+To run the program on its own in the shell...
    
     .. code-block:: console
 
@@ -80,7 +80,7 @@ In the shell
 With *ssbio*
 ------------
 
-* To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.dssp.get_dssp_df_on_file`
+To run the program using the ssbio Python wrapper, see: :func:`ssbio.protein.structure.properties.dssp.get_dssp_df_on_file`
 
 
 FAQs
