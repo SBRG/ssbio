@@ -27,7 +27,7 @@ Try it without installing
 =========================
 
 .. image:: https://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/SBRG/ssbio/master
+    :target: https://mybinder.org/v2/gh/SBRG/ssbio/master?filepath=Binder.ipynb
 
 
 .. note:: Binder notebooks are still in beta, but they mostly work! Third-party programs are also preinstalled in the Binder notebooks except I-TASSER and TMHMM due to licensing restrictions.
