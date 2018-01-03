@@ -1,3 +1,4 @@
+gfortran
 emboss
 dssp
 default-jre
