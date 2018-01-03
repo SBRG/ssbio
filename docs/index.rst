@@ -14,7 +14,7 @@ Table of Contents
    structure
    sequence
    software
-   tutorials
+   ../Binder.ipynb
    python_api
 
 
