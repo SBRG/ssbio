@@ -14,6 +14,7 @@ Table of Contents
    structure
    sequence
    software
+   tutorials
    python_api
 
 

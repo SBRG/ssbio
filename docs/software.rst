@@ -1,8 +1,8 @@
 .. _software:
 
-********
-Software
-********
+***************
+Index: Software
+***************
 
 This section provides a simple list of external software that may be required to carry out specific computations on a protein sequence or structure. This list only contains software that is wrapped with *ssbio* -- there may be other programs that carry out these same functions, and do it better (or worse)!
 
