@@ -6,25 +6,31 @@ from cobra.io import read_sbml_model
 from cobra.io import load_json_model
 from cobra.core import Model
 from cobra.core import Gene
+from cobra.core import Reaction
 from cobra.core import DictList
 from ssbio.core.genepro import GenePro
+from ssbio.core.reactionpro import ReactionPro
 
 
 class ModelPro(Model):
     def __new__(cls, *args, **kwargs):
-        """Casting Gene objects into GenePro objects
-            This replaces any new instance of Genes with GenePros. Even when you load a model later
+        """Casting Gene objects into GenePro objects and Reaction objects into ReactionPro objects
+            This replaces any new instance of "X" with "X"-Pros. Even when you load a model later
             using COBRApy methods. Use with caution!
         See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
 
         Returns:
             GenePro: a Gene object with a .protein attribute
+            ReactionPro: a Reaciton object with a .complex attribute
         """
         if cls == Gene:
             return object.__new__(GenePro)
+        if cls == Reaction:
+            return object.__new__(ReactionPro)
         return object.__new__(cls)
 
     Gene.__new__ = staticmethod(__new__)
+    Reaction.__new__ = staticmethod(__new__)
 
     def __json_encode__(self):
         """convert the model to a dict"""

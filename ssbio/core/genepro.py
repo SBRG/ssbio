@@ -16,8 +16,8 @@ class GenePro(Gene):
         id (str): ID for the gene
         name (str): Name of the gene
         functional (bool): If this gene is functional in the linked genome-scale model
-        root_dir (str):
-        pdb_file_type (str):
+        root_dir (str): Path to directory to store protein related files
+        pdb_file_type (str): Type of PDB structure file to use
 
     """
 

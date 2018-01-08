@@ -67,7 +67,7 @@ See: Software_ for a list of external programs to install, along with the functi
 Tutorials
 =========
 
-Check out some Jupyter notebook tutorials for a single Protein_ and or for many in a GEM-PRO_ model.
+Check out some Jupyter notebook tutorials for a single Protein_ and or for many in a GEM-PRO_ model. See a list of all Tutorials_.
 
 
 Citation
@@ -82,3 +82,4 @@ The manuscript for the *ssbio* package can be found and cited at [1]_.
 .. _Protein: http://ssbio.readthedocs.io/en/latest/protein.html
 .. _GEM-PRO: http://ssbio.readthedocs.io/en/latest/gempro.html
 .. _Software: http://ssbio.readthedocs.io/en/latest/software.html
+.. _Tutorials: http://ssbio.readthedocs.io/en/latest/tutorials.html
