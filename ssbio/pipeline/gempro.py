@@ -178,7 +178,7 @@ class GEMPRO(Object):
 
         self._root_dir = path
 
-        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir]:
+        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir, self.reactions_dir]:
             ssbio.utils.make_dir(d)
 
         log.info('{}: GEM-PRO project location'.format(self.base_dir))
@@ -187,6 +187,11 @@ class GEMPRO(Object):
         if hasattr(self, 'genes'):
             for g in self.genes:
                 g.root_dir = self.genes_dir
+
+        # Propagate changes to reaction
+        if hasattr(self, 'reactions'):
+            for g in self.reactions:
+                g.root_dir = self.reactions_dir
 
     @property
     def base_dir(self):
@@ -220,6 +225,14 @@ class GEMPRO(Object):
         else:
             return None
 
+    @property
+    def reactions_dir(self):
+        """str: Directory where all gene specific information is stored."""
+        if self.base_dir:
+            return op.join(self.base_dir, 'reactions')
+        else:
+            return None
+
     def load_cobra_model(self, model):
         """Load a COBRApy Model object into the GEM-PRO project.
 
@@ -232,7 +245,13 @@ class GEMPRO(Object):
             if self.genes_dir:
                 g.root_dir = self.genes_dir
             g.protein.pdb_file_type = self.pdb_file_type
+        for r in self.model.reactions:
+            r.set_complex()
+            if self.reactions_dir:
+                r.root_dir = self.reactions_dir
+            r.complex.pdb_file_type = self.pdb_file_type
         self.genes = self.model.genes
+        self.reactions = self.model.reactions
 
         log.info('{}: loaded model'.format(model.id))
         log.info('{}: number of reactions'.format(len(self.model.reactions)))
@@ -240,7 +259,8 @@ class GEMPRO(Object):
         log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.core.modelpro.true_num_genes(self.model,
                                                                                                          custom_spont_id=self.custom_spont_id)))
         log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
-        log.warning('IMPORTANT: All Gene objects have been transformed into GenePro objects, and will be for any new ones')
+        log.warning('IMPORTANT: All Gene and Reaction objects have been transformed into GenePro or ReactionPro '
+                    'objects, and will be for any new ones')
 
     @property
     def genes_with_structures(self):
