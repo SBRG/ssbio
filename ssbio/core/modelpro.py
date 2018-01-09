@@ -9,7 +9,6 @@ from cobra.core import Gene
 from cobra.core import Reaction
 from cobra.core import DictList
 from ssbio.core.genepro import GenePro
-from ssbio.core.reactionpro import ReactionPro
 
 
 class ModelPro(Model):
@@ -25,12 +24,9 @@ class ModelPro(Model):
         """
         if cls == Gene:
             return object.__new__(GenePro)
-        if cls == Reaction:
-            return object.__new__(ReactionPro)
         return object.__new__(cls)
 
     Gene.__new__ = staticmethod(__new__)
-    Reaction.__new__ = staticmethod(__new__)
 
     def __json_encode__(self):
         """convert the model to a dict"""
