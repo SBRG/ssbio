@@ -1,6 +1,6 @@
 """
 Protein
-======
+=======
 """
 
 import logging
@@ -41,18 +41,20 @@ log = logging.getLogger(__name__)
 
 class Protein(Object):
 
-    """Store information on a protein that represents the translated unit of a gene.
+    """Store information about a protein, which represents the monomeric translated unit of a gene.
 
     The main utilities of this class are to:
     
-    #. Load, parse, and store the same (ie. from different database sources) or similar (ie. from different strains) \
-        protein sequences as ``SeqProp`` objects in the ``sequences`` attribute
-    #. Load, parse, and store multiple experimental or predicted protein structures as ``StructProp`` \
-        objects in the ``structures`` attribute
-    #. Set a single representative sequence and structure
-    #. Calculate, store, and access pairwise sequence alignments to the representative sequence or structure
-    #. Provide summaries of alignments and mutations seen
-    #. Map between residue numbers of sequences and structures
+    * Load, parse, and store the same (ie. from different database sources) or similar (ie. from different strains)
+      protein sequences as :ref:`SeqProp <sequence>` objects in the :attr:`~ssbio.core.protein.Protein.sequences`
+      attribute
+    * Load, parse, and store multiple experimental or predicted protein structures as :ref:`StructProp <structure>`
+      objects in the :attr:`~ssbio.core.protein.Protein.structures` attribute
+    * Set a single :attr:`~ssbio.core.protein.Protein.representative_sequence` and
+      :attr:`~ssbio.core.protein.Protein.representative_structure`
+    * Calculate, store, and access pairwise sequence alignments to the representative sequence or structure
+    * Provide summaries of alignments and mutations seen
+    * Map between residue numbers of sequences and structures
 
     Args:
         ident (str): Unique identifier for this protein
@@ -63,7 +65,7 @@ class Protein(Object):
             choose a file type for files downloaded from the PDB
 
     Todo:
-        - Implement structural alignment objects
+        - Implement structural alignment objects with FATCAT
     
     """
 
@@ -2025,6 +2027,7 @@ class Protein(Object):
         """Add select features from the selected SeqProp object to an NGLWidget view object.
 
         Currently parsing for:
+
             * Single residue features (ie. metal binding sites)
             * Disulfide bonds
 

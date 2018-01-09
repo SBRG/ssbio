@@ -438,9 +438,11 @@ class GEMPRO(Object):
             model_gene_source (str): the database source of your model gene IDs.
                 See: http://www.uniprot.org/help/api_idmapping
                 Common model gene sources are:
-                    * Ensembl Genomes - ``ENSEMBLGENOME_ID`` (i.e. E. coli b-numbers)
-                    * Entrez Gene (GeneID) - ``P_ENTREZGENEID``
-                    * RefSeq Protein - ``P_REFSEQ_AC``
+
+                * Ensembl Genomes - ``ENSEMBLGENOME_ID`` (i.e. E. coli b-numbers)
+                * Entrez Gene (GeneID) - ``P_ENTREZGENEID``
+                * RefSeq Protein - ``P_REFSEQ_AC``
+
             custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,
                 custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
                 Dictionary keys must match model genes.
@@ -692,6 +694,7 @@ class GEMPRO(Object):
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
         """Run and parse ``SCRATCH`` results to predict secondary structure and solvent accessibility.
         Annotations are stored in the protein's representative sequence at:
+
             * ``.annotations``
             * ``.letter_annotations``
 
@@ -748,6 +751,7 @@ class GEMPRO(Object):
         
         This is a basic function to parse pre-run TMHMM results. Run TMHMM from the 
         web service (http://www.cbs.dtu.dk/services/TMHMM/) by doing the following:
+
             1. Write all representative sequences in the GEM-PRO using the function ``write_representative_sequences_file``
             2. Upload the file to http://www.cbs.dtu.dk/services/TMHMM/ and choose "Extensive, no graphics" as the output
             3. Copy and paste the results (ignoring the top header and above "HELP with output formats") into a file and save it

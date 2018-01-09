@@ -10,16 +10,22 @@ log = logging.getLogger(__name__)
 class SCRATCH():
     """Provide wrappers for running and parsing SCRATCH on a sequence file or sequence string.
 
-    To run from the command line:
+    To run from the command line::
+
         ./run_SCRATCH-1D_predictors.sh  input_fasta  output_prefix  [num_threads]
 
     SCRATCH predicts:
+
         - Secondary structure
+
             - 3 classes (helix, strand, other) using SSpro
             - 8 classes (standard DSSP definitions) using SSpro8
+
         - Relative solvent accessibility (RSA, also known as relative accessible surface area)
+
             - @ 25% exposed RSA cutoff (<25% RSA means it is buried)
             - @ all cutoffs in 5% increments from 0 to 100
+
     """
 
     # TODO: also provide summary dataframes

@@ -436,6 +436,7 @@ def request_json(link, outfile, outdir=None, force_rerun_flag=False):
 
     return my_dict
 
+
 def program_exists(prog_name):
     """Check if a program is available as a command line executable on a system.
 

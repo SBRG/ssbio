@@ -1,3 +1,8 @@
+"""
+Structure Residues
+==================
+"""
+
 import logging
 from collections import defaultdict
 from copy import deepcopy

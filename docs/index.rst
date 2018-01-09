@@ -11,6 +11,10 @@ Table of Contents
    getting_started
    gempro
    protein
+   structure
+   sequence
+   software
+   tutorials.ipynb
    python_api
 
 

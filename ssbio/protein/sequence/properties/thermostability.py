@@ -1,4 +1,8 @@
-"""This module provides functions to predict thermostability parameters (specifically the free energy of unfolding dG) 
+"""
+Thermostability
+===============
+
+This module provides functions to predict thermostability parameters (specifically the free energy of unfolding dG)
     of an amino acid sequence.
 
 These methods are adapted from:
@@ -19,19 +23,16 @@ For an example of usage of these parameters in a genome-scale model:
 """
 
 __author__ = 'Ke Chen'
-__email__ = "kec003@eng.ucsd.edu"
+__email__ = "kec003@ucsd.edu"
 
 import math
 import scipy.constants
 import ssbio.protein.sequence.utils
 
-# R (molar gas constant) in calories
-r_cal = scipy.constants.R / scipy.constants.calorie
-
 # Oobatake dG constants
 ## dG and dCp from Table 8 in Oobatake paper.
 ## dG,dH in unit kcal/mol
-## dCp,dS in unit cal/mol.K
+## dCp,dS in unit cal/mol.Ks
 oobatake_dictionary = {}
 oobatake_dictionary['A'] = {'dG': -0.02, 'dCp': 14.22, 'dH': 0.51, 'dS': 1.82}
 oobatake_dictionary['C'] = {'dG': 1.08, 'dCp': 9.41, 'dH': 5.21, 'dS': 13.85}
@@ -163,10 +164,12 @@ def get_dG_at_T(seq, temp):
         (tuple): tuple containing:
 
             dG (float) Free energy of unfolding dG (cal/mol)
-            keq (float): equilibrium constant Keq
+            keq (float): Equilibrium constant Keq
             method (str): Method used to calculate
             
     """
+    # R (molar gas constant) in calories
+    r_cal = scipy.constants.R / scipy.constants.calorie
 
     seq = ssbio.protein.sequence.utils.cast_to_str(seq)
 

@@ -1,9 +1,11 @@
-import ssbio.utils
-from copy import deepcopy
-import pandas as pd
-import ssbio.utils
-import ssbio.core.io
 import logging
+from copy import deepcopy
+
+import pandas as pd
+
+import ssbio.io
+import ssbio.utils
+
 log = logging.getLogger(__name__)
 
 class Object(object):
@@ -171,7 +173,7 @@ class Object(object):
             str: Path to pickle file
 
         """
-        ssbio.core.io.save_pickle(self, outfile, protocol)
+        ssbio.io.save_pickle(self, outfile, protocol)
 
     def __json_encode__(self):
         to_return = {}
@@ -182,4 +184,4 @@ class Object(object):
 
     def save_json(self, outfile, compression=False):
         """Save the object as a JSON file using json_tricks"""
-        ssbio.core.io.save_json(self, outfile, compression=compression)
+        ssbio.io.save_json(self, outfile, compression=compression)

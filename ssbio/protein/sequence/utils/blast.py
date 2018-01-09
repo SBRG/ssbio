@@ -1,7 +1,14 @@
+"""
+Sequence BLAST
+==============
+"""
+
 import os
 import subprocess
+import pandas as pd
 import os.path as op
 from ssbio import utils
+import logging
 try:
     from IPython.display import clear_output
     have_ipython = True
@@ -11,11 +18,7 @@ except ImportError:
     from tqdm import tqdm
 
 date = utils.Date()
-
-import logging
 log = logging.getLogger(__name__)
-
-import pandas as pd
 
 
 def run_makeblastdb(infile, dbtype, outdir=''):
@@ -241,7 +244,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
     Args:
         r_name (str): Name of the reference genome
         genome_to_bbh_files (dict): Mapping of genome names to the BBH csv output from the
-            :func:`~ssbio.sequence.utils.blast.calculate_bbh` method
+            :func:`~ssbio.protein.sequence.utils.blast.calculate_bbh` method
         pid_cutoff (float): Minimum percent identity between BLAST hits to filter for in the range [0, 100]
         bitscore_cutoff (float): Minimum bitscore allowed between BLAST hits
         evalue_cutoff (float): Maximum E-value allowed between BLAST hits

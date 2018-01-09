@@ -27,6 +27,7 @@ from recommonmark.parser import CommonMarkParser
 source_parsers = {'.md': CommonMarkParser}
 source_suffix = ['.rst', '.md']
 
+
 class Mock(object):
     __all__ = []
     def __init__(self, *args, **kwargs):
@@ -42,7 +43,11 @@ class Mock(object):
         else:
             return Mock()
 
-MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats',
+    def __div__(self, other):
+        return Mock()
+
+
+MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.io', 'scipy.stats', 'scipy.constants',
                 'glpk', 'gurobipy', 'gurobipy.GRB', 'cplex', 'pp', 'libsbml',
                 'cplex.exceptions', 'tabulate', 'argparse', 'pandas',
                 'nglview', 'matplotlib', 'numpy.linalg', 'biopython', 'bioservices', 'seaborn',
@@ -79,6 +84,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.todo',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -152,6 +158,12 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# html_context = {
+#     'css_files': [
+#         '_static/theme_overrides.css',  # override wide tables in RTD theme
+#     ],
+# }
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -227,3 +239,5 @@ texinfo_documents = [
 
 
 
+def setup(app):
+    app.add_stylesheet('_static/theme_overrides.css')

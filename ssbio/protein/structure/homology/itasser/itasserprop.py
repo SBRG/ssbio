@@ -289,10 +289,14 @@ class ITASSERProp(StructProp):
 def parse_init_dat(infile):
     """Parse the main init.dat file which contains the modeling results
 
-    The first line of the file init.dat contains stuff like:
-    "120 easy  40   8"
-    The other lines look like this:
-    "     161   11.051   1  1guqA MUSTER"
+    The first line of the file init.dat contains stuff like::
+    
+        "120 easy  40   8"
+    
+    The other lines look like this::
+    
+        "     161   11.051   1  1guqA MUSTER"
+    
     and getting the first 10 gives you the top 10 templates used in modeling
 
     Args:
@@ -415,31 +419,34 @@ def parse_coach_bsites_inf(infile):
 
     Bsites.inf contains the summary of COACH clustering results after all other prediction algorithms have finished
     For each site (cluster), there are three lines:
-    Line 1: site number, c-score of coach prediction, cluster size
-    Line 2: algorithm, PDB ID, ligand ID, center of binding site (cartesian coordinates),
-        c-score of the algorithm's prediction, binding residues from single template
-    Line 3: Statistics of ligands in the cluster
+    
+        - Line 1: site number, c-score of coach prediction, cluster size
+        - Line 2: algorithm, PDB ID, ligand ID, center of binding site (cartesian coordinates), 
+          c-score of the algorithm's prediction, binding residues from single template
+        - Line 3: Statistics of ligands in the cluster
 
-    C-score information
-        "In our training data, a prediction with C-score>0.35 has average false positive and false negative rates below
-        0.16 and 0.13, respectively." (https://zhanglab.ccmb.med.umich.edu/COACH/COACH.pdf)
+    C-score information:
+
+        - "In our training data, a prediction with C-score>0.35 has average false positive and false negative rates below
+          0.16 and 0.13, respectively." (https://zhanglab.ccmb.med.umich.edu/COACH/COACH.pdf)
 
     Args:
         infile (str): Path to Bsites.inf
 
     Returns:
         list: Ranked list of dictionaries, keys defined below
-            site_num: cluster which is the consensus binding site
-            c_score: confidence score of the cluster prediction
-            cluster_size: number of predictions within this cluster
-            algorithm: main? algorithm used to make the prediction
-            pdb_template_id: PDB ID of the template used to make the prediction
-            pdb_template_chain: chain of the PDB which has the ligand
-            pdb_ligand: predicted ligand to bind
-            binding_location_coords: centroid of the predicted ligand position in the homology model
-            c_score_method: confidence score for the main algorithm
-            binding_residues: predicted residues to bind the ligand
-            ligand_cluster_counts: number of predictions per ligand
+        
+            - ``site_num``: cluster which is the consensus binding site
+            - ``c_score``: confidence score of the cluster prediction
+            - ``cluster_size``: number of predictions within this cluster
+            - ``algorithm``: main? algorithm used to make the prediction
+            - ``pdb_template_id``: PDB ID of the template used to make the prediction
+            - ``pdb_template_chain``: chain of the PDB which has the ligand
+            - ``pdb_ligand``: predicted ligand to bind
+            - ``binding_location_coords``: centroid of the predicted ligand position in the homology model
+            - ``c_score_method``: confidence score for the main algorithm
+            - ``binding_residues``: predicted residues to bind the ligand
+            - ``ligand_cluster_counts``: number of predictions per ligand
 
     """
 
@@ -484,8 +491,8 @@ def parse_coach_ec_df(infile):
     """Parse the EC.dat output file of COACH and return a dataframe of results
 
     EC.dat contains the predicted EC number and active residues.
-        The columns are: PDB_ID, TM-score, RMSD, Sequence identity,
-        Coverage, Confidence score, EC number, and Active site residues
+    The columns are: PDB_ID, TM-score, RMSD, Sequence identity,
+    Coverage, Confidence score, EC number, and Active site residues
 
     Args:
         infile (str): Path to EC.dat
@@ -513,23 +520,24 @@ def parse_coach_ec(infile):
     """Parse the EC.dat output file of COACH and return a list of rank-ordered EC number predictions
 
     EC.dat contains the predicted EC number and active residues.
-        The columns are: PDB_ID, TM-score, RMSD, Sequence identity,
-        Coverage, Confidence score, EC number, and Active site residues
+    The columns are: PDB_ID, TM-score, RMSD, Sequence identity,
+    Coverage, Confidence score, EC number, and Active site residues
 
     Args:
         infile (str): Path to EC.dat
 
     Returns:
          list: Ranked list of dictionaries, keys defined below
-            pdb_template_id: PDB ID of the template used to make the prediction
-            pdb_template_chain: chain of the PDB which has the ligand
-            tm_score: TM-score of the template to the model (similarity score)
-            rmsd: RMSD of the template to the model (also a measure of similarity)
-            seq_ident: percent sequence identity
-            seq_coverage: percent sequence coverage
-            c_score: confidence score of the EC prediction
-            ec_number: predicted EC number
-            binding_residues: predicted residues to bind the ligand
+
+            - ``pdb_template_id``: PDB ID of the template used to make the prediction
+            - ``pdb_template_chain``: chain of the PDB which has the ligand
+            - ``tm_score``: TM-score of the template to the model (similarity score)
+            - ``rmsd``: RMSD of the template to the model (also a measure of similarity)
+            - ``seq_ident``: percent sequence identity
+            - ``seq_coverage``: percent sequence coverage
+            - ``c_score``: confidence score of the EC prediction
+            - ``ec_number``: predicted EC number
+            - ``binding_residues``: predicted residues to bind the ligand
 
     """
     return list(parse_coach_ec_df(infile).to_dict(orient='index').values())
@@ -538,19 +546,21 @@ def parse_coach_ec(infile):
 def parse_coach_go(infile):
     """Parse a GO output file from COACH and return a rank-ordered list of GO term predictions
 
-    The columns in all files are: GO terms, Confidence score, Name of GO terms.
-        GO_MF.dat - GO terms in 'molecular function'
-        GO_BP.dat - GO terms in 'biological process'
-        GO_CC.dat - GO terms in 'cellular component'
+    The columns in all files are: GO terms, Confidence score, Name of GO terms. The files are:
+        
+        - GO_MF.dat - GO terms in 'molecular function'
+        - GO_BP.dat - GO terms in 'biological process'
+        - GO_CC.dat - GO terms in 'cellular component'
 
     Args:
         infile (str): Path to any COACH GO prediction file
 
     Returns:
         Pandas DataFrame: Organized dataframe of results, columns defined below
-            go_id: GO term ID
-            go_term: GO term text
-            c_score: confidence score of the GO prediction
+            
+            - ``go_id``: GO term ID
+            - ``go_term``: GO term text
+            - ``c_score``: confidence score of the GO prediction
 
     """
     go_list = []

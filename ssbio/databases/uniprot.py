@@ -1,6 +1,6 @@
 """
 UniProtProp
-======
+===========
 """
 
 import os.path as op

@@ -1,6 +1,6 @@
 """
 StructProp
-======
+==========
 """
 
 import logging

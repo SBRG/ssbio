@@ -5,6 +5,18 @@ The GEM-PRO Pipeline
 ********************
 
 
+Introduction
+============
+
+The GEM-PRO pipeline is focused on annotating genome-scale models with protein structure information. Any SBML model can be used as input to the pipeline, although it is not required to have a one. Here are the possible starting points for using the pipeline:
+
+#. An SBML model in *SBML* (``.sbml``, ``.xml``), or *MATLAB* (``.mat``) formats
+#. A list of gene IDs (``['b0001', 'b0002', ...]``)
+#. A dictionary of gene IDs and their sequences (``{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}``)
+
+A GEM-PRO object can be thought of at a high-level as simply an annotation project. Creating a new project with any of the above starting points will create a new folder where protein sequences and structures will be downloaded to.
+
+
 Tutorials
 =========
 
@@ -15,38 +27,27 @@ Tutorials
    notebooks/GEM-PRO*
 
 
-Introduction
-============
-
-The GEM-PRO pipeline is focused on annotating genome-scale models with protein structure information. Any SBML model can be used as input to the pipeline, although it is not required to have a one. Here are the possible starting points for using the pipeline:
-
-#. An SBML model in `SBML` (`.sbml`, `.xml`), or `MATLAB` (`.mat`) formats
-#. A list of gene IDs (`['b0001', 'b0002', ...]`)
-#. A dictionary of gene IDs and their sequences (`{'b0001':'MSAVEVEEAP..', 'b0002':'AERAPLS', ...}`)
-
-A GEM-PRO object can be thought of at a high-level as simply an annotation project. Creating a new project with any of the above starting points will create a new folder where protein sequences and structures will be downloaded to.
-
-
 Features
 ========
 
-* Automated mapping of sequence IDs
-* Consolidating sequence IDs and setting a representative sequence
-* Mapping of representative sequence --> structures
-* Preparation of files for homology modeling (currently for I-TASSER_)
-* Running QC/QA on structures and setting a representative structure
+* Automated mapping of gene/protein sequence IDs
+* Consolidating sequence IDs and setting a representative protein sequence
+* Mapping of representative protein sequence --> 3D structures
+* Preparation of sequences for homology modeling (currently for I-TASSER_)
+* Running QC/QA on structures and setting a representative protein structure
 * Automation of protein sequence and structure property calculation
-* Creation of Pandas DataFrame summaries directly from downloaded metadata
+* Creation of Pandas DataFrame summaries directly from downloaded or calculated metadata
 
 
 COBRApy model additions
 =======================
 
-.. image:: ./assets/ssbioGEMPROClass.png
+.. image:: ./assets/ssbio_gempro_class.png
     :align: center
     :alt: The GEM-PRO Class
+    :scale: 60 %
 
-Let's take a look at a GEM loaded with ``ssbio`` and what additions exist compared to a GEM loaded with COBRApy_. In the figure above, the text in grey indicates objects that exist in a ``COBRApy`` ``Model`` object, and in blue, the attributes added when loading with ``ssbio``. Please note that the ``Complex`` object is still under development and currently non-functional.
+Let's take a look at a GEM loaded with *ssbio* and what additions exist compared to a GEM loaded with COBRApy_. In the figure above, the text in grey indicates objects that exist in a *COBRApy* ``Model`` object, and in blue, the attributes added when loading with *ssbio*. Please note that the ``Complex`` object is still under development and currently non-functional.
 
 COBRApy
 -------
@@ -70,9 +71,10 @@ Under construction...
 Use cases
 =========
 
-.. image:: ./assets/ssbioGEMPROuses.png
+.. image:: ./assets/ssbio_fig1_C.png
     :align: center
     :alt: Uses of a GEM-PRO
+    :scale: 60 %
 
 When would you create or use a GEM-PRO? The added context of manually curated network interactions to protein structures enables different scales of analyses. For instance...
 
@@ -94,7 +96,7 @@ File organization
 
 Files such as sequences, structures, alignment files, and property calculation outputs can optionally be cached on a user's disk to minimize calls to web services, limit recalculations, and provide direct inputs to common sequence and structure algorithms which often require local copies of the data. For a GEM-PRO project, files are organized in the following fashion once a root directory and project name are set:
 
-.. code-block:: bash
+.. code-block:: console
 
     <ROOT_DIR>
     └── <PROJECT_NAME>
@@ -105,6 +107,13 @@ Files such as sequences, structures, alignment files, and property calculation o
                       └── <protein_id1>  # Protein directory
                             ├── sequences  # Protein sequence files, alignments, etc.
                             └── structures  # Protein structure files, calculations, etc.
+
+
+API
+===
+
+.. automodule:: ssbio.pipeline.gempro
+    :members:
 
 
 Further reading

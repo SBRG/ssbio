@@ -1,0 +1,6 @@
+nglview==1.0
+ssbio
+ipywidgets==7.0.0
+jupyter_contrib_nbextensions
+requests_cache==0.4.13
+requests

@@ -1,6 +1,8 @@
-from json_tricks.np import dump, load
-import pickle
 import logging
+import pickle
+
+from json_tricks import dump, load
+
 log = logging.getLogger(__name__)
 
 
@@ -48,7 +50,7 @@ def save_pickle(obj, outfile, protocol=2):
 
 def load_pickle(file):
     """Load a pickle file.
-    
+
     Args:
         file (str): Path to pickle file
 

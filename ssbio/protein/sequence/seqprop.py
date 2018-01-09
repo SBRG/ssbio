@@ -1,6 +1,6 @@
 """
-StructProp
-======
+SeqProp
+=======
 """
 
 import os.path as op
@@ -479,10 +479,8 @@ class SeqProp(SeqRecord):
         self.feature_path = outfile
 
     def get_biopython_pepstats(self):
-        """Run Biopython's built in ProteinAnalysis module.
+        """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""
 
-        Stores statistics in the ``annotations`` attribute.
-        """
         if self.seq:
             try:
                 pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq)
@@ -554,3 +552,59 @@ class SeqProp(SeqRecord):
 
         # Get sequence properties
         return f.extract(self).letter_annotations
+
+    def get_aggregation_propensity(self, email, password, cutoff_v=5, cutoff_n=5, run_amylmuts=False, outdir=None):
+        """Run the AMYLPRED2 web server to calculate the aggregation propensity of this protein sequence, which is
+        the number of aggregation-prone segments on the unfolded protein sequence.
+
+        Stores statistics in the ``annotations`` attribute, under the key `aggprop-amylpred`.
+
+        See :mod:`ssbio.protein.sequence.properties.aggregation_propensity` for instructions and details.
+
+        """
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        import ssbio.protein.sequence.properties.aggregation_propensity as agg
+
+        agg_predictions = agg.AMYLPRED(email=email, password=password)
+        result = agg_predictions.get_aggregation_propensity(seq=self, outdir=outdir,
+                                                            cutoff_v=cutoff_v, cutoff_n=cutoff_n,
+                                                            run_amylmuts=run_amylmuts)
+        self.annotations['aggprop-amylpred'] = result
+
+    def get_kinetic_folding_rate(self, secstruct, at_temp=None):
+        """Run the FOLD-RATE web server to calculate the kinetic folding rate given an amino acid sequence and its
+        structural classficiation (alpha/beta/mixed)
+
+        Stores statistics in the ``annotations`` attribute, under the key `kinetic_folding_rate_<TEMP>-foldrate`.
+
+        See :func:`ssbio.protein.sequence.properties.kinetic_folding_rate.get_foldrate` for instructions and details.
+
+        """
+
+        import ssbio.protein.sequence.properties.kinetic_folding_rate as kfr
+
+        rate = kfr.get_foldrate(seq=self, secstruct=secstruct)
+        self.annotations['kinetic_folding_rate_37.0_C-foldrate'] = rate
+
+        if at_temp:
+            new_rate = kfr.get_foldrate_at_temp(ref_rate=rate, new_temp=at_temp)
+            self.annotations['kinetic_folding_rate_{}_C-foldrate'.format(at_temp)] = new_rate
+
+    def get_thermostability(self, at_temp):
+        """Run the thermostability calculator using either the Dill or Oobatake methods.
+
+        Stores calculated (dG, Keq) tuple in the ``annotations`` attribute, under the key
+        `thermostability_<TEMP>-<METHOD_USED>`.
+
+        See :func:`ssbio.protein.sequence.properties.thermostability.get_dG_at_T` for instructions and details.
+
+        """
+
+        import ssbio.protein.sequence.properties.thermostability as ts
+
+        dG = ts.get_dG_at_T(seq=self, temp=at_temp)
+        self.annotations['thermostability_{}_C-{}'.format(at_temp, dG[2].lower())] = (dG[0], dG[1])

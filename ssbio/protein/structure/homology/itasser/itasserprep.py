@@ -10,34 +10,38 @@ from ssbio.protein.sequence.utils import fasta as fasta
 log = logging.getLogger(__name__)
 
 class ITASSERPrep():
-    """Prepare a sequence for I-TASSER runs
+
+    """Prepare a protein sequence for an I-TASSER homology modeling run.
+
+    The main utilities of this class are to:
+
+    * Allow for the input of a protein sequence string and paths to I-TASSER to create execution scripts
+    * Automate large-scale homology modeling efforts by creating Slurm or TORQUE job scheduling scripts
+
+    Args:
+        ident: Identifier for your sequence. Will be used as the global ID (folder name, sequence name)
+        seq_str: Sequence in string format
+        root_dir: Local directory where I-TASSER folder will be created
+        itasser_path: Path to I-TASSER folder, i.e. '~/software/I-TASSER4.4'
+        itlib_path: Path to ITLIB folder, i.e. '~/software/ITLIB'
+        execute_dir: Optional path to execution directory - use this if you are copying the homology models to
+            another location such as a supercomputer for running
+        light: If simulations should be limited to 5 runs
+        runtype: How you will be running I-TASSER - local, slurm, or torque
+        print_exec: If the execution script should be printed out
+        java_home: Path to Java executable
+        binding_site_pred: If binding site predictions should be run
+        ec_pred: If EC number predictions should be run
+        go_pred: If GO term predictions should be run
+        additional_options: Any other additional I-TASSER options, appended to the command
+        job_scheduler_header: Any job scheduling options, prepended as a header to the file
+
     """
 
     def __init__(self, ident, seq_str, root_dir, itasser_path, itlib_path,
                  execute_dir=None, light=True, runtype='local', print_exec=False, java_home=None,
                  binding_site_pred=False, ec_pred=False, go_pred=False, additional_options=None,
                  job_scheduler_header=None):
-        """Create the I-TASSER folder and also an executable script to run I-TASSER
-
-        Args:
-            ident: Identifier for your sequence. Will be used as the global ID (folder name, sequence name)
-            seq_str: Sequence in string format
-            root_dir: Local directory where I-TASSER folder will be created
-            itasser_path: Path to I-TASSER folder, i.e. '~/software/I-TASSER4.4'
-            itlib_path: Path to ITLIB folder, i.e. '~/software/ITLIB'
-            execute_dir: Optional path to execution directory - use this if you are copying the homology models to
-                another location such as a supercomputer for running
-            light: If simulations should be limited to 5 runs
-            runtype: How you will be running I-TASSER - local, slurm, or torque
-            print_exec: If the execution script should be printed out
-            java_home: Path to Java executable
-            binding_site_pred: If binding site predictions should be run
-            ec_pred: If EC number predictions should be run
-            go_pred: If GO term predictions should be run
-            additional_options: Any other additional I-TASSER options, appended to the command
-            job_scheduler_header: Any job scheduling options, prepended as a header to the file
-        """
-
         if runtype.lower() not in ['local', 'torque', 'slurm']:
             raise ValueError('Invalid runtype, must be "local", "torque", "slurm"')
 
@@ -101,8 +105,7 @@ class ITASSERPrep():
                                    itlib_loc=itlib_path)
 
     def prep_folder(self, seq):
-        """Take in a sequence string and prepares the folder for the I-TASSER run
-        """
+        """Take in a sequence string and prepares the folder for the I-TASSER run."""
         itasser_dir = op.join(self.root_dir, self.id)
 
         if not op.exists(itasser_dir):
