@@ -240,7 +240,7 @@ class GEMPRO(Object):
         log.info('{}: number of genes (excluding spontaneous)'.format(ssbio.core.modelpro.true_num_genes(self.model,
                                                                                                          custom_spont_id=self.custom_spont_id)))
         log.info('{}: number of metabolites'.format(len(self.model.metabolites)))
-        log.warning('IMPORTANT: All Gene and Reaction objects have been transformed into GenePro or ReactionPro '
+        log.warning('IMPORTANT: All Gene objects have been transformed into GenePro '
                     'objects, and will be for any new ones')
 
     @property
@@ -473,9 +473,9 @@ class GEMPRO(Object):
         """Read a manual dictionary of model gene IDs --> UniProt IDs. By default sets them as representative.
 
         This allows for mapping of the missing genes, or overriding of automatic mappings.
-        
+
         Input a dictionary of::
-            
+
             {
                 <gene_id1>: <uniprot_id1>,
                 <gene_id2>: <uniprot_id2>,
@@ -729,8 +729,8 @@ class GEMPRO(Object):
 
     def get_tmhmm_predictions(self, tmhmm_results, custom_gene_mapping=None):
         """Parse TMHMM results and store in the representative sequences.
-        
-        This is a basic function to parse pre-run TMHMM results. Run TMHMM from the 
+
+        This is a basic function to parse pre-run TMHMM results. Run TMHMM from the
         web service (http://www.cbs.dtu.dk/services/TMHMM/) by doing the following:
 
             1. Write all representative sequences in the GEM-PRO using the function ``write_representative_sequences_file``
@@ -902,7 +902,7 @@ class GEMPRO(Object):
         """Copy homology models to the GEM-PRO project.
 
         Requires an input of a dictionary formatted like so::
-        
+
             {
                 model_gene: {
                                 homology_model_id1: {
@@ -910,7 +910,7 @@ class GEMPRO(Object):
                                                         'file_type': 'pdb'
                                                         'additional_info': info_value
                                                     },
-                                homology_model_id2: {   
+                                homology_model_id2: {
                                                         'model_file': '/path/to/homology/model.pdb'
                                                         'file_type': 'pdb'
                                                     }

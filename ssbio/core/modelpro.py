@@ -13,14 +13,13 @@ from ssbio.core.genepro import GenePro
 
 class ModelPro(Model):
     def __new__(cls, *args, **kwargs):
-        """Casting Gene objects into GenePro objects and Reaction objects into ReactionPro objects
+        """Casting Gene objects into GenePro objects
             This replaces any new instance of "X" with "X"-Pros. Even when you load a model later
             using COBRApy methods. Use with caution!
         See http://stackoverflow.com/questions/3464061/cast-base-class-to-derived-class-python-or-more-pythonic-way-of-extending-class
 
         Returns:
             GenePro: a Gene object with a .protein attribute
-            ReactionPro: a Reaciton object with a .complex attribute
         """
         if cls == Gene:
             return object.__new__(GenePro)
