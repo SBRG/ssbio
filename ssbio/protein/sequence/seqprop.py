@@ -14,7 +14,7 @@ from Bio import SeqIO
 from BCBio import GFF
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.SeqFeature import SeqFeature, FeatureLocation
+from Bio.SeqFeature import SeqFeature, FeatureLocation, ExactPosition
 
 from ssbio.core.object import Object
 import ssbio.utils
@@ -478,7 +478,34 @@ class SeqProp(SeqRecord):
 
         self.feature_path = outfile
 
-    def add_feature(self, start_resnum, end_resnum, feat_name, ):
+    def add_point_feature(self, resnum, feat_type=None):
+        """Add a feature to the features list describing a single residue.
+
+        Args:
+            resnum (int): Protein sequence residue number
+            feat_type (str, optional): Optional description of the feature type (ie. 'catalytic residue')
+
+        """
+        if not feat_type:
+            feat_type = 'Manually added protein sequence single residue feature'
+        newfeat = SeqFeature(location=FeatureLocation(ExactPosition(resnum-1), ExactPosition(resnum)),
+                             type=feat_type)
+        self.features.append(newfeat)
+
+    def add_region_feature(self, start_resnum, end_resnum, feat_type=None):
+        """Add a feature to the features list describing a region of the protein sequence.
+
+        Args:
+            start_resnum (int): Start residue number of the protein sequence feature
+            end_resnum (int): End residue number of the protein sequence feature
+            feat_type (str, optional): Optional description of the feature type (ie. 'binding domain')
+
+        """
+        if not feat_type:
+            feat_type = 'Manually added protein sequence region feature'
+        newfeat = SeqFeature(location=FeatureLocation(start_resnum-1, end_resnum),
+                             type=feat_type)
+        self.features.append(newfeat)
 
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""
