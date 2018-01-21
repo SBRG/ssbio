@@ -63,10 +63,6 @@ class PDBProp(StructProp):
         self.update(cif_dict)
 
     def get_pisa_complex_predictions(self, outdir, existing_pisa_multimer_xml=None):
-        if not self.is_experimental:
-            log.error('Complex predictions for homology models currently not implemented')
-            return
-
         if not existing_pisa_multimer_xml:
             pisa_xmls = pisa.download_pisa_multimers_xml(pdb_ids=self.id, outdir=outdir,
                                                          save_single_xml_files=True)

@@ -20,3 +20,4 @@ nbsphinx
 bcbio-gff
 biopandas
 webcolors
+more_itertools

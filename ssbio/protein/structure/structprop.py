@@ -79,6 +79,9 @@ class StructProp(Object):
         if mapped_chains:
             self.add_mapped_chain_ids(mapped_chains)
 
+        # Simple flag to track if this structure has had its structure + chain sequences parsed
+        self.parsed = False
+
         # File information
         self.file_type = file_type
         self._structure_dir = None
@@ -151,6 +154,7 @@ class StructProp(Object):
             if not self.mapped_chains:
                 self.add_mapped_chain_ids(structure_chains)
 
+            self.parsed = True
             return structure
 
     def clean_structure(self, out_suffix='_clean', outdir=None, force_rerun=False,

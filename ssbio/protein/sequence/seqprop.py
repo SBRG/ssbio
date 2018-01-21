@@ -478,6 +478,8 @@ class SeqProp(SeqRecord):
 
         self.feature_path = outfile
 
+    def add_feature(self, start_resnum, end_resnum, feat_name, ):
+
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""
 

@@ -951,3 +951,31 @@ def scale_calculator(multiplier, elements, rescale=None):
         for k,v in scales.items():
             new_scales[k] = remap(v, min(scales.values()), max(scales.values()), rescale[0], rescale[1])
         return new_scales
+
+
+def label_sequential_regions(inlist):
+    """Input a list of labeled tuples and return a dictionary of sequentially labeled regions.
+
+    Args:
+        inlist (list): A list of tuples with the first number representing the index and the second the index label.
+
+    Returns:
+        dict: Dictionary of labeled regions.
+
+    Examples:
+
+        >>> label_sequential_regions([(1, 'O'), (2, 'O'), (3, 'O'), (4, 'M'), (5, 'M'), (6, 'I'), (7, 'M'), (8, 'O'), (9, 'O')])
+        {'O1': [1, 2, 3], 'M1': [4, 5], 'I1': [6], 'M2': [7], 'O2': [8, 9]}
+
+    """
+    import more_itertools as mit
+
+    df = pd.DataFrame(inlist).set_index(0)
+
+    labeled = {}
+    for label in df[1].unique():
+        iterable = df[df[1] == label].index.tolist()
+        labeled.update({'{}{}'.format(label, i + 1): items for i, items in
+                        enumerate([list(group) for group in mit.consecutive_groups(iterable)])})
+
+    return labeled

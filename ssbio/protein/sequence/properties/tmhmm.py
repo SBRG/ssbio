@@ -40,6 +40,15 @@ log = logging.getLogger(__name__)
 
 
 def parse_tmhmm_long(tmhmm_results):
+    """Parse the 'long' output format of TMHMM and return a dictionary of ``{sequence_ID: TMHMM_prediction}``.
+
+    Args:
+        tmhmm_results (str): Path to long format TMHMM output.
+
+    Returns:
+        dict: Dictionary of ``{sequence_ID: TMHMM_prediction}``
+
+    """
     with open(tmhmm_results) as f:
         lines = f.read().splitlines()
 

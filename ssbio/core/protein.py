@@ -236,11 +236,11 @@ class Protein(Object):
 
     def get_experimental_structures(self):
         """DictList: Return a DictList of all experimental structures in self.structures"""
-        return DictList(x for x in self.structures if x.is_experimental)
+        return DictList(x for x in self.structures if x.is_experimental and x.id != self.representative_structure.id)
 
     def get_homology_models(self):
         """DictList: Return a DictList of all homology models in self.structures"""
-        return DictList(x for x in self.structures if not x.is_experimental)
+        return DictList(x for x in self.structures if not x.is_experimental and x.id != self.representative_structure.id)
 
     def filter_sequences(self, seq_type):
         """Return a DictList of only specified types in the sequences attribute.
@@ -1089,7 +1089,7 @@ class Protein(Object):
         return ssbio.utils.clean_df(df)
 
     def align_seqprop_to_structprop(self, seqprop, structprop, chains=None, outdir=None,
-                                    engine='needle', parse=True, force_rerun=False,
+                                    engine='needle', structure_already_parsed=False, parse=True, force_rerun=False,
                                     **kwargs):
         """Run and store alignments of a SeqProp to chains in the ``mapped_chains`` attribute of a StructProp.
 
@@ -1107,6 +1107,9 @@ class Protein(Object):
             engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
                 ``needle`` is the standard EMBOSS tool to run pairwise alignments.
                 ``biopython`` is Biopython's implementation of needle. Results can differ!
+            structure_already_parsed (bool): If the structure has already been parsed and the chain sequences are
+                stored. Temporary option until Hadoop sequence file is implemented to reduce number of times a
+                structure is parsed.
             parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
             force_rerun (bool): If alignments should be rerun
             **kwargs: Other alignment options
@@ -1119,8 +1122,9 @@ class Protein(Object):
         if not outdir:
             outdir = self.sequence_dir
 
-        # Parse the structure so chain sequences are stored
-        structprop.parse_structure()
+        if not structure_already_parsed:
+            # Parse the structure so chain sequences are stored
+            structprop.parse_structure()
 
         if chains:
             chains_to_align_to = ssbio.utils.force_list(chains)
