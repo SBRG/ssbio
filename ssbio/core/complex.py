@@ -170,3 +170,4 @@ def get_structure_stoichiometry(structure_file):
     """
     # TODO: [VizRecon]
     # TODO: most likely to be moved to another module, need to brainstorm
+    pass
