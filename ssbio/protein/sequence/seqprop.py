@@ -365,6 +365,22 @@ class SeqProp(SeqRecord):
                 self.feature_dir = op.dirname(gff_path)
             self.feature_file = op.basename(gff_path)
 
+    def feature_path_unset(self):
+        """Copy features to memory and remove the association of the feature file."""
+        if not self.feature_file:
+            raise IOError('No feature file to unset')
+
+        with open(self.feature_path) as handle:
+            feats = list(GFF.parse(handle))
+            if len(feats) > 1:
+                log.warning('Too many sequences in GFF')
+            else:
+                tmp = feats[0].features
+
+        self.feature_dir = None
+        self.feature_file = None
+        self.features = tmp
+
     def __str__(self):
         return Object.__str__(self)
 
@@ -478,33 +494,47 @@ class SeqProp(SeqRecord):
 
         self.feature_path = outfile
 
-    def add_point_feature(self, resnum, feat_type=None):
+    def add_point_feature(self, resnum, feat_type=None, feat_id=None):
         """Add a feature to the features list describing a single residue.
 
         Args:
             resnum (int): Protein sequence residue number
             feat_type (str, optional): Optional description of the feature type (ie. 'catalytic residue')
+            feat_id (str, optional): Optional ID of the feature type (ie. 'TM1')
 
         """
+        if self.feature_file:
+            raise ValueError('Feature file associated with sequence, please remove file association to append '
+                             'additional features.')
+
         if not feat_type:
             feat_type = 'Manually added protein sequence single residue feature'
         newfeat = SeqFeature(location=FeatureLocation(ExactPosition(resnum-1), ExactPosition(resnum)),
-                             type=feat_type)
+                             type=feat_type,
+                             id=feat_id)
+
         self.features.append(newfeat)
 
-    def add_region_feature(self, start_resnum, end_resnum, feat_type=None):
+    def add_region_feature(self, start_resnum, end_resnum, feat_type=None, feat_id=None):
         """Add a feature to the features list describing a region of the protein sequence.
 
         Args:
             start_resnum (int): Start residue number of the protein sequence feature
             end_resnum (int): End residue number of the protein sequence feature
             feat_type (str, optional): Optional description of the feature type (ie. 'binding domain')
+            feat_id (str, optional): Optional ID of the feature type (ie. 'TM1')
 
         """
+        if self.feature_file:
+            raise ValueError('Feature file associated with sequence, please remove file association to append '
+                             'additional features.')
+
         if not feat_type:
             feat_type = 'Manually added protein sequence region feature'
         newfeat = SeqFeature(location=FeatureLocation(start_resnum-1, end_resnum),
-                             type=feat_type)
+                             type=feat_type,
+                             id=feat_id)
+
         self.features.append(newfeat)
 
     def get_biopython_pepstats(self):
