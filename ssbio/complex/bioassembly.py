@@ -3,6 +3,9 @@ Bioassembly
 ===========
 """
 
+from ssbio.core.object import Object
+
+
 class Bioassembly(Object):
 
     """Methods to deal with a PDB biological assembly file.
