@@ -28,3 +28,6 @@ class Bioassembly(Object):
             choose a file type for files downloaded from the PDB
 
     """
+
+    def __init__(self):
+        pass
