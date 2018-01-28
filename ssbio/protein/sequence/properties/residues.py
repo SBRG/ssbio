@@ -142,7 +142,7 @@ def emboss_pepstats_parser(infile):
         num = cleaninfo[2]
         percent = float(cleaninfo[-1]) / float(100)
 
-        info_dict['percent_' + prop.lower() + '-pepstats'] = percent
+        info_dict['mol_percent_' + prop.lower() + '-pepstats'] = percent
 
     return info_dict
 
