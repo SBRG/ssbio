@@ -236,11 +236,17 @@ class Protein(Object):
 
     def get_experimental_structures(self):
         """DictList: Return a DictList of all experimental structures in self.structures"""
-        return DictList(x for x in self.structures if x.is_experimental and x.id != self.representative_structure.id)
+        if self.representative_structure:
+            return DictList(x for x in self.structures if x.is_experimental and x.id != self.representative_structure.id)
+        else:
+            return DictList(x for x in self.structures if x.is_experimental)
 
     def get_homology_models(self):
         """DictList: Return a DictList of all homology models in self.structures"""
-        return DictList(x for x in self.structures if not x.is_experimental and x.id != self.representative_structure.id)
+        if self.representative_structure:
+            return DictList(x for x in self.structures if not x.is_experimental and x.id != self.representative_structure.id)
+        else:
+            return DictList(x for x in self.structures if not x.is_experimental)
 
     def filter_sequences(self, seq_type):
         """Return a DictList of only specified types in the sequences attribute.
@@ -620,6 +626,80 @@ class Protein(Object):
                 aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
 
             self.sequence_alignments.append(aln)
+
+    def sc_pairwise_align_sequences_to_representative(self, sc, gapopen=10, gapextend=0.5, outdir=None,
+                                                      engine='needle', parse=True, force_rerun=False):
+        """Pairwise all sequences in the sequences attribute to the representative sequence. Stores the alignments
+        in the ``sequence_alignments`` DictList attribute.
+
+        Args:
+            sc (SparkContext): Configured spark context for parallelization
+            gapopen (int): Only for ``engine='needle'`` - Gap open penalty is the score taken away when a gap is created
+            gapextend (float): Only for ``engine='needle'`` - Gap extension penalty is added to the standard gap penalty
+                for each base or residue in the gap
+            outdir (str): Only for ``engine='needle'`` - Path to output directory. Default is the protein sequence
+                directory.
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
+            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an
+                annotation)
+            force_rerun (bool): Only for ``engine='needle'`` - Default False, set to True if you want to rerun the
+                alignment if outfile exists.
+
+        """
+
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        sequences_rdd = sc.parallelize(self.sequences)
+
+        def make_aln_id(self, seq_id):
+            aln_id = '{}_{}'.format(self.id, seq_id)
+            outfile = '{}.needle'.format(aln_id)
+            return outfile
+
+        # if not self.representative_sequence:
+        #     log.error('{}: no representative sequence set, skipping gene'.format(self.id))
+        #     continue
+        #
+        # if self.sequence_alignments.has_id(aln_id):
+        #     log.debug('{}: alignment already completed'.format(seq.id))
+        #     continue
+        #
+        # if not seq.seq_str:
+        #     log.error('{}: no sequence stored, skipping alignment'.format(seq.id))
+        #     continue
+        #
+        # # Don't need to compare sequence to itself
+        # if seq.id == self.representative_sequence.id:
+        #     continue
+        #
+        # aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
+        #                                                                          a_seq_id=self.id,
+        #                                                                          b_seq=seq.seq_str,
+        #                                                                          b_seq_id=seq.id,
+        #                                                                          gapopen=gapopen, gapextend=gapextend,
+        #                                                                          engine=engine,
+        #                                                                          outdir=outdir,
+        #                                                                          outfile=outfile,
+        #                                                                          force_rerun=force_rerun)
+        # # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
+        # aln.id = aln_id
+        # aln.annotations['a_seq'] = self.representative_sequence.id
+        # aln.annotations['b_seq'] = seq.id
+        #
+        # if parse:
+        #     aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
+        #                                                                      b_aln_seq=str(list(aln)[1].seq))
+        #     aln.annotations['ssbio_type'] = 'seqalign'
+        #     aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
+        #     aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
+        #     aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
+        #
+        # self.sequence_alignments.append(aln)
 
     def get_sequence_properties(self, representative_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
