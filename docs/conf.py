@@ -87,8 +87,9 @@ extensions = [
     'sphinx.ext.autosectionlabel',
 ]
 
-# Allow errors in nbsphinx
+# Allow errors in nbsphinx and do not execute
 nbsphinx_allow_errors = True
+nbsphinx_execute = 'never'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
