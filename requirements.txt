@@ -22,3 +22,6 @@ biopandas
 webcolors
 more_itertools
 slugify
+bcbio-gff
+scipy
+pytest
