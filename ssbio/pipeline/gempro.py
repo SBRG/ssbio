@@ -374,8 +374,8 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes mapped to KEGG'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> KEGG. See the "df_kegg_metadata" attribute for a summary dataframe.')
 
-    def kegg_mapping_and_metadata_parallel(self, sc, kegg_organism_code, custom_gene_mapping=None, outdir=None,
-                                  set_as_representative=False, force_rerun=False):
+    def kegg_mapping_and_metadata_parallelize(self, sc, kegg_organism_code, custom_gene_mapping=None, outdir=None,
+                                              set_as_representative=False, force_rerun=False):
         """Map all genes in the model to KEGG IDs using the KEGG service.
 
         Steps:
@@ -399,10 +399,10 @@ class GEMPRO(Object):
         # First map all of the organism's KEGG genes to UniProt
         kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
 
-        successfully_mapped_counter = 0
-
+        # Parallelize the genes list
         genes_rdd = sc.parallelize(self.genes)
 
+        # Write a sub-function to carry out the bulk of the original function
         def gp_kegg_sc(g):
             if custom_gene_mapping:
                 kegg_g = custom_gene_mapping[g.id]
@@ -422,11 +422,25 @@ class GEMPRO(Object):
                     if g.protein.representative_sequence.kegg == kegg_prop.kegg:
                         g.protein.representative_sequence.uniprot = kegg_to_uniprot[kegg_g]
 
-            return g
+            # Tracker for if it mapped successfully to KEGG
+            if kegg_prop.sequence_file:
+                success = True
+            else:
+                success = False
 
-        results = genes_rdd.map(gp_kegg_sc).collect()
+            return g, success
 
-        return results
+        # Run a map operation to execute the function on all items in the RDD
+        result = genes_rdd.map(gp_kegg_sc).collect()
+
+        # Copy the results over to the GEM-PRO object's genes using the GenePro function "copy_modified_gene"
+        # Also count how many genes mapped to KEGG
+        successfully_mapped_counter = 0
+        for modified_g, success in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
+            if success:
+                successfully_mapped_counter += 1
 
         log.info('{}/{}: number of genes mapped to KEGG'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> KEGG. See the "df_kegg_metadata" attribute for a summary dataframe.')
