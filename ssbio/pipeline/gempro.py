@@ -374,6 +374,63 @@ class GEMPRO(Object):
         log.info('{}/{}: number of genes mapped to KEGG'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> KEGG. See the "df_kegg_metadata" attribute for a summary dataframe.')
 
+    def kegg_mapping_and_metadata_parallel(self, sc, kegg_organism_code, custom_gene_mapping=None, outdir=None,
+                                  set_as_representative=False, force_rerun=False):
+        """Map all genes in the model to KEGG IDs using the KEGG service.
+
+        Steps:
+            1. Download all metadata and sequence files in the sequences directory
+            2. Creates a KEGGProp object in the protein.sequences attribute
+            3. Returns a Pandas DataFrame of mapping results
+
+        Args:
+            sc (SparkContext): Spark Context to parallelize this function
+            kegg_organism_code (str): The three letter KEGG code of your organism
+            custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,
+                custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
+                Dictionary keys must match model gene IDs.
+            outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
+                were not created initially
+            set_as_representative (bool): If mapped KEGG IDs should be set as representative sequences
+            force_rerun (bool): If you want to overwrite any existing mappings and files
+
+        """
+
+        # First map all of the organism's KEGG genes to UniProt
+        kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
+
+        successfully_mapped_counter = 0
+
+        genes_rdd = sc.parallelize(self.genes)
+
+        def gp_kegg_sc(g):
+            if custom_gene_mapping:
+                kegg_g = custom_gene_mapping[g.id]
+            else:
+                kegg_g = g.id
+
+            # Download both FASTA and KEGG metadata files
+            kegg_prop = g.protein.load_kegg(kegg_id=kegg_g, kegg_organism_code=kegg_organism_code,
+                                            download=True, outdir=outdir,
+                                            set_as_representative=set_as_representative,
+                                            force_rerun=force_rerun)
+
+            # Update potentially old UniProt ID
+            if kegg_g in kegg_to_uniprot.keys():
+                kegg_prop.uniprot = kegg_to_uniprot[kegg_g]
+                if g.protein.representative_sequence:
+                    if g.protein.representative_sequence.kegg == kegg_prop.kegg:
+                        g.protein.representative_sequence.uniprot = kegg_to_uniprot[kegg_g]
+
+            return g
+
+        results = genes_rdd.map(gp_kegg_sc).collect()
+
+        return results
+
+        log.info('{}/{}: number of genes mapped to KEGG'.format(successfully_mapped_counter, len(self.genes)))
+        log.info('Completed ID mapping --> KEGG. See the "df_kegg_metadata" attribute for a summary dataframe.')
+
     @property
     def df_kegg_metadata(self):
         """DataFrame: Pandas DataFrame of KEGG metadata per protein."""
@@ -1085,6 +1142,83 @@ class GEMPRO(Object):
                                                                allow_unresolved=allow_unresolved,
                                                                clean=clean,
                                                                force_rerun=force_rerun)
+
+        log.info('{}/{}: number of genes with a representative structure'.format(len(self.genes_with_a_representative_structure),
+                                                                                 len(self.genes)))
+        log.info('See the "df_representative_structures" attribute for a summary dataframe.')
+
+    def set_representative_structure_parallel(self, sc, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
+                                     engine='needle', always_use_homology=False, rez_cutoff=0.0,
+                                     seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+                                     allow_mutants=True, allow_deletions=False,
+                                     allow_insertions=False, allow_unresolved=True,
+                                     clean=True, force_rerun=False):
+        """Set all representative structure for proteins from a structure in the structures attribute.
+
+        Each gene can have a combination of the following, which will be analyzed to set a representative structure.
+
+            * Homology model(s)
+            * Ranked PDBs
+            * BLASTed PDBs
+
+        If the ``always_use_homology`` flag is true, homology models are always set as representative when they exist.
+        If there are multiple homology models, we rank by the percent sequence coverage.
+
+        Args:
+            seq_outdir (str): Path to output directory of sequence alignment files, must be set if GEM-PRO directories
+                were not created initially
+            struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories
+                were not created initially
+            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
+                choose a file type for files downloaded from the PDB
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
+            always_use_homology (bool): If homology models should always be set as the representative structure
+            rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
+            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
+            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
+                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
+                5 to 95 will be checked for modifications.
+            allow_mutants (bool): If mutations should be allowed or checked for
+            allow_deletions (bool): If deletions should be allowed or checked for
+            allow_insertions (bool): If insertions should be allowed or checked for
+            allow_unresolved (bool): If unresolved residues should be allowed or checked for
+            clean (bool): If structures should be cleaned
+            force_rerun (bool): If sequence to structure alignment should be rerun
+
+        """
+        genes_rdd = sc.parallelize(self.genes)
+
+        genes_rdd.map(lambda g: (g, g.protein.set_representative_structure(seq_outdir=seq_outdir,
+                                                           struct_outdir=struct_outdir,
+                                                           pdb_file_type=pdb_file_type,
+                                                           engine=engine,
+                                                           rez_cutoff=rez_cutoff,
+                                                           seq_ident_cutoff=seq_ident_cutoff,
+                                                           always_use_homology=always_use_homology,
+                                                           allow_missing_on_termini=allow_missing_on_termini,
+                                                           allow_mutants=allow_mutants,
+                                                           allow_deletions=allow_deletions,
+                                                           allow_insertions=allow_insertions,
+                                                           allow_unresolved=allow_unresolved,
+                                                           clean=clean,
+                                                           force_rerun=force_rerun))).collect()
+
+        # repstruct = g.protein.set_representative_structure(seq_outdir=seq_outdir,
+        #                                                    struct_outdir=struct_outdir,
+        #                                                    pdb_file_type=pdb_file_type,
+        #                                                    engine=engine,
+        #                                                    rez_cutoff=rez_cutoff,
+        #                                                    seq_ident_cutoff=seq_ident_cutoff,
+        #                                                    always_use_homology=always_use_homology,
+        #                                                    allow_missing_on_termini=allow_missing_on_termini,
+        #                                                    allow_mutants=allow_mutants,
+        #                                                    allow_deletions=allow_deletions,
+        #                                                    allow_insertions=allow_insertions,
+        #                                                    allow_unresolved=allow_unresolved,
+        #                                                    clean=clean,
+        #                                                    force_rerun=force_rerun)
 
         log.info('{}/{}: number of genes with a representative structure'.format(len(self.genes_with_a_representative_structure),
                                                                                  len(self.genes)))

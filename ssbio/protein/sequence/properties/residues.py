@@ -46,6 +46,42 @@ _aa_flexibility_dict_one = {'A': -0.605,
 
 _aa_flexibility_dict_three = {one_to_three(k): v for k, v in _aa_flexibility_dict_one.items()}
 
+_human_readable_pepstats = {'A_percent-biop': '% Ala',
+'C_percent-biop': '% Cys',
+'D_percent-biop': '% Asp',
+'E_percent-biop': '% Glu',
+'F_percent-biop': '% Phe',
+'G_percent-biop': '% Gly',
+'H_percent-biop': '% His',
+'I_percent-biop': '% Ile',
+'K_percent-biop': '% Lys',
+'L_percent-biop': '% Leu',
+'M_percent-biop': '% Met',
+'N_percent-biop': '% Asn',
+'P_percent-biop': '% Pro',
+'Q_percent-biop': '% Gln',
+'R_percent-biop': '% Arg',
+'S_percent-biop': '% Ser',
+'T_percent-biop': '% Thr',
+'V_percent-biop': '% Val',
+'W_percent-biop': '% Trp',
+'Y_percent-biop': '% Tyr',
+'aromaticity-biop': 'Aromaticity',
+'instability_index-biop': 'Instability index',
+'isoelectric_point-biop': 'Isoelectric point (pI)',
+'percent_helix_naive-biop': '% residues commonly in helix (V, I, Y, F, W, L)',
+'percent_turn_naive-biop': '% residues commonly in turn (N, P, G, S))',
+'percent_strand_naive-biop': '% residues commonly in sheet (E, M, A, L)',
+'mol_percent_tiny-pepstats': 'Molar % of tiny residues (A, C, G, S, T)',
+'mol_percent_small-pepstats': 'Molar % of small residues (A, B, C, D, G, N, P, S, T, V)',
+'mol_percent_aliphatic-pepstats': 'Molar % of aliphatic residues (A, I, L, V)',
+'mol_percent_aromatic-pepstats': 'Molar % of aromatic residues (F, H, W, Y)',
+'mol_percent_non-polar-pepstats': 'Molar % of non-polar residues (A, C, F, G, I, L, M, P, V, W, Y)',
+'mol_percent_polar-pepstats': 'Molar % of polar residues (D, E, H, K, N, Q, R, S, T, Z)',
+'mol_percent_charged-pepstats': 'Molar % of charged residues (B, D, E, H, K, R, Z)',
+'mol_percent_basic-pepstats': 'Molar % of basic residues (H, K, R)',
+'mol_percent_acidic-pepstats': 'Molar % of acidic residues (B, D, E, Z)'}
+
 
 def biopython_protein_analysis(inseq):
     """Utiize Biopython's ProteinAnalysis module to return general sequence properties of an amino acid string.
@@ -142,7 +178,7 @@ def emboss_pepstats_parser(infile):
         num = cleaninfo[2]
         percent = float(cleaninfo[-1]) / float(100)
 
-        info_dict['percent_' + prop.lower() + '-pepstats'] = percent
+        info_dict['mol_percent_' + prop.lower() + '-pepstats'] = percent
 
     return info_dict
 
