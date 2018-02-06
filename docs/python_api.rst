@@ -8,6 +8,12 @@ Information on select functions, classes, or methods.
 
 .. toctree::
 
+``ssbio.pipeline.gempro``
+-------------------------
+
+.. automodule:: ssbio.pipeline.gempro
+    :members:
+
 ``ssbio.databases``
 -----------------
 
