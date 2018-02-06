@@ -10,7 +10,7 @@ xmltodict
 mmtf-python
 msgpack-python
 awesome-slugify
-ipywidgets==5.2.2
+ipywidgets==7.0.0
 lxml
 json-tricks>3.0
 seaborn
@@ -21,3 +21,4 @@ bcbio-gff
 biopandas
 webcolors
 more_itertools
+slugify
