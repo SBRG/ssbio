@@ -68,6 +68,20 @@ class GenePro(Gene):
         else:
             return None
 
+    def copy_modified_gene(self, modified_gene, ignore_model_attributes=True):
+        """Copy attributes of a Gene object over to this Gene, given that the modified gene has the same ID.
+
+        Args:
+            modified_gene (Gene, GenePro): Gene with modified attributes that you want to copy over.
+            ignore_model_attributes (bool): If you want to ignore copying over attributes related to metabolic models.
+
+        """
+        ignore = ['_model', '_reaction', '_functional', 'model', 'reaction', 'functional']
+        for attr in filter(lambda a: not a.startswith('__') and not isinstance(getattr(type(self), a, None), property) and not callable(getattr(self, a)),
+                           dir(modified_gene)):
+            if attr not in ignore and ignore_model_attributes:
+                setattr(self, attr, getattr(modified_gene, attr))
+
     def reset_protein(self):
         self.protein = Protein(self.id, root_dir=self.gene_dir, pdb_file_type=self.pdb_file_type)
 
