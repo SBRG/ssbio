@@ -19,7 +19,6 @@ beautifulsoup4==4.5.3
 nbsphinx
 bcbio-gff
 biopandas
-webcolors
 more_itertools
 slugify
 bcbio-gff
