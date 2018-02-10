@@ -249,7 +249,7 @@ class ATLAS(Object):
 
         log.info('Created {} new strain GEM-PROs, accessible at "strains" attribute'.format(counter))
 
-    def download_patric_genomes_parallelize(self, ids, sc, force_rerun=False):
+    def download_patric_genomes_parallelize(self, ids, sc, write_protein_fasta_files=False, outdir=None, force_rerun=False):
         """Download genome files from PATRIC given a list of PATRIC genome IDs and load them as strains.
 
         Args:
@@ -271,7 +271,7 @@ class ATLAS(Object):
             f = ssbio.databases.patric.download_coding_sequences(patric_id=strain_id, seqtype='protein',
                                                                  outdir=self.sequences_by_organism_dir,
                                                                  force_rerun=force_rerun)
-            strain_gp = GEMPRO(gem_name=strain_id, genome_path=f, write_protein_fasta_files=False)
+            strain_gp = GEMPRO(gem_name=strain_id, genome_path=f, write_protein_fasta_files=write_protein_fasta_files, root_dir=outdir)
             return strain_gp
 
         strains_rdd = sc.parallelize(ids)
