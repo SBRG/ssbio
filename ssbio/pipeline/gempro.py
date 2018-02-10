@@ -108,7 +108,7 @@ class GEMPRO(Object):
 
     def __init__(self, gem_name, pdb_file_type='mmtf', root_dir=None,
                  gem=None, gem_file_path=None, gem_file_type=None,
-                 genes_list=None, genes_and_sequences=None, genome_path=None,
+                 genes_list=None, genes_and_sequences=None, genome_path=None, write_protein_fasta_files=True,
                  description=None, custom_spont_id=None):
         Object.__init__(self, id=gem_name, description=description)
 
@@ -140,13 +140,13 @@ class GEMPRO(Object):
         # Or, load a dictionary of genes and their sequences
         elif genes_and_sequences:
             self.genes = list(genes_and_sequences.keys())
-            self.manual_seq_mapping(genes_and_sequences)
+            self.manual_seq_mapping(genes_and_sequences, write_fasta_files=write_protein_fasta_files)
 
         # Or, load the provided FASTA file
         elif genome_path:
             tmp = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
             self.genes = list(tmp.keys())
-            self.manual_seq_mapping(tmp)
+            self.manual_seq_mapping(tmp, write_fasta_files=write_protein_fasta_files)
 
         # If neither a model or genes are input, you can still add IDs with method add_genes_by_id later
         else:
@@ -614,7 +614,7 @@ class GEMPRO(Object):
         return list(set(uniprot_missing))
 
     # TODO: should also have a seq --> uniprot id function (has to be 100% match) (also needs organism)
-    def manual_seq_mapping(self, gene_to_seq_dict, outdir=None, set_as_representative=True):
+    def manual_seq_mapping(self, gene_to_seq_dict, outdir=None, write_fasta_files=True, set_as_representative=True):
         """Read a manual input dictionary of model gene IDs --> protein sequences. By default sets them as representative.
 
         Args:
@@ -634,13 +634,13 @@ class GEMPRO(Object):
             g = str(g)
             gene = self.genes.get_by_id(g)
 
-            if not outdir_set:
+            if not outdir_set and write_fasta_files:
                 outdir = gene.protein.sequence_dir
                 if not outdir:
                     raise ValueError('Output directory must be specified')
 
             manual_info = gene.protein.load_manual_sequence(ident=g, seq=s, outdir=outdir,
-                                                            write_fasta_file=True,
+                                                            write_fasta_file=write_fasta_files,
                                                             set_as_representative=set_as_representative)
             log.debug('{}: loaded manually defined sequence information'.format(g))
 
