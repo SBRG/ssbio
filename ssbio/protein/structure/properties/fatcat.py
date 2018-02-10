@@ -38,7 +38,7 @@ def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=
     fatcat_cmd = '{} -file1 {} -file2 {} -outFile {}'.format(fatcat_sh, structure_path_1, structure_path_2, outfile)
     if print_cmd:
         print(fatcat_cmd)
-    ssbio.utils.command_runner(fatcat_cmd, force_rerun_flag=force_rerun, outfile=outfile, silent=silent)
+    ssbio.utils.command_runner(fatcat_cmd, force_rerun_flag=force_rerun, outfile_checker=outfile, silent=silent)
 
     return outfile
 

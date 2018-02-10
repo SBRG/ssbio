@@ -453,15 +453,16 @@ def program_exists(prog_name):
         return False
 
 
-def command_runner(shell_command, force_rerun_flag, outfile, silent=False):
-    """Run a program with command-line arguments.
+def command_runner(shell_command, force_rerun_flag, outfile_checker, cwd=None, silent=False):
+    """Run a shell command with subprocess, with additional options to check if output file exists and printing stdout.
 
     Args:
-        program: Name of the program.
-        args: Any program flags as they would be formatted in the command-line (ie. "-i test.in -o test.out").
+        shell_command (str): Command as it would be formatted in the command-line (ie. "program -i test.in -o test.out").
         force_rerun_flag: If the program should be rerun even if the output file exists.
-        outfile: Name out the output file which may have been generated.
-            This does not specify what the outfile will be, that should be done in the args.
+        outfile_checker (str): Name out the output file which may have been generated. This does not specify what the outfile
+            will be, that should be done in the program's args or predetermined.
+        cwd (str): Path to working directory where command will be executed.
+        silent (bool): If program STDOUT should be printed to the current shell.
 
     Returns:
         bool: If the program ran successfully.
@@ -473,25 +474,31 @@ def command_runner(shell_command, force_rerun_flag, outfile, silent=False):
     if not program_exists(program_and_args[0]):
         raise OSError('{}: program not installed'.format(program_and_args[0]))
 
+    # Format outfile if working in cwd
+    if cwd:
+        # TODO: should this be done, or should user explicitly define whole outfile path?
+        outfile_checker = op.join(cwd, op.basename(outfile_checker))
+
     # Check for force rerunning
-    if force_rerun(flag=force_rerun_flag, outfile=outfile):
+    if force_rerun(flag=force_rerun_flag, outfile=outfile_checker):
         if silent:
-            command = subprocess.Popen(program_and_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            command = subprocess.Popen(program_and_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
             out, err = command.communicate()
             ret = command.returncode
         else:
             # Prints output
-            for path in execute(program_and_args):
+            for path in execute(cmd=program_and_args, cwd=cwd):
                 print(path, end="")
 
         # TODO: check return code and log properly
-        log.debug('{}: Ran program, output to {}'.format(program_and_args[0], outfile))
+        log.debug('{}: Ran program, output to {}'.format(program_and_args[0], outfile_checker))
     else:
-        log.debug('{}: Output already exists'.format(outfile))
+        log.debug('{}: Output already exists'.format(outfile_checker))
 
 
-def execute(cmd):
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+def execute(cmd, cwd=None):
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd, universal_newlines=True)
+    # TODO: should also print stderr or give an option for that
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
     popen.stdout.close()
