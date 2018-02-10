@@ -89,7 +89,7 @@ class StructProp(Object):
     @property
     def structure_dir(self):
         if not self._structure_dir:
-            raise OSError('No sequence folder set')
+            raise OSError('No structure folder set')
         return self._structure_dir
 
     @structure_dir.setter
