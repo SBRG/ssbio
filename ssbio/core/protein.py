@@ -487,6 +487,41 @@ class Protein(Object):
 
         return self.sequences.get_by_id(ident)
 
+    def load_manual_sequence_from_genome(self, ident, genome_path, write_fasta_file=False, outdir=None,
+                                         set_as_representative=False, force_rewrite=False):
+        """Load a manual sequence from a FASTA file of many protein sequences.
+
+        Args:
+            ident (str): Identifier for the sequence in the FASTA file.
+            genome_path (str): Path to FASTA file containing multiple protein sequences
+            write_fasta_file (bool): If this sequence should be written out to a FASTA file
+            outdir (str): Path to output directory
+            set_as_representative (bool): If this sequence should be set as the representative one
+            force_rewrite (bool): If the FASTA file should be overwritten if it already exists
+
+        Returns:
+            SeqProp: Sequence that was loaded into the ``sequences`` attribute
+
+        """
+        if write_fasta_file:
+            if not outdir:
+                outdir = self.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+            outfile = op.join(outdir, '{}.faa'.format(ident))
+        else:
+            outfile = None
+
+        manual_sequence = SeqProp(id=ident, genome_path=genome_path, seq=None)
+        if write_fasta_file:
+            manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
+        self.sequences.append(manual_sequence)
+
+        if set_as_representative:
+            self.representative_sequence = manual_sequence
+
+        return self.sequences.get_by_id(ident)
+
     def set_representative_sequence(self, force_rerun=False):
         """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative
         sequence.
@@ -660,10 +695,6 @@ class Protein(Object):
             aln_id = '{}_{}'.format(self.id, seqprop.id)
             outfile = '{}.needle'.format(aln_id)
 
-            # Don't need to compare sequence to itself
-            if seqprop.id == self.representative_sequence.id:
-                return
-
             aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
                                                                                      a_seq_id=self.id,
                                                                                      b_seq=seqprop.seq_str,
@@ -688,7 +719,7 @@ class Protein(Object):
 
             return aln
 
-        sequences_rdd = sc.parallelize(self.sequences)
+        sequences_rdd = sc.parallelize(filter(lambda x: x.id != self.representative_sequence.id, self.sequences))
         result = sequences_rdd.map(lambda x: pairwise_sc(self, x)).collect()
 
         for r in result:
@@ -831,6 +862,9 @@ class Protein(Object):
             new_pdbs = [y for y in pdbs if not self.structures.has_id(y)]
             if new_pdbs:
                 log.debug('{}: adding {} PDBs from BLAST results'.format(self.id, len(new_pdbs)))
+            else:
+                already_have = [y for y in pdbs if self.structures.has_id(y)]
+                log.debug('{}: PDBs already contained in structures list'.format(';'.join(already_have)))
             blast_results = [z for z in blast_results if z['hit_pdb'].lower() in new_pdbs]
 
             for blast_result in blast_results:

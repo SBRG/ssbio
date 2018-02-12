@@ -100,7 +100,7 @@ class GEMPRO(Object):
         gem_file_type (str): GEM model type - ``sbml`` (or ``xml``), ``mat``, or ``json`` formats
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
-        genome_path (str): Genome FASTA file of protein coding sequences
+        genome_path (str): FASTA file of all protein coding sequences
         description (str): Optional string to describe your project
         custom_spont_id (str): ID of spontaneous gene
 
@@ -144,9 +144,7 @@ class GEMPRO(Object):
 
         # Or, load the provided FASTA file
         elif genome_path:
-            tmp = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
-            self.genes = list(tmp.keys())
-            self.manual_seq_mapping(tmp, write_fasta_files=write_protein_fasta_files)
+            self.genome_path_loader(genome_path, write_fasta_files=write_protein_fasta_files)
 
         # If neither a model or genes are input, you can still add IDs with method add_genes_by_id later
         else:
@@ -621,6 +619,7 @@ class GEMPRO(Object):
             gene_to_seq_dict (dict): Mapping of gene IDs to their protein sequence strings
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            write_fasta_files (bool): If individual protein FASTA files should be written out
             set_as_representative (bool): If mapped sequences should be set as representative
 
         """
@@ -631,8 +630,7 @@ class GEMPRO(Object):
 
         # Save the sequence information in individual FASTA files
         for g, s in gene_to_seq_dict.items():
-            g = str(g)
-            gene = self.genes.get_by_id(g)
+            gene = self.genes.get_by_id(str(g))
 
             if not outdir_set and write_fasta_files:
                 outdir = gene.protein.sequence_dir
@@ -645,6 +643,42 @@ class GEMPRO(Object):
             log.debug('{}: loaded manually defined sequence information'.format(g))
 
         log.info('Loaded in {} sequences'.format(len(gene_to_seq_dict)))
+
+    def genome_path_loader(self, genome_path, outdir=None, write_fasta_files=True, set_as_representative=True):
+        """Read a manual input dictionary of model gene IDs --> protein sequences. By default sets them as representative.
+
+        Args:
+            gene_to_seq_idx (Bio.File._IndexedSeqFileDict): Doesn't load the entire FASTA file in memory
+            outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
+                were not created initially
+            write_fasta_files (bool): If individual protein FASTA files should be written out
+            set_as_representative (bool): If mapped sequences should be set as representative
+
+        """
+        if outdir:
+            outdir_set = True
+        else:
+            outdir_set = False
+
+        gene_to_seq_idx = SeqIO.index(genome_path, "fasta")
+        self.genes = list(gene_to_seq_idx.keys())
+
+        # Save the sequence information in individual FASTA files
+        for g, s in gene_to_seq_idx.items():
+            gene = self.genes.get_by_id(str(g))
+
+            if not outdir_set and write_fasta_files:
+                outdir = gene.protein.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+
+            manual_info = gene.protein.load_manual_sequence_from_genome(ident=g, genome_path=genome_path,
+                                                                        outdir=outdir,
+                                                                        write_fasta_file=write_fasta_files,
+                                                                        set_as_representative=set_as_representative)
+            log.debug('{}: loaded manually defined sequence information'.format(g))
+
+        log.info('Loaded in {} sequences'.format(len(gene_to_seq_idx)))
 
     def set_representative_sequence(self, force_rerun=False):
         """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative sequence.
@@ -1204,7 +1238,7 @@ class GEMPRO(Object):
         """
         genes_rdd = sc.parallelize(self.genes)
 
-        genes_rdd.map(lambda g: (g, g.protein.set_representative_structure(seq_outdir=seq_outdir,
+        result = genes_rdd.map(lambda g: (g, g.protein.set_representative_structure(seq_outdir=seq_outdir,
                                                            struct_outdir=struct_outdir,
                                                            pdb_file_type=pdb_file_type,
                                                            engine=engine,
@@ -1219,20 +1253,11 @@ class GEMPRO(Object):
                                                            clean=clean,
                                                            force_rerun=force_rerun))).collect()
 
-        # repstruct = g.protein.set_representative_structure(seq_outdir=seq_outdir,
-        #                                                    struct_outdir=struct_outdir,
-        #                                                    pdb_file_type=pdb_file_type,
-        #                                                    engine=engine,
-        #                                                    rez_cutoff=rez_cutoff,
-        #                                                    seq_ident_cutoff=seq_ident_cutoff,
-        #                                                    always_use_homology=always_use_homology,
-        #                                                    allow_missing_on_termini=allow_missing_on_termini,
-        #                                                    allow_mutants=allow_mutants,
-        #                                                    allow_deletions=allow_deletions,
-        #                                                    allow_insertions=allow_insertions,
-        #                                                    allow_unresolved=allow_unresolved,
-        #                                                    clean=clean,
-        #                                                    force_rerun=force_rerun)
+        # Copy the results over to the GEM-PRO object's genes using the GenePro function "copy_modified_gene"
+        # Also count how many genes mapped to KEGG
+        for modified_g, success in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
 
         log.info('{}/{}: number of genes with a representative structure'.format(len(self.genes_with_a_representative_structure),
                                                                                  len(self.genes)))
