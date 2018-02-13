@@ -289,13 +289,13 @@ def get_alignment_df(a_aln_seq, b_aln_seq, a_seq_id=None, b_seq_id=None):
 
         if a == b and a != '-' and b != '-':
             aa_flag = 'match'
-        if a != b and a == '-' and b != '-':
+        elif a != b and a == '-' and b != '-':
             aa_flag = 'insertion'
-        if a != b and a != '-' and b == '-':
+        elif a != b and a != '-' and b == '-':
             aa_flag = 'deletion'
-        if a != b and a != '-' and b == 'X':
+        elif a != b and a != '-' and b == 'X':
             aa_flag = 'unresolved'
-        if a != b and b != '-' and a == 'X':
+        elif a != b and b != '-' and a == 'X':
             aa_flag = 'unresolved'
         elif a != b and a != '-' and b != '-':
             aa_flag = 'mutation'
