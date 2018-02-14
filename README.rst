@@ -75,8 +75,7 @@ Citation
 
 The manuscript for the *ssbio* package can be found and cited at [1]_.
 
-.. [1] Mih N, Brunk E, Chen K, Catoiu E, Sastry A, Kavvas E, Monk JM, Zhang Z, Palsson BO. ssbio: A Python Framework for Structural Systems Biology. bioRxiv. 2017. p. 165506. https://doi.org/10.1101/165506
-
+.. [1] Mih N, Brunk E, Chen K, Catoiu E, Sastry A, Kavvas E, Monk JM, Zhang Z, Palsson BO. 2018. ssbio: A Python Framework for Structural Systems Biology. Bioinformatics. https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty077/4850940.
 
 .. Links
 .. _Protein: http://ssbio.readthedocs.io/en/latest/protein.html
