@@ -15,6 +15,7 @@ import requests
 import deprecation
 from Bio.PDB import PDBList
 from lxml import etree
+from six.moves.urllib_error import URLError
 from six.moves.urllib.request import urlopen, urlretrieve
 
 import ssbio.databases.pisa as pisa
@@ -66,6 +67,7 @@ class PDBProp(StructProp):
             structure_file = p.retrieve_pdb_file(pdb_code=self.id, pdir=outdir, file_format=file_type, overwrite=force_rerun)
         if not op.exists(structure_file):
             log.debug('{}: {} file not available'.format(self.id, file_type))
+            raise URLError('{}.{}: file not available to download'.format(self.id, file_type))
         else:
             log.debug('{}: {} file saved'.format(self.id, file_type))
             self.load_structure_path(structure_file, file_type)
