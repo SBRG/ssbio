@@ -8,10 +8,12 @@ import json
 import logging
 import os.path as op
 import zlib
-
+import os
+from cobra.core import DictList
 import pandas as pd
 import requests
-from Bio.PDB.MMCIF2Dict import MMCIF2Dict
+import deprecation
+from Bio.PDB import PDBList
 from lxml import etree
 from six.moves.urllib.request import urlopen, urlretrieve
 
@@ -43,30 +45,34 @@ class PDBProp(StructProp):
         self.resolution = None
         self.date = None
         self.taxonomy_name = None
+        self.biological_assemblies = DictList()
+        """DictList: A list for storing Bioassembly objects related to this PDB ID"""
 
-    def download_structure_file(self, outdir, file_type, force_rerun=False):
-        pdb_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=False, outdir=outdir,
-                                      force_rerun=force_rerun)
-        log.debug('{}: downloaded {} file'.format(self.id, file_type))
-        self.load_structure_path(pdb_file, file_type)
+    def download_structure_file(self, outdir, file_type, load_header_metadata=True, force_rerun=False):
+        """Download a structure file from the PDB, specifying an output directory and a file type. Optionally download
+        the mmCIF header file and parse data from it to store within this object.
 
-        if 'cif' in file_type:
-            self.update(parse_mmcif_header(pdb_file))
+        Args:
+            outdir (str): Path to output directory
+            file_type (str):
+            load_header_metadata (bool):
+            force_rerun (bool):
 
-    def download_cif_header_file(self, outdir, force_rerun=False):
-        file_type = 'cif'
-        cif_file = download_structure(pdb_id=self.id, file_type=file_type, only_header=True,
-                                      outdir=outdir, force_rerun=force_rerun)
-        log.debug('{}: downloaded mmCIF file header'.format(self.id))
+        Returns:
 
-        cif_dict = parse_mmcif_header(cif_file)
-        self.update(cif_dict)
+        """
+        p = PDBList()
+        with ssbio.utils.suppress_stdout():
+            structure_file = p.retrieve_pdb_file(pdb_code=self.id, pdir=outdir, file_format=file_type, overwrite=force_rerun)
+        if not op.exists(structure_file):
+            log.debug('{}: {} file not available'.format(self.id, file_type))
+        else:
+            log.debug('{}: {} file saved'.format(self.id, file_type))
+            self.load_structure_path(structure_file, file_type)
+            if load_header_metadata:
+                self.update(parse_mmcif_header(download_mmcif_header(pdb_id=self.id, outdir=outdir, force_rerun=force_rerun)))
 
     def get_pisa_complex_predictions(self, outdir, existing_pisa_multimer_xml=None):
-        if not self.is_experimental:
-            log.error('Complex predictions for homology models currently not implemented')
-            return
-
         if not existing_pisa_multimer_xml:
             pisa_xmls = pisa.download_pisa_multimers_xml(pdb_ids=self.id, outdir=outdir,
                                                          save_single_xml_files=True)
@@ -87,120 +93,33 @@ class PDBProp(StructProp):
         return to_return
 
 
-def download_structure(pdb_id, file_type, outdir='', outfile='', only_header=False, force_rerun=False):
-    """Download a structure from the RCSB PDB by ID. Specify the file type desired.
+def download_mmcif_header(pdb_id, outdir='', force_rerun=False):
+    """Download a mmCIF header file from the RCSB PDB by ID.
 
     Args:
         pdb_id: PDB ID
-        file_type: pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz
-        outdir: Optional output directory
-        outfile: Optional output name
-        only_header: If only the header file should be downloaded
+        outdir: Optional output directory, default is current working directory
         force_rerun: If the file should be downloaded again even if it exists
 
     Returns:
         str: Path to outfile
 
     """
-    # TODO: keep an eye on https://github.com/biopython/biopython/pull/943 Biopython PR#493 for functionality of this
     # method in biopython. extra file types have not been added to biopython download yet
 
     pdb_id = pdb_id.lower()
-    file_type = file_type.lower()
-    file_types = ['pdb', 'pdb.gz', 'mmcif', 'cif', 'cif.gz', 'xml.gz', 'mmtf', 'mmtf.gz']
-    if file_type not in file_types:
-        raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz')
-
-    if file_type == 'mmtf':
-        file_type = 'mmtf.gz'
-
-    if file_type.endswith('.gz'):
-        gzipped = True
-    else:
-        gzipped = False
-
-    if file_type == 'mmcif':
-        file_type = 'cif'
-
-    if only_header:
-        folder = 'header'
-        if outfile:
-            outfile = op.join(outdir, outfile)
-        else:
-            outfile = op.join(outdir, '{}.header.{}'.format(pdb_id, file_type))
-    else:
-        folder = 'download'
-        if outfile:
-            outfile = op.join(outdir, outfile)
-        else:
-            outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
+    file_type = 'cif'
+    folder = 'header'
+    outfile = op.join(outdir, '{}.header.{}'.format(pdb_id, file_type))
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
-        if file_type == 'mmtf.gz' or file_type == 'mmtf':
-            mmtf_api = '1.0'
-            download_link = 'http://mmtf.rcsb.org/v{}/full/{}.mmtf.gz'.format(mmtf_api, pdb_id)
-        else:
-            download_link = 'http://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
-
+        download_link = 'http://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
         urlretrieve(download_link, outfile)
-
-        if gzipped:
-            outfile = ssbio.utils.gunzip_file(infile=outfile,
-                                              outfile=outfile.strip('.gz'),
-                                              outdir=outdir,
-                                              delete_original=True,
-                                              force_rerun_flag=force_rerun)
-
-        log.debug('{}: saved structure file'.format(outfile))
+        log.debug('{}: saved header file'.format(outfile))
     else:
-        log.debug('{}: structure file already saved'.format(outfile))
+        log.debug('{}: header file already saved'.format(outfile))
 
     return outfile
-
-
-def download_biological_assemblies(pdb_id, outdir):
-    """Downloads biological assembly file from:
-    `ftp://ftp.wwpdb.org/pub/pdb/data/biounit/coordinates/divided/`
-
-    Args:
-        outdir (str): Output directory of the decompressed assembly
-
-    """
-
-    # TODO: not tested yet
-    if not op.exists(outdir):
-        raise ValueError('{}: output directory does not exist'.format(outdir))
-
-    folder = pdb_id[1:3]
-    server = 'ftp://ftp.wwpdb.org/pub/pdb/data/biounit/coordinates/divided/{}/'.format(folder)
-    html_folder = urlopen(server).readlines()
-    for line in html_folder:
-        if pdb_id in str(line).strip():
-            file_name = '%s' % (pdb_id + str(line).strip().split(pdb_id)[1].split('\r\n')[0])
-            outfile_name = file_name.replace('.', '_')
-            outfile_name = outfile_name.replace('_gz', '.pdb')
-            f = urlopen(op.join(server, file_name))
-            decompressed_data = zlib.decompress(f.read(), 16 + zlib.MAX_WBITS)
-            with open(op.join(outdir, outfile_name), 'wb') as f:
-                f.write(decompressed_data)
-                f.close()
-            log.debug('{}: downloaded biological assembly')
-            return op.join(outdir, outfile_name)
-
-
-def parse_pdb_header(infile):
-    """Parse a couple important fields from the mmCIF file format with some manual curation of ligands.
-
-    If you want full access to the mmCIF file just use the MMCIF2Dict class in Biopython.
-
-    Args:
-        infile: Path to mmCIF file
-
-    Returns:
-        dict: Dictionary of parsed header
-
-    """
-    pass
 
 
 def parse_mmcif_header(infile):
@@ -215,6 +134,8 @@ def parse_mmcif_header(infile):
         dict: Dictionary of parsed header
 
     """
+    from Bio.PDB.MMCIF2Dict import MMCIF2Dict
+
     newdict = {}
     try:
         mmdict = MMCIF2Dict(infile)
@@ -235,7 +156,9 @@ def parse_mmcif_header(infile):
     else:
         log.debug('{}: no description field'.format(infile))
 
-    if '_database_PDB_rev.date' in mmdict:
+    if '_pdbx_database_status.recvd_initial_deposition_date' in mmdict:
+        newdict['date'] = mmdict['_pdbx_database_status.recvd_initial_deposition_date']
+    elif '_database_PDB_rev.date' in mmdict:
         newdict['date'] = mmdict['_database_PDB_rev.date']
     else:
         log.debug('{}: no date field'.format(infile))
@@ -278,27 +201,24 @@ def parse_mmcif_header(infile):
     return newdict
 
 
-# TODO: check this for python 2
-def download_sifts_xml(pdb_id, outdir='', outfile=''):
+def download_sifts_xml(pdb_id, outdir='', force_rerun=False):
     """Download the SIFTS file for a PDB ID.
 
     Args:
-        pdb_id:
-        outdir:
-        outfile:
+        pdb_id (str): PDB ID
+        outdir (str): Output directory, current working directory if not specified.
+        force_rerun (bool): If the file should be downloaded again even if it exists
 
     Returns:
+        str: Path to downloaded file
 
     """
     baseURL = 'ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/xml/'
-    filename = '{}.xml.gz'.format(pdb_id)
+    filename = '{}.xml.gz'.format(pdb_id.lower())
 
-    if outfile:
-        outfile = op.join(outdir, outfile)
-    else:
-        outfile = op.join(outdir, filename.split('.')[0] + '.sifts.xml')
+    outfile = op.join(outdir, filename.split('.')[0] + '.sifts.xml')
 
-    if not op.exists(outfile):
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         response = urlopen(baseURL + filename)
         with open(outfile, 'wb') as f:
             f.write(gzip.decompress(response.read()))
@@ -623,7 +543,248 @@ def get_release_date(pdb_id):
     else:
         release_date = _property_table().ix[pdb_id, 'releaseDate']
         if pd.isnull(release_date):
-            log.debug('{}: no taxonomy available')
+            log.debug('{}: no release date available')
             release_date = None
 
     return release_date
+
+
+def get_num_bioassemblies(pdb_id, cache=False, outdir=None, force_rerun=False):
+    """Check if there are bioassemblies using the PDB REST API, and if there are, get the number of bioassemblies
+    available.
+
+    See: https://www.rcsb.org/pages/webservices/rest, section 'List biological assemblies'
+
+    Not all PDB entries have biological assemblies available and some have multiple. Details that are necessary to
+    recreate a biological assembly from the asymmetric unit can be accessed from the following requests.
+
+    - Number of biological assemblies associated with a PDB entry
+    - Access the transformation information needed to generate a biological assembly (nr=0 will return information
+      for the asymmetric unit, nr=1 will return information for the first assembly, etc.)
+
+    A query of https://www.rcsb.org/pdb/rest/bioassembly/nrbioassemblies?structureId=1hv4 returns this::
+
+        <nrBioAssemblies structureId="1HV4" hasAssemblies="true" count="2"/>
+
+    Args:
+        pdb_id (str): PDB ID
+        cache (bool): If the XML file should be downloaded
+        outdir (str): If cache, then specify the output directory
+        force_rerun (bool): If cache, and if file exists, specify if API should be queried again
+
+    """
+    parser = etree.XMLParser(ns_clean=True)
+
+    if not outdir:
+        outdir = os.getcwd()
+    outfile = op.join(outdir, '{}_nrbiomols.xml'.format(pdb_id))
+
+    if ssbio.utils.force_rerun(force_rerun, outfile):
+        page = 'https://www.rcsb.org/pdb/rest/bioassembly/nrbioassemblies?structureId={}'.format(pdb_id)
+        req = requests.get(page)
+
+        if req.status_code == 200:
+            response = req.text
+
+            # Save the XML file
+            if cache:
+                with open(outfile, 'w') as f:
+                    f.write(response)
+
+            # Parse the XML string
+            tree = etree.ElementTree(etree.fromstring(response, parser))
+            log.debug('Loaded bioassembly information from REST server')
+        else:
+            log.error('Request timed out')
+            req.raise_for_status()
+    else:
+        tree = etree.parse(outfile, parser)
+        log.debug('{}: Loaded existing XML results'.format(outfile))
+
+    r = tree.getroot()
+    has_biomols = r.get('hasAssemblies')
+    if has_biomols == 'true':
+        has_biomols = True
+    else:
+        has_biomols = False
+
+    if has_biomols:
+        num_biomols = r.get('count')
+    else:
+        num_biomols = 0
+
+    num_biomols = int(num_biomols)
+    return num_biomols
+
+
+def get_bioassembly_info(pdb_id, biomol_num, cache=False, outdir=None, force_rerun=False):
+    """Get metadata about a bioassembly from the RCSB PDB's REST API.
+
+    See: https://www.rcsb.org/pdb/rest/bioassembly/bioassembly?structureId=1hv4&nr=1
+    The API returns an XML file containing the information on a biological assembly that looks like this::
+
+        <bioassembly structureId="1HV4" assemblyNr="1" method="PISA" desc="author_and_software_defined_assembly">
+            <transformations operator="1" chainIds="A,B,C,D">
+                <transformation index="1">
+                    <matrix m11="1.00000000" m12="0.00000000" m13="0.00000000" m21="0.00000000" m22="1.00000000" m23="0.00000000" m31="0.00000000" m32="0.00000000" m33="1.00000000"/>
+                    <shift v1="0.00000000" v2="0.00000000" v3="0.00000000"/>
+                </transformation>
+            </transformations>
+        </bioassembly>
+
+    Args:
+        pdb_id (str): PDB ID
+        biomol_num (int): Biological assembly number you are interested in
+        cache (bool): If the XML file should be downloaded
+        outdir (str): If cache, then specify the output directory
+        force_rerun (bool): If cache, and if file exists, specify if API should be queried again
+
+    """
+    parser = etree.XMLParser(ns_clean=True)
+    #
+    # if not outdir:
+    #     outdir = os.getcwd()
+    # outfile = op.join(outdir, '{}.xml'.format(self.id))
+    #
+    # if ssbio.utils.force_rerun(force_rerun, outfile):
+    #     page = 'https://www.rcsb.org/pdb/rest/bioassembly/bioassembly?structureId={}&nr={}'.format(
+    #         self.original_pdb_id, biomol_num)
+    #     req = requests.get(page)
+    #
+    #     if req.status_code == 200:
+    #         response = req.text
+    #
+    #         # Save the XML file
+    #         if cache:
+    #             with open(outfile, 'w') as f:
+    #                 f.write(response)
+    #
+    #         # Parse the XML string
+    #         r = xmltodict.parse(response)
+    #         log.debug('Loaded bioassembly information from REST server')
+    #     else:
+    #         log.error('Request timed out')
+    #         req.raise_for_status()
+    # else:
+    #     with open(outfile, 'r') as f:
+    #         r = xmltodict.parse(f.read())
+    #     log.debug('{}: Loaded existing XML results'.format(outfile))
+    #
+    # self.biomol_to_chain_dict[biomol_num] = {'chains': r['bioassembly']['transformations']['@chainIds'],
+    #                                          'multiplier': len(r['bioassembly']['transformations']['transformation'])}
+    # # TODO: figure out how to store matrices etc.
+    #
+    # log.info('{}_{}: ')
+
+
+def download_biomol(pdb_id, biomol_num, outdir, file_type='pdb', force_rerun=False):
+    import zlib
+    from six.moves.urllib_error import URLError
+    from six.moves.urllib.request import urlopen, urlretrieve
+    import contextlib
+
+    ssbio.utils.make_dir(outdir)
+    server_folder = pdb_id[1:3]
+
+    if file_type == 'pdb':
+        # server = 'ftp://ftp.wwpdb.org/pub/pdb/data/biounit/coordinates/divided/{}/'.format(server_folder)
+        server = 'https://files.rcsb.org/download/'
+        server_filename = pdb_id + '.pdb%i.gz' % biomol_num
+        local_filename = pdb_id + '_bio%i.pdb' % biomol_num
+        outfile = op.join(outdir, local_filename)
+
+    elif file_type.lower() == 'mmcif' or file_type.lower() == 'cif':
+        server = 'ftp://ftp.wwpdb.org/pub/pdb/data/biounit/mmCIF/divided/{}/'.format(server_folder)
+        server_filename = pdb_id + '-assembly%i.cif.gz' % biomol_num
+        local_filename = pdb_id + '_bio%i.cif' % biomol_num
+        outfile = op.join(outdir, local_filename)
+
+    else:
+        raise ValueError('Biological assembly only available in PDB or mmCIF file types.')
+
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        download_link = op.join(server, server_filename)
+        try:
+            with contextlib.closing(urlopen(download_link)) as f:
+                decompressed_data = zlib.decompress(f.read(), 16 + zlib.MAX_WBITS)
+                with open(op.join(outdir, local_filename), 'wb') as f:
+                    f.write(decompressed_data)
+        except URLError as e:
+            print(e)
+            return None
+
+    return outfile
+
+
+########################################################################################################################
+########################################################################################################################
+# DEPRECATED FUNCTIONS
+########################################################################################################################
+########################################################################################################################
+
+
+@deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
+                        details="Use Biopython's PDBList.retrieve_pdb_file function instead")
+def download_structure(pdb_id, file_type, outdir='', only_header=False, force_rerun=False):
+    """Download a structure from the RCSB PDB by ID. Specify the file type desired.
+
+    Args:
+        pdb_id: PDB ID
+        file_type: pdb, pdb.gz, mmcif, cif, cif.gz, xml.gz, mmtf, mmtf.gz
+        outdir: Optional output directory
+        only_header: If only the header file should be downloaded
+        force_rerun: If the file should be downloaded again even if it exists
+
+    Returns:
+        str: Path to outfile
+
+    """
+    # method in biopython. extra file types have not been added to biopython download yet
+
+    pdb_id = pdb_id.lower()
+    file_type = file_type.lower()
+    file_types = ['pdb', 'pdb.gz', 'mmcif', 'cif', 'cif.gz', 'xml.gz', 'mmtf', 'mmtf.gz']
+    if file_type not in file_types:
+        raise ValueError('Invalid file type, must be either: pdb, pdb.gz, cif, cif.gz, xml.gz, mmtf, mmtf.gz')
+
+    if file_type == 'mmtf':
+        file_type = 'mmtf.gz'
+
+    if file_type.endswith('.gz'):
+        gzipped = True
+    else:
+        gzipped = False
+
+    if file_type == 'mmcif':
+        file_type = 'cif'
+
+    if only_header:
+        folder = 'header'
+        outfile = op.join(outdir, '{}.header.{}'.format(pdb_id, file_type))
+    else:
+        folder = 'download'
+        outfile = op.join(outdir, '{}.{}'.format(pdb_id, file_type))
+
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+        if file_type == 'mmtf.gz' or file_type == 'mmtf':
+            mmtf_api = '1.0'
+            download_link = 'http://mmtf.rcsb.org/v{}/full/{}.mmtf.gz'.format(mmtf_api, pdb_id)
+        else:
+            download_link = 'http://files.rcsb.org/{}/{}.{}'.format(folder, pdb_id, file_type)
+
+        urlretrieve(download_link, outfile)
+
+        if gzipped:
+            outfile = ssbio.utils.gunzip_file(infile=outfile,
+                                              outfile=outfile.strip('.gz'),
+                                              outdir=outdir,
+                                              delete_original=False,
+                                              force_rerun_flag=force_rerun)
+
+        log.debug('{}: saved structure file'.format(outfile))
+    else:
+        if file_type == 'mmtf.gz':
+            outfile = op.join(outdir, '{}.{}'.format(pdb_id, 'mmtf'))
+        log.debug('{}: structure file already saved'.format(outfile))
+
+    return outfile
