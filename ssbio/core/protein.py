@@ -236,11 +236,17 @@ class Protein(Object):
 
     def get_experimental_structures(self):
         """DictList: Return a DictList of all experimental structures in self.structures"""
-        return DictList(x for x in self.structures if x.is_experimental)
+        if self.representative_structure:
+            return DictList(x for x in self.structures if x.is_experimental and x.id != self.representative_structure.id)
+        else:
+            return DictList(x for x in self.structures if x.is_experimental)
 
     def get_homology_models(self):
         """DictList: Return a DictList of all homology models in self.structures"""
-        return DictList(x for x in self.structures if not x.is_experimental)
+        if self.representative_structure:
+            return DictList(x for x in self.structures if not x.is_experimental and x.id != self.representative_structure.id)
+        else:
+            return DictList(x for x in self.structures if not x.is_experimental)
 
     def filter_sequences(self, seq_type):
         """Return a DictList of only specified types in the sequences attribute.
@@ -331,10 +337,10 @@ class Protein(Object):
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None, download=False, outdir=None,
                      set_as_representative=False, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
-        
+
         Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
         Metadata files will be downloaded as XML files.
-        
+
         Args:
             uniprot_id (str): UniProt ID/ACC
             uniprot_seq_file (str): Path to FASTA file
@@ -481,6 +487,41 @@ class Protein(Object):
 
         return self.sequences.get_by_id(ident)
 
+    def load_manual_sequence_from_genome(self, ident, genome_path, write_fasta_file=False, outdir=None,
+                                         set_as_representative=False, force_rewrite=False):
+        """Load a manual sequence from a FASTA file of many protein sequences.
+
+        Args:
+            ident (str): Identifier for the sequence in the FASTA file.
+            genome_path (str): Path to FASTA file containing multiple protein sequences
+            write_fasta_file (bool): If this sequence should be written out to a FASTA file
+            outdir (str): Path to output directory
+            set_as_representative (bool): If this sequence should be set as the representative one
+            force_rewrite (bool): If the FASTA file should be overwritten if it already exists
+
+        Returns:
+            SeqProp: Sequence that was loaded into the ``sequences`` attribute
+
+        """
+        if write_fasta_file:
+            if not outdir:
+                outdir = self.sequence_dir
+                if not outdir:
+                    raise ValueError('Output directory must be specified')
+            outfile = op.join(outdir, '{}.faa'.format(ident))
+        else:
+            outfile = None
+
+        manual_sequence = SeqProp(id=ident, genome_path=genome_path, seq=None)
+        if write_fasta_file:
+            manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
+        self.sequences.append(manual_sequence)
+
+        if set_as_representative:
+            self.representative_sequence = manual_sequence
+
+        return self.sequences.get_by_id(ident)
+
     def set_representative_sequence(self, force_rerun=False):
         """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative
         sequence.
@@ -572,6 +613,9 @@ class Protein(Object):
 
         """
 
+        if not self.representative_sequence:
+            raise ValueError('{}: no representative sequence set'.format(self.id))
+
         if not outdir:
             outdir = self.sequence_dir
             if not outdir:
@@ -580,10 +624,6 @@ class Protein(Object):
         for seq in self.sequences:
             aln_id = '{}_{}'.format(self.id, seq.id)
             outfile = '{}.needle'.format(aln_id)
-
-            if not self.representative_sequence:
-                log.error('{}: no representative sequence set, skipping gene'.format(self.id))
-                continue
 
             if self.sequence_alignments.has_id(aln_id):
                 log.debug('{}: alignment already completed'.format(seq.id))
@@ -621,10 +661,74 @@ class Protein(Object):
 
             self.sequence_alignments.append(aln)
 
+    def pairwise_align_sequences_to_representative_parallelize(self, sc, gapopen=10, gapextend=0.5, outdir=None,
+                                                      engine='needle', parse=True, force_rerun=False):
+        """Pairwise all sequences in the sequences attribute to the representative sequence. Stores the alignments
+        in the ``sequence_alignments`` DictList attribute.
+
+        Args:
+            sc (SparkContext): Configured spark context for parallelization
+            gapopen (int): Only for ``engine='needle'`` - Gap open penalty is the score taken away when a gap is created
+            gapextend (float): Only for ``engine='needle'`` - Gap extension penalty is added to the standard gap penalty
+                for each base or residue in the gap
+            outdir (str): Only for ``engine='needle'`` - Path to output directory. Default is the protein sequence
+                directory.
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
+            parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an
+                annotation)
+            force_rerun (bool): Only for ``engine='needle'`` - Default False, set to True if you want to rerun the
+                alignment if outfile exists.
+
+        """
+
+        if not self.representative_sequence:
+            raise ValueError('{}: no representative sequence set'.format(self.id))
+
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        def pairwise_sc(self, seqprop):
+            aln_id = '{}_{}'.format(self.id, seqprop.id)
+            outfile = '{}.needle'.format(aln_id)
+
+            aln = ssbio.protein.sequence.utils.alignment.pairwise_sequence_alignment(a_seq=self.representative_sequence.seq_str,
+                                                                                     a_seq_id=self.id,
+                                                                                     b_seq=seqprop.seq_str,
+                                                                                     b_seq_id=seqprop.id,
+                                                                                     gapopen=gapopen,
+                                                                                     gapextend=gapextend,
+                                                                                     engine=engine,
+                                                                                     outdir=outdir,
+                                                                                     outfile=outfile,
+                                                                                     force_rerun=force_rerun)
+            aln.id = aln_id
+            aln.annotations['a_seq'] = self.representative_sequence.id
+            aln.annotations['b_seq'] = seqprop.id
+
+            if parse:
+                aln_df = ssbio.protein.sequence.utils.alignment.get_alignment_df(a_aln_seq=str(list(aln)[0].seq),
+                                                                                 b_aln_seq=str(list(aln)[1].seq))
+                aln.annotations['ssbio_type'] = 'seqalign'
+                aln.annotations['mutations'] = ssbio.protein.sequence.utils.alignment.get_mutations(aln_df)
+                aln.annotations['deletions'] = ssbio.protein.sequence.utils.alignment.get_deletions(aln_df)
+                aln.annotations['insertions'] = ssbio.protein.sequence.utils.alignment.get_insertions(aln_df)
+
+            return aln
+
+        sequences_rdd = sc.parallelize(filter(lambda x: x.id != self.representative_sequence.id, self.sequences))
+        result = sequences_rdd.map(lambda x: pairwise_sc(self, x)).collect()
+
+        for r in result:
+            self.sequence_alignments.append(r)
+
     def get_sequence_properties(self, representative_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
         Results are stored in the protein's respective SeqProp objects at ``.annotations``
-        
+
         Args:
             representative_only (bool): If analysis should only be run on the representative sequence
 
@@ -758,6 +862,9 @@ class Protein(Object):
             new_pdbs = [y for y in pdbs if not self.structures.has_id(y)]
             if new_pdbs:
                 log.debug('{}: adding {} PDBs from BLAST results'.format(self.id, len(new_pdbs)))
+            else:
+                already_have = [y for y in pdbs if self.structures.has_id(y)]
+                log.debug('{}: PDBs already contained in structures list'.format(';'.join(already_have)))
             blast_results = [z for z in blast_results if z['hit_pdb'].lower() in new_pdbs]
 
             for blast_result in blast_results:
@@ -999,6 +1106,45 @@ class Protein(Object):
     def df_homology_models(self):
         """DataFrame: Get a dataframe of I-TASSER homology model results"""
 
+        # TODO: add definitions of column names
+        # model_date	Date the model was created
+        # difficulty	Difficulty level of the modeling run (easy, medium, hard)
+        # top_template_pdb	Top template used to model the protein (PDB ID)
+        # top_template_chain	Chain of the top template used to model the protein
+        # c_score	Confidence score of the homology model from [-5,2]
+        # tm_score	Structural similarity score to best template
+        # tm_score_err	Standard error of TM score
+        # rmsd	RMSD to best template
+        # rmsd_err	Standard error of RMSD
+        # top_bsite_site_num	Cluster which contained the consensus binding site
+        # top_bsite_c_score	Confidence score of the consensus binding site prediction from [0,1]
+        # top_bsite_cluster_size	Number of predictions within this cluster
+        # top_bsite_binding_residues	Residue numbers of top ranked binding site prediction
+        # top_bsite_binding_location_coords	Cartesian coordinates of top ranked binding site prediction
+        # top_bsite_pdb_ligand	Top predicted ligand to bind
+        # top_bsite_ligand_cluster_counts	Number of predictions for all ligands
+        # top_bsite_algorithm	Algorithm used for top ranked binding site prediction
+        # top_bsite_c_score_method	Confidence score of just the top algorithm's binding site prediction from [0,1]. >0.35 is somewhat reliable.
+        # top_bsite_pdb_template_id	PDB ID of the template used to make the prediction
+        # top_bsite_pdb_template_chain	Chain of the PDB which has the ligand
+        # top_ec_ec_number	Top predicted EC number
+        # top_ec_c_score	Confidence score of the consensus EC number prediction from [0,1]
+        # top_ec_pdb_template_id	Top PDB ID used as template for EC number prediction
+        # top_ec_pdb_template_chain	Chain of PDB ID used as template for EC number prediction
+        # top_ec_rmsd	RMSD to best template
+        # top_ec_seq_coverage	Sequence coverage percentage to best template
+        # top_ec_seq_ident	Sequence identity percentage to best template
+        # top_ec_tm_score	Structural similarity score to best template
+        # top_go_bp_go_id	Predicted GO ID for biological process
+        # top_go_bp_go_term	Predicted GO term for biological process
+        # top_go_bp_c_score	Confidence score of the GO BP prediction from [0,1]
+        # top_go_cc_go_id	Predicted GO ID for cellular compartment
+        # top_go_cc_go_term	Predicted GO term for cellular compartment
+        # top_go_cc_c_score	Confidence score of the GO CC prediction from [0,1]
+        # top_go_mf_go_id	Predicted GO ID for molecular function
+        # top_go_mf_go_term	Predicted GO term for molecular function
+        # top_go_mf_c_score	Confidence score of the GO MF prediction from [0,1]
+
         itasser_pre_df = []
 
         df_cols = ['id', 'structure_file', 'model_date', 'difficulty',
@@ -1089,7 +1235,7 @@ class Protein(Object):
         return ssbio.utils.clean_df(df)
 
     def align_seqprop_to_structprop(self, seqprop, structprop, chains=None, outdir=None,
-                                    engine='needle', parse=True, force_rerun=False,
+                                    engine='needle', structure_already_parsed=False, parse=True, force_rerun=False,
                                     **kwargs):
         """Run and store alignments of a SeqProp to chains in the ``mapped_chains`` attribute of a StructProp.
 
@@ -1107,20 +1253,24 @@ class Protein(Object):
             engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
                 ``needle`` is the standard EMBOSS tool to run pairwise alignments.
                 ``biopython`` is Biopython's implementation of needle. Results can differ!
+            structure_already_parsed (bool): If the structure has already been parsed and the chain sequences are
+                stored. Temporary option until Hadoop sequence file is implemented to reduce number of times a
+                structure is parsed.
             parse (bool): Store locations of mutations, insertions, and deletions in the alignment object (as an annotation)
             force_rerun (bool): If alignments should be rerun
             **kwargs: Other alignment options
 
         Todo:
             * Document **kwargs for alignment options
-            
+
         """
 
         if not outdir:
             outdir = self.sequence_dir
 
-        # Parse the structure so chain sequences are stored
-        structprop.parse_structure()
+        if not structure_already_parsed:
+            # Parse the structure so chain sequences are stored
+            structprop.parse_structure()
 
         if chains:
             chains_to_align_to = ssbio.utils.force_list(chains)
