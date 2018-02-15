@@ -61,9 +61,9 @@ class SCRATCH():
         self.out_accpro20 = '{}.acc20'.format(outname)
 
         # TODO: check for multiple output files in command_runner
-        ssbio.utils.command_runner(shell_command='{} {} {} {}'.format(path_to_scratch, self.seq_file, outname, num_cores),
-                                   outfile='{}.ss'.format(outname),
-                                   force_rerun_flag=force_rerun)
+        ssbio.utils.command_runner(
+            shell_command='{} {} {} {}'.format(path_to_scratch, self.seq_file, outname, num_cores),
+            force_rerun_flag=force_rerun, outfile_checker='{}.ss'.format(outname))
 
     def sspro_results(self):
         """Parse the SSpro output file and return a dict of secondary structure compositions.

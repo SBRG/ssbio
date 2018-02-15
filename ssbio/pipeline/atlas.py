@@ -217,9 +217,9 @@ class ATLAS(Object):
             strain_genome_file (str): Path to strain genome file
 
         """
-        logging.disable(logging.WARNING)
-        strain_gp = GEMPRO(gem_name=strain_id, genome_path=strain_genome_file)
-        logging.disable(logging.NOTSET)
+        # logging.disable(logging.WARNING)
+        strain_gp = GEMPRO(gem_name=strain_id, genome_path=strain_genome_file, write_protein_fasta_files=False)
+        # logging.disable(logging.NOTSET)
 
         self.strains.append(strain_gp)
         return self.strains.get_by_id(strain_id)
@@ -248,6 +248,37 @@ class ATLAS(Object):
                 log.warning('{}: unable to download sequence'.format(patric_id))
 
         log.info('Created {} new strain GEM-PROs, accessible at "strains" attribute'.format(counter))
+
+    def download_patric_genomes_parallelize(self, ids, sc, write_protein_fasta_files=False, outdir=None, force_rerun=False):
+        """Download genome files from PATRIC given a list of PATRIC genome IDs and load them as strains.
+
+        Args:
+            ids (str, list): PATRIC ID or list of PATRIC IDs
+            sc (SparkContext): Spark context to parallelize this method
+            force_rerun (bool): If genome files should be downloaded again even if they exist
+
+        """
+        ids = ssbio.utils.force_list(ids)
+
+        def load_strain(self, strain_id):
+            """Load a strain as a new GEM-PRO by its ID and associated genome file. Stored in the ``strains`` attribute.
+
+            Args:
+                strain_id (str): Strain ID
+                strain_genome_file (str): Path to strain genome file
+
+            """
+            f = ssbio.databases.patric.download_coding_sequences(patric_id=strain_id, seqtype='protein',
+                                                                 outdir=self.sequences_by_organism_dir,
+                                                                 force_rerun=force_rerun)
+            strain_gp = GEMPRO(gem_name=strain_id, genome_path=f, write_protein_fasta_files=write_protein_fasta_files, root_dir=outdir)
+            return strain_gp
+
+        strains_rdd = sc.parallelize(ids)
+        result = strains_rdd.map(lambda x: load_strain(self, x)).collect()
+
+        for strain_gp in result:
+            self.strains.append(strain_gp)
 
     def get_orthology_matrix(self, pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None, filter_condition='OR',
                              remove_strains_with_no_orthology=True,

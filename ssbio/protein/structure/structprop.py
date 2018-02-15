@@ -30,69 +30,66 @@ class StructProp(Object):
 
     """Generic class to represent information for a protein structure.
 
-    Provides access to the 3D coordinates using a Biopython Structure object through the method ``parse_structure``.
-    The main functionality added is the ability to set and load directly from any supported structure and metadata
-    file. Additionally, the ``mapped_chains`` attribute allows for analysis of a subset of chains, which will map
-    to a gene of interest. Also provides methods through ``nglview`` to view the structure in a Jupyter notebook.
+    The main utilities of this class are to:
 
-    Attributes:
-        id (str): Unique identifier for this protein structure
-        name (str): Optional name for this structure
-        description (str): Optional description for this structure
-        is_experimental (bool): Flag to note if this structure is an experimental model or a homology model
-        chains (DictList): A DictList of chains have their sequence stored in them, along with residue-specific
-            annotations
-        mapped_chains (list): A simple list of chain IDs (strings) that will be used to subset analyses
-        file_type (str): Type of structure file
-        structure_file (str): Name of the structure file
+    * Provide access to the 3D coordinates using a Biopython Structure object through the method ``parse_structure``.
+    * Run predictions and computations on the structure
+    * Analyze specific chains using the ``mapped_chains`` attribute
+    * Provide wrapper methods to ``nglview`` to view the structure in a Jupyter notebook
+
+    Args:
+        ident (str): Unique identifier for this structure
+        description (str): Optional human-readable description
+        chains (str, list): Chain ID or list of IDs
+        mapped_chains (str, list): A chain ID or IDs to indicate what chains should be analyzed
+        is_experimental (bool): Flag to indicate if structure is an experimental or computational model
+        structure_path (str): Path to structure file
+        file_type (str): Type of structure file - ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``,
+            ``xml.gz``, ``mmtf``, ``mmtf.gz``
 
     """
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None,
                  is_experimental=False, structure_path=None, file_type=None):
-        """Initialize a StructProp object.
-        
-        Args:
-            ident (str): Unique identifier for this structure 
-            description (str): Optional human-readable description
-            chains (str, list): Chain ID or list of IDs
-            mapped_chains (str, list): A chain ID or IDs to indicate what chains should be analyzed
-            is_experimental (bool): Flag to indicate if structure is an experimental or computational model
-            structure_path (str): Path to structure file 
-            file_type (str): Type of structure file - ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``,
-                ``xml.gz``, ``mmtf``, ``mmtf.gz``
-
-        """
         Object.__init__(self, id=ident, description=description)
 
         self.is_experimental = is_experimental
+        """bool: Flag to note if this structure is an experimental model or a homology model"""
 
         # Chain information
         # chains is a DictList of ChainProp objects
         # If you run self.parse_structure(), all chains will be parsed and stored here
         # Use mapped_chains below to keep track of chains you are interested in
         self.chains = DictList()
+        """DictList: A DictList of chains have their sequence stored in them, along with residue-specific"""
         if chains:
             self.add_chain_ids(chains)
         # mapped_chains is an ordered list of mapped chain IDs which would come from BLAST or the best_structures API
         self.mapped_chains = []
+        """list: A simple list of chain IDs (strings) that will be used to subset analyses"""
         if mapped_chains:
             self.add_mapped_chain_ids(mapped_chains)
 
-        # Simple flag to track if this structure has had its structure + chain sequences parsed
         self.parsed = False
+        """bool: Simple flag to track if this structure has had its structure + chain sequences parsed"""
+        # XTODO: rename to sequence_parsed or something similar
 
         # File information
         self.file_type = file_type
+        """str: Type of structure file"""
         self._structure_dir = None
         self.structure_file = None
+        """str: Name of the structure file"""
         if structure_path:
             self.load_structure_path(structure_path, file_type)
+
+        self.structure = None
+        """Structure: Biopython Structure object, only used if ``store_in_memory`` option of ``parse_structure`` is set to True"""
 
     @property
     def structure_dir(self):
         if not self._structure_dir:
-            raise OSError('No sequence folder set')
+            raise OSError('No structure folder set')
         return self._structure_dir
 
     @structure_dir.setter
@@ -128,17 +125,19 @@ class StructProp(Object):
         self.structure_dir = op.dirname(structure_path)
         self.structure_file = op.basename(structure_path)
 
-    def parse_structure(self):
-        """Read the 3D coordinates of a structure file and return it as a Biopython Structure object
+    def parse_structure(self, store_in_memory=False):
+        """Read the 3D coordinates of a structure file and return it as a Biopython Structure object.
+        Also create ChainProp objects in the chains attribute for each chain in the first model.
 
-        Also create ChainProp objects in the chains attribute
+        Args:
+            store_in_memory (bool): If the Biopython Structure object should be stored in the attribute ``structure``.
 
         Returns:
             Structure: Biopython Structure object
 
         """
         # TODO: perhaps add option to parse into ProDy object?
-        if not self.structure_path:
+        if not self.structure_file:
             log.error('{}: no structure file, unable to parse'.format(self.id))
             return None
         else:
@@ -155,6 +154,10 @@ class StructProp(Object):
                 self.add_mapped_chain_ids(structure_chains)
 
             self.parsed = True
+
+            if store_in_memory:
+                self.structure = structure
+
             return structure
 
     def clean_structure(self, out_suffix='_clean', outdir=None, force_rerun=False,
@@ -182,7 +185,7 @@ class StructProp(Object):
 
         """
 
-        if not self.structure_path:
+        if not self.structure_file:
             log.error('{}: no structure file, unable to clean'.format(self.id))
             return None
 
@@ -302,7 +305,6 @@ class StructProp(Object):
         final_dict = {k: v for k, v in Object.get_dict(self, only_attributes=keys, exclude_attributes=exclude_attributes,
                                                        df_format=df_format).items()}
 
-
         chain_prop = self.chains.get_by_id(chain)
         # Filter out keys that show up in StructProp
         if not chain_keys:
@@ -315,7 +317,12 @@ class StructProp(Object):
 
     def find_disulfide_bridges(self, threshold=3.0):
         """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp."""
-        parsed = self.parse_structure()
+
+        if self.structure:
+            parsed = self.structure
+        else:
+            parsed = self.parse_structure()
+
         if not parsed:
             log.error('{}: unable to open structure to find S-S bridges'.format(self.id))
             return
@@ -349,7 +356,11 @@ class StructProp(Object):
             * Also parse global properties, like total accessible surface area. Don't think Biopython parses those?
 
         """
-        parsed = self.parse_structure()
+        if self.structure:
+            parsed = self.structure
+        else:
+            parsed = self.parse_structure()
+
         if not parsed:
             log.error('{}: unable to open structure to run DSSP'.format(self.id))
             return
@@ -411,7 +422,11 @@ class StructProp(Object):
             raise ValueError('{}: unable to run MSMS with "{}" file type. Please change file type to "pdb"'.format(self.id,
                                                                                                             self.file_type))
 
-        parsed = self.parse_structure()
+        if self.structure:
+            parsed = self.structure
+        else:
+            parsed = self.parse_structure()
+
         if not parsed:
             log.error('{}: unable to open structure to run MSMS'.format(self.id))
             return
@@ -455,7 +470,11 @@ class StructProp(Object):
             return
 
         # Parse the structure to store chain sequences
-        parsed = self.parse_structure()
+        if self.structure:
+            parsed = self.structure
+        else:
+            parsed = self.parse_structure()
+
         if not parsed:
             log.error('{}: unable to open structure to run freesasa'.format(self.id))
             return
@@ -534,7 +553,7 @@ class StructProp(Object):
         else:
             raise EnvironmentError('Unable to display structure - not running in a Jupyter notebook environment')
 
-        if not self.structure_path:
+        if not self.structure_file:
             raise ValueError("Structure file not loaded")
 
         only_chains = ssbio.utils.force_list(only_chains)
