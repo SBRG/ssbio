@@ -2111,8 +2111,6 @@ class Protein(Object):
             structprop = self.representative_structure
             chain_id = self.representative_chain
 
-        chain = structprop.chains.get_by_id(chain_id)
-
         log.debug('Using sequence: {}, structure: {}, chain: {}'.format(seqprop.id, structprop.id, chain_id))
 
         # Create a new SeqFeature
@@ -2129,6 +2127,8 @@ class Protein(Object):
         all_info['seq_residue'] = str(seq_features.seq)
 
         if structprop:
+            chain = structprop.chains.get_by_id(chain_id)
+
             # Get structure properties
             mapping_to_structure_resnum = self.map_seqprop_resnums_to_structprop_resnums(resnums=seq_resnum,
                                                                                          seqprop=seqprop,
