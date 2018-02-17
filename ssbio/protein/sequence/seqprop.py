@@ -381,11 +381,11 @@ class SeqProp(SeqRecord):
         self.feature_file = None
         self.features = tmp
 
-    def __str__(self):
-        return Object.__str__(self)
-
-    def __repr__(self):
-        return Object.__repr__(self)
+    # def __str__(self):
+    #     return Object.__str__(self)
+    #
+    # def __repr__(self):
+    #     return Object.__repr__(self)
 
     def update(self, newdata, overwrite=False, only_keys=None):
         # Filter for list of keys in only_keys
@@ -458,17 +458,22 @@ class SeqProp(SeqRecord):
                     df_dict[k] = deepcopy(v)
         return df_dict
 
-    def save_dataframes(self, outdir, prefix='df_'):
-        Object.save_dataframes(self, outdir=outdir, prefix=prefix)
-
     def save_pickle(self, outfile, protocol=2):
-        Object.save_pickle(self, outfile=outfile, protocol=protocol)
+        import ssbio.io
+        ssbio.io.save_pickle(self, outfile, protocol)
 
     def __json_encode__(self):
-        Object.__json_encode__(self)
+        to_return = {}
+        # Don't save properties, methods in the JSON
+        for x in [a for a in dir(self) if
+                  not a.startswith('__') and not a.startswith('_{}__'.format(type(self).__name__)) and not isinstance(
+                          getattr(type(self), a, None), property) and not callable(getattr(self, a))]:
+            to_return.update({x: getattr(self, x)})
+        return to_return
 
     def save_json(self, outfile, compression=False):
-        Object.save_json(self, outfile=outfile, compression=compression)
+        import ssbio.io
+        ssbio.io.save_json(self, outfile, compression=compression)
 
     def equal_to(self, seq_prop):
         """Test if the sequence is equal to another SeqProp's sequence
