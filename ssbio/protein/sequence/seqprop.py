@@ -14,7 +14,7 @@ from Bio import SeqIO
 from BCBio import GFF
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.SeqFeature import SeqFeature, FeatureLocation
+from Bio.SeqFeature import SeqFeature, FeatureLocation, ExactPosition
 
 from ssbio.core.object import Object
 import ssbio.utils
@@ -365,11 +365,27 @@ class SeqProp(SeqRecord):
                 self.feature_dir = op.dirname(gff_path)
             self.feature_file = op.basename(gff_path)
 
-    def __str__(self):
-        return Object.__str__(self)
+    def feature_path_unset(self):
+        """Copy features to memory and remove the association of the feature file."""
+        if not self.feature_file:
+            raise IOError('No feature file to unset')
 
-    def __repr__(self):
-        return Object.__repr__(self)
+        with open(self.feature_path) as handle:
+            feats = list(GFF.parse(handle))
+            if len(feats) > 1:
+                log.warning('Too many sequences in GFF')
+            else:
+                tmp = feats[0].features
+
+        self.feature_dir = None
+        self.feature_file = None
+        self.features = tmp
+
+    # def __str__(self):
+    #     return Object.__str__(self)
+    #
+    # def __repr__(self):
+    #     return Object.__repr__(self)
 
     def update(self, newdata, overwrite=False, only_keys=None):
         # Filter for list of keys in only_keys
@@ -442,17 +458,22 @@ class SeqProp(SeqRecord):
                     df_dict[k] = deepcopy(v)
         return df_dict
 
-    def save_dataframes(self, outdir, prefix='df_'):
-        Object.save_dataframes(self, outdir=outdir, prefix=prefix)
-
     def save_pickle(self, outfile, protocol=2):
-        Object.save_pickle(self, outfile=outfile, protocol=protocol)
+        import ssbio.io
+        ssbio.io.save_pickle(self, outfile, protocol)
 
     def __json_encode__(self):
-        Object.__json_encode__(self)
+        to_return = {}
+        # Don't save properties, methods in the JSON
+        for x in [a for a in dir(self) if
+                  not a.startswith('__') and not a.startswith('_{}__'.format(type(self).__name__)) and not isinstance(
+                          getattr(type(self), a, None), property) and not callable(getattr(self, a))]:
+            to_return.update({x: getattr(self, x)})
+        return to_return
 
     def save_json(self, outfile, compression=False):
-        Object.save_json(self, outfile=outfile, compression=compression)
+        import ssbio.io
+        ssbio.io.save_json(self, outfile, compression=compression)
 
     def equal_to(self, seq_prop):
         """Test if the sequence is equal to another SeqProp's sequence
@@ -496,6 +517,49 @@ class SeqProp(SeqRecord):
                 GFF.write([self], out_handle)
 
         self.feature_path = outfile
+
+    def add_point_feature(self, resnum, feat_type=None, feat_id=None):
+        """Add a feature to the features list describing a single residue.
+
+        Args:
+            resnum (int): Protein sequence residue number
+            feat_type (str, optional): Optional description of the feature type (ie. 'catalytic residue')
+            feat_id (str, optional): Optional ID of the feature type (ie. 'TM1')
+
+        """
+        if self.feature_file:
+            raise ValueError('Feature file associated with sequence, please remove file association to append '
+                             'additional features.')
+
+        if not feat_type:
+            feat_type = 'Manually added protein sequence single residue feature'
+        newfeat = SeqFeature(location=FeatureLocation(ExactPosition(resnum-1), ExactPosition(resnum)),
+                             type=feat_type,
+                             id=feat_id)
+
+        self.features.append(newfeat)
+
+    def add_region_feature(self, start_resnum, end_resnum, feat_type=None, feat_id=None):
+        """Add a feature to the features list describing a region of the protein sequence.
+
+        Args:
+            start_resnum (int): Start residue number of the protein sequence feature
+            end_resnum (int): End residue number of the protein sequence feature
+            feat_type (str, optional): Optional description of the feature type (ie. 'binding domain')
+            feat_id (str, optional): Optional ID of the feature type (ie. 'TM1')
+
+        """
+        if self.feature_file:
+            raise ValueError('Feature file associated with sequence, please remove file association to append '
+                             'additional features.')
+
+        if not feat_type:
+            feat_type = 'Manually added protein sequence region feature'
+        newfeat = SeqFeature(location=FeatureLocation(start_resnum-1, end_resnum),
+                             type=feat_type,
+                             id=feat_id)
+
+        self.features.append(newfeat)
 
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""

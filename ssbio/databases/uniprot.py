@@ -209,6 +209,7 @@ class UniProtProp(SeqProp):
         for x in self.__dict__.keys():
             if x == 'description':
                 sanitized = ssbio.utils.force_string(getattr(self, x)).replace('#', '-')
+                to_return.update({x: getattr(self, x)})
             else:
                 to_return.update({x: getattr(self, x)})
         return to_return
