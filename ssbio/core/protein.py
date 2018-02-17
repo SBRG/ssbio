@@ -1525,7 +1525,7 @@ class Protein(Object):
 
         if use_representatives:
             seqprop = self.representative_sequence
-            structprop = self.representative_structure
+            structprop = self.representative_structure  # TODO: add checks for if repstruct exists
             chain_id = self.representative_chain
         else:
             if not seqprop or not structprop or not chain_id:
