@@ -337,10 +337,10 @@ class Protein(Object):
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None, download=False, outdir=None,
                      set_as_representative=False, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
-
+        
         Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
         Metadata files will be downloaded as XML files.
-
+        
         Args:
             uniprot_id (str): UniProt ID/ACC
             uniprot_seq_file (str): Path to FASTA file
@@ -478,41 +478,6 @@ class Protein(Object):
                 seq.id = ident
 
         manual_sequence = SeqProp(id=ident, seq=seq)
-        if write_fasta_file:
-            manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
-        self.sequences.append(manual_sequence)
-
-        if set_as_representative:
-            self.representative_sequence = manual_sequence
-
-        return self.sequences.get_by_id(ident)
-
-    def load_manual_sequence_from_genome(self, ident, genome_path, write_fasta_file=False, outdir=None,
-                                         set_as_representative=False, force_rewrite=False):
-        """Load a manual sequence from a FASTA file of many protein sequences.
-
-        Args:
-            ident (str): Identifier for the sequence in the FASTA file.
-            genome_path (str): Path to FASTA file containing multiple protein sequences
-            write_fasta_file (bool): If this sequence should be written out to a FASTA file
-            outdir (str): Path to output directory
-            set_as_representative (bool): If this sequence should be set as the representative one
-            force_rewrite (bool): If the FASTA file should be overwritten if it already exists
-
-        Returns:
-            SeqProp: Sequence that was loaded into the ``sequences`` attribute
-
-        """
-        if write_fasta_file:
-            if not outdir:
-                outdir = self.sequence_dir
-                if not outdir:
-                    raise ValueError('Output directory must be specified')
-            outfile = op.join(outdir, '{}.faa'.format(ident))
-        else:
-            outfile = None
-
-        manual_sequence = SeqProp(id=ident, genome_path=genome_path, seq=None)
         if write_fasta_file:
             manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
         self.sequences.append(manual_sequence)
@@ -728,7 +693,7 @@ class Protein(Object):
     def get_sequence_properties(self, representative_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
         Results are stored in the protein's respective SeqProp objects at ``.annotations``
-
+        
         Args:
             representative_only (bool): If analysis should only be run on the representative sequence
 
@@ -1201,10 +1166,59 @@ class Protein(Object):
         # Download the PDBs
         for s in self.get_experimental_structures():
             log.debug('{}: downloading structure file from the PDB...'.format(s.id))
+            s.download_structure_file(outdir=outdir, file_type=pdb_file_type, force_rerun=force_rerun, load_header_metadata=True)
+            downloaded_pdb_ids.append(s.id)
+
+        return downloaded_pdb_ids
+
+    def download_all_pdbs(self, outdir=None, pdb_file_type=None, load_metadata=False, force_rerun=False):
+        """Downloads all structures from the PDB. load_metadata flag sets if metadata should be parsed and stored in
+        StructProp, otherwise filepaths are just linked"""
+        # TODO: will replace pdb_downloader_and_metadata function
+        if not outdir:
+            outdir = self.structure_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        if not pdb_file_type:
+            pdb_file_type = self.pdb_file_type
+
+        # Check if we have any PDBs
+        if self.num_structures_experimental == 0:
+            log.debug('{}: no structures available - nothing will be downloaded'.format(self.id))
+            return
+
+        downloaded_pdb_ids = []
+        # Download the PDBs
+        for s in self.get_experimental_structures():
+            log.debug('{}: downloading structure file from the PDB...'.format(s.id))
+            s.download_structure_file(outdir=outdir, file_type=pdb_file_type,
+                                      load_header_metadata=load_metadata, force_rerun=force_rerun)
+            downloaded_pdb_ids.append(s.id)
+
+        return downloaded_pdb_ids
+
+    def parse_all_stored_structures(self, outdir=None, pdb_file_type=None, force_rerun=False):
+        """Runs parse_structure for any stored structure with a file available"""
+        # TODO: will replace pdb_downloader_and_metadata function
+        if not outdir:
+            outdir = self.structure_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        if not pdb_file_type:
+            pdb_file_type = self.pdb_file_type
+
+        # Check if we have any PDBs
+        if self.num_structures_experimental == 0:
+            log.debug('{}: no structures available - nothing will be downloaded'.format(self.id))
+            return
+
+        downloaded_pdb_ids = []
+        # Download the PDBs
+        for s in self.get_experimental_structures():
+            log.debug('{}: downloading structure file from the PDB...'.format(s.id))
             s.download_structure_file(outdir=outdir, file_type=pdb_file_type, force_rerun=force_rerun)
-            # Download the mmCIF header file to get additional information
-            if 'cif' not in pdb_file_type:
-                s.download_cif_header_file(outdir=outdir, force_rerun=force_rerun)
             downloaded_pdb_ids.append(s.id)
 
         return downloaded_pdb_ids
@@ -1262,7 +1276,7 @@ class Protein(Object):
 
         Todo:
             * Document **kwargs for alignment options
-
+            
         """
 
         if not outdir:
@@ -1271,6 +1285,7 @@ class Protein(Object):
         if not structure_already_parsed:
             # Parse the structure so chain sequences are stored
             structprop.parse_structure()
+            # XTODO: remove and use the "parsed" attribute in a structprop instead
 
         if chains:
             chains_to_align_to = ssbio.utils.force_list(chains)
@@ -1318,7 +1333,7 @@ class Protein(Object):
                                                                                          outfile=outfile,
                                                                                          force_rerun=force_rerun)
             except ValueError:
-                log.error('{}: alignment failed to run, unable to check structure'.format(full_structure_id))
+                log.error('{}: alignment failed to run, unable to check structure\'s chain'.format(full_structure_id))
                 continue
 
             # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
@@ -1347,6 +1362,41 @@ class Protein(Object):
             if force_rerun and self.sequence_alignments.has_id(aln.id):
                 self.sequence_alignments.remove(aln.id)
             self.sequence_alignments.append(aln)
+
+    def _get_seqprop_to_structprop_alignment(self, seqprop, structprop, chain_id):
+        """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
+        full_structure_id = '{}-{}'.format(structprop.id, chain_id)
+        aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+
+        if self.sequence_alignments.has_id(aln_id):
+            alignment = self.sequence_alignments.get_by_id(aln_id)
+            return alignment
+        else:
+            raise ValueError('{}: structure alignment not found, please run the alignment first'.format(aln_id))
+
+    def get_seqprop_to_structprop_alignment_stats(self, seqprop, structprop, chain_id):
+        """Get the sequence alignment information for a sequence to a structure's chain."""
+        alignment = self._get_seqprop_to_structprop_alignment(seqprop=seqprop, structprop=structprop, chain_id=chain_id)
+        return ssbio.protein.structure.properties.quality.seq_to_struct_alignment_stats(reference_seq_aln=alignment[0],
+                                                                                        structure_seq_aln=alignment[1])
+
+    def check_structure_chain_quality(self, seqprop, structprop, chain_id,
+                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+                                      allow_mutants=True, allow_deletions=False,
+                                      allow_insertions=False, allow_unresolved=True):
+        """Report if a structure's chain meets the defined cutoffs for sequence quality."""
+        alignment = self._get_seqprop_to_structprop_alignment(seqprop=seqprop, structprop=structprop, chain_id=chain_id)
+
+        # Compare sequence to structure's sequence using the alignment
+        chain_passes_quality_check = ssbio.protein.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
+                                                                   structure_seq_aln=alignment[1],
+                                                                   seq_ident_cutoff=seq_ident_cutoff,
+                                                                   allow_missing_on_termini=allow_missing_on_termini,
+                                                                   allow_mutants=allow_mutants,
+                                                                   allow_deletions=allow_deletions,
+                                                                   allow_insertions=allow_insertions,
+                                                                   allow_unresolved=allow_unresolved)
+        return chain_passes_quality_check
 
     def find_representative_chain(self, seqprop, structprop, chains_to_check=None,
                                   seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
@@ -1382,30 +1432,25 @@ class Protein(Object):
             chains_to_check = structprop.chains.list_attr('id')
 
         for chain_id in chains_to_check:
-            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
-            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
-
-            if self.sequence_alignments.has_id(aln_id):
-                alignment = self.sequence_alignments.get_by_id(aln_id)
-            else:
-                log.error('{}: structure alignment not found, please run the alignment first'.format(aln_id))
-                continue
-
-            # Compare sequence to structure's sequence using the alignment
-            found_good_chain = ssbio.protein.structure.properties.quality.sequence_checker(reference_seq_aln=alignment[0],
-                                                                                           structure_seq_aln=alignment[1],
-                                                                                           seq_ident_cutoff=seq_ident_cutoff,
-                                                                                           allow_missing_on_termini=allow_missing_on_termini,
-                                                                                           allow_mutants=allow_mutants,
-                                                                                           allow_deletions=allow_deletions,
-                                                                                           allow_insertions=allow_insertions,
-                                                                                           allow_unresolved=allow_unresolved)
+            try:
+                # Compare sequence to structure's sequence using the alignment
+                found_good_chain = self.check_structure_chain_quality(seqprop=seqprop, structprop=structprop, chain_id=chain_id,
+                                                                      seq_ident_cutoff=seq_ident_cutoff,
+                                                                      allow_missing_on_termini=allow_missing_on_termini,
+                                                                      allow_mutants=allow_mutants,
+                                                                      allow_deletions=allow_deletions,
+                                                                      allow_insertions=allow_insertions,
+                                                                      allow_unresolved=allow_unresolved)
+            except ValueError:
+                log.error('{}-{}: unable to check chain "{}"'.format(seqprop.id, structprop.id, chain_id))
+                found_good_chain = False
 
             # If found_good_chain = True, return chain ID
             # If not, move on to the next potential chain
             if found_good_chain:
+                stats = self.get_seqprop_to_structprop_alignment_stats(seqprop=seqprop, structprop=structprop, chain_id=chain_id)
                 self.representative_chain = chain_id
-                self.representative_chain_seq_coverage = alignment.annotations['percent_identity']
+                self.representative_chain_seq_coverage = stats['percent_identity']
                 return chain_id
         else:
             log.debug('{}: no chains meet quality checks'.format(structprop.id))
@@ -1768,10 +1813,7 @@ class Protein(Object):
                 # Download the structure and parse it
                 # This will add all chains to the mapped_chains attribute if there are none
                 try:
-                    pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun)
-                    # Download the mmCIF header file to get additional information
-                    if 'cif' not in pdb_file_type:
-                        pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
+                    pdb.download_structure_file(outdir=struct_outdir, file_type=pdb_file_type, force_rerun=force_rerun, load_header_metadata=True)
                 except (requests.exceptions.HTTPError, URLError):
                     log.error('{}: structure file could not be downloaded in {} format'.format(pdb, pdb_file_type))
                     continue
@@ -1795,10 +1837,7 @@ class Protein(Object):
                     # Fall back to using mmCIF file if structure cannot be parsed
                     try:
                         pdb.download_structure_file(outdir=struct_outdir, file_type='cif',
-                                                    force_rerun=force_rerun)
-                        # Download the mmCIF header file to get additional information
-                        if 'cif' not in pdb_file_type:
-                            pdb.download_cif_header_file(outdir=struct_outdir, force_rerun=force_rerun)
+                                                    force_rerun=force_rerun, load_header_metadata=True)
                     except (requests.exceptions.HTTPError, URLError):
                         log.error('{}: structure file could not be downloaded'.format(pdb))
                         continue
@@ -1825,10 +1864,26 @@ class Protein(Object):
                                                               keep_chemicals=keep_chemicals,
                                                               outdir=struct_outdir,
                                                               force_rerun=force_rerun)
-                    except:
-                        # TODO: inspect causes of these errors - most common is Biopython PDBParser error
-                        logging.exception("Unknown error with PDB ID {}".format(pdb.id))
-                        continue
+                    except TypeError:
+                        log.warning("Unable to save large PDB {} in PDB file format, setting original structure "
+                                    "as representative.".format(pdb.id))
+                        self.representative_structure = pdb
+                    except Exception as e:
+                        # Try force rerunning first if there exists a corrupt clean PDB file
+                        try:
+                            log.debug('{}: unknown error with {}, trying force_rerun first'.format(self.id, pdb.id))
+                            self._representative_structure_setter(structprop=pdb,
+                                                                  clean=clean,
+                                                                  out_suffix='-{}_clean'.format(best_chain),
+                                                                  keep_chain=best_chain,
+                                                                  keep_chemicals=keep_chemicals,
+                                                                  outdir=struct_outdir,
+                                                                  force_rerun=True)
+                        except Exception as e:
+                            # TODO: inspect causes of these errors - most common is Biopython PDBParser error
+                            logging.exception("{}: unknown error with PDB ID {}".format(self.id, pdb.id))
+                            print(e)
+                            continue
                     log.debug('{}-{}: set as representative structure'.format(pdb.id, best_chain))
                     pdb.reset_chain_seq_records()
                     return self.representative_structure

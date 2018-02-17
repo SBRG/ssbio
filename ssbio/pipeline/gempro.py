@@ -100,7 +100,7 @@ class GEMPRO(Object):
         gem_file_type (str): GEM model type - ``sbml`` (or ``xml``), ``mat``, or ``json`` formats
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
-        genome_path (str): Genome FASTA file of protein coding sequences
+        genome_path (str): FASTA file of all protein coding sequences
         description (str): Optional string to describe your project
         custom_spont_id (str): ID of spontaneous gene
 
@@ -144,9 +144,9 @@ class GEMPRO(Object):
 
         # Or, load the provided FASTA file
         elif genome_path:
-            tmp = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
-            self.genes = list(tmp.keys())
-            self.manual_seq_mapping(tmp, write_fasta_files=write_protein_fasta_files)
+            genes_and_sequences = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
+            self.genes = list(genes_and_sequences.keys())
+            self.manual_seq_mapping(genes_and_sequences, write_fasta_files=write_protein_fasta_files)
 
         # If neither a model or genes are input, you can still add IDs with method add_genes_by_id later
         else:
@@ -178,7 +178,7 @@ class GEMPRO(Object):
 
         self._root_dir = path
 
-        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir]:
+        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir, self.structures_dir]:
             ssbio.utils.make_dir(d)
 
         log.info('{}: GEM-PRO project location'.format(self.base_dir))
@@ -217,6 +217,15 @@ class GEMPRO(Object):
         """str: Directory where all gene specific information is stored."""
         if self.base_dir:
             return op.join(self.base_dir, 'genes')
+        else:
+            return None
+
+    @property
+    def structures_dir(self):
+        """str: Directory where all structures are stored."""
+        # XTODO: replace storage of structures in individual protein directories with this to reduce redundancy
+        if self.base_dir:
+            return op.join(self.base_dir, 'structures')
         else:
             return None
 
@@ -269,6 +278,11 @@ class GEMPRO(Object):
         """DictList: All genes with a representative protein structure."""
         tmp = DictList(x for x in self.genes if x.protein.representative_structure)
         return DictList(y for y in tmp if y.protein.representative_structure.structure_file)
+
+    @property
+    def functional_genes(self):
+        """DictList: All genes with a representative protein structure."""
+        return DictList(x for x in self.genes if x.functional)
 
     @property
     def genes(self):
@@ -370,6 +384,77 @@ class GEMPRO(Object):
                 successfully_mapped_counter += 1
 
             log.debug('{}: loaded KEGG information for gene'.format(g.id))
+
+        log.info('{}/{}: number of genes mapped to KEGG'.format(successfully_mapped_counter, len(self.genes)))
+        log.info('Completed ID mapping --> KEGG. See the "df_kegg_metadata" attribute for a summary dataframe.')
+
+    def kegg_mapping_and_metadata_parallelize(self, sc, kegg_organism_code, custom_gene_mapping=None, outdir=None,
+                                              set_as_representative=False, force_rerun=False):
+        """Map all genes in the model to KEGG IDs using the KEGG service.
+
+        Steps:
+            1. Download all metadata and sequence files in the sequences directory
+            2. Creates a KEGGProp object in the protein.sequences attribute
+            3. Returns a Pandas DataFrame of mapping results
+
+        Args:
+            sc (SparkContext): Spark Context to parallelize this function
+            kegg_organism_code (str): The three letter KEGG code of your organism
+            custom_gene_mapping (dict): If your model genes differ from the gene IDs you want to map,
+                custom_gene_mapping allows you to input a dictionary which maps model gene IDs to new ones.
+                Dictionary keys must match model gene IDs.
+            outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
+                were not created initially
+            set_as_representative (bool): If mapped KEGG IDs should be set as representative sequences
+            force_rerun (bool): If you want to overwrite any existing mappings and files
+
+        """
+
+        # First map all of the organism's KEGG genes to UniProt
+        kegg_to_uniprot = ssbio.databases.kegg.map_kegg_all_genes(organism_code=kegg_organism_code, target_db='uniprot')
+
+        # Parallelize the genes list
+        genes_rdd = sc.parallelize(self.genes)
+
+        # Write a sub-function to carry out the bulk of the original function
+        def gp_kegg_sc(g):
+            if custom_gene_mapping:
+                kegg_g = custom_gene_mapping[g.id]
+            else:
+                kegg_g = g.id
+
+            # Download both FASTA and KEGG metadata files
+            kegg_prop = g.protein.load_kegg(kegg_id=kegg_g, kegg_organism_code=kegg_organism_code,
+                                            download=True, outdir=outdir,
+                                            set_as_representative=set_as_representative,
+                                            force_rerun=force_rerun)
+
+            # Update potentially old UniProt ID
+            if kegg_g in kegg_to_uniprot.keys():
+                kegg_prop.uniprot = kegg_to_uniprot[kegg_g]
+                if g.protein.representative_sequence:
+                    if g.protein.representative_sequence.kegg == kegg_prop.kegg:
+                        g.protein.representative_sequence.uniprot = kegg_to_uniprot[kegg_g]
+
+            # Tracker for if it mapped successfully to KEGG
+            if kegg_prop.sequence_file:
+                success = True
+            else:
+                success = False
+
+            return g, success
+
+        # Run a map operation to execute the function on all items in the RDD
+        result = genes_rdd.map(gp_kegg_sc).collect()
+
+        # Copy the results over to the GEM-PRO object's genes using the GenePro function "copy_modified_gene"
+        # Also count how many genes mapped to KEGG
+        successfully_mapped_counter = 0
+        for modified_g, success in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
+            if success:
+                successfully_mapped_counter += 1
 
         log.info('{}/{}: number of genes mapped to KEGG'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> KEGG. See the "df_kegg_metadata" attribute for a summary dataframe.')
@@ -550,6 +635,7 @@ class GEMPRO(Object):
             gene_to_seq_dict (dict): Mapping of gene IDs to their protein sequence strings
             outdir (str): Path to output directory of downloaded files, must be set if GEM-PRO directories
                 were not created initially
+            write_fasta_files (bool): If individual protein FASTA files should be written out
             set_as_representative (bool): If mapped sequences should be set as representative
 
         """
@@ -560,8 +646,7 @@ class GEMPRO(Object):
 
         # Save the sequence information in individual FASTA files
         for g, s in gene_to_seq_dict.items():
-            g = str(g)
-            gene = self.genes.get_by_id(g)
+            gene = self.genes.get_by_id(str(g))
 
             if not outdir_set and write_fasta_files:
                 outdir = gene.protein.sequence_dir
@@ -1090,6 +1175,75 @@ class GEMPRO(Object):
                                                                                  len(self.genes)))
         log.info('See the "df_representative_structures" attribute for a summary dataframe.')
 
+    def set_representative_structure_parallel(self, sc, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
+                                     engine='needle', always_use_homology=False, rez_cutoff=0.0,
+                                     seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
+                                     allow_mutants=True, allow_deletions=False,
+                                     allow_insertions=False, allow_unresolved=True,
+                                     clean=True, force_rerun=False):
+        """Set all representative structure for proteins from a structure in the structures attribute.
+
+        Each gene can have a combination of the following, which will be analyzed to set a representative structure.
+
+            * Homology model(s)
+            * Ranked PDBs
+            * BLASTed PDBs
+
+        If the ``always_use_homology`` flag is true, homology models are always set as representative when they exist.
+        If there are multiple homology models, we rank by the percent sequence coverage.
+
+        Args:
+            seq_outdir (str): Path to output directory of sequence alignment files, must be set if GEM-PRO directories
+                were not created initially
+            struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories
+                were not created initially
+            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
+                choose a file type for files downloaded from the PDB
+            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
+                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
+                ``biopython`` is Biopython's implementation of needle. Results can differ!
+            always_use_homology (bool): If homology models should always be set as the representative structure
+            rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
+            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
+            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
+                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
+                5 to 95 will be checked for modifications.
+            allow_mutants (bool): If mutations should be allowed or checked for
+            allow_deletions (bool): If deletions should be allowed or checked for
+            allow_insertions (bool): If insertions should be allowed or checked for
+            allow_unresolved (bool): If unresolved residues should be allowed or checked for
+            clean (bool): If structures should be cleaned
+            force_rerun (bool): If sequence to structure alignment should be rerun
+
+        """
+        genes_rdd = sc.parallelize(self.genes)
+
+        result = genes_rdd.map(lambda g: (g, g.protein.set_representative_structure(seq_outdir=seq_outdir,
+                                                           struct_outdir=struct_outdir,
+                                                           pdb_file_type=pdb_file_type,
+                                                           engine=engine,
+                                                           rez_cutoff=rez_cutoff,
+                                                           seq_ident_cutoff=seq_ident_cutoff,
+                                                           always_use_homology=always_use_homology,
+                                                           allow_missing_on_termini=allow_missing_on_termini,
+                                                           allow_mutants=allow_mutants,
+                                                           allow_deletions=allow_deletions,
+                                                           allow_insertions=allow_insertions,
+                                                           allow_unresolved=allow_unresolved,
+                                                           clean=clean,
+                                                           force_rerun=force_rerun))).collect()
+
+        # Copy the results over to the GEM-PRO object's genes using the GenePro function "copy_modified_gene"
+        # Also count how many genes mapped to KEGG
+        for modified_g, success in result:
+            # TODO - this is not gonna work because set_repstruct does not return a modified gene
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
+
+        log.info('{}/{}: number of genes with a representative structure'.format(len(self.genes_with_a_representative_structure),
+                                                                                 len(self.genes)))
+        log.info('See the "df_representative_structures" attribute for a summary dataframe.')
+
     @property
     def df_representative_structures(self):
         """DataFrame: Get a dataframe of representative protein structure information."""
@@ -1184,6 +1338,17 @@ class GEMPRO(Object):
 
         log.info('Updated PDB metadata dataframe. See the "df_pdb_metadata" attribute for a summary dataframe.')
         log.info('Saved {} structures total'.format(counter))
+
+    def download_all_pdbs(self, outdir=None, pdb_file_type=None, load_metadata=False, force_rerun=False):
+        if not pdb_file_type:
+            pdb_file_type = self.pdb_file_type
+
+        all_structures = []
+        for g in tqdm(self.genes):
+            pdbs = g.protein.download_all_pdbs(outdir=outdir, pdb_file_type=pdb_file_type,
+                                               load_metadata=load_metadata, force_rerun=force_rerun)
+            all_structures.extend(pdbs)
+        return list(set(all_structures))
 
     @property
     def df_pdb_metadata(self):
