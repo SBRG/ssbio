@@ -280,7 +280,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
         evalue_cutoff = float('Inf')
 
     out = pd.DataFrame()
-    for g_name, bbh_path in tqdm(genome_to_bbh_files.items()):
+    for g_name, bbh_path in genome_to_bbh_files.items():
 
         df_bbh = pd.read_csv(bbh_path, index_col=0)
         bidirectional = df_bbh[df_bbh.BBH == '<=>']

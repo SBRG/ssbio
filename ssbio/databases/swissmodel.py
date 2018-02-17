@@ -36,7 +36,10 @@ class SWISSMODEL():
     @property
     def metadata_index_json(self):
         """str: Path to the INDEX_JSON file."""
-        return op.join(self.metadata_dir, 'INDEX_JSON')
+        try:
+            return op.join(self.metadata_dir, 'INDEX.json')
+        except FileNotFoundError:
+            return op.join(self.metadata_dir, 'INDEX_JSON')
 
     @property
     def uniprots_modeled(self):
@@ -51,7 +54,7 @@ class SWISSMODEL():
         with open(self.metadata_index_json) as f:
             loaded = json.load(f)
 
-        for m in loaded:
+        for m in loaded['index']:
             all_models[m['uniprot_ac']].append(m)
 
         self.all_models = dict(all_models)
@@ -66,7 +69,37 @@ class SWISSMODEL():
             dict: All available models in SWISS-MODEL for this UniProt entry
 
         """
-        return self.all_models[uniprot_acc]
+        if uniprot_acc in self.all_models:
+            return self.all_models[uniprot_acc]
+        else:
+            log.error('{}: no SWISS-MODELs available'.format(uniprot_acc))
+            return None
+
+    def get_model_filepath(self, infodict):
+        """Get the path to the homology model using information from the index dictionary for a single model.
+
+        Example: use self.get_models(UNIPROT_ID) to get all the models, which returns a list of dictionaries.
+            Use one of those dictionaries as input to this function to get the filepath to the model itself.
+
+        Args:
+            infodict (dict): Information about a model from get_models
+
+        Returns:
+            str: Path to homology model
+
+        """
+        u = infodict['uniprot_ac']
+
+        original_filename = '{}_{}_{}_{}'.format(infodict['from'], infodict['to'],
+                                                 infodict['template'], infodict['coordinate_id'])
+        file_path = op.join(self.metadata_dir, u[:2], u[2:4], u[4:6],
+                            'swissmodel', '{}.pdb'.format(original_filename))
+
+        if op.exists(file_path):
+            return file_path
+        else:
+            log.warning('{}: no file {} found for model'.format(u, file_path))
+            return None
 
     def download_models(self, uniprot_acc, outdir='', force_rerun=False):
         """Download all models available for a UniProt accession number.
@@ -103,3 +136,25 @@ class SWISSMODEL():
                 downloaded.append(outfile)
 
         return downloaded
+
+    def organize_models(self, outdir, force_rerun=False):
+        """Organize and rename SWISS-MODEL models to a single folder with a name containing template information.
+
+        Args:
+            outdir (str): New directory to copy renamed models to
+            force_rerun (bool): If models should be copied again even if they already exist
+
+        Returns:
+            dict: Dictionary of lists, UniProt IDs as the keys and new file paths as the values
+
+        """
+        for u, models in self.all_models:
+            for m in models:
+                original_filename = '{}_{}_{}_{}'.format(m['from'], m['to'], m['template'], m['coordinate_id'])
+                file_path = op.join(self.metadata_dir,
+                                    u[:2], u[2:4], u[4:], 'swissmodel',
+                                    '{}.pdb'.format(original_filename))
+                if op.exists(file_path):
+                    uniprot_to_swissmodel[uni].append(file_path)
+                else:
+                    log.warning('{}: no file {} found for model'.format(u, ))
