@@ -487,41 +487,6 @@ class Protein(Object):
 
         return self.sequences.get_by_id(ident)
 
-    def load_manual_sequence_from_genome(self, ident, genome_path, write_fasta_file=False, outdir=None,
-                                         set_as_representative=False, force_rewrite=False):
-        """Load a manual sequence from a FASTA file of many protein sequences.
-
-        Args:
-            ident (str): Identifier for the sequence in the FASTA file.
-            genome_path (str): Path to FASTA file containing multiple protein sequences
-            write_fasta_file (bool): If this sequence should be written out to a FASTA file
-            outdir (str): Path to output directory
-            set_as_representative (bool): If this sequence should be set as the representative one
-            force_rewrite (bool): If the FASTA file should be overwritten if it already exists
-
-        Returns:
-            SeqProp: Sequence that was loaded into the ``sequences`` attribute
-
-        """
-        if write_fasta_file:
-            if not outdir:
-                outdir = self.sequence_dir
-                if not outdir:
-                    raise ValueError('Output directory must be specified')
-            outfile = op.join(outdir, '{}.faa'.format(ident))
-        else:
-            outfile = None
-
-        manual_sequence = SeqProp(id=ident, genome_path=genome_path, seq=None)
-        if write_fasta_file:
-            manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
-        self.sequences.append(manual_sequence)
-
-        if set_as_representative:
-            self.representative_sequence = manual_sequence
-
-        return self.sequences.get_by_id(ident)
-
     def set_representative_sequence(self, force_rerun=False):
         """Automatically consolidate loaded sequences (manual, UniProt, or KEGG) and set a single representative
         sequence.
@@ -1368,7 +1333,7 @@ class Protein(Object):
                                                                                          outfile=outfile,
                                                                                          force_rerun=force_rerun)
             except ValueError:
-                log.error('{}: alignment failed to run, unable to check structure'.format(full_structure_id))
+                log.error('{}: alignment failed to run, unable to check structure\'s chain'.format(full_structure_id))
                 continue
 
             # Add an identifier to the MultipleSeqAlignment object for storage in a DictList
@@ -1467,14 +1432,18 @@ class Protein(Object):
             chains_to_check = structprop.chains.list_attr('id')
 
         for chain_id in chains_to_check:
-            # Compare sequence to structure's sequence using the alignment
-            found_good_chain = self.check_structure_chain_quality(seqprop=seqprop, structprop=structprop, chain_id=chain_id,
-                                                                  seq_ident_cutoff=seq_ident_cutoff,
-                                                                  allow_missing_on_termini=allow_missing_on_termini,
-                                                                  allow_mutants=allow_mutants,
-                                                                  allow_deletions=allow_deletions,
-                                                                  allow_insertions=allow_insertions,
-                                                                  allow_unresolved=allow_unresolved)
+            try:
+                # Compare sequence to structure's sequence using the alignment
+                found_good_chain = self.check_structure_chain_quality(seqprop=seqprop, structprop=structprop, chain_id=chain_id,
+                                                                      seq_ident_cutoff=seq_ident_cutoff,
+                                                                      allow_missing_on_termini=allow_missing_on_termini,
+                                                                      allow_mutants=allow_mutants,
+                                                                      allow_deletions=allow_deletions,
+                                                                      allow_insertions=allow_insertions,
+                                                                      allow_unresolved=allow_unresolved)
+            except ValueError:
+                log.error('{}-{}: unable to check chain "{}"'.format(seqprop.id, structprop.id, chain_id))
+                found_good_chain = False
 
             # If found_good_chain = True, return chain ID
             # If not, move on to the next potential chain
@@ -1897,7 +1866,7 @@ class Protein(Object):
                                                               force_rerun=force_rerun)
                     except TypeError:
                         log.warning("Unable to save large PDB {} in PDB file format, setting original structure "
-                                          "as representative.".format(pdb.id))
+                                    "as representative.".format(pdb.id))
                         self.representative_structure = pdb
                     except Exception as e:
                         # Try force rerunning first if there exists a corrupt clean PDB file
