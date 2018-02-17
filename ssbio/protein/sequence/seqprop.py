@@ -388,7 +388,26 @@ class SeqProp(SeqRecord):
         return Object.__repr__(self)
 
     def update(self, newdata, overwrite=False, only_keys=None):
-        Object.update(self, newdata=newdata, overwrite=overwrite, only_keys=only_keys)
+        # Filter for list of keys in only_keys
+        if only_keys:
+            only_keys = ssbio.utils.force_list(only_keys)
+            newdata = {k: v for k, v in newdata.items() if k in only_keys}
+
+        # Update attributes
+        for key, value in newdata.items():
+            # Overwrite flag overwrites all attributes
+            if overwrite:
+                setattr(self, key, value)
+            else:
+                # Otherwise check if attribute is None and set it if so
+                if hasattr(self, key):
+                    if not getattr(self, key):
+                        setattr(self, key, value)
+                    else:
+                        continue
+                # Or just add a new attribute
+                else:
+                    setattr(self, key, value)
 
     def get_dict(self, only_attributes=None, exclude_attributes=None, df_format=False):
         """Get a dictionary of this object's attributes. Optional format for storage in a Pandas DataFrame.
