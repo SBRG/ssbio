@@ -177,7 +177,7 @@ class GEMPRO(Object):
 
         self._root_dir = path
 
-        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir, self.structures_dir]:
+        for d in [self.base_dir, self.model_dir, self.data_dir, self.genes_dir]:#, self.structures_dir]:
             ssbio.utils.make_dir(d)
 
         log.info('{}: GEM-PRO project location'.format(self.base_dir))
@@ -219,14 +219,14 @@ class GEMPRO(Object):
         else:
             return None
 
-    @property
-    def structures_dir(self):
-        """str: Directory where all structures are stored."""
-        # XTODO: replace storage of structures in individual protein directories with this to reduce redundancy
-        if self.base_dir:
-            return op.join(self.base_dir, 'structures')
-        else:
-            return None
+    # @property
+    # def structures_dir(self):
+    #     """str: Directory where all structures are stored."""
+    #     # XTODO: replace storage of structures in individual protein directories with this to reduce redundancy
+    #     if self.base_dir:
+    #         return op.join(self.base_dir, 'structures')
+    #     else:
+    #         return None
 
     def load_cobra_model(self, model):
         """Load a COBRApy Model object into the GEM-PRO project.
