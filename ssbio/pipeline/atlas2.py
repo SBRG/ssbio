@@ -329,7 +329,7 @@ class ATLAS2(Object):
         log.info('{} genes to be analyzed, originally {}'.format(len(self.reference_gempro.functional_genes), initial_num_genes))
         log.info('{} strains to be analyzed, originally {}'.format(len(self.strains), initial_num_strains))
 
-    def build_strain_specific_models(self, save_models=False):
+    def build_strain_specific_models(self, save_models=False, force_rerun=False):
         """Using the orthologous genes matrix, create and modify the strain specific models based on if orthologous
         genes exist.
         """
@@ -343,39 +343,46 @@ class ATLAS2(Object):
         # Create an emptied copy of the reference GEM-PRO
         def build_strain_specific_model(strain_gempro, empty_reference_gempro=self._empty_reference_gempro,
                                         orth_matrix=self.df_orthology_matrix,
-                                        save_model=save_models, model_dir=self.model_dir):
-            # For each genome, load the metabolic model or genes from the reference GEM-PRO
-            if empty_reference_gempro.model:
-                logging.disable(logging.WARNING)
-                strain_gempro.load_cobra_model(empty_reference_gempro.model)
-                logging.disable(logging.NOTSET)
-                strain_gempro.model._trimmed = False
-                strain_gempro.model._trimmed_genes = []
-                strain_gempro.model._trimmed_reactions = {}
-            elif empty_reference_gempro.genes:
-                strain_gempro.genes = empty_reference_gempro.genes.copy()
+                                        save_model=save_models, model_dir=self.model_dir,
+                                        force_rerun=force_rerun):
+            already_saved_model = op.join(model_dir, '{}.json'.format(strain_gempro.id))
 
-            # Get a list of genes which do not have orthology in the strain
-            genes_to_remove = orth_matrix[pd.isnull(orth_matrix[strain_gempro.id])][strain_gempro.id].index.tolist()
+            if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_model):
+                # For each genome, load the metabolic model or genes from the reference GEM-PRO
+                if empty_reference_gempro.model:
+                    logging.disable(logging.WARNING)
+                    strain_gempro.load_cobra_model(empty_reference_gempro.model)
+                    logging.disable(logging.NOTSET)
+                    strain_gempro.model._trimmed = False
+                    strain_gempro.model._trimmed_genes = []
+                    strain_gempro.model._trimmed_reactions = {}
+                elif empty_reference_gempro.genes:
+                    strain_gempro.genes = empty_reference_gempro.genes.copy()
 
-            # Mark genes non-functional
-            strain_genes = [x.id for x in strain_gempro.genes]
-            genes_to_remove = list(set(genes_to_remove).intersection(set(strain_genes)))
+                # Get a list of genes which do not have orthology in the strain
+                genes_to_remove = orth_matrix[pd.isnull(orth_matrix[strain_gempro.id])][strain_gempro.id].index.tolist()
 
-            if len(genes_to_remove) > 0:
-                # If a COBRApy model exists, utilize the delete_model_genes method
-                if strain_gempro.model:
-                    cobra.manipulation.delete_model_genes(strain_gempro.model, genes_to_remove)
-                # Otherwise, just mark the genes as non-functional
-                else:
-                    for g in genes_to_remove:
-                        strain_gempro.genes.get_by_id(g).functional = False
+                # Mark genes non-functional
+                strain_genes = [x.id for x in strain_gempro.genes]
+                genes_to_remove = list(set(genes_to_remove).intersection(set(strain_genes)))
 
-            if save_model:
-                cobra.io.save_json_model(model=strain_gempro.model,
-                                         filename=op.join(model_dir, '{}.json'.format(strain_gempro.id)))
+                if len(genes_to_remove) > 0:
+                    # If a COBRApy model exists, utilize the delete_model_genes method
+                    if strain_gempro.model:
+                        cobra.manipulation.delete_model_genes(strain_gempro.model, genes_to_remove)
+                    # Otherwise, just mark the genes as non-functional
+                    else:
+                        for g in genes_to_remove:
+                            strain_gempro.genes.get_by_id(g).functional = False
 
-            return strain_gempro
+                if save_model:
+                    cobra.io.save_json_model(model=strain_gempro.model,
+                                             filename=op.join(model_dir, '{}.json'.format(strain_gempro.id)))
+
+                return strain_gempro
+
+            else:
+                return GEMPRO(gem_name=strain_gempro.id, gem_file_path=already_saved_model, gem_file_type='json')
 
         self.strains = DictList(self.strains_rdd.map(build_strain_specific_model).collect())
         # for s in self.strains:
