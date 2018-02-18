@@ -57,8 +57,11 @@ def search_ss_bonds(model, threshold=3.0):
 
     bridges = []
     for cys_pair in pairs:
-        if cys_pair[0]['SG'] - cys_pair[1]['SG'] < threshold:
-            bridges.append(cys_pair)
+        try:
+            if cys_pair[0]['SG'] - cys_pair[1]['SG'] < threshold:
+                bridges.append(cys_pair)
+        except KeyError:  # This will occur when a CYS residue is missing a SG atom for some reason
+            continue
 
     infodict = {}
     if bridges:
