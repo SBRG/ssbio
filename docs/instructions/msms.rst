@@ -40,14 +40,14 @@ Installation instructions (Unix)
 
     .. code-block:: console
 
-        sudo ln -s /usr/local/lib/msms/msms.i86Linux2.2.6.1 /usr/local/bin/msms
+        sudo ln -s /usr/local/lib/msms/msms.x86_64Linux2.2.6.1 /usr/local/bin/msms
         sudo ln -s /usr/local/lib/msms/pdb_to_xyzr* /usr/local/bin
 
 #. Fix a bug in the pdb_to_xyzr file (see: http://mailman.open-bio.org/pipermail/biopython/2015-November/015787.html):
    
     .. code-block:: console
 
-        sudo gedit /usr/local/lib/msms/pdb_to_xyzr
+        sudo vi /usr/local/lib/msms/pdb_to_xyzr
 
     at line 34, change:
 
