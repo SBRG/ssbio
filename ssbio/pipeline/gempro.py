@@ -782,7 +782,14 @@ class GEMPRO(Object):
         # Runs SCRATCH or loads existing results in results_dir
         scratch = SCRATCH(project_name=scratch_basename, seq_file=self.genome_path)
         scratch.run_scratch(path_to_scratch=path_to_scratch, num_cores=num_cores, outdir=results_dir)
-
+        sspro_summary = scratch.sspro_summary()
+        sspro8_summary = scratch.sspro8_summary()
+        sspro_results = scratch.sspro_results()
+        sspro8_results = scratch.sspro8_results()
+        accpro_summary = scratch.accpro_summary()
+        accpro20_summary = scratch.accpro20_summary(exposed_buried_cutoff)
+        accpro_results = scratch.accpro_results()
+        accpro20_results = scratch.accpro20_results()
         counter = 0
 
         # Adding the scratch annotations to the representative_sequences letter_annotations
@@ -792,18 +799,18 @@ class GEMPRO(Object):
             else:
                 g_id = g.id
 
-            if g_id in scratch.sspro_summary():
+            if g_id in sspro_summary:
                 # Secondary structure
-                g.protein.representative_sequence.annotations.update(scratch.sspro_summary()[g_id])
-                g.protein.representative_sequence.annotations.update(scratch.sspro8_summary()[g_id])
-                g.protein.representative_sequence.letter_annotations['SS-sspro'] = scratch.sspro_results()[g_id]
-                g.protein.representative_sequence.letter_annotations['SS-sspro8'] = scratch.sspro8_results()[g_id]
+                g.protein.representative_sequence.annotations.update(sspro_summary[g_id])
+                g.protein.representative_sequence.annotations.update(sspro8_summary[g_id])
+                g.protein.representative_sequence.letter_annotations['SS-sspro'] = sspro_results[g_id]
+                g.protein.representative_sequence.letter_annotations['SS-sspro8'] = sspro8_results[g_id]
 
                 # Solvent accessibility
-                g.protein.representative_sequence.annotations.update(scratch.accpro_summary()[g_id])
-                g.protein.representative_sequence.annotations.update(scratch.accpro20_summary(exposed_buried_cutoff)[g_id])
-                g.protein.representative_sequence.letter_annotations['RSA-accpro'] = scratch.accpro_results()[g_id]
-                g.protein.representative_sequence.letter_annotations['RSA-accpro20'] = scratch.accpro20_results()[g_id]
+                g.protein.representative_sequence.annotations.update(accpro_summary[g_id])
+                g.protein.representative_sequence.annotations.update(accpro20_summary[g_id])
+                g.protein.representative_sequence.letter_annotations['RSA-accpro'] = accpro_results[g_id]
+                g.protein.representative_sequence.letter_annotations['RSA-accpro20'] = accpro20_results[g_id]
 
                 counter += 1
             else:
@@ -1117,7 +1124,7 @@ class GEMPRO(Object):
                                      engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
-                                     allow_insertions=False, allow_unresolved=True,
+                                     allow_insertions=False, allow_unresolved=True, skip_large_structures=False,
                                      clean=True, force_rerun=False):
         """Set all representative structure for proteins from a structure in the structures attribute.
 
@@ -1166,6 +1173,7 @@ class GEMPRO(Object):
                                                                allow_deletions=allow_deletions,
                                                                allow_insertions=allow_insertions,
                                                                allow_unresolved=allow_unresolved,
+                                                               skip_large_structures=skip_large_structures,
                                                                clean=clean,
                                                                force_rerun=force_rerun)
 
@@ -1177,7 +1185,7 @@ class GEMPRO(Object):
                                      engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
-                                     allow_insertions=False, allow_unresolved=True,
+                                     allow_insertions=False, allow_unresolved=True, skip_large_structures=False,
                                      clean=True, force_rerun=False):
         def set_repstruct(g, seq_outdir=seq_outdir, struct_outdir=struct_outdir,
                           pdb_file_type=pdb_file_type, engine=engine,
@@ -1186,6 +1194,7 @@ class GEMPRO(Object):
                           allow_missing_on_termini=allow_missing_on_termini,
                           allow_mutants=allow_mutants, allow_deletions=allow_deletions,
                           allow_insertions=allow_insertions, allow_unresolved=allow_unresolved,
+                          skip_large_structures=skip_large_structures,
                           clean=clean, force_rerun=force_rerun):
             g.protein.set_representative_structure(seq_outdir=seq_outdir, struct_outdir=struct_outdir,
                           pdb_file_type=pdb_file_type, engine=engine,
@@ -1194,6 +1203,7 @@ class GEMPRO(Object):
                           allow_missing_on_termini=allow_missing_on_termini,
                           allow_mutants=allow_mutants, allow_deletions=allow_deletions,
                           allow_insertions=allow_insertions, allow_unresolved=allow_unresolved,
+                          skip_large_structures=skip_large_structures,
                           clean=clean, force_rerun=force_rerun)
             return g
 
