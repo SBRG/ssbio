@@ -1,6 +1,27 @@
+import pytest
 import unittest
 import os.path as op
 import ssbio.utils
+
+
+class Dummy(object):
+    def __init__(self):
+        self.outdir_set = 'an_output_directory'
+        self.outdir_notset = None
+
+
+@pytest.fixture(scope='class')
+def dummy_object():
+    return Dummy()
+
+
+def test_double_check_attribute():
+    dummy = dummy_object()
+    ssbio.utils.double_check_attribute(object=dummy, setter=None, backup_attribute='outdir_set')
+    ssbio.utils.double_check_attribute(object=dummy, setter='newoutdir', backup_attribute='outdir_set')
+    with pytest.raises(ValueError):
+        ssbio.utils.double_check_attribute(object=dummy, setter=None, backup_attribute='outdir_notset')
+
 
 class TestUtils(unittest.TestCase):
     """Unit tests for utils

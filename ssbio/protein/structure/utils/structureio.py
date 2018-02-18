@@ -35,6 +35,8 @@ class StructureIO(PDBIO):
     Also adds some logging methods.
     """
 
+    # XTODO: need to revamp this module to be clearer on what files are supported, how file path is parsed
+    # (should explicitly define it)
     def __init__(self, structure_file, file_type=None):
         PDBIO.__init__(self)
 
@@ -52,7 +54,7 @@ class StructureIO(PDBIO):
             if '.' not in file_type:
                 file_type = '.{}'.format(file_type)
 
-        if file_type in ['.pdb', '.ent', '.mmcif', '.cif', '.mmtf']:
+        if file_type.lower() in ['.pdb', '.ent', '.mmcif', '.cif', '.mmtf']:
             # Load the structure
             if file_type.lower() == '.pdb' or file_type.lower() == '.ent':
                 structure = pdbp.get_structure(id='ssbio_pdb', file=structure_file)

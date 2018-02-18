@@ -7,7 +7,7 @@ import gzip
 import json
 import logging
 import os.path as op
-import zlib
+import mmtf
 import os
 from cobra.core import DictList
 import pandas as pd
@@ -37,6 +37,14 @@ class PDBProp(StructProp):
     Extends the :class:`~ssbio.protein.structure.structprop.StructProp` class to allow initialization of the structure
     by its PDB ID, and then enabling downloads of the structure file as well as parsing its metadata.
 
+    Args:
+        ident (str):
+        description (str):
+        chains (str):
+        mapped_chains (str):
+        structure_path (str):
+        file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
+
     """
 
     def __init__(self, ident, description=None, chains=None, mapped_chains=None, structure_path=None, file_type=None):
@@ -49,19 +57,22 @@ class PDBProp(StructProp):
         self.biological_assemblies = DictList()
         """DictList: A list for storing Bioassembly objects related to this PDB ID"""
 
-    def download_structure_file(self, outdir, file_type, load_header_metadata=True, force_rerun=False):
+    def download_structure_file(self, outdir, file_type=None, load_header_metadata=True, force_rerun=False):
         """Download a structure file from the PDB, specifying an output directory and a file type. Optionally download
         the mmCIF header file and parse data from it to store within this object.
 
         Args:
             outdir (str): Path to output directory
-            file_type (str):
-            load_header_metadata (bool):
-            force_rerun (bool):
-
-        Returns:
+            file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
+            load_header_metadata (bool): If header metadata should be loaded into this object, fastest with mmtf files
+            force_rerun (bool): If structure file should be downloaded even if it already exists
 
         """
+        ssbio.utils.double_check_attribute(object=self, setter=file_type, backup_attribute='file_type',
+                                           custom_error_text='Please set file type to be downloaded from the PDB: '
+                                                             'pdb, mmCif, xml, or mmtf')
+
+        # XTODO: check if outfile exists using ssbio.utils.force_rerun, pdblist seems to take long if it exists
         p = PDBList()
         with ssbio.utils.suppress_stdout():
             structure_file = p.retrieve_pdb_file(pdb_code=self.id, pdir=outdir, file_format=file_type, overwrite=force_rerun)
@@ -71,7 +82,9 @@ class PDBProp(StructProp):
         else:
             log.debug('{}: {} file saved'.format(self.id, file_type))
             self.load_structure_path(structure_file, file_type)
-            if load_header_metadata:
+            if load_header_metadata and file_type == 'mmtf':
+                self.update(parse_mmtf_header(structure_file))
+            if load_header_metadata and file_type != 'mmtf':
                 self.update(parse_mmcif_header(download_mmcif_header(pdb_id=self.id, outdir=outdir, force_rerun=force_rerun)))
 
     def get_pisa_complex_predictions(self, outdir, existing_pisa_multimer_xml=None):
@@ -94,6 +107,35 @@ class PDBProp(StructProp):
                 to_return.update({x: getattr(self, x)})
         return to_return
 
+
+def parse_mmtf_header(infile):
+    """Parse an MMTF file and return basic header-like information.
+
+    Args:
+        infile (str): Path to MMTF file
+
+    Returns:
+        dict: Dictionary of parsed header
+
+    Todo:
+        - Can this be sped up by not parsing the 3D coordinate info somehow?
+        - OR just store the sequences when this happens since it is already being parsed.
+
+    """
+    infodict = {}
+
+    mmtf_decoder = mmtf.parse(infile)
+    infodict['date'] = mmtf_decoder.deposition_date
+    infodict['release_date'] = mmtf_decoder.release_date
+    infodict['experimental_method'] = [x.decode() for x in mmtf_decoder.experimental_methods]
+    infodict['resolution'] = mmtf_decoder.resolution
+    infodict['description'] = mmtf_decoder.title
+
+    group_name_exclude = ['HOH']
+    chem_comp_type_exclude = ['l-peptide linking', 'peptide linking']
+    chemicals = list(set([mmtf_decoder.group_list[idx]['groupName'] for idx in mmtf_decoder.group_type_list if mmtf_decoder.group_list[idx]['chemCompType'].lower() not in chem_comp_type_exclude and mmtf_decoder.group_list[idx]['groupName'] not in group_name_exclude]))
+    infodict['chemicals'] = chemicals
+    return infodict
 
 def download_mmcif_header(pdb_id, outdir='', force_rerun=False):
     """Download a mmCIF header file from the RCSB PDB by ID.
