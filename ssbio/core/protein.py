@@ -376,8 +376,7 @@ class Protein(Object):
                                        fasta_path=uniprot_seq_file,
                                        xml_path=uniprot_xml_file)
             if download:
-                uniprot_prop.download_metadata_file(outdir=outdir,
-                                                    force_rerun=force_rerun)
+                uniprot_prop.download_metadata_file(outdir=outdir, force_rerun=force_rerun)
                 uniprot_prop.download_seq_file(outdir=outdir, force_rerun=force_rerun)
 
             # Also check if UniProt sequence matches a potentially set representative sequence
@@ -1713,7 +1712,7 @@ class Protein(Object):
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True,
-                                     clean=True, keep_chemicals=None,
+                                     clean=True, keep_chemicals=None, skip_large_structures=False,
                                      force_rerun=False):
         """Set a representative structure from a structure in the structures attribute.
 
@@ -1869,7 +1868,10 @@ class Protein(Object):
                     except TypeError:
                         log.warning("Unable to save large PDB {} in PDB file format, setting original structure "
                                     "as representative.".format(pdb.id))
-                        self.representative_structure = pdb
+                        if skip_large_structures == True:
+                            continue
+                        else:
+                            self.representative_structure = pdb
                     except Exception as e:
                         # Try force rerunning first if there exists a corrupt clean PDB file
                         try:
