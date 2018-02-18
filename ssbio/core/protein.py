@@ -61,8 +61,7 @@ class Protein(Object):
         description (str): Optional description for this protein
         root_dir (str): Path to where the folder named by this protein's ID will be created.
             Default is current working directory.
-        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-            choose a file type for files downloaded from the PDB
+        pdb_file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
 
     Todo:
         - Implement structural alignment objects with FATCAT
@@ -1232,15 +1231,19 @@ class Protein(Object):
 
         pdb_pre_df = []
 
+        not_showing_info = []
         for p in self.get_experimental_structures():
             if not p.structure_file:
-                log.error('{}: PDB file has not been downloaded, run "pdb_downloader_and_metadata" \
+                not_showing_info.append(p.id)
+                log.debug('{}: PDB file has not been downloaded, run "pdb_downloader_and_metadata" \
                     to download all structures'.format(p.id))
                 continue
 
             infodict = p.get_dict(df_format=True)
             infodict['pdb_id'] = p.id
             pdb_pre_df.append(infodict)
+
+        log.warning('Not showing info for {} mapped PDB entries, as they have not been downloaded yet. Run ')
 
         cols = ['pdb_id', 'pdb_title', 'description', 'experimental_method', 'mapped_chains',
                 'resolution', 'chemicals', 'date', 'taxonomy_name',
@@ -1727,8 +1730,7 @@ class Protein(Object):
                 was not created initially
             struct_outdir (str): Path to output directory of structure files, must be set if Protein directory
                 was not created initially
-            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-                choose a file type for files downloaded from the PDB
+            pdb_file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
             engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
                 ``needle`` is the standard EMBOSS tool to run pairwise alignments.
                 ``biopython`` is Biopython's implementation of needle. Results can differ!
@@ -1831,12 +1833,12 @@ class Protein(Object):
                                                      engine=engine,
                                                      parse=True,
                                                      force_rerun=force_rerun)
-                except (PDBConstructionException, ExtraData) as e:
+                except (PDBConstructionException, ExtraData, KeyError) as e:
                     log.error('{}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(pdb, pdb_file_type))
                     print(e)
                     # Fall back to using mmCIF file if structure cannot be parsed
                     try:
-                        pdb.download_structure_file(outdir=struct_outdir, file_type='cif',
+                        pdb.download_structure_file(outdir=struct_outdir, file_type='mmCif',
                                                     force_rerun=force_rerun, load_header_metadata=True)
                     except (requests.exceptions.HTTPError, URLError):
                         log.error('{}: structure file could not be downloaded'.format(pdb))

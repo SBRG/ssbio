@@ -183,18 +183,27 @@ def clean_single_dict(indict, prepend_to_keys=None, remove_keys_containing=None)
     return outdict
 
 
-def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emmitted
-    when the function is used."""
-    def newFunc(*args, **kwargs):
-        warnings.warn("Call to deprecated function %s." % func.__name__,
-                      category=DeprecationWarning)
-        return func(*args, **kwargs)
-    newFunc.__name__ = func.__name__
-    newFunc.__doc__ = func.__doc__
-    newFunc.__dict__.update(func.__dict__)
-    return newFunc
+def double_check_attribute(object, setter, backup_attribute, custom_error_text=None):
+    """Check if a parameter to be used is None, if it is, then check the specified backup attribute and throw
+    an error if it is also None.
+
+    Args:
+        object: The original object
+        setter: Any input object
+        backup_attribute (str): Attribute in <object> to be double checked
+        custom_error_text (str): If a custom string for the error should be raised
+
+    Raises:
+         ValueError: If both setter and backup_attribute are None
+
+    """
+    if not setter:
+        next_checker = getattr(object, backup_attribute)
+        if not next_checker:
+            if custom_error_text:
+                raise ValueError(custom_error_text)
+            else:
+                raise ValueError('Attribute replacing "{}" must be specified'.format(backup_attribute))
 
 
 def split_folder_and_path(filepath):

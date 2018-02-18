@@ -35,8 +35,7 @@ class Complex(Object):
         description (str): Optional description for this complex
         root_dir (str): Path to where the folder named by this complex's ID will be created.
             Default is current working directory.
-        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-            choose a file type for files downloaded from the PDB
+        pdb_file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
 
     """
 

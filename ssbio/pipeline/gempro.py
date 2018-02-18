@@ -91,8 +91,7 @@ class GEMPRO(Object):
     Args:
         gem_name (str): The name of your GEM or just your project in general.
             This will be the name of the main folder that is created in root_dir.
-        pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` - 
-            choose a file type for files downloaded from the PDB
+        pdb_file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
         root_dir (str): Path to where the folder named after ``gem_name`` will be created. If not provided,
             directories will not be created and output directories need to be specified for some steps
         gem (Model): COBRApy Model object
@@ -1136,8 +1135,7 @@ class GEMPRO(Object):
                 were not created initially
             struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories
                 were not created initially
-            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-                choose a file type for files downloaded from the PDB
+            pdb_file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
             engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
                 ``needle`` is the standard EMBOSS tool to run pairwise alignments.
                 ``biopython`` is Biopython's implementation of needle. Results can differ!
@@ -1175,68 +1173,36 @@ class GEMPRO(Object):
                                                                                  len(self.genes)))
         log.info('See the "df_representative_structures" attribute for a summary dataframe.')
 
-    def set_representative_structure_parallel(self, sc, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
+    def set_representative_structure_parallelize(self, sc, seq_outdir=None, struct_outdir=None, pdb_file_type=None,
                                      engine='needle', always_use_homology=False, rez_cutoff=0.0,
                                      seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
                                      allow_mutants=True, allow_deletions=False,
                                      allow_insertions=False, allow_unresolved=True,
                                      clean=True, force_rerun=False):
-        """Set all representative structure for proteins from a structure in the structures attribute.
+        def set_repstruct(g, seq_outdir=seq_outdir, struct_outdir=struct_outdir,
+                          pdb_file_type=pdb_file_type, engine=engine,
+                          rez_cutoff=rez_cutoff, seq_ident_cutoff=seq_ident_cutoff,
+                          always_use_homology=always_use_homology,
+                          allow_missing_on_termini=allow_missing_on_termini,
+                          allow_mutants=allow_mutants, allow_deletions=allow_deletions,
+                          allow_insertions=allow_insertions, allow_unresolved=allow_unresolved,
+                          clean=clean, force_rerun=force_rerun):
+            g.protein.set_representative_structure(seq_outdir=seq_outdir, struct_outdir=struct_outdir,
+                          pdb_file_type=pdb_file_type, engine=engine,
+                          rez_cutoff=rez_cutoff, seq_ident_cutoff=seq_ident_cutoff,
+                          always_use_homology=always_use_homology,
+                          allow_missing_on_termini=allow_missing_on_termini,
+                          allow_mutants=allow_mutants, allow_deletions=allow_deletions,
+                          allow_insertions=allow_insertions, allow_unresolved=allow_unresolved,
+                          clean=clean, force_rerun=force_rerun)
+            return g
 
-        Each gene can have a combination of the following, which will be analyzed to set a representative structure.
-
-            * Homology model(s)
-            * Ranked PDBs
-            * BLASTed PDBs
-
-        If the ``always_use_homology`` flag is true, homology models are always set as representative when they exist.
-        If there are multiple homology models, we rank by the percent sequence coverage.
-
-        Args:
-            seq_outdir (str): Path to output directory of sequence alignment files, must be set if GEM-PRO directories
-                were not created initially
-            struct_outdir (str): Path to output directory of structure files, must be set if GEM-PRO directories
-                were not created initially
-            pdb_file_type (str): ``pdb``, ``pdb.gz``, ``mmcif``, ``cif``, ``cif.gz``, ``xml.gz``, ``mmtf``, ``mmtf.gz`` -
-                choose a file type for files downloaded from the PDB
-            engine (str): ``biopython`` or ``needle`` - which pairwise alignment program to use.
-                ``needle`` is the standard EMBOSS tool to run pairwise alignments.
-                ``biopython`` is Biopython's implementation of needle. Results can differ!
-            always_use_homology (bool): If homology models should always be set as the representative structure
-            rez_cutoff (float): Resolution cutoff, in Angstroms (only if experimental structure)
-            seq_ident_cutoff (float): Percent sequence identity cutoff, in decimal form
-            allow_missing_on_termini (float): Percentage of the total length of the reference sequence which will be ignored
-                when checking for modifications. Example: if 0.1, and reference sequence is 100 AA, then only residues
-                5 to 95 will be checked for modifications.
-            allow_mutants (bool): If mutations should be allowed or checked for
-            allow_deletions (bool): If deletions should be allowed or checked for
-            allow_insertions (bool): If insertions should be allowed or checked for
-            allow_unresolved (bool): If unresolved residues should be allowed or checked for
-            clean (bool): If structures should be cleaned
-            force_rerun (bool): If sequence to structure alignment should be rerun
-
-        """
         genes_rdd = sc.parallelize(self.genes)
-
-        result = genes_rdd.map(lambda g: (g, g.protein.set_representative_structure(seq_outdir=seq_outdir,
-                                                           struct_outdir=struct_outdir,
-                                                           pdb_file_type=pdb_file_type,
-                                                           engine=engine,
-                                                           rez_cutoff=rez_cutoff,
-                                                           seq_ident_cutoff=seq_ident_cutoff,
-                                                           always_use_homology=always_use_homology,
-                                                           allow_missing_on_termini=allow_missing_on_termini,
-                                                           allow_mutants=allow_mutants,
-                                                           allow_deletions=allow_deletions,
-                                                           allow_insertions=allow_insertions,
-                                                           allow_unresolved=allow_unresolved,
-                                                           clean=clean,
-                                                           force_rerun=force_rerun))).collect()
+        result = genes_rdd.map(set_repstruct).collect()
 
         # Copy the results over to the GEM-PRO object's genes using the GenePro function "copy_modified_gene"
         # Also count how many genes mapped to KEGG
-        for modified_g, success in result:
-            # TODO - this is not gonna work because set_repstruct does not return a modified gene
+        for modified_g in result:
             original_gene = self.genes.get_by_id(modified_g.id)
             original_gene.copy_modified_gene(modified_g)
 
