@@ -2005,7 +2005,7 @@ class Protein(Object):
         if representative_only:
             if self.representative_structure:
                 try:
-                    self.representative_structure.get_residue_depths(outdir=self.structure_dir, force_rerun=force_rerun)
+                    self.representative_structure.get_msms_annotations(outdir=self.structure_dir, force_rerun=force_rerun)
                 except TypeError:
                     log.error('{}: MSMS SeqRecord length mismatch with {}'.format(self.id, self.representative_structure))
                 except:
@@ -2015,7 +2015,7 @@ class Protein(Object):
         else:
             for s in self.structures:
                 try:
-                    s.get_residue_depths(outdir=self.structure_dir)
+                    s.get_msms_annotations(outdir=self.structure_dir)
                 except TypeError:
                     log.error('{}: MSMS SeqRecord length mismatch with {}'.format(self.id, s.id))
                 except Exception as e:
