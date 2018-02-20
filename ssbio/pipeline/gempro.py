@@ -89,40 +89,49 @@ class GEMPRO(Object):
     #. Creation of Pandas DataFrame summaries directly from downloaded metadata
 
     Args:
-        gem_name (str): The name of your GEM or just your project in general.
-            This will be the name of the main folder that is created in root_dir.
+        gem_name (str): The name of your GEM or just your project in general. This will be the name of the main folder
+            that is created in root_dir.
+        root_dir (str): Path to where the folder named after ``gem_name`` will be created. If not provided, directories
+            will not be created and output directories need to be specified for some steps.
         pdb_file_type (str): ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB
-        root_dir (str): Path to where the folder named after ``gem_name`` will be created. If not provided,
-            directories will not be created and output directories need to be specified for some steps
         gem (Model): COBRApy Model object
         gem_file_path (str): Path to GEM file
         gem_file_type (str): GEM model type - ``sbml`` (or ``xml``), ``mat``, or ``json`` formats
         genes_list (list): List of gene IDs that you want to map
         genes_and_sequences (dict): Dictionary of gene IDs and their amino acid sequence strings
-        genome_path (str): FASTA file of all protein coding sequences
-        description (str): Optional string to describe your project
-        custom_spont_id (str): ID of spontaneous gene
+        genome_path (str): FASTA file of all protein sequences
+        write_protein_fasta_files (bool): If individual protein FASTA files should be written out
+        description (str): Description string of your project
+        custom_spont_id (str): ID of spontaneous genes in a COBRA model which will be ignored for analysis
 
     """
 
-    def __init__(self, gem_name, pdb_file_type='mmtf', root_dir=None,
+    def __init__(self, gem_name, root_dir=None, pdb_file_type='mmtf',
                  gem=None, gem_file_path=None, gem_file_type=None,
-                 genes_list=None, genes_and_sequences=None, genome_path=None, write_protein_fasta_files=True,
+                 genes_list=None, genes_and_sequences=None, genome_path=None,
+                 write_protein_fasta_files=True,
                  description=None, custom_spont_id=None):
         Object.__init__(self, id=gem_name, description=description)
 
+        self.genes = DictList()
+        """DictList: All protein-coding genes in this GEM-PRO project"""
         self.custom_spont_id = custom_spont_id
+        """str: ID of spontaneous genes in a COBRA model which will be ignored for analysis"""
         self.pdb_file_type = pdb_file_type
+        """str: ``pdb``, ``mmCif``, ``xml``, ``mmtf`` - file type for files downloaded from the PDB"""
         self.genome_path = genome_path
+        """str: Simple link to the filepath of the FASTA file containing all protein sequences"""
+        self.model = None
+        """Model: COBRApy model object"""
 
         # Create directories
         self._root_dir = None
         if root_dir:
             self.root_dir = root_dir
 
-        # TODO: add some checks
-        # Load a model object
-        self.model = None
+        # TODO: add some checks for multiple inputs (only allow one!)
+
+        # Load a Model object
         if gem:
             self.load_cobra_model(gem)
 
@@ -134,22 +143,21 @@ class GEMPRO(Object):
 
         # Or, load a list of gene IDs
         elif genes_list:
-            self.genes = genes_list
+            self.add_gene_ids(genes_list)
 
         # Or, load a dictionary of genes and their sequences
         elif genes_and_sequences:
-            self.genes = list(genes_and_sequences.keys())
+            self.add_gene_ids(list(genes_and_sequences.keys()))
             self.manual_seq_mapping(genes_and_sequences, write_fasta_files=write_protein_fasta_files)
 
         # Or, load the provided FASTA file
         elif genome_path:
             genes_and_sequences = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
-            self.genes = list(genes_and_sequences.keys())
+            self.add_gene_ids(list(genes_and_sequences.keys()))
             self.manual_seq_mapping(genes_and_sequences, write_fasta_files=write_protein_fasta_files)
 
-        # If neither a model or genes are input, you can still add IDs with method add_genes_by_id later
+        # If neither a model or genes are input, you can still add IDs with method add_gene_ids later
         else:
-            self.genes = []
             log.warning('No model or genes input')
 
         log.info('{}: number of genes'.format(len(self.genes)))
@@ -283,54 +291,50 @@ class GEMPRO(Object):
         """DictList: All genes with a representative protein structure."""
         return DictList(x for x in self.genes if x.functional)
 
-    @property
-    def genes(self):
-        """DictList: All genes excluding spontaneous ones."""
-        return ssbio.core.modelpro.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
+    # @property
+    # def genes(self):
+    #     """DictList: All genes excluding spontaneous ones."""
+    #     return ssbio.core.modelpro.filter_out_spontaneous_genes(self._genes, custom_spont_id=self.custom_spont_id)
 
-    @genes.setter
-    def genes(self, genes_list):
-        """Set the genes attribute to be a DictList of GenePro objects.
+    # @genes.setter
+    # def genes(self, genes_list):
+    #     """Set the genes attribute to be a DictList of GenePro objects.
+    #
+    #     A "protein" attribute will be added to each Gene.
+    #
+    #     Args:
+    #         genes_list: DictList of COBRApy Gene objects, or list of gene IDs
+    #
+    #     """
+    #
+    #     if not isinstance(genes_list, DictList):
+    #         tmp_list = []
+    #         for x in list(set(genes_list)):
+    #             x = str(x)
+    #             new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type, root_dir=self.genes_dir)
+    #             tmp_list.append(new_gene)
+    #         self._genes = DictList(tmp_list)
+    #     else:
+    #         self._genes = genes_list
 
-        A "protein" attribute will be added to each Gene.
-
-        Args:
-            genes_list: DictList of COBRApy Gene objects, or list of gene IDs
-
-        """
-
-        if not isinstance(genes_list, DictList):
-            tmp_list = []
-            for x in list(set(genes_list)):
-                x = str(x)
-                new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type, root_dir=self.genes_dir)
-                tmp_list.append(new_gene)
-            self._genes = DictList(tmp_list)
-        else:
-            self._genes = genes_list
-
-    def add_genes_by_id(self, genes_list):
+    def add_gene_ids(self, genes_list):
         """Add gene IDs manually into the GEM-PRO project.
 
         Args:
             genes_list (list): List of gene IDs as strings.
 
         """
-
-        new_genes = []
-        for x in list(set(genes_list)):
-            new_gene = GenePro(id=x, pdb_file_type=self.pdb_file_type, root_dir=self.genes_dir)
-            new_genes.append(new_gene)
-
         orig_num_genes = len(self.genes)
 
-        # Add unique genes only
-        if self.model:
-            self.model.genes.union(new_genes)
-        else:
-            self.genes.union(new_genes)
+        for g in list(set(genes_list)):
+            if not self.genes.has_id(g):
+                new_gene = GenePro(id=g, pdb_file_type=self.pdb_file_type, root_dir=self.genes_dir)
+                if self.model:
+                    self.model.genes.append(new_gene)
+                else:
+                    self.genes.append(new_gene)
 
-        log.info('Added {}/{} genes to GEM-PRO project'.format(len(self.genes)-orig_num_genes, len(genes_list)))
+        log.info('Added {} genes to GEM-PRO project'.format(len(self.genes)-orig_num_genes))
 
     ####################################################################################################################
     ### SEQUENCE RELATED METHODS ###
@@ -1380,6 +1384,28 @@ class GEMPRO(Object):
         for g in tqdm(self.genes):
             g.protein.get_dssp_annotations(representative_only=representatives_only, force_rerun=force_rerun)
 
+    def get_dssp_annotations_parallelize(self, sc, representatives_only=True, force_rerun=False):
+        """Run DSSP on structures and store calculations.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-dssp']``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        """
+        genes_rdd = sc.parallelize(self.genes)
+
+        def get_dssp_annotation(g):
+            g.protein.get_dssp_annotations(representative_only=representatives_only, force_rerun=force_rerun)
+            return g
+
+        result = genes_rdd.map(get_dssp_annotation).collect()
+        for modified_g in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
+
     def get_msms_annotations(self, representatives_only=True, force_rerun=False):
         """Run MSMS on structures and store calculations.
 
@@ -1393,6 +1419,28 @@ class GEMPRO(Object):
         """
         for g in tqdm(self.genes):
             g.protein.get_msms_annotations(representative_only=representatives_only, force_rerun=force_rerun)
+
+    def get_msms_annotations_parallelize(self, sc, representatives_only=True, force_rerun=False):
+        """Run MSMS on structures and store calculations.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-msms']``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        """
+        genes_rdd = sc.parallelize(self.genes)
+
+        def get_msms_annotation(g):
+            g.protein.get_msms_annotations(representative_only=representatives_only, force_rerun=force_rerun)
+            return g
+
+        result = genes_rdd.map(get_msms_annotation).collect()
+        for modified_g in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
 
     def get_freesasa_annotations(self, include_hetatms=False, representatives_only=True, force_rerun=False):
         """Run freesasa on structures and store calculations.
@@ -1411,6 +1459,32 @@ class GEMPRO(Object):
                                                representative_only=representatives_only,
                                                force_rerun=force_rerun)
 
+    def get_freesasa_annotations_parallelize(self, sc, include_hetatms=False,
+                                             representatives_only=True, force_rerun=False):
+        """Run freesasa on structures and store calculations.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.letter_annotations['*-freesasa']``
+
+        Args:
+            include_hetatms (bool): If HETATMs should be included in calculations. Defaults to ``False``.
+            representative_only (bool): If analysis should only be run on the representative structure
+            force_rerun (bool): If calculations should be rerun even if an output file exists
+
+        """
+        genes_rdd = sc.parallelize(self.genes)
+
+        def get_freesasa_annotation(g):
+            g.protein.get_freesasa_annotations(include_hetatms=include_hetatms,
+                                               representative_only=representatives_only,
+                                               force_rerun=force_rerun)
+            return g
+
+        result = genes_rdd.map(get_freesasa_annotation).collect()
+        for modified_g in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
+
     def find_disulfide_bridges(self, representatives_only=True):
         """Run Biopython's disulfide bridge finder and store found bridges.
 
@@ -1423,6 +1497,27 @@ class GEMPRO(Object):
         """
         for g in tqdm(self.genes):
             g.protein.find_disulfide_bridges(representative_only=representatives_only)
+
+    def find_disulfide_bridges_parallelize(self, sc, representatives_only=True):
+        """Run Biopython's disulfide bridge finder and store found bridges.
+
+        Annotations are stored in the protein structure's chain sequence at:
+        ``<chain_prop>.seq_record.annotations['SSBOND-biopython']``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative structure
+
+        """
+        genes_rdd = sc.parallelize(self.genes)
+
+        def find_disulfide_bridges(g):
+            g.protein.find_disulfide_bridges(representative_only=representatives_only)
+            return g
+
+        result = genes_rdd.map(find_disulfide_bridges).collect()
+        for modified_g in result:
+            original_gene = self.genes.get_by_id(modified_g.id)
+            original_gene.copy_modified_gene(modified_g)
 
     ### END STRUCTURE RELATED METHODS ###
     ####################################################################################################################
