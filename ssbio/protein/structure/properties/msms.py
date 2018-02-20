@@ -1,6 +1,6 @@
 import argparse
 import logging
-
+import os.path as op
 import pandas as pd
 from Bio import PDB
 from tqdm import tqdm
@@ -11,31 +11,37 @@ from ssbio.protein.structure.utils.structureio import StructureIO
 log = logging.getLogger(__name__)
 
 
-def get_msms_df(model, pdb_file, outfile=None, outdir=None, outext='_msms.df', force_rerun=False):
-    """Run MSMS (using Biopython) on a Biopython Structure Model and the path to the actual PDB file.
+def get_msms_df(model, pdb_id, outfile=None, outdir=None, outext='_msms.df', force_rerun=False):
+    """Run MSMS (using Biopython) on a Biopython Structure Model.
 
-    Returns a dictionary of:
-        {chain_id: {resnum1_id: (res_depth, ca_depth)},
-                   {resnum2_id: (res_depth, ca_depth)} }
-    Depths are in units Angstroms. 1A = 10^-10 m = 1nm
+    Depths are in units Angstroms. 1A = 10^-10 m = 1nm. Returns a dictionary of::
+
+        {
+            chain_id:{
+                        resnum1_id: (res_depth, ca_depth),
+                        resnum2_id: (res_depth, ca_depth)
+                     }
+        }
 
     Args:
         model: Biopython Structure Model
-        pdb_file: Path to PDB file
 
     Returns:
         Pandas DataFrame: ResidueDepth property_dict, reformatted
 
     """
+    # XTODO: need to deal with temporary surface/vertex files in tmp directory when running on a large scale --
+    # XTODO: will run into inode limits! Also, some valuable information is in these MSMS output files that we should save.
+
     # Create the output file name
-    outfile = ssbio.utils.outfile_maker(inname=pdb_file, outname=outfile, outdir=outdir, outext=outext)
+    outfile = ssbio.utils.outfile_maker(inname=pdb_id, outname=outfile, outdir=outdir, outext=outext)
 
     if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
         # Run MSMS with Biopython
         try:
-            rd = PDB.ResidueDepth(model, pdb_file)
+            rd = PDB.ResidueDepth(model)
         except AssertionError:
-            log.error('{}: unable to run MSMS'.format(pdb_file))
+            log.error('{}: unable to run MSMS'.format(pdb_id))
             return pd.DataFrame()
 
         # Reorganize the results into a csv file
@@ -91,7 +97,8 @@ def get_msms_df_on_file(pdb_file, outfile=None, outdir=None, outext='_msms.df', 
         # Load the structure
         my_structure = StructureIO(pdb_file)
         model = my_structure.first_model
-        df = get_msms_df(model, pdb_file, outfile=outfile, outdir=outdir, outext=outext, force_rerun=force_rerun)
+        df = get_msms_df(model, pdb_id=op.splitext(op.basename(pdb_file))[0],
+                         outfile=outfile, outdir=outdir, outext=outext, force_rerun=force_rerun)
     else:
         log.debug('{}: already ran MSMS and force_rerun={}, loading results'.format(outfile, force_rerun))
         df = pd.read_csv(outfile, index_col=0)

@@ -61,6 +61,7 @@ def search_ss_bonds(model, threshold=3.0):
             if cys_pair[0]['SG'] - cys_pair[1]['SG'] < threshold:
                 bridges.append(cys_pair)
         except KeyError:  # This will occur when a CYS residue is missing a SG atom for some reason
+            log.error('{}: no SG atom found for one or both of the cysteine residues {}'.format(model, cys_pair))
             continue
 
     infodict = {}
