@@ -1,9 +1,58 @@
+import os.path as op
 import pytest
 from ssbio.pipeline.gempro import GEMPRO
 
-# GEM-PRO with just an ID
 
-# GEM-PRO with ID + root dir
+@pytest.fixture(scope='class')
+def gempro_empty():
+    """GEMPRO with ID"""
+    return GEMPRO(gem_name='test_id')
+
+
+@pytest.fixture(scope='class')
+def gempro_with_dir(test_files_tempdir):
+    """GEMPRO with ID and set root directory"""
+    return GEMPRO(gem_name='test_id_dir', root_dir=test_files_tempdir)
+
+
+@pytest.fixture(scope='class')
+def gempro_with_dir_sbml(test_files_outputs, test_gem_small_sbml):
+    """GEMPRO with ID + GEM (E coli core SBML)"""
+    return GEMPRO(gem_name='test_id_dir_sbml', root_dir=test_files_outputs,
+                  gem_file_path=test_gem_small_sbml, gem_file_type='sbml')
+
+
+@pytest.fixture(scope='class')
+def gempro_with_dir_json(test_files_outputs, test_gem_large_json):
+    """GEMPRO with ID + GEM (iNJ661 JSON)"""
+    return GEMPRO(gem_name='test_id_dir_json', root_dir=test_files_outputs,
+                  gem_file_path=test_gem_large_json, gem_file_type='json')
+
+
+@pytest.fixture(scope='class')
+def gempro_with_dir_genes(test_files_outputs, list_of_genes_ecoli):
+    """GEMPRO with ID + list of gene IDs"""
+    return GEMPRO(gem_name='test_id_geneids', root_dir=test_files_outputs, genes_list=list_of_genes_ecoli)
+
+
+@pytest.fixture(scope='class')
+def gempro_with_dir_genes_seqs(test_files_outputs, dict_of_genes_seqs_ecoli):
+    """GEMPRO with ID + dictionary of gene IDs + protein sequences"""
+    return GEMPRO(gem_name='test_id_geneseqs', root_dir=test_files_outputs, genes_and_sequences=dict_of_genes_seqs_ecoli)
+
+
+@pytest.fixture(scope='class')
+def gempro_with_dir_genes_fasta(test_files_outputs, test_fasta_file_multseqs):
+    """GEMPRO with ID + FASTA file"""
+    return GEMPRO(gem_name='test_id_fasta', root_dir=test_files_outputs,
+                  genome_path=test_fasta_file_multseqs)
+
+
+def test_directory_creation(gempro_with_dir, test_files_tempdir):
+    check_dir = op.join(test_files_tempdir, gempro_with_dir.id)
+    assert op.exists(check_dir)
+
+
 
 # import shutil
 # import os.path as op
@@ -47,14 +96,14 @@ from ssbio.pipeline.gempro import GEMPRO
 #
 #         # Test the manual adding of any gene ID
 #         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
-#         self.my_gempro.add_genes_by_id(add_these)
+#         self.my_gempro.add_gene_ids(add_these)
 #
 #         self.kegg_will_not_map = ['b1417', 'b2092']
 #         self.uniprot_will_not_map = ['b1417', 'b2092']
 #
 #         print(self.base_dir)
 #
-#     def test_add_genes_by_id(self):
+#     def test_add_gene_ids(self):
 #         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
 #         for x in add_these:
 #             self.assertTrue(self.my_gempro.genes.has_id(x))
