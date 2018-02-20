@@ -264,6 +264,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
         outfile = op.join(outdir, '{}_orthology.csv'.format(r_name))
 
     if op.exists(outfile) and os.stat(outfile).st_size != 0 and not force_rerun:
+        log.info('{}: loaded existing orthology matrix'.format(outfile))
         return outfile
 
     if not pid_cutoff and not bitscore_cutoff and not evalue_cutoff:

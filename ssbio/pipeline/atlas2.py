@@ -10,7 +10,7 @@ import pandas as pd
 from Bio import SeqIO
 from cobra.core import DictList
 from slugify import Slugify
-
+from copy import deepcopy
 import ssbio.core.modelpro
 import ssbio.databases.ncbi
 import ssbio.databases.patric
@@ -44,12 +44,11 @@ class ATLAS2(Object):
 
     """REDO ATLAS workflow"""
 
-    def __init__(self, atlas_name, spark_context, root_dir, reference_gempro, reference_genome_path=None, description=None):
+    def __init__(self, atlas_name, root_dir, reference_gempro, reference_genome_path=None, description=None):
         """Prepare a GEM-PRO model for ATLAS analysis
 
         Args:
             atlas_name (str): Name of your ATLAS project
-            spark_context (SparkContext): Spark Context for parallelization
             root_dir (str): Path to where the folder named after ``atlas_name`` will be created.
             reference_gempro (GEMPRO): GEM-PRO model to use as the reference genome
             reference_genome_path (str): Path to reference genome FASTA file
@@ -61,8 +60,6 @@ class ATLAS2(Object):
         # Create directories
         self._root_dir = None
         self.root_dir = root_dir
-
-        self.sc = spark_context
 
         self.strains = DictList()
         self.df_orthology_matrix = pd.DataFrame()
@@ -82,22 +79,24 @@ class ATLAS2(Object):
         self._empty_reference_gempro = None
 
     def set_empty_reference_gempro(self):
-        self._empty_reference_gempro = None
+        logging.disable(logging.WARNING)
+
         if self.reference_gempro.model:
             # If there is a SBML model associated with the GEMPRO, copy that model
-            logging.disable(logging.WARNING)
+
             self._empty_reference_gempro = GEMPRO(gem_name='Copied reference GEM-PRO',
                                                   gem=self.reference_gempro.model.copy())
-            logging.disable(logging.NOTSET)
             # Reset the GenePro attributes
             for x in self._empty_reference_gempro.genes:
                 x.reset_protein()
         else:
             # Otherwise, just copy the list of genes over and rename the IDs
-            strain_genes = [x.id for x in self.reference_gempro.genes]
+            strain_genes = [x.id for x in self.reference_gempro.functional_genes]
             if len(strain_genes) == 0:
                 raise ValueError('GEM-PRO has no genes, unable to run multi-strain analysis')
             self._empty_reference_gempro = GEMPRO(gem_name='Copied reference GEM-PRO', genes_list=strain_genes)
+
+        logging.disable(logging.NOTSET)
 
     @property
     def root_dir(self):
@@ -176,12 +175,6 @@ class ATLAS2(Object):
         else:
             return None
 
-    @property
-    def strains_rdd(self):
-        if len(self.strains) == 0:
-            raise ValueError('No strains to create RDD from!')
-        return self.sc.parallelize(self.strains)
-
     def load_strains(self, strains_to_fasta_files):
         """Load in a dictionary of strain IDs to their protein FASTA files"""
         logging.disable(logging.WARNING)
@@ -191,7 +184,7 @@ class ATLAS2(Object):
             self.strains.append(strain_gp)
         logging.disable(logging.NOTSET)
 
-    def get_orthology_matrix(self, outfile, outdir=None,
+    def get_orthology_matrix(self, outfile, outdir=None, sc=None,
                              pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None, filter_condition='OR',
                              force_rerun=False):
         """Create the orthology matrix by finding best bidirectional BLAST hits. Genes = rows, strains = columns
@@ -215,47 +208,53 @@ class ATLAS2(Object):
             DataFrame: Orthology matrix calculated from best bidirectional BLAST hits.
 
         """
-
-        ################################################################################################################
-        # BIDIRECTIONAL BLAST
-        def run_bidirectional_blast(strain_gempro,
-                                    r_file=self.reference_gempro.genome_path,
-                                    outdir=self.sequences_by_organism_dir):
-            import ssbio.protein.sequence.utils.blast
-            g_file = strain_gempro.genome_path
-
-            # Run bidirectional BLAST
-            r_vs_g, g_vs_r = ssbio.protein.sequence.utils.blast.run_bidirectional_blast(reference=r_file,
-                                                                                        other_genome=g_file,
-                                                                                        dbtype='prot',
-                                                                                        outdir=outdir)
-
-            # Using the BLAST files, find the BBH
-            bbh = ssbio.protein.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
-                                                                   outdir=outdir)
-            return strain_gempro.id, bbh
-
-        log.info('Running bidirectional BLAST and finding best bidirectional hits (BBH)...')
-        result = self.strains_rdd.map(run_bidirectional_blast).collect()
-        bbh_files = dict(result)
-        ################################################################################################################
-
-        ################################################################################################################
-        # ORTHOLOGY MATRIX
+        # Output directory for orthology matrix
         if not outdir:
             outdir = self.data_dir
-        log.info('Creating orthology matrix from BBHs...')
-        ortho_matrix = ssbio.protein.sequence.utils.blast.create_orthology_matrix(r_name=self.reference_gempro.id,
-                                                                                  genome_to_bbh_files=bbh_files,
-                                                                                  pid_cutoff=pid_cutoff,
-                                                                                  bitscore_cutoff=bitscore_cutoff,
-                                                                                  evalue_cutoff=evalue_cutoff,
-                                                                                  filter_condition=filter_condition,
-                                                                                  outname=outfile,
-                                                                                  outdir=outdir,
-                                                                                  force_rerun=force_rerun)
 
-        log.info('Saved orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
+        ortho_matrix = op.join(outdir, outfile)
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=ortho_matrix):
+            if not sc:
+                raise ValueError('Please initialize SparkContext')
+            ################################################################################################################
+            # BIDIRECTIONAL BLAST
+            def run_bidirectional_blast(strain_gempro,
+                                        r_file=self.reference_gempro.genome_path,
+                                        outdir2=self.sequences_by_organism_dir):
+                import ssbio.protein.sequence.utils.blast
+                g_file = strain_gempro.genome_path
+
+                # Run bidirectional BLAST
+                r_vs_g, g_vs_r = ssbio.protein.sequence.utils.blast.run_bidirectional_blast(reference=r_file,
+                                                                                            other_genome=g_file,
+                                                                                            dbtype='prot',
+                                                                                            outdir=outdir2)
+
+                # Using the BLAST files, find the BBH
+                bbh = ssbio.protein.sequence.utils.blast.calculate_bbh(blast_results_1=r_vs_g, blast_results_2=g_vs_r,
+                                                                       outdir=outdir2)
+                return strain_gempro.id, bbh
+
+            log.info('Running bidirectional BLAST and finding best bidirectional hits (BBH)...')
+            strains_rdd = sc.parallelize(self.strains)
+            result = strains_rdd.map(run_bidirectional_blast).collect()
+            bbh_files = dict(result)
+            ################################################################################################################
+
+            ################################################################################################################
+            # ORTHOLOGY MATRIX
+            log.info('Creating orthology matrix from BBHs...')
+            ortho_matrix = ssbio.protein.sequence.utils.blast.create_orthology_matrix(r_name=self.reference_gempro.id,
+                                                                                      genome_to_bbh_files=bbh_files,
+                                                                                      pid_cutoff=pid_cutoff,
+                                                                                      bitscore_cutoff=bitscore_cutoff,
+                                                                                      evalue_cutoff=evalue_cutoff,
+                                                                                      filter_condition=filter_condition,
+                                                                                      outname=outfile,
+                                                                                      outdir=outdir,
+                                                                                      force_rerun=force_rerun)
+
+        log.info('Orthology matrix at {}. See the "df_orthology_matrix" attribute.'.format(ortho_matrix))
         self.df_orthology_matrix = pd.read_csv(ortho_matrix, index_col=0)
         self.df_orthology_matrix = self.df_orthology_matrix.rename_axis('gene').rename_axis("strain", axis="columns")
         ################################################################################################################
@@ -286,20 +285,22 @@ class ATLAS2(Object):
         initial_num_strains = len(strain_ids)
 
         # Gene filtering
+        to_remove_genes = []
         if custom_keep_genes:
-            to_remove = [x for x in reference_strain_gene_ids if x not in custom_keep_genes]
-            if self.reference_gempro.model:
-                cobra.manipulation.delete_model_genes(self.reference_gempro.model, to_remove)
-            else:
-                for g_id in to_remove:
-                    self.reference_gempro.genes.remove(g_id)
+            to_remove_genes.extend([x for x in reference_strain_gene_ids if x not in custom_keep_genes])
         if remove_genes_not_in_reference_model:
-            to_remove = [x for x in reference_strain_gene_ids if x not in self.df_orthology_matrix.index.tolist()]
-            if self.reference_gempro.model:
-                cobra.manipulation.delete_model_genes(self.reference_gempro.model, to_remove)
-            else:
-                for g_id in to_remove:
-                    self.reference_gempro.genes.remove(g_id)
+            to_remove_genes.extend([x for x in reference_strain_gene_ids if x not in self.df_orthology_matrix.index.tolist()])
+
+        to_remove_genes = list(set(to_remove_genes))
+        if self.reference_gempro.model:
+            cobra.manipulation.delete_model_genes(self.reference_gempro.model, to_remove_genes)
+        else:
+            for g_id in to_remove_genes:
+                self.reference_gempro.genes.get_by_id(g_id).functional = False
+
+        # Create new orthology matrix with only our genes of interest
+        new_gene_subset = [x.id for x in self.reference_gempro.functional_genes]
+        tmp_new_orthology_matrix = self.df_orthology_matrix[self.df_orthology_matrix.index.isin(new_gene_subset)]
 
         # Strain filtering
         if custom_keep_strains or remove_strains_with_no_orthology or remove_strains_with_no_differences:
@@ -310,17 +311,17 @@ class ATLAS2(Object):
                         continue
 
                 if remove_strains_with_no_orthology:
-                    if strain_id not in self.df_orthology_matrix.columns:
+                    if strain_id not in tmp_new_orthology_matrix.columns:
                         self.strains.remove(strain_id)
                         log.info('{}: no orthologous genes found for this strain, removed from analysis.'.format(strain_id))
                         continue
-                    elif self.df_orthology_matrix[strain_id].isnull().all():
+                    elif tmp_new_orthology_matrix[strain_id].isnull().all():
                         self.strains.remove(strain_id)
                         log.info('{}: no orthologous genes found for this strain, removed from analysis.'.format(strain_id))
                         continue
 
                 if remove_strains_with_no_differences:
-                    not_in_strain = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_id])][strain_id].index.tolist()
+                    not_in_strain = tmp_new_orthology_matrix[pd.isnull(tmp_new_orthology_matrix[strain_id])][strain_id].index.tolist()
                     if len(not_in_strain) == 0:
                         self.strains.remove(strain_id)
                         log.info('{}: strain has no differences from the base, removed from analysis.')
@@ -329,7 +330,7 @@ class ATLAS2(Object):
         log.info('{} genes to be analyzed, originally {}'.format(len(self.reference_gempro.functional_genes), initial_num_genes))
         log.info('{} strains to be analyzed, originally {}'.format(len(self.strains), initial_num_strains))
 
-    def build_strain_specific_models(self, save_models=False, force_rerun=False):
+    def build_strain_specific_models(self, sc=None, save_models=False, force_rerun=False):
         """Using the orthologous genes matrix, create and modify the strain specific models based on if orthologous
         genes exist.
         """
@@ -351,13 +352,14 @@ class ATLAS2(Object):
                 # For each genome, load the metabolic model or genes from the reference GEM-PRO
                 if empty_reference_gempro.model:
                     logging.disable(logging.WARNING)
+                    # TODO: investigate if this creates a new copy and all references to old model are unlinked
                     strain_gempro.load_cobra_model(empty_reference_gempro.model)
                     logging.disable(logging.NOTSET)
                     strain_gempro.model._trimmed = False
                     strain_gempro.model._trimmed_genes = []
                     strain_gempro.model._trimmed_reactions = {}
                 elif empty_reference_gempro.genes:
-                    strain_gempro.genes = empty_reference_gempro.genes.copy()
+                    strain_gempro.genes = deepcopy(empty_reference_gempro.genes)
 
                 # Get a list of genes which do not have orthology in the strain
                 genes_to_remove = orth_matrix[pd.isnull(orth_matrix[strain_gempro.id])][strain_gempro.id].index.tolist()
@@ -384,16 +386,16 @@ class ATLAS2(Object):
             else:
                 return GEMPRO(gem_name=strain_gempro.id, gem_file_path=already_saved_model, gem_file_type='json')
 
-        self.strains = DictList(self.strains_rdd.map(build_strain_specific_model).collect())
-        # for s in self.strains:
-        #     build_strain_specific_model(s)
+        log.info('Building strain specific models...')
+        if sc:
+            strains_rdd = sc.parallelize(self.strains)
+            result = strains_rdd.map(build_strain_specific_model).collect()
+            self.strains = DictList(result)
+        else:
+            for s in tqdm(self.strains):
+                build_strain_specific_model(s)
 
-    def load_strains_sequences(self, save_models=False):
-        """Load all strains sequences from the orthology matrix into the base model for comparisons, and into the
-        strain-specific model itself.
-
-        """
-
+    def load_strains_sequences_to_strains(self, sc=None, save_models=False):
         def load_sequences_to_strain(strain_gempro, orth_matrix=self.df_orthology_matrix,
                                      save_model=save_models, model_dir=self.model_dir):
             strain_sequences = SeqIO.index(strain_gempro.genome_path, 'fasta')
@@ -403,6 +405,8 @@ class ATLAS2(Object):
                 strain_gene_key = orth_matrix.at[strain_gene.id, strain_gempro.id]
                 # Load into the strain GEM-PRO
                 new_id = '{}_{}'.format(strain_gene.id, strain_gempro.id)
+                if strain_gene.protein.sequences.has_id(new_id):
+                    continue
                 strain_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
                                                          set_as_representative=True)
             if save_model:
@@ -410,10 +414,16 @@ class ATLAS2(Object):
                 strain_gempro.save_pickle(outfile=op.join(model_dir, '{}_gp.pckl'.format(strain_gempro.id)))
             return strain_gempro
 
-        self.strains = DictList(self.strains_rdd.map(load_sequences_to_strain).collect())
-        # for s in self.strains:
-        #     load_sequences_to_strain(s)
+        log.info('Loading sequences to strain GEM-PROs...')
+        if sc:
+            strains_rdd = sc.parallelize(self.strains)
+            result = strains_rdd.map(load_sequences_to_strain).collect()
+            self.strains = DictList(result)
+        else:
+            for s in tqdm(self.strains):
+                load_sequences_to_strain(s)
 
+    def load_strains_sequences_to_reference(self, sc=None):
         def load_sequences_to_reference_gene(g, strain_gempros=self.strains,
                                              orth_matrix=self.df_orthology_matrix):
             for strain_gempro in strain_gempros:
@@ -429,30 +439,36 @@ class ATLAS2(Object):
                                                    set_as_representative=False)
             return g
 
-        # for g in self.reference_gempro.functional_genes:
-        #     load_sequences_to_reference_gene(g)
-        genes_rdd = self.sc.parallelize(self.reference_gempro.functional_genes)
-        result = genes_rdd.map(load_sequences_to_reference_gene).collect()
-        for modified_g in result:
-            original_gene = self.reference_gempro.genes.get_by_id(modified_g.id)
-            original_gene.copy_modified_gene(modified_g)
+        log.info('Loading sequences to reference GEM-PRO...')
+        if sc:
+            genes_rdd = sc.parallelize(self.reference_gempro.functional_genes)
+            result = genes_rdd.map(load_sequences_to_reference_gene).collect()
+            for modified_g in result:
+                original_gene = self.reference_gempro.genes.get_by_id(modified_g.id)
+                original_gene.copy_modified_gene(modified_g)
+        else:
+            for g in tqdm(self.reference_gempro.functional_genes):
+                load_sequences_to_reference_gene(g)
 
-    def align_orthologous_genes_pairwise(self, gapopen=10, gapextend=0.5):
+    def align_orthologous_genes_pairwise(self, sc=None, gapopen=10, gapextend=0.5):
         """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it."""
         def run_alignments(g, outdir=self.sequences_by_gene_dir):
             if len(g.protein.sequences) > 1:
                 alignment_dir = op.join(outdir, g.id)
-                if not op.exists(alignment_dir):
-                    os.mkdir(alignment_dir)
+                ssbio.utils.make_dir(alignment_dir)
                 g.protein.pairwise_align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend,
                                                                      outdir=alignment_dir, parse=True)
             return g
 
-        genes_rdd = self.sc.parallelize(self.reference_gempro.functional_genes)
-        result = genes_rdd.map(run_alignments).collect()
-        for modified_g in result:
-            original_gene = self.reference_gempro.genes.get_by_id(modified_g.id)
-            original_gene.copy_modified_gene(modified_g)
+        if sc:
+            genes_rdd = sc.parallelize(self.reference_gempro.functional_genes)
+            result = genes_rdd.map(run_alignments).collect()
+            for modified_g in result:
+                original_gene = self.reference_gempro.genes.get_by_id(modified_g.id)
+                original_gene.copy_modified_gene(modified_g)
+        else:
+            for g in tqdm(self.reference_gempro.functional_genes):
+                run_alignments(g)
 
 def get_atlas_summary_df(self):
     """Create a single data frame which summarizes all genes per row.
