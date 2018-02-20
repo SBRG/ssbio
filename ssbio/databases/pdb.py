@@ -81,11 +81,19 @@ class PDBProp(StructProp):
             raise URLError('{}.{}: file not available to download'.format(self.id, file_type))
         else:
             log.debug('{}: {} file saved'.format(self.id, file_type))
+
+            # Rename .ent files to .pdb
+            if file_type == 'pdb':
+                new_name = structure_file.replace('pdb', '').replace('ent', 'pdb')
+                os.rename(structure_file, new_name)
+                structure_file = new_name
+
             self.load_structure_path(structure_file, file_type)
             if load_header_metadata and file_type == 'mmtf':
                 self.update(parse_mmtf_header(structure_file))
             if load_header_metadata and file_type != 'mmtf':
                 self.update(parse_mmcif_header(download_mmcif_header(pdb_id=self.id, outdir=outdir, force_rerun=force_rerun)))
+
 
     def get_pisa_complex_predictions(self, outdir, existing_pisa_multimer_xml=None):
         if not existing_pisa_multimer_xml:
