@@ -414,13 +414,13 @@ class StructProp(Object):
             chain_prop.seq_record.letter_annotations['PSI-dssp'] = psi
             log.debug('{}: stored DSSP annotations in chain seq_record letter_annotations'.format(chain))
 
-    def get_residue_depths(self, outdir, force_rerun=False):
+    def get_msms_annotations(self, outdir, force_rerun=False):
         """Run MSMS on this structure and store the residue depths/ca depths in the corresponding ChainProp SeqRecords
         """
-        # TODO: rename to get_msms_annotations
-        if self.file_type != 'pdb':
-            raise ValueError('{}: unable to run MSMS with "{}" file type. Please change file type to "pdb"'.format(self.id,
-                                                                                                            self.file_type))
+        # Now can run on Biopython Model objects exclusively thanks to Biopython updates
+        # if self.file_type != 'pdb':
+        #     raise ValueError('{}: unable to run MSMS with "{}" file type. Please change file type to "pdb"'.format(self.id,
+        #                                                                                                     self.file_type))
 
         if self.structure:
             parsed = self.structure
@@ -432,8 +432,8 @@ class StructProp(Object):
             return
 
         log.debug('{}: running MSMS'.format(self.id))
-        msms_results = ssbio.protein.structure.properties.msms.get_msms_df(model=parsed.first_model,
-                                                                           pdb_file=self.structure_path,
+        # PDB ID is currently set to the structure file so the output name is the same with _msms.df appended to it
+        msms_results = ssbio.protein.structure.properties.msms.get_msms_df(model=parsed.first_model, pdb_id=self.structure_path,
                                                                            outdir=outdir, force_rerun=force_rerun)
         if msms_results.empty:
             log.error('{}: unable to run MSMS'.format(self.id))
