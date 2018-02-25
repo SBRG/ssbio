@@ -1745,11 +1745,18 @@ class Protein(Object):
             allow_unresolved (bool): If unresolved residues should be allowed or checked for
             clean (bool): If structure should be cleaned
             keep_chemicals (str, list): Keep specified chemical names if structure is to be cleaned
+            skip_large_structures (bool): Default False -- currently, large structures can't be saved as a PDB file even
+                if you just want to save a single chain, so Biopython will throw an error when trying to do so. As an
+                alternative, if a large structure is selected as representative, the pipeline will currently point to it
+                and not clean it. If you don't want this to happen, set this to true.
             force_rerun (bool): If sequence to structure alignment should be rerun
 
         Returns:
             StructProp: Representative structure from the list of structures. This is a not a map to the original
             structure, it is copied and optionally cleaned from the original one.
+
+        Todo:
+            - Remedy large structure representative setting
 
         """
         log.debug('{}: setting representative structure'.format(self.id))
@@ -1866,11 +1873,14 @@ class Protein(Object):
                                                               outdir=struct_outdir,
                                                               force_rerun=force_rerun)
                     except TypeError:
-                        log.warning("Unable to save large PDB {} in PDB file format, setting original structure "
-                                    "as representative.".format(pdb.id))
                         if skip_large_structures == True:
+                            log.warning("{}: unable to save large PDB {}-{} in PDB file format, trying next "
+                                        "structure.".format(self.id, pdb.id, best_chain))
                             continue
                         else:
+                            log.warning("{}: unable to save large PDB {}-{} in PDB file format, setting original "
+                                        "structure as representative. Set skip_large_structures=True if you don't "
+                                        "want this to happen".format(self.id, pdb.id, best_chain))
                             self.representative_structure = pdb
                     except Exception as e:
                         # Try force rerunning first if there exists a corrupt clean PDB file
