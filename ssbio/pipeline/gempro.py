@@ -277,8 +277,8 @@ class GEMPRO(Object):
     @property
     def genes_with_a_representative_sequence(self):
         """DictList: All genes with a representative sequence."""
-        tmp = DictList(x for x in self.genes if x.protein.representative_sequence)
-        return DictList(y for y in tmp if y.protein.representative_sequence.seq)
+        return DictList(x for x in self.genes if x.protein.representative_sequence)
+        # return DictList(y for y in tmp if y.protein.representative_sequence.seq)
 
     @property
     def genes_with_a_representative_structure(self):
@@ -369,6 +369,10 @@ class GEMPRO(Object):
                 kegg_g = custom_gene_mapping[g.id]
             else:
                 kegg_g = g.id
+
+            if kegg_g not in kegg_to_uniprot:
+                log.debug('{}: unable to map to KEGG'.format(g.id))
+                continue
 
             # Download both FASTA and KEGG metadata files
             kegg_prop = g.protein.load_kegg(kegg_id=kegg_g, kegg_organism_code=kegg_organism_code,
@@ -538,21 +542,22 @@ class GEMPRO(Object):
             else:
                 uniprot_gene = g.id
 
-            if uniprot_gene not in list(genes_to_uniprots.keys()):
+            if uniprot_gene not in genes_to_uniprots:
                 log.debug('{}: unable to map to UniProt'.format(g.id))
-            else:
-                for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
-                    try:
-                        uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
-                                                              set_as_representative=set_as_representative,
-                                                              force_rerun=force_rerun)
-                    except HTTPError as e:
-                        log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
-                        print(e)
-                        continue
+                continue
 
-                    if uniprot_prop.sequence_file or uniprot_prop.metadata_file:
-                        successfully_mapped_counter += 1
+            for mapped_uniprot in genes_to_uniprots[uniprot_gene]:
+                try:
+                    uniprot_prop = g.protein.load_uniprot(uniprot_id=mapped_uniprot, download=True, outdir=outdir,
+                                                          set_as_representative=set_as_representative,
+                                                          force_rerun=force_rerun)
+                except HTTPError as e:
+                    log.error('{}, {}: unable to complete web request'.format(g.id, mapped_uniprot))
+                    print(e)
+                    continue
+
+                if uniprot_prop.sequence_file or uniprot_prop.metadata_file:
+                    successfully_mapped_counter += 1
 
         log.info('{}/{}: number of genes mapped to UniProt'.format(successfully_mapped_counter, len(self.genes)))
         log.info('Completed ID mapping --> UniProt. See the "df_uniprot_metadata" attribute for a summary dataframe.')
@@ -676,17 +681,13 @@ class GEMPRO(Object):
 
         # TODO: rethink use of multiple database sources - may lead to inconsistency with genome sources
 
-        sequence_missing = []
         successfully_mapped_counter = 0
         for g in tqdm(self.genes):
             repseq = g.protein.set_representative_sequence(force_rerun=force_rerun)
 
-            if not repseq:
-                sequence_missing.append(g.id)
-            elif not repseq.sequence_file:
-                sequence_missing.append(g.id)
-            else:
-                successfully_mapped_counter += 1
+            if repseq:
+                if repseq.sequence_file:
+                    successfully_mapped_counter += 1
 
         log.info('{}/{}: number of genes with a representative sequence'.format(len(self.genes_with_a_representative_sequence),
                                                                                 len(self.genes)))
@@ -1160,8 +1161,15 @@ class GEMPRO(Object):
             allow_deletions (bool): If deletions should be allowed or checked for
             allow_insertions (bool): If insertions should be allowed or checked for
             allow_unresolved (bool): If unresolved residues should be allowed or checked for
+            skip_large_structures (bool): Default False -- currently, large structures can't be saved as a PDB file even
+                if you just want to save a single chain, so Biopython will throw an error when trying to do so. As an
+                alternative, if a large structure is selected as representative, the pipeline will currently point to it
+                and not clean it. If you don't want this to happen, set this to true.
             clean (bool): If structures should be cleaned
             force_rerun (bool): If sequence to structure alignment should be rerun
+
+        Todo:
+            - Remedy large structure representative setting
 
         """
         for g in tqdm(self.genes):
