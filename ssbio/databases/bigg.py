@@ -9,7 +9,7 @@ import ssbio.databases.uniprot
 bs_unip = UniProt()
 
 
-def get_pdbs_for_gene(bigg_model, bigg_gene, cache_dir=tempfile.gettempdir()):
+def get_pdbs_for_gene(bigg_model, bigg_gene, cache_dir=tempfile.gettempdir(), force_rerun=False):
     """Attempt to get a rank-ordered list of available PDB structures for a BiGG Model and its gene.
 
     Args:
@@ -26,7 +26,7 @@ def get_pdbs_for_gene(bigg_model, bigg_gene, cache_dir=tempfile.gettempdir()):
     gene = ssbio.utils.request_json(link='http://bigg.ucsd.edu/api/v2/models/{}/genes/{}'.format(bigg_model, bigg_gene),
                                     outfile='{}_{}.json'.format(bigg_model, bigg_gene),
                                     outdir=cache_dir,
-                                    force_rerun_flag=False)
+                                    force_rerun_flag=force_rerun)
 
     uniprots = []
     if 'database_links' in gene:

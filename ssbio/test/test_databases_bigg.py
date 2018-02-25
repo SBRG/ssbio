@@ -12,11 +12,11 @@ class TestBiGG(unittest.TestCase):
 
         expected = [('1l5j', 'A'), ('1l5j', 'B')]
 
-        six.assertCountEqual(self, expected, ssbio.databases.bigg.get_pdbs_for_gene(model, gene))
+        six.assertCountEqual(self, expected, ssbio.databases.bigg.get_pdbs_for_gene(model, gene, force_rerun=True))
 
         model = 'e_coli_core'
         gene = 'b0351'
 
         expected = []
 
-        six.assertCountEqual(self, expected, ssbio.databases.bigg.get_pdbs_for_gene(model, gene))
+        six.assertCountEqual(self, expected, ssbio.databases.bigg.get_pdbs_for_gene(model, gene, force_rerun=True))
