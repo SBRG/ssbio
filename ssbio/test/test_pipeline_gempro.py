@@ -1,6 +1,11 @@
 import os.path as op
 import pytest
 from ssbio.pipeline.gempro import GEMPRO
+from ssbio.core.genepro import GenePro
+from ssbio.databases.kegg import KEGGProp
+from ssbio.databases.uniprot import UniProtProp
+from ssbio.databases.pdb import PDBProp
+from cobra.core import Model, DictList
 
 
 @pytest.fixture(scope='class')
@@ -16,35 +21,28 @@ def gempro_with_dir(test_files_tempdir):
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_sbml(test_files_outputs, test_gem_small_sbml):
-    """GEMPRO with ID + GEM (E coli core SBML)"""
-    return GEMPRO(gem_name='test_id_dir_sbml', root_dir=test_files_outputs,
-                  gem_file_path=test_gem_small_sbml, gem_file_type='sbml')
+def gempro_with_dir_mini_json(test_files_tempdir, test_gem_small_json):
+    """GEMPRO with ID + GEM (mini JSON)"""
+    return GEMPRO(gem_name='test_id_dir_json', root_dir=test_files_tempdir,
+                  gem_file_path=test_gem_small_json, gem_file_type='json')
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_json(test_files_outputs, test_gem_large_json):
-    """GEMPRO with ID + GEM (iNJ661 JSON)"""
-    return GEMPRO(gem_name='test_id_dir_json', root_dir=test_files_outputs,
-                  gem_file_path=test_gem_large_json, gem_file_type='json')
-
-
-@pytest.fixture(scope='class')
-def gempro_with_dir_genes(test_files_outputs, list_of_genes_ecoli):
+def gempro_with_dir_genes(test_files_tempdir, list_of_genes_ecoli):
     """GEMPRO with ID + list of gene IDs"""
-    return GEMPRO(gem_name='test_id_geneids', root_dir=test_files_outputs, genes_list=list_of_genes_ecoli)
+    return GEMPRO(gem_name='test_id_geneids', root_dir=test_files_tempdir, genes_list=list_of_genes_ecoli)
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_genes_seqs(test_files_outputs, dict_of_genes_seqs_ecoli):
+def gempro_with_dir_genes_seqs(test_files_tempdir, dict_of_genes_seqs_ecoli):
     """GEMPRO with ID + dictionary of gene IDs + protein sequences"""
-    return GEMPRO(gem_name='test_id_geneseqs', root_dir=test_files_outputs, genes_and_sequences=dict_of_genes_seqs_ecoli)
+    return GEMPRO(gem_name='test_id_geneseqs', root_dir=test_files_tempdir, genes_and_sequences=dict_of_genes_seqs_ecoli)
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_genes_fasta(test_files_outputs, test_fasta_file_multseqs):
+def gempro_with_dir_genes_fasta(test_files_tempdir, test_fasta_file_multseqs):
     """GEMPRO with ID + FASTA file"""
-    return GEMPRO(gem_name='test_id_fasta', root_dir=test_files_outputs,
+    return GEMPRO(gem_name='test_id_fasta', root_dir=test_files_tempdir,
                   genome_path=test_fasta_file_multseqs)
 
 
@@ -53,196 +51,157 @@ def test_directory_creation(gempro_with_dir, test_files_tempdir):
     assert op.exists(check_dir)
 
 
+class TestGemproWithDirMiniJson():
+    """Tests for the gempro_with_dir_mini_json fixture"""
 
-# import shutil
-# import os.path as op
-# import unittest
-# import cobra
-# import pandas as pd
-# import six
-# from ssbio.pipeline.gempro import GEMPRO
-# from ssbio.core.genepro import GenePro
-# from ssbio.utils import Date
-# from ssbio.databases.kegg import KEGGProp
-#
-# date = Date()
-#
-# class TestGEMPRO(unittest.TestCase):
-#     """Unit tests for the GEMPRO pipeline
-#     """
-#
-#     @classmethod
-#     def setUpClass(self):
-#         self.GEM_NAME = 'ecoli_test'
-#         self.ROOT_DIR = op.join('test_files', 'out')
-#         gem_file = op.join('test_files', 'Ec_core_flux1.xml')
-#
-#         self.my_gempro = GEMPRO(gem_name=self.GEM_NAME, root_dir=self.ROOT_DIR, gem_file_path=gem_file, gem_file_type='sbml')
-#         self.base_dir = self.my_gempro.base_dir
-#
-#         # Remove some genes from this model so testing doesn't take too long
-#         remove_these = ['b0118', 'b4025', 'b4153', 'b2925', 'b3919', 'b3738', 'b3732', 'b0726', 'b1602', 'b1101',
-#                         'b3236', 'b0728', 'b1603', 'b2926', 'b0432', 'b3735', 'b0474', 'b4090', 'b3731', 'b0767',
-#                         'b3737', 'b0724', 'b0008', 'b3403', 'b1779', 'b0727', 'b3956', 'b1676', 'b2935', 'b4232',
-#                         'b0430', 'b2914', 'b0723', 'b0722', 'b0729', 'b0720', 'b0116', 'b4152', 'b2415', 'b0429',
-#                         'b0621', 'b0904', 'b1241', 'b1276', 'b1380', 'b1416', 'b1479', 'b1612', 'b1702', 'b2417',
-#                         'b1852', 'b1854', 'b2276', 'b2277', 'b2278', 'b2279', 'b2280', 'b2281', 'b2282', 'b2283',
-#                         'b2284', 'b2285', 'b2286', 'b2287', 'b2288', 'b2297', 'b2463', 'b2465', 'b2587', 'b2975',
-#                         'b3117', 'b3386', 'b3528', 'b3603', 'b3739', 'b3951', 'b3952', 'b4122', 'b4395', 'b0721',
-#                         'b2029', 'b1136', 'b4015', 'b4014', 'b2976', 'b0114', 'b0115', 'b3916', 'b1723', 'b0755'
-#                         ]
-#         for x in remove_these:
-#             self.my_gempro.genes.remove(self.my_gempro.genes.get_by_id(x))
-#
-#         # Test the manual adding of any gene ID
-#         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
-#         self.my_gempro.add_gene_ids(add_these)
-#
-#         self.kegg_will_not_map = ['b1417', 'b2092']
-#         self.uniprot_will_not_map = ['b1417', 'b2092']
-#
-#         print(self.base_dir)
-#
-#     def test_add_gene_ids(self):
-#         add_these = ['b0002', 'b0003', 'b0004', 'b2092']
-#         for x in add_these:
-#             self.assertTrue(self.my_gempro.genes.has_id(x))
-#
-#     def test_gene_content(self):
-#         # Test that genes were correctly removed from self.genes
-#         remaining = ['b2296', 'b3734', 'b3733', 'b3736', 'b0431', 'b2779', 'b4151', 'b4154', 'b1611',  'b2416',
-#                      'b0002', 'b0003', 'b0004', 'b1417', 'b2092']
-#         six.assertCountEqual(self, [x.id for x in self.my_gempro.genes], remaining)
-#
-#     def test_prep_folders(self):
-#         # Test if folders were made
-#         self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME)))
-#         folders = ['data', 'structures', 'sequences']
-#         for f in folders:
-#             self.assertTrue(op.exists(op.join(self.ROOT_DIR, self.GEM_NAME, f)))
-#
-#     def test_load_model(self):
-#         # Test that we can access the model using .model
-#         self.assertIsInstance(self.my_gempro.model, cobra.Model)
-#
-#         # Test original model attributes
-#         self.assertEqual(len(self.my_gempro.model.reactions), 77)
-#         self.assertEqual(len(self.my_gempro.model.metabolites), 63)
-#         # genes should be removed from model
-#         self.assertEqual(len(self.my_gempro.genes), 15)
-#
-#     def test_gene_info(self):
-#         # Test that self.genes is a DictList and contains GenePro objects
-#         self.assertIsInstance(self.my_gempro.genes, cobra.DictList)
-#         for g in self.my_gempro.genes:
-#             self.assertIsInstance(g, GenePro)
-#
-#     def test_kegg_mapping_and_metadata(self):
-#         """Test that KEGG mapping did these things:
-#         1. Create the df_kegg_metadata attribute
-#         2. Save individual sequence and metadata files per gene in the sequence_files folder
-#         3. Save KEGG related info into each GeneInfo object
-#         """
-#         kegg_organism_code = 'eco'
-#         self.my_gempro.kegg_mapping_and_metadata(kegg_organism_code=kegg_organism_code)
-#         # print(self.my_gempro.df_kegg_metadata)
-#
-#         # 1.
-#         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
-#         self.assertIsInstance(self.my_gempro.df_kegg_metadata, pd.DataFrame)
-#         self.assertEqual(len(self.my_gempro.df_kegg_metadata.gene.unique()), len(self.my_gempro.genes))
-#
-#         ## Tests per gene
-#         for gene in self.my_gempro.genes:
-#             g = gene.id
-#
-#             # 2.
-#             # Test that gene metadata was downloaded
-#             # If the gene did not map to a KEGG ID, a folder will still be made for it
-#             # It will still be in the KEGG DF, just with empty entries
-#             # It will not have anything downloaded for it
-#             gene_structure_folder = op.join(self.my_gempro.sequence_dir, g)
-#             self.assertTrue(op.exists(gene_structure_folder))
-#             self.assertTrue(g in self.my_gempro.df_kegg_metadata.gene.tolist())
-#
-#             if g in self.kegg_will_not_map:
-#                 self.assertTrue(g in self.my_gempro.missing_kegg_mapping)
-#                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}-{}.faa'.format(kegg_organism_code, g))))
-#             else:
-#                 self.assertTrue(op.exists(op.join(gene_structure_folder, '{}-{}.faa'.format(kegg_organism_code, g))))
-#                 self.assertTrue(op.exists(op.join(gene_structure_folder, '{}-{}.kegg'.format(kegg_organism_code, g))))
-#                 # 3.
-#                 # Test that the sequence_properties attribute has KEGG information in it
-#                 keggs = gene.protein.filter_sequences(KEGGProp)
-#                 for k in keggs:
-#                     self.assertTrue(k.seq_len > 0)
-#
-#     def test_uniprot_mapping_and_metadata(self):
-#         """Test that UniProt mapping did these things:
-#         1. Create the df_uniprot_metadata attribute
-#         2. Save individual sequence and metadata files per gene in the sequence_files folder
-#         3. Save UniProt related info into each GeneInfo object
-#         """
-#         self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
-#         # print(self.my_gempro.df_uniprot_metadata)
-#
-#         # 1.
-#         # Test if attribute is a DataFrame and the number of entries in it is equal to the number of genes
-#         self.assertIsInstance(self.my_gempro.df_uniprot_metadata, pd.DataFrame)
-#         self.assertEqual(len(self.my_gempro.df_uniprot_metadata.gene.unique()), len(self.my_gempro.genes))
-#
-#         ## Tests per gene
-#         for gene in self.my_gempro.genes:
-#             g = gene.id
-#
-#             # 2.
-#             # Test that gene metadata was downloaded
-#             # If the gene did not map to a UniProt ID, a folder will still be made for it
-#             # It will still be in the UniProt DF, just with empty entries
-#             # It will not have anything downloaded for it
-#             gene_structure_folder = op.join(self.my_gempro.sequence_dir, g)
-#             self.assertTrue(op.exists(gene_structure_folder))
-#             self.assertTrue(g in self.my_gempro.df_uniprot_metadata.gene.tolist())
-#
-#             if g in self.uniprot_will_not_map:
-#                 self.assertTrue(g in self.my_gempro.missing_uniprot_mapping)
-#                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
-#                 self.assertFalse(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))
-#             else:
-#                 uniprots = self.my_gempro.df_uniprot_metadata[self.my_gempro.df_uniprot_metadata.gene == g].uniprot.unique().tolist()
-#                 for u in uniprots:
-#                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.fasta'.format(u))))
-#                     self.assertTrue(op.exists(op.join(gene_structure_folder, '{}.txt'.format(u))))
-#                     # 3.
-#                     # Test that the.annotation['sequence'] attribute has UniProt information in it
-#                     u_prop = gene.protein.sequences.get_by_id(u)
-#                     self.assertTrue(u_prop.seq_len > 0)
-#
-#     def test_x_map_uniprot_to_pdb(self):
-#         self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
-#         self.my_gempro.set_representative_sequence()
-#         self.my_gempro.map_uniprot_to_pdb(seq_ident_cutoff=.9)
-#
-#         look_at_this_gene = self.my_gempro.genes.get_by_id('b3734').protein
-#         self.assertTrue(look_at_this_gene.structures.has_id('3oaa'))
-#         look_at_this_structure = look_at_this_gene.structures.get_by_id('3oaa')
-#         # TODO: check parsing of taxonomy name
-#         # self.assertEqual(536056, look_at_this_structure.taxonomy_name)
-#         look_at_this_chain = look_at_this_structure.chains.get_by_id('A')
-#         self.assertEqual(513, look_at_this_chain.unp_end)
-#         self.assertEqual(1, look_at_this_chain.coverage)
-#
-#     def test_x_blast_pdb(self):
-#         self.my_gempro.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
-#         self.my_gempro.set_representative_sequence()
-#         self.my_gempro.blast_seqs_to_pdb(seq_ident_cutoff=.8, all_genes=True)
-#
-#         look_at_this_gene = self.my_gempro.genes.get_by_id('b2296').protein
-#         self.assertTrue(look_at_this_gene.structures.has_id('3slc'))
-#         look_at_this_structure = look_at_this_gene.structures.get_by_id('3slc')
-#         look_at_this_chain = look_at_this_structure.chains.get_by_id('A')
-#         self.assertEqual(0.9425, look_at_this_chain.hit_percent_ident)
-#
-#     @classmethod
-#     def tearDownClass(self):
-#         shutil.rmtree(self.base_dir)
+    @pytest.mark.run(order=1)
+    def test_init(self, gempro_with_dir_mini_json):
+        """Test initialization of a GEMPRO"""
+        assert op.exists(gempro_with_dir_mini_json.base_dir)
+        assert op.exists(gempro_with_dir_mini_json.data_dir)
+        assert op.exists(gempro_with_dir_mini_json.genes_dir)
+
+        # Test that we can access the model using .model
+        assert isinstance(gempro_with_dir_mini_json.model, Model)
+
+    @pytest.mark.run(order=2)
+    def test_gene_info(self, gempro_with_dir_mini_json):
+        """Test that genes is a DictList, contains GenePro objects, and directories were made"""
+        assert isinstance(gempro_with_dir_mini_json.genes, DictList)
+        for g in gempro_with_dir_mini_json.genes:
+            assert isinstance(g, GenePro)
+            assert op.exists(g.gene_dir)
+            assert op.exists(g.protein.protein_dir)
+
+    @pytest.mark.run(order=3)
+    def test_add_remove_gene_ids(self, gempro_with_dir_mini_json):
+        """Test adding and removing genes to a GEMPRO, mainly to double check the genes convenience attribute"""
+        add_these = ['b0002', 'b2092']
+        gempro_with_dir_mini_json.add_gene_ids(add_these)
+        for x in add_these:
+            assert gempro_with_dir_mini_json.genes.has_id(x)
+            assert isinstance(gempro_with_dir_mini_json.genes.get_by_id(x), GenePro)
+
+        remove_these = ['b4395', 'b3612', 'b2417', 'b2779', 'b2925', 'b2926', 'b3916', 'b3919', 'b4025', 'b2097']
+        for x in remove_these:
+            gempro_with_dir_mini_json.genes.remove(gempro_with_dir_mini_json.genes.get_by_id(x))
+            assert not gempro_with_dir_mini_json.genes.has_id(x)
+
+        assert len(gempro_with_dir_mini_json.genes) == len(gempro_with_dir_mini_json.model.genes)
+
+    @pytest.mark.run(order=4)
+    def test_kegg_mapping_and_metadata(self, gempro_with_dir_mini_json):
+        """Test KEGG mapping"""
+
+        gempro_with_dir_mini_json.kegg_mapping_and_metadata(kegg_organism_code='eco')
+
+        for g in gempro_with_dir_mini_json.genes:
+
+            kegg_mappings = g.protein.filter_sequences(KEGGProp)
+
+            # Test that KEGGProp objects have not been added to the sequences if missing
+            if g.id in gempro_with_dir_mini_json.missing_kegg_mapping:
+                assert len(kegg_mappings) == 0
+                continue
+
+            # Test that KEGGProp objects have been added to the sequences
+            assert len(kegg_mappings) > 0
+
+            # Test that KEGG sequence files have been saved
+            for k in kegg_mappings:
+                assert op.exists(k.sequence_path)
+
+    @pytest.mark.run(order=5)
+    def test_uniprot_mapping_and_metadata(self, gempro_with_dir_mini_json):
+        """Test UniProt mapping"""
+
+        gempro_with_dir_mini_json.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
+
+        for g in gempro_with_dir_mini_json.genes:
+
+            uniprot_mappings = g.protein.filter_sequences(UniProtProp)
+
+            # Test that UniProtProp objects have not been added to the sequences if missing
+            if g.id in gempro_with_dir_mini_json.missing_uniprot_mapping:
+                assert len(uniprot_mappings) == 0
+                continue
+
+            # Test that UniProtProp objects have been added to the sequences
+            assert len(uniprot_mappings) > 0
+
+            # Test that UniProt XML files have been saved
+            for u in uniprot_mappings:
+                assert op.exists(u.metadata_path)
+
+    @pytest.mark.run(order=6)
+    def test_set_representative_sequence(self, gempro_with_dir_mini_json):
+        """Test representative sequence setting"""
+
+        gempro_with_dir_mini_json.set_representative_sequence()
+
+        # Test proteins that shouldn't map don't have a representative sequence
+        will_not_map = ['b2092']
+        for g_id in will_not_map:
+            assert g_id in gempro_with_dir_mini_json.missing_representative_sequence
+            assert not gempro_with_dir_mini_json.genes_with_a_representative_sequence.has_id(g_id)
+
+    @pytest.mark.run(order=7)
+    def test_map_uniprot_to_pdb(self, gempro_with_dir_mini_json):
+        """Test mapping of UniProt IDs to PDB IDs"""
+
+        # Mapped to PDB successfully as of 2018-02-24
+        mapped_to_pdb = ['b0755', 'b0875', 'b1101', 'b1676', 'b1723', 'b1779', 'b1817', 'b2133', 'b2415', 'b2416']
+
+        gempro_with_dir_mini_json.map_uniprot_to_pdb(seq_ident_cutoff=0.0)
+
+        for g_id in mapped_to_pdb:
+            g = gempro_with_dir_mini_json.genes.get_by_id(g_id)
+            assert g.protein.num_structures_experimental > 0
+
+            for s in g.protein.get_experimental_structures():
+                # Test that PDBProp objects have been added to protein structures list
+                assert isinstance(s, PDBProp)
+                # Test that their structures have NOT been downloaded yet
+                assert not s.structure_file
+
+    @pytest.mark.run(order=8)
+    def test_blast_seqs_to_pdb(self, gempro_with_dir_mini_json):
+        """Test BLASTing sequences to PDB"""
+
+        # BLASTed to PDB successfully as of 2018-02-24
+        additional_blasted_to_pdb = ['b1380']
+
+        gempro_with_dir_mini_json.blast_seqs_to_pdb(seq_ident_cutoff=0.5, evalue=0.0001, all_genes=False)
+
+        for g_id in additional_blasted_to_pdb:
+            p = gempro_with_dir_mini_json.genes.get_by_id(g_id).protein
+            assert p.num_structures_experimental > 0
+
+            for s in p.get_experimental_structures():
+                # Test that PDBProp objects have been added to protein structures list
+                assert isinstance(s, PDBProp)
+                # Test that their structures have NOT been downloaded yet
+                assert not s.structure_file
+
+    @pytest.mark.run(order=9)
+    def test_set_representative_structure(self, gempro_with_dir_mini_json):
+        """Test setting the representative structure"""
+
+        gempro_with_dir_mini_json.set_representative_structure(engine='biopython', always_use_homology=False,
+                                                               rez_cutoff=0.0, seq_ident_cutoff=0.5,
+                                                               allow_missing_on_termini=0.2,
+                                                               allow_mutants=True, allow_deletions=False,
+                                                               allow_insertions=False, allow_unresolved=True,
+                                                               skip_large_structures=False, clean=True)
+
+        # List of genes with representative structures as of 2018-02-24
+        genes_with_repstructs = ['b0755', 'b0875', 'b1723', 'b1779', 'b2415', 'b2416']
+
+        # TODO: should we test the large structure setting here?
+        genes_with_large_struct = []
+
+        for g_id in genes_with_repstructs:
+            p = gempro_with_dir_mini_json.genes.get_by_id(g_id).protein
+            assert p.representative_structure
+            assert p.structures.has_id(p.representative_structure.id)
+            assert op.exists(p.representative_structure.structure_path)
