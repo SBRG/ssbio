@@ -414,7 +414,7 @@ def request_file(link, outfile, force_rerun_flag=False):
     return outfile
 
 
-def request_json(link, outfile, outdir=None, force_rerun_flag=False):
+def request_json(link, outfile, force_rerun_flag, outdir=None):
     """Download a file in JSON format from a web request
 
     Args:
