@@ -69,7 +69,7 @@ class GenePro(Gene):
             return None
 
     def reset_protein(self):
-        self.protein = Protein(self.id, root_dir=self.gene_dir, pdb_file_type=self.pdb_file_type)
+        self.protein = Protein(self.id, root_dir=self.gene_dir)
 
     def __json_encode__(self):
         reqd_attribs = cobra.io.dict._REQUIRED_GENE_ATTRIBUTES
