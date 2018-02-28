@@ -6,6 +6,7 @@ from ssbio.databases.kegg import KEGGProp
 from ssbio.databases.uniprot import UniProtProp
 from ssbio.databases.pdb import PDBProp
 from cobra.core import Model, DictList
+import cobra.manipulation
 
 
 @pytest.fixture(scope='class')
@@ -15,39 +16,39 @@ def gempro_empty():
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir(test_files_tempdir):
+def gempro_with_dir(test_files_outputs):
     """GEMPRO with ID and set root directory"""
-    return GEMPRO(gem_name='test_id_dir', root_dir=test_files_tempdir)
+    return GEMPRO(gem_name='test_id_dir', root_dir=test_files_outputs)
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_mini_json(test_files_tempdir, test_gem_small_json):
+def gempro_with_dir_mini_json(test_files_outputs, test_gem_small_json):
     """GEMPRO with ID + GEM (mini JSON)"""
-    return GEMPRO(gem_name='test_id_dir_json', root_dir=test_files_tempdir,
+    return GEMPRO(gem_name='test_id_dir_json', root_dir=test_files_outputs,
                   gem_file_path=test_gem_small_json, gem_file_type='json')
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_genes(test_files_tempdir, list_of_genes_ecoli):
+def gempro_with_dir_genes(test_files_outputs, list_of_genes_ecoli):
     """GEMPRO with ID + list of gene IDs"""
-    return GEMPRO(gem_name='test_id_geneids', root_dir=test_files_tempdir, genes_list=list_of_genes_ecoli)
+    return GEMPRO(gem_name='test_id_geneids', root_dir=test_files_outputs, genes_list=list_of_genes_ecoli)
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_genes_seqs(test_files_tempdir, dict_of_genes_seqs_ecoli):
+def gempro_with_dir_genes_seqs(test_files_outputs, dict_of_genes_seqs_ecoli):
     """GEMPRO with ID + dictionary of gene IDs + protein sequences"""
-    return GEMPRO(gem_name='test_id_geneseqs', root_dir=test_files_tempdir, genes_and_sequences=dict_of_genes_seqs_ecoli)
+    return GEMPRO(gem_name='test_id_geneseqs', root_dir=test_files_outputs, genes_and_sequences=dict_of_genes_seqs_ecoli)
 
 
 @pytest.fixture(scope='class')
-def gempro_with_dir_genes_fasta(test_files_tempdir, test_fasta_file_multseqs):
+def gempro_with_dir_genes_fasta(test_files_outputs, test_fasta_file_multseqs):
     """GEMPRO with ID + FASTA file"""
-    return GEMPRO(gem_name='test_id_fasta', root_dir=test_files_tempdir,
+    return GEMPRO(gem_name='test_id_fasta', root_dir=test_files_outputs,
                   genome_path=test_fasta_file_multseqs)
 
 
-def test_directory_creation(gempro_with_dir, test_files_tempdir):
-    check_dir = op.join(test_files_tempdir, gempro_with_dir.id)
+def test_directory_creation(gempro_with_dir, test_files_outputs):
+    check_dir = op.join(test_files_outputs, gempro_with_dir.id)
     assert op.exists(check_dir)
 
 
@@ -83,9 +84,10 @@ class TestGemproWithDirMiniJson():
             assert isinstance(gempro_with_dir_mini_json.genes.get_by_id(x), GenePro)
 
         remove_these = ['b4395', 'b3612', 'b2417', 'b2779', 'b2925', 'b2926', 'b3916', 'b3919', 'b4025', 'b2097']
+        cobra.manipulation.remove_genes(gempro_with_dir_mini_json.model, remove_these)
         for x in remove_these:
-            gempro_with_dir_mini_json.genes.remove(gempro_with_dir_mini_json.genes.get_by_id(x))
             assert not gempro_with_dir_mini_json.genes.has_id(x)
+            assert not gempro_with_dir_mini_json.model.genes.has_id(x)
 
         assert len(gempro_with_dir_mini_json.genes) == len(gempro_with_dir_mini_json.model.genes)
 
@@ -93,7 +95,7 @@ class TestGemproWithDirMiniJson():
     def test_kegg_mapping_and_metadata(self, gempro_with_dir_mini_json):
         """Test KEGG mapping"""
 
-        gempro_with_dir_mini_json.kegg_mapping_and_metadata(kegg_organism_code='eco')
+        gempro_with_dir_mini_json.kegg_mapping_and_metadata(kegg_organism_code='eco', force_rerun=True)
 
         for g in gempro_with_dir_mini_json.genes:
 
@@ -115,7 +117,7 @@ class TestGemproWithDirMiniJson():
     def test_uniprot_mapping_and_metadata(self, gempro_with_dir_mini_json):
         """Test UniProt mapping"""
 
-        gempro_with_dir_mini_json.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID')
+        gempro_with_dir_mini_json.uniprot_mapping_and_metadata(model_gene_source='ENSEMBLGENOME_ID', force_rerun=True)
 
         for g in gempro_with_dir_mini_json.genes:
 
@@ -152,7 +154,7 @@ class TestGemproWithDirMiniJson():
         # Mapped to PDB successfully as of 2018-02-24
         mapped_to_pdb = ['b0755', 'b0875', 'b1101', 'b1676', 'b1723', 'b1779', 'b1817', 'b2133', 'b2415', 'b2416']
 
-        gempro_with_dir_mini_json.map_uniprot_to_pdb(seq_ident_cutoff=0.0)
+        gempro_with_dir_mini_json.map_uniprot_to_pdb(seq_ident_cutoff=0.0, force_rerun=True)
 
         for g_id in mapped_to_pdb:
             g = gempro_with_dir_mini_json.genes.get_by_id(g_id)
@@ -171,7 +173,7 @@ class TestGemproWithDirMiniJson():
         # BLASTed to PDB successfully as of 2018-02-24
         additional_blasted_to_pdb = ['b1380']
 
-        gempro_with_dir_mini_json.blast_seqs_to_pdb(seq_ident_cutoff=0.5, evalue=0.0001, all_genes=False)
+        gempro_with_dir_mini_json.blast_seqs_to_pdb(seq_ident_cutoff=0.5, evalue=0.0001, all_genes=False, force_rerun=True)
 
         for g_id in additional_blasted_to_pdb:
             p = gempro_with_dir_mini_json.genes.get_by_id(g_id).protein
@@ -192,7 +194,7 @@ class TestGemproWithDirMiniJson():
                                                                allow_missing_on_termini=0.2,
                                                                allow_mutants=True, allow_deletions=False,
                                                                allow_insertions=False, allow_unresolved=True,
-                                                               skip_large_structures=False, clean=True)
+                                                               skip_large_structures=False, clean=True, force_rerun=True)
 
         # List of genes with representative structures as of 2018-02-24
         genes_with_repstructs = ['b0755', 'b0875', 'b1723', 'b1779', 'b2415', 'b2416']
@@ -205,3 +207,15 @@ class TestGemproWithDirMiniJson():
             assert p.representative_structure
             assert p.structures.has_id(p.representative_structure.id)
             assert op.exists(p.representative_structure.structure_path)
+
+    @pytest.mark.run(order=10)
+    def test_write_representative_sequences_file(self, gempro_with_dir_mini_json):
+        gempro_with_dir_mini_json.write_representative_sequences_file(outname='mini_gp', )
+        assert op.exists(op.join(gempro_with_dir_mini_json.data_dir, 'mini_gp.faa'))
+
+    @pytest.mark.run(order=11)
+    def test_save(self, gempro_with_dir_mini_json):
+        gempro_with_dir_mini_json.save_pickle(op.join(gempro_with_dir_mini_json.model_dir, 'mini_gp.pckl'))
+        gempro_with_dir_mini_json.save_json(op.join(gempro_with_dir_mini_json.model_dir, 'mini_gp.json'))
+        assert op.exists(op.join(gempro_with_dir_mini_json.model_dir, 'mini_gp.pckl'))
+        assert op.exists(op.join(gempro_with_dir_mini_json.model_dir, 'mini_gp.json'))
