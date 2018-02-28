@@ -1,0 +1,72 @@
+ENTRY       b1779             CDS       T00007
+NAME        gapA
+DEFINITION  (RefSeq) glyceraldehyde-3-phosphate dehydrogenase A
+ORTHOLOGY   K00134  glyceraldehyde 3-phosphate dehydrogenase [EC:1.2.1.12]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00010  Glycolysis / Gluconeogenesis
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+            eco01120  Microbial metabolism in diverse environments
+            eco01130  Biosynthesis of antibiotics
+            eco01200  Carbon metabolism
+            eco01230  Biosynthesis of amino acids
+MODULE      eco_M00001  Glycolysis (Embden-Meyerhof pathway), glucose => pyruvate
+            eco_M00002  Glycolysis, core module involving three-carbon compounds
+            eco_M00003  Gluconeogenesis, oxaloacetate => fructose-6P
+            eco_M00552  D-galactonate degradation, De Ley-Doudoroff pathway, D-galactonate => glycerate-3P
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00010 Glycolysis / Gluconeogenesis
+                b1779 (gapA)
+            Enzymes [BR:eco01000]
+             1. Oxidoreductases
+              1.2  Acting on the aldehyde or oxo group of donors
+               1.2.1  With NAD+ or NADP+ as acceptor
+                1.2.1.12  glyceraldehyde-3-phosphate dehydrogenase (phosphorylating)
+                 b1779 (gapA)
+            Membrane trafficking [BR:eco04131]
+             Autophagy
+              Chaperone mediated autophagy (CMA)
+               Selective cargos
+                b1779 (gapA)
+            Exosome [BR:eco04147]
+             Exosomal proteins
+              Proteins found in most exosomes
+               b1779 (gapA)
+POSITION    1862771..1863766
+MOTIF       Pfam: Gp_dh_C Gp_dh_N DapB_N 2-Hacid_dh_C
+DBLINKS     NCBI-GeneID: 947679
+            NCBI-ProteinID: NP_416293
+            Pasteur: gapA
+            RegulonDB: ECK120000360
+            ECOCYC: EG10367
+            ASAP: ABE-0005920
+            UniProt: P0A9B2
+STRUCTURE   PDB: 1GAD 1DC5 1DC6 1S7C 1GAE 2VYN 2VYV 5O0V 1DC3 1DC4 4MVJ
+AASEQ       331
+            MTIKVGINGFGRIGRIVFRAAQKRSDIEIVAINDLLDADYMAYMLKYDSTHGRFDGTVEV
+            KDGHLIVNGKKIRVTAERDPANLKWDEVGVDVVAEATGLFLTDETARKHITAGAKKVVMT
+            GPSKDNTPMFVKGANFDKYAGQDIVSNASCTTNCLAPLAKVINDNFGIIEGLMTTVHATT
+            ATQKTVDGPSHKDWRGGRGASQNIIPSSTGAAKAVGKVLPELNGKLTGMAFRVPTPNVSV
+            VDLTVRLEKAATYEQIKAAVKAAAEGEMKGVLGYTEDDVVSTDFNGEVCTSVFDAKAGIA
+            LNDNFVKLVSWYDNETGYSNKVLDLIAHISK
+NTSEQ       996
+            atgactatcaaagtaggtatcaacggttttggccgtatcggtcgcattgttttccgtgct
+            gctcagaaacgttctgacatcgagatcgttgcaatcaacgacctgttagacgctgattac
+            atggcatacatgctgaaatatgactccactcacggccgtttcgacggtaccgttgaagtg
+            aaagacggtcatctgatcgttaacggtaaaaaaatccgtgttaccgctgaacgtgatccg
+            gctaacctgaaatgggacgaagttggtgttgacgttgtcgctgaagcaactggtctgttc
+            ctgactgacgaaactgctcgtaaacacatcaccgctggtgcgaagaaagtggttatgact
+            ggtccgtctaaagacaacactccgatgttcgttaaaggcgctaacttcgacaaatatgct
+            ggccaggacatcgtttccaacgcttcctgcaccaccaactgcctggctccgctggctaaa
+            gttatcaacgataacttcggcatcatcgaaggtctgatgaccaccgttcacgctactacc
+            gctactcagaaaaccgttgatggcccgtctcacaaagactggcgcggcggccgcggcgct
+            tcccagaacatcatcccgtcctctaccggtgctgctaaagctgtaggtaaagtactgcca
+            gaactgaatggcaaactgactggtatggcgttccgcgttccgaccccgaacgtatctgta
+            gttgacctgaccgttcgtctggaaaaagctgcaacttacgagcagatcaaagctgccgtt
+            aaagctgctgctgaaggcgaaatgaaaggcgttctgggctacaccgaagatgacgtagta
+            tctaccgatttcaacggcgaagtttgcacttccgtgttcgatgctaaagctggtatcgct
+            ctgaacgacaacttcgtgaaactggtatcctggtacgacaacgaaaccggttactccaac
+            aaagttctggacctgatcgctcacatctccaaataa
+///

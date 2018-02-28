@@ -1,0 +1,88 @@
+ENTRY       b1676             CDS       T00007
+NAME        pykF
+DEFINITION  (RefSeq) pyruvate kinase I
+ORTHOLOGY   K00873  pyruvate kinase [EC:2.7.1.40]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00010  Glycolysis / Gluconeogenesis
+            eco00230  Purine metabolism
+            eco00620  Pyruvate metabolism
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+            eco01120  Microbial metabolism in diverse environments
+            eco01130  Biosynthesis of antibiotics
+            eco01200  Carbon metabolism
+            eco01230  Biosynthesis of amino acids
+MODULE      eco_M00001  Glycolysis (Embden-Meyerhof pathway), glucose => pyruvate
+            eco_M00002  Glycolysis, core module involving three-carbon compounds
+            eco_M00049  Adenine ribonucleotide biosynthesis, IMP => ADP,ATP
+            eco_M00050  Guanine ribonucleotide biosynthesis IMP => GDP,GTP
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00010 Glycolysis / Gluconeogenesis
+                b1676 (pykF)
+               00620 Pyruvate metabolism
+                b1676 (pykF)
+              Nucleotide metabolism
+               00230 Purine metabolism
+                b1676 (pykF)
+            Enzymes [BR:eco01000]
+             2. Transferases
+              2.7  Transferring phosphorus-containing groups
+               2.7.1  Phosphotransferases with an alcohol group as acceptor
+                2.7.1.40  pyruvate kinase
+                 b1676 (pykF)
+            Membrane trafficking [BR:eco04131]
+             Autophagy
+              Chaperone mediated autophagy (CMA)
+               Selective cargos
+                b1676 (pykF)
+            Exosome [BR:eco04147]
+             Exosomal proteins
+              Proteins found in most exosomes
+               b1676 (pykF)
+POSITION    1755698..1757110
+MOTIF       Pfam: PK PK_C HpcH_HpaI DUF4115 DUF4651
+DBLINKS     NCBI-GeneID: 946179
+            NCBI-ProteinID: NP_416191
+            Pasteur: pykF
+            RegulonDB: ECK120000795
+            ECOCYC: EG10804
+            ASAP: ABE-0005600
+            UniProt: P0AD61
+STRUCTURE   PDB: 4YNG 1PKY 1E0T 1E0U
+AASEQ       470
+            MKKTKIVCTIGPKTESEEMLAKMLDAGMNVMRLNFSHGDYAEHGQRIQNLRNVMSKTGKT
+            AAILLDTKGPEIRTMKLEGGNDVSLKAGQTFTFTTDKSVIGNSEMVAVTYEGFTTDLSVG
+            NTVLVDDGLIGMEVTAIEGNKVICKVLNNGDLGENKGVNLPGVSIALPALAEKDKQDLIF
+            GCEQGVDFVAASFIRKRSDVIEIREHLKAHGGENIHIISKIENQEGLNNFDEILEASDGI
+            MVARGDLGVEIPVEEVIFAQKMMIEKCIRARKVVITATQMLDSMIKNPRPTRAEAGDVAN
+            AILDGTDAVMLSGESAKGKYPLEAVSIMATICERTDRVMNSRLEFNNDNRKLRITEAVCR
+            GAVETAEKLDAPLIVVATQGGKSARAVRKYFPDATILALTTNEKTAHQLVLSKGVVPQLV
+            KEITSTDDFYRLGKELALQSGLAHKGDVVVMVSGALVPSGTTNTASVHVL
+NTSEQ       1413
+            atgaaaaagaccaaaattgtttgcaccatcggaccgaaaaccgaatctgaagagatgtta
+            gctaaaatgctggacgctggcatgaacgttatgcgtctgaacttctctcatggtgactat
+            gcagaacacggtcagcgcattcagaatctgcgcaacgtgatgagcaaaactggtaaaacc
+            gccgctatcctgcttgataccaaaggtccggaaatccgcaccatgaaactggaaggcggt
+            aacgacgtttctctgaaagctggtcagacctttactttcaccactgataaatctgttatc
+            ggcaacagcgaaatggttgcggtaacgtatgaaggtttcactactgacctgtctgttggc
+            aacaccgtactggttgacgatggtctgatcggtatggaagttaccgccattgaaggtaac
+            aaagttatctgtaaagtgctgaacaacggtgacctgggcgaaaacaaaggtgtgaacctg
+            cctggcgtttccattgctctgccagcactggctgaaaaagacaaacaggacctgatcttt
+            ggttgcgaacaaggcgtagactttgttgctgcttcctttattcgtaagcgttctgacgtt
+            atcgaaatccgtgagcacctgaaagcgcacggcggcgaaaacatccacatcatctccaaa
+            atcgaaaaccaggaaggcctcaacaacttcgacgaaatcctcgaagcctctgacggcatc
+            atggttgcgcgtggcgacctgggtgtagaaatcccggtagaagaagttatcttcgcccag
+            aagatgatgatcgaaaaatgtatccgtgcacgtaaagtcgttatcactgcgacccagatg
+            ctggattccatgatcaaaaacccacgcccgactcgcgcagaagccggtgacgttgcaaac
+            gccatcctcgacggtactgacgcagtgatgctgtctggtgaatccgcaaaaggtaaatac
+            ccgctggaagcggtttctatcatggcgaccatctgcgaacgtaccgaccgcgtgatgaac
+            agccgtctcgagttcaacaatgacaaccgtaaactgcgcattaccgaagcggtatgccgt
+            ggtgccgttgaaactgctgaaaaactggatgctccgctgatcgtggttgctactcagggc
+            ggtaaatctgctcgcgcagtacgtaaatacttcccggatgccaccatcctggcactgacc
+            accaacgaaaaaacggctcatcagttggtactgagcaaaggcgttgtgccgcagcttgtt
+            aaagagatcacttctactgatgatttctaccgtctgggtaaagaactggctctgcagagc
+            ggtctggcacacaaaggtgacgttgtagttatggtttctggtgcactggtaccgagcggc
+            actactaacaccgcatctgttcacgtcctgtaa
+///

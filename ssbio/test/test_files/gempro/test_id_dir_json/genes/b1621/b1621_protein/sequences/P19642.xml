@@ -1,0 +1,568 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1991-02-01" modified="2017-10-25" version="162">
+<accession>P19642</accession>
+<accession>P77621</accession>
+<name>PTOCB_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName evidence="6">PTS system maltose-specific EIICB component</fullName>
+</recommendedName>
+<domain>
+<recommendedName>
+<fullName evidence="6">Maltose permease IIC component</fullName>
+</recommendedName>
+<alternativeName>
+<fullName evidence="6">PTS system maltose-specific EIIC component</fullName>
+</alternativeName>
+</domain>
+<domain>
+<recommendedName>
+<fullName evidence="6">Maltose-specific phosphotransferase enzyme IIB component</fullName>
+<ecNumber evidence="1">2.7.1.208</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName evidence="6">PTS system maltose-specific EIIB component</fullName>
+</alternativeName>
+</domain>
+</protein>
+<gene>
+<name type="primary" evidence="6">malX</name>
+<name type="ordered locus">b1621</name>
+<name type="ordered locus">JW1613</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1991" name="J. Bacteriol." volume="173" first="4862" last="4876">
+<title>The malX malY operon of Escherichia coli encodes a novel enzyme II of the phosphotransferase system recognizing glucose and maltose and an enzyme abolishing the endogenous induction of the maltose system.</title>
+<authorList>
+<person name="Reidl J."/>
+<person name="Boos W."/>
+</authorList>
+<dbReference type="PubMed" id="1856179"/>
+<dbReference type="DOI" id="10.1128/jb.173.15.4862-4876.1991"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<scope>FUNCTION</scope>
+<scope>SUBSTRATE SPECIFICITY</scope>
+<scope>INDUCTION</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="363" last="377">
+<title>A 570-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 28.0-40.1 min region on the linkage map.</title>
+<authorList>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kasai H."/>
+<person name="Kashimoto K."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Takeuchi Y."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097039"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.363"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="1989" name="J. Bacteriol." volume="171" first="4888" last="4899">
+<title>MalI, a novel protein involved in regulation of the maltose system of Escherichia coli, is highly homologous to the repressor proteins GalR, CytR, and LacI.</title>
+<authorList>
+<person name="Reidl J."/>
+<person name="Roemisch K."/>
+<person name="Ehrmann M."/>
+<person name="Boos W."/>
+</authorList>
+<dbReference type="PubMed" id="2670898"/>
+<dbReference type="DOI" id="10.1128/jb.171.9.4888-4899.1989"/>
+</citation>
+<scope>PRELIMINARY NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-177</scope>
+</reference>
+<reference key="6">
+<citation type="journal article" date="2005" name="Science" volume="308" first="1321" last="1323">
+<title>Global topology analysis of the Escherichia coli inner membrane proteome.</title>
+<authorList>
+<person name="Daley D.O."/>
+<person name="Rapp M."/>
+<person name="Granseth E."/>
+<person name="Melen K."/>
+<person name="Drew D."/>
+<person name="von Heijne G."/>
+</authorList>
+<dbReference type="PubMed" id="15919996"/>
+<dbReference type="DOI" id="10.1126/science.1109730"/>
+</citation>
+<scope>SUBCELLULAR LOCATION</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<comment type="function">
+<text evidence="5">The phosphoenolpyruvate-dependent sugar phosphotransferase system (sugar PTS), a major carbohydrate active transport system, catalyzes the phosphorylation of incoming sugar substrates concomitantly with their translocation across the cell membrane. This system is involved in maltose transport. MalX can also recognize and transport glucose even though this sugar may not represent the natural substrate of the system.</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="1">[Protein]-N(pi)-phospho-L-histidine + maltose(Side 1) = [protein]-L-histidine + maltose 6'-phosphate(Side 2).</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-556578"/>
+<interactant intactId="EBI-368956">
+<id>P21599</id>
+<label>pykA</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>4</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="3 4">Cell inner membrane</location>
+<topology evidence="3 4">Multi-pass membrane protein</topology>
+</subcellularLocation>
+</comment>
+<comment type="induction">
+<text evidence="5">By maltose. Repressed by MalI.</text>
+</comment>
+<comment type="domain">
+<text evidence="3">The EIIC domain type-1 forms the PTS system translocation channel and contains the specific substrate-binding site.</text>
+</comment>
+<comment type="domain">
+<text evidence="2">The PTS EIIB type-1 domain is phosphorylated by phospho-EIIA on a cysteinyl residue. Then, it transfers the phosphoryl group to the sugar substrate concomitantly with the sugar uptake processed by the PTS EIIC type-1 domain.</text>
+</comment>
+<dbReference type="EC" id="2.7.1.208" evidence="1"/>
+<dbReference type="EMBL" id="M60722">
+<property type="protein sequence ID" value="AAA24098.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74693.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15372.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M28539">
+<property type="protein sequence ID" value="AAA24103.2"/>
+<property type="status" value="ALT_SEQ"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="G64918">
+<property type="entry name" value="G64918"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416138.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000125583.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="ProteinModelPortal" id="P19642"/>
+<dbReference type="SMR" id="P19642"/>
+<dbReference type="BioGrid" id="4261128">
+<property type="interactions" value="20"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-10150N"/>
+<dbReference type="IntAct" id="P19642">
+<property type="interactions" value="1"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-1239961"/>
+<dbReference type="STRING" id="316385.ECDH10B_1754"/>
+<dbReference type="TCDB" id="4.A.1.1.3">
+<property type="family name" value="the pts glucose-glucoside (glc) family"/>
+</dbReference>
+<dbReference type="PaxDb" id="P19642"/>
+<dbReference type="PRIDE" id="P19642"/>
+<dbReference type="EnsemblBacteria" id="AAC74693">
+<property type="protein sequence ID" value="AAC74693"/>
+<property type="gene ID" value="b1621"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15372">
+<property type="protein sequence ID" value="BAA15372"/>
+<property type="gene ID" value="BAA15372"/>
+</dbReference>
+<dbReference type="GeneID" id="946009"/>
+<dbReference type="KEGG" id="ecj:JW1613"/>
+<dbReference type="KEGG" id="eco:b1621"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.640"/>
+<dbReference type="EchoBASE" id="EB0558"/>
+<dbReference type="EcoGene" id="EG10563">
+<property type="gene designation" value="malX"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105CI1">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG1263">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG1264">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000250995"/>
+<dbReference type="InParanoid" id="P19642"/>
+<dbReference type="KO" id="K02790"/>
+<dbReference type="KO" id="K02791"/>
+<dbReference type="PhylomeDB" id="P19642"/>
+<dbReference type="BioCyc" id="EcoCyc:MALX-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:MALX-MONOMER"/>
+<dbReference type="PRO" id="PR:P19642"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016021">
+<property type="term" value="C:integral component of membrane"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005886">
+<property type="term" value="C:plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016301">
+<property type="term" value="F:kinase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008982">
+<property type="term" value="F:protein-N(PI)-phosphohistidine-sugar phosphotransferase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009758">
+<property type="term" value="P:carbohydrate utilization"/>
+<property type="evidence" value="ECO:0000316"/>
+<property type="project" value="CACAO"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009401">
+<property type="term" value="P:phosphoenolpyruvate-dependent sugar phosphotransferase system"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="CDD" id="cd00212">
+<property type="entry name" value="PTS_IIB_glc"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.30.1360.60">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036878">
+<property type="entry name" value="Glu_permease_IIB"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR018113">
+<property type="entry name" value="PTrfase_EIIB_Cys"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR003352">
+<property type="entry name" value="PTS_EIIC"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR013013">
+<property type="entry name" value="PTS_EIIC_1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001996">
+<property type="entry name" value="PTS_IIB_1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR011301">
+<property type="entry name" value="PTS_Mal/Glc-sp_IIBC_component"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR004719">
+<property type="entry name" value="PTS_maltose/Glc_sub_IIC"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00367">
+<property type="entry name" value="PTS_EIIB"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF02378">
+<property type="entry name" value="PTS_EIIC"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF55604">
+<property type="entry name" value="SSF55604"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00826">
+<property type="entry name" value="EIIB_glc"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00852">
+<property type="entry name" value="pts-Glc"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR02004">
+<property type="entry name" value="PTS-IIBC-malX"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51098">
+<property type="entry name" value="PTS_EIIB_TYPE_1"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS01035">
+<property type="entry name" value="PTS_EIIB_TYPE_1_CYS"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51103">
+<property type="entry name" value="PTS_EIIC_TYPE_1"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0997">Cell inner membrane</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-0598">Phosphotransferase system</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0762">Sugar transport</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<keyword id="KW-0812">Transmembrane</keyword>
+<keyword id="KW-1133">Transmembrane helix</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="chain" description="PTS system maltose-specific EIICB component" id="PRO_0000186657">
+<location>
+<begin position="1"/>
+<end position="530"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="22"/>
+<end position="42"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="69"/>
+<end position="89"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="96"/>
+<end position="116"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="138"/>
+<end position="158"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="189"/>
+<end position="209"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="289"/>
+<end position="309"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="321"/>
+<end position="341"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="343"/>
+<end position="363"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="369"/>
+<end position="389"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="3">
+<location>
+<begin position="399"/>
+<end position="419"/>
+</location>
+</feature>
+<feature type="domain" description="PTS EIIC type-1" evidence="3">
+<location>
+<begin position="1"/>
+<end position="431"/>
+</location>
+</feature>
+<feature type="domain" description="PTS EIIB type-1" evidence="2">
+<location>
+<begin position="449"/>
+<end position="530"/>
+</location>
+</feature>
+<feature type="active site" description="Phosphocysteine intermediate; for EIIB activity" evidence="2">
+<location>
+<position position="471"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24098." ref="1" evidence="7">
+<original>I</original>
+<variation>Y</variation>
+<location>
+<position position="144"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24098." ref="1" evidence="7">
+<original>P</original>
+<variation>N</variation>
+<location>
+<position position="296"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24098." ref="1" evidence="7">
+<original>E</original>
+<variation>R</variation>
+<location>
+<position position="432"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000250">
+<source>
+<dbReference type="UniProtKB" id="P54715"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU00421"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU00426"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="15919996"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1856179"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="1856179"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000305"/>
+<sequence length="530" mass="56627" checksum="042E9817955975BF" modified="1997-11-01" version="3">
+MTAKTAPKVTLWEFFQQLGKTFMLPVALLSFCGIMLGIGSSLSSHDVITLIPVLGNPVLQ
+AIFTWMSKIGSFAFSFLPVMFCIAIPLGLARENKGVAAFAGFIGYAVMNLAVNFWLTNKG
+ILPTTDAAVLKANNIQSILGIQSIDTGILGAVIAGIIVWMLHERFHNIRLPDALAFFGGT
+RFVPIISSLVMGLVGLVIPLVWPIFAMGISGLGHMINSAGDFGPMLFGTGERLLLPFGLH
+HILVALIRFTDAGGTQEVCGQTVSGALTIFQAQLSCPTTHGFSESATRFLSQGKMPAFLG
+GLPGAALAMYHCARPENRHKIKGLLISGLIACVVGGTTEPLEFLFLFVAPVLYVIHALLT
+GLGFTVMSVLGVTIGNTDGNIIDFVVFGILHGLSTKWYMVPVVAAIWFVVYYVIFRFAIT
+RFNLKTPGRDSEVASSIEKAVAGAPGKSGYNVPAILEALGGADNIVSLDNCITRLRLSVK
+DMSLVNVQALKDNRAIGVVQLNQHNLQVVIGPQVQSVKDEMAGLMHTVQA
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

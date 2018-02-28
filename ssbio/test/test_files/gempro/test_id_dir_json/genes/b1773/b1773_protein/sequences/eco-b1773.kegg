@@ -1,0 +1,35 @@
+ENTRY       b1773             CDS       T00007
+NAME        ydjI
+DEFINITION  (RefSeq) putative aldolase
+ORGANISM    eco  Escherichia coli K-12 MG1655
+POSITION    complement(1856933..1857769)
+MOTIF       Pfam: F_bP_aldolase NMO FMN_dh PEP_mutase
+DBLINKS     NCBI-GeneID: 946291
+            NCBI-ProteinID: NP_416287
+            Pasteur: ydjI
+            RegulonDB: ECK120003548
+            ECOCYC: G6960
+            ASAP: ABE-0005906
+            UniProt: P77704
+AASEQ       278
+            MLADIRYWENDATNKHYAIAHFNVWNAEMLMGVIDAAEEAKSPVIISFGTGFVGNTSFED
+            FSHMMVSMAQKATVPVITHWDHGRSMEIIHNAWTHGMNSLMRDASAFDFEENIRLTKEAV
+            DFFHPLGIPVEAELGHVGNETVYEEALAGYHYTDPDQAAEFVERTGCDSLAVAIGNQHGV
+            YTSEPQLNFEVVKRVRDAVSVPLVLHGASGISDADIKTAISLGIAKINIHTELCQAAMVA
+            VKENQDQPFLHLEREVRKAVKERALEKIKLFGSDGKAE
+NTSEQ       837
+            atgctcgcagatatcagatattgggaaaacgatgccacaaataaacattatgcaattgcc
+            cattttaacgtatggaatgcagaaatgttgatgggcgttatcgacgcagccgaagaagcg
+            aaatccccggttattatttcttttggtacaggttttgtcggtaacacctcatttgaagat
+            ttctctcacatgatggtatcaatggcacaaaaagcaacggtgccggtaataactcattgg
+            gatcatggtcggagtatggagattattcataacgcctggactcatggtatgaattcatta
+            atgcgtgatgcttccgcgtttgatttcgaagaaaatattcgtttaaccaaagaggctgtc
+            gatttcttccatccgctgggtattccggtagaggcggaattagggcatgtcggtaatgaa
+            accgtttatgaggaagcgctggcgggctatcactataccgatcctgaccaggcggctgaa
+            tttgttgaacgtacgggctgtgattcattggctgtcgccatcggcaaccagcatggggtt
+            tatacgtcagagccacaattgaactttgaggtcgtcaaacgcgtacgcgatgccgtttct
+            gttccgctggttttgcacggtgcatcggggatcagtgatgccgacattaaaactgcaatt
+            tcgttgggtatcgcgaaaatcaacattcatacggagctctgtcaggccgcaatggttgca
+            gtgaaagaaaaccaggatcagcctttcctgcatttagaacgtgaagtacgtaaagctgta
+            aaagaacgggcattggaaaaaattaaactgttcggttctgatggcaaagcggaataa
+///

@@ -1,0 +1,76 @@
+ENTRY       b0755             CDS       T00007
+NAME        gpmA
+DEFINITION  (RefSeq) phosphoglyceromutase 1
+ORTHOLOGY   K01834  2,3-bisphosphoglycerate-dependent phosphoglycerate mutase [EC:5.4.2.11]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00010  Glycolysis / Gluconeogenesis
+            eco00260  Glycine, serine and threonine metabolism
+            eco00680  Methane metabolism
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+            eco01120  Microbial metabolism in diverse environments
+            eco01130  Biosynthesis of antibiotics
+            eco01200  Carbon metabolism
+            eco01230  Biosynthesis of amino acids
+MODULE      eco_M00001  Glycolysis (Embden-Meyerhof pathway), glucose => pyruvate
+            eco_M00002  Glycolysis, core module involving three-carbon compounds
+            eco_M00003  Gluconeogenesis, oxaloacetate => fructose-6P
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00010 Glycolysis / Gluconeogenesis
+                b0755 (gpmA)
+              Energy metabolism
+               00680 Methane metabolism
+                b0755 (gpmA)
+              Amino acid metabolism
+               00260 Glycine, serine and threonine metabolism
+                b0755 (gpmA)
+            Enzymes [BR:eco01000]
+             5. Isomerases
+              5.4  Intramolecular transferases
+               5.4.2  Phosphotransferases (phosphomutases)
+                5.4.2.11  phosphoglycerate mutase (2,3-diphosphoglycerate-dependent)
+                 b0755 (gpmA)
+            Membrane trafficking [BR:eco04131]
+             Autophagy
+              Chaperone mediated autophagy (CMA)
+               Selective cargos
+                b0755 (gpmA)
+            Exosome [BR:eco04147]
+             Exosomal proteins
+              Exosomal proteins of bladder cancer cells
+               b0755 (gpmA)
+              Exosomal proteins of melanoma cells
+               b0755 (gpmA)
+POSITION    complement(786843..787595)
+MOTIF       Pfam: His_Phos_1 TAF6_C
+DBLINKS     NCBI-GeneID: 945068
+            NCBI-ProteinID: NP_415276
+            Pasteur: gpmA
+            RegulonDB: ECK120001642
+            ECOCYC: EG11699
+            ASAP: ABE-0002563
+            UniProt: P62707
+STRUCTURE   PDB: 1E58 1E59
+AASEQ       250
+            MAVTKLVLVRHGESQWNKENRFTGWYDVDLSEKGVSEAKAAGKLLKEEGYSFDFAYTSVL
+            KRAIHTLWNVLDELDQAWLPVEKSWKLNERHYGALQGLNKAETAEKYGDEQVKQWRRGFA
+            VTPPELTKDDERYPGHDPRYAKLSEKELPLTESLALTIDRVIPYWNETILPRMKSGERVI
+            IAAHGNSLRALVKYLDNMSEEEILELNIPTGVPLVYEFDENFKPLKRYYLGNADEIAAKA
+            AAVANQGKAK
+NTSEQ       753
+            atggctgtaactaagctggttctggttcgtcatggcgaaagtcagtggaacaaagaaaac
+            cgtttcaccggttggtacgacgtggatctgtctgagaaaggcgtaagcgaagcaaaagca
+            gcaggtaagctgctgaaagaggaaggttacagctttgactttgcttacacttctgtgctg
+            aaacgcgctatccataccctgtggaatgtgctggacgaactggatcaggcatggctgccc
+            gttgagaaatcctggaaactgaacgaacgtcactacggtgcgttgcagggtctgaacaaa
+            gcggaaactgctgaaaagtatggcgacgagcaggtgaaacagtggcgtcgtggttttgca
+            gtgactccgccggaactgactaaagatgatgagcgttatccgggtcacgatccgcgttac
+            gcgaaactgagcgagaaagaactgccgctgacggaaagcctggcgctgaccattgaccgc
+            gtgatcccttactggaatgaaactattctgccgcgtatgaagagcggtgagcgcgtgatc
+            atcgctgcacacggtaactctttacgtgcgctggtgaaatatcttgataacatgagcgaa
+            gaagagattcttgagcttaatatcccgactggcgtgccgctggtgtatgagttcgacgag
+            aatttcaaaccgctgaaacgctattatctgggtaatgctgacgagatcgcagcgaaagca
+            gcggcggttgcaaaccagggtaaagcgaagtaa
+///

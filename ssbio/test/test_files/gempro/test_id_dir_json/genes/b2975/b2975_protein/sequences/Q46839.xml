@@ -1,0 +1,455 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1997-11-01" modified="2017-07-05" version="126">
+<accession>Q46839</accession>
+<accession>Q2M9M1</accession>
+<name>GLCA_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Glycolate permease GlcA</fullName>
+</recommendedName>
+</protein>
+<gene>
+<name type="primary">glcA</name>
+<name type="synonym">yghK</name>
+<name type="ordered locus">b2975</name>
+<name type="ordered locus">JW2942</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="2001" name="Microbiology" volume="147" first="1069" last="1077">
+<title>The gene yghK linked to the glc operon of Escherichia coli encodes a permease for glycolate that is structurally and functionally similar to L-lactate permease.</title>
+<authorList>
+<person name="Nunez M.F."/>
+<person name="Pellicer M.T."/>
+<person name="Badia J."/>
+<person name="Aguilar J."/>
+<person name="Baldoma L."/>
+</authorList>
+<dbReference type="PubMed" id="11283302"/>
+</citation>
+<scope>CHARACTERIZATION</scope>
+<source>
+<strain>K12 / MC4100 / ATCC 35695 / DSM 6574</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="2002" name="Biochem. Biophys. Res. Commun." volume="290" first="824" last="829">
+<title>Transport of L-lactate, D-lactate, and glycolate by the LldP and GlcA membrane carriers of Escherichia coli.</title>
+<authorList>
+<person name="Nunez M.F."/>
+<person name="Kwon O."/>
+<person name="Wilson T.H."/>
+<person name="Aguilar J."/>
+<person name="Baldoma L."/>
+<person name="Lin E.C.C."/>
+</authorList>
+<dbReference type="PubMed" id="11785976"/>
+<dbReference type="DOI" id="10.1006/bbrc.2001.6255"/>
+</citation>
+<scope>CHARACTERIZATION</scope>
+<source>
+<strain>K12 / MC4100 / ATCC 35695 / DSM 6574</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2005" name="Science" volume="308" first="1321" last="1323">
+<title>Global topology analysis of the Escherichia coli inner membrane proteome.</title>
+<authorList>
+<person name="Daley D.O."/>
+<person name="Rapp M."/>
+<person name="Granseth E."/>
+<person name="Melen K."/>
+<person name="Drew D."/>
+<person name="von Heijne G."/>
+</authorList>
+<dbReference type="PubMed" id="15919996"/>
+<dbReference type="DOI" id="10.1126/science.1109730"/>
+</citation>
+<scope>TOPOLOGY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<comment type="function">
+<text>Transports glycolate across the membrane. Can also transport L-lactate and D-lactate. Seems to be driven by a proton motive force.</text>
+</comment>
+<comment type="enzyme regulation">
+<text>Inhibited by carbonyl cyanide m-chlorophenylhydrazone (CCCP).</text>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location>Cell inner membrane</location>
+<topology>Multi-pass membrane protein</topology>
+</subcellularLocation>
+</comment>
+<comment type="induction">
+<text>By glycolate.</text>
+</comment>
+<comment type="similarity">
+<text evidence="2">Belongs to the lactate permease family.</text>
+</comment>
+<dbReference type="EMBL" id="U28377">
+<property type="protein sequence ID" value="AAA69142.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC76011.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAE77035.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="E65083">
+<property type="entry name" value="E65083"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_417449.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000259302.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="ProteinModelPortal" id="Q46839"/>
+<dbReference type="DIP" id="DIP-12206N"/>
+<dbReference type="IntAct" id="Q46839">
+<property type="interactions" value="2"/>
+</dbReference>
+<dbReference type="STRING" id="316385.ECDH10B_3151"/>
+<dbReference type="TCDB" id="2.A.14.1.2">
+<property type="family name" value="the lactate permease (lctp) family"/>
+</dbReference>
+<dbReference type="PaxDb" id="Q46839"/>
+<dbReference type="PRIDE" id="Q46839"/>
+<dbReference type="EnsemblBacteria" id="AAC76011">
+<property type="protein sequence ID" value="AAC76011"/>
+<property type="gene ID" value="b2975"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAE77035">
+<property type="protein sequence ID" value="BAE77035"/>
+<property type="gene ID" value="BAE77035"/>
+</dbReference>
+<dbReference type="GeneID" id="947259"/>
+<dbReference type="KEGG" id="ecj:JW2942"/>
+<dbReference type="KEGG" id="eco:b2975"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.3756"/>
+<dbReference type="EchoBASE" id="EB2818"/>
+<dbReference type="EcoGene" id="EG12995">
+<property type="gene designation" value="glcA"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105DAA">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG1620">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000253321"/>
+<dbReference type="InParanoid" id="Q46839"/>
+<dbReference type="KO" id="K02550"/>
+<dbReference type="PhylomeDB" id="Q46839"/>
+<dbReference type="BioCyc" id="EcoCyc:B2975-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:B2975-MONOMER"/>
+<dbReference type="PRO" id="PR:Q46839"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005887">
+<property type="term" value="C:integral component of plasma membrane"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005886">
+<property type="term" value="C:plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0015129">
+<property type="term" value="F:lactate transmembrane transporter activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0015295">
+<property type="term" value="F:solute:proton symporter activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR003804">
+<property type="entry name" value="Lactate_perm"/>
+</dbReference>
+<dbReference type="PANTHER" id="PTHR30003">
+<property type="entry name" value="PTHR30003"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF02652">
+<property type="entry name" value="Lactate_perm"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00795">
+<property type="entry name" value="lctP"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0997">Cell inner membrane</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0812">Transmembrane</keyword>
+<keyword id="KW-1133">Transmembrane helix</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="chain" description="Glycolate permease GlcA" id="PRO_0000210380">
+<location>
+<begin position="1"/>
+<end position="560"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="1"/>
+<end position="13"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="14"/>
+<end position="34"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="35"/>
+<end position="41"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="42"/>
+<end position="62"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="63"/>
+<end position="69"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="70"/>
+<end position="90"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="91"/>
+<end position="130"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="131"/>
+<end position="151"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="152"/>
+<end position="158"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="159"/>
+<end position="179"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="180"/>
+<end position="199"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="200"/>
+<end position="220"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="221"/>
+<end position="225"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="226"/>
+<end position="246"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="247"/>
+<end position="248"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="249"/>
+<end position="269"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="270"/>
+<end position="313"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="314"/>
+<end position="334"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="335"/>
+<end position="378"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="379"/>
+<end position="399"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="400"/>
+<end position="409"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="410"/>
+<end position="430"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="431"/>
+<end position="439"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="440"/>
+<end position="460"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="1">
+<location>
+<begin position="461"/>
+<end position="537"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="1">
+<location>
+<begin position="538"/>
+<end position="558"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="1">
+<location>
+<begin position="559"/>
+<end position="560"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000255"/>
+<evidence key="2" type="ECO:0000305"/>
+<sequence length="560" mass="58920" checksum="8ECB9F9626FFC40A" modified="1996-11-01" version="1">
+MVTWTQMYMPMGGLGLSALVALIPIIFFFVALAVLRLKGHVAGAITLILSILIAIFAFKM
+PIDMAFAAAGYGFIYGLWPIAWIIVAAVFLYKLTVASGQFDIIRSSVISITDDQRLQVLL
+IGFSFGALLEGAAGFGAPVAITGALLVGLGFKPLYAAGLCLIANTAPVAFGALGVPILVA
+GQVTGIDPFHIGAMAGRQLPFLSVLVPFWLVAMMDGWKGVKETWPAALVAGGSFAVTQFF
+TSNYIGPELPDITSALVSIVSLALFLKVWRPKNTETAISMGQSAGAMVVNKPSSGGPVPS
+EYSLGQIIRAWSPFLILTVLVTIWTMKPFKALFAPGGAFYSLVINFQIPHLHQQVLKAAP
+IVAQPTPMDAVFKFDPLSAGGTAIFIAAIISIFILGVGIKKGIGVFAETLISLKWPILSI
+GMVLAFAFVTNYSGMSTTLALVLAGTGVMFPFFSPFLGWLGVFLTGSDTSSNALFGSLQS
+TTAQQINVSDTLLVAANTSGGVTGKMISPQSIAVACAATGMVGRESELFRYTVKHSLIFA
+SVIGIITLLQAYVFTGMLVS
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

@@ -1,0 +1,1115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-08-01" modified="2018-01-31" version="126">
+<accession>P69797</accession>
+<accession>P08186</accession>
+<accession>Q47350</accession>
+<name>PTNAB_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName evidence="17">PTS system mannose-specific EIIAB component</fullName>
+<ecNumber evidence="9 14">2.7.1.191</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName evidence="17">EIIAB-Man</fullName>
+</alternativeName>
+<alternativeName>
+<fullName evidence="16">EIII-Man</fullName>
+</alternativeName>
+<domain>
+<recommendedName>
+<fullName evidence="17">Mannose-specific phosphotransferase enzyme IIA component</fullName>
+</recommendedName>
+<alternativeName>
+<fullName evidence="17">PTS system mannose-specific EIIA component</fullName>
+</alternativeName>
+</domain>
+<domain>
+<recommendedName>
+<fullName evidence="17">Mannose-specific phosphotransferase enzyme IIB component</fullName>
+</recommendedName>
+<alternativeName>
+<fullName evidence="17">PTS system mannose-specific EIIB component</fullName>
+</alternativeName>
+</domain>
+</protein>
+<gene>
+<name type="primary" evidence="18">manX</name>
+<name type="synonym">gptB</name>
+<name type="synonym" evidence="16">ptsL</name>
+<name type="ordered locus">b1817</name>
+<name type="ordered locus">JW1806</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1988" name="FEMS Microbiol. Lett." volume="49" first="69" last="73">
+<title>Nucleotide sequence of manX(ptsL) encoding the enzyme III(Man) (II-A(Man)) function in the phosphotransferase system of Escherichia coli K-12.</title>
+<authorList>
+<person name="Saris P.E.J."/>
+<person name="Liljestroem P."/>
+<person name="Palva E.T."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1987" name="J. Biol. Chem." volume="262" first="5238" last="5247">
+<title>The mannose permease of Escherichia coli consists of three different proteins. Amino acid sequence and function in sugar transport, sugar phosphorylation, and penetration of phage lambda DNA.</title>
+<authorList>
+<person name="Erni B."/>
+<person name="Zanolari B."/>
+<person name="Kocher H.P."/>
+</authorList>
+<dbReference type="PubMed" id="2951378"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<scope>FUNCTION</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="379" last="392">
+<title>A 460-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 40.1-50.0 min region on the linkage map.</title>
+<authorList>
+<person name="Itoh T."/>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Kasai H."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097040"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.379"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1259" last="1313">
+<title>Comparing the predicted and observed properties of proteins encoded in the genome of Escherichia coli K-12.</title>
+<authorList>
+<person name="Link A.J."/>
+<person name="Robison K."/>
+<person name="Church G.M."/>
+</authorList>
+<dbReference type="PubMed" id="9298646"/>
+<dbReference type="DOI" id="10.1002/elps.1150180807"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 2-13</scope>
+<source>
+<strain>K12 / EMG2</strain>
+</source>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1974" name="Proc. Natl. Acad. Sci. U.S.A." volume="71" first="2895" last="2899">
+<title>Phosphotransferase-system enzymes as chemoreceptors for certain sugars in Escherichia coli chemotaxis.</title>
+<authorList>
+<person name="Adler J."/>
+<person name="Epstein W."/>
+</authorList>
+<dbReference type="PubMed" id="4604906"/>
+<dbReference type="DOI" id="10.1073/pnas.71.7.2895"/>
+</citation>
+<scope>FUNCTION</scope>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1978" name="Mol. Gen. Genet." volume="161" first="1" last="8">
+<title>E. coli K-12 pel mutants, which block phage lambda DNA injection, coincide with ptsM, which determines a component of a sugar transport system.</title>
+<authorList>
+<person name="Elliott J."/>
+<person name="Arber W."/>
+</authorList>
+<dbReference type="PubMed" id="353494"/>
+<dbReference type="DOI" id="10.1007/BF00266608"/>
+</citation>
+<scope>FUNCTION</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1985" name="J. Biol. Chem." volume="260" first="15495" last="15503">
+<title>The mannose-permease of the bacterial phosphotransferase system. Gene cloning and purification of the enzyme IIMan/IIIMan complex of Escherichia coli.</title>
+<authorList>
+<person name="Erni B."/>
+<person name="Zanolari B."/>
+</authorList>
+<dbReference type="PubMed" id="2999119"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="10">
+<citation type="journal article" date="1989" name="J. Biol. Chem." volume="264" first="18733" last="18741">
+<title>Mannose permease of Escherichia coli. Domain structure and function of the phosphorylating subunit.</title>
+<authorList>
+<person name="Erni B."/>
+<person name="Zanolari B."/>
+<person name="Graff P."/>
+<person name="Kocher H.P."/>
+</authorList>
+<dbReference type="PubMed" id="2681202"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="11">
+<citation type="journal article" date="1993" name="J. Biol. Chem." volume="268" first="27094" last="27099">
+<title>The mannose transporter of Escherichia coli. Structure and function of the IIABMan subunit.</title>
+<authorList>
+<person name="Stolz B."/>
+<person name="Huber M."/>
+<person name="Markovic-Housley Z."/>
+<person name="Erni B."/>
+</authorList>
+<dbReference type="PubMed" id="8262947"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>MUTAGENESIS OF HIS-10; TRP-12; LYS-48; SER-72; HIS-86; SER-110; HIS-175 AND HIS-219</scope>
+<scope>ACTIVE SITE</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="2005" name="J. Biol. Chem." volume="280" first="34409" last="34419">
+<title>Protein complexes of the Escherichia coli cell envelope.</title>
+<authorList>
+<person name="Stenberg F."/>
+<person name="Chovanec P."/>
+<person name="Maslen S.L."/>
+<person name="Robinson C.V."/>
+<person name="Ilag L."/>
+<person name="von Heijne G."/>
+<person name="Daley D.O."/>
+</authorList>
+<dbReference type="PubMed" id="16079137"/>
+<dbReference type="DOI" id="10.1074/jbc.M506479200"/>
+</citation>
+<scope>SUBCELLULAR LOCATION</scope>
+<source>
+<strain>BL21-DE3</strain>
+</source>
+</reference>
+<reference key="13">
+<citation type="journal article" date="2009" name="Mol. Cell. Proteomics" volume="8" first="215" last="225">
+<title>Lysine acetylation is a highly abundant and evolutionarily conserved modification in Escherichia coli.</title>
+<authorList>
+<person name="Zhang J."/>
+<person name="Sprung R."/>
+<person name="Pei J."/>
+<person name="Tan X."/>
+<person name="Kim S."/>
+<person name="Zhu H."/>
+<person name="Liu C.F."/>
+<person name="Grishin N.V."/>
+<person name="Zhao Y."/>
+</authorList>
+<dbReference type="PubMed" id="18723842"/>
+<dbReference type="DOI" id="10.1074/mcp.M800187-MCP200"/>
+</citation>
+<scope>ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-55 AND LYS-234</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY</scope>
+<source>
+<strain>K12 / JW1106</strain>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="14">
+<citation type="journal article" date="1996" name="J. Mol. Biol." volume="259" first="502" last="511">
+<title>Structure of the IIA domain of the mannose transporter from Escherichia coli at 1.7-A resolution.</title>
+<authorList>
+<person name="Nunn R.S."/>
+<person name="Markovic-Housley Z."/>
+<person name="Genovesio-Taverne J.-C."/>
+<person name="Fluekiger K."/>
+<person name="Rizkallah P.J."/>
+<person name="Jansonius J.N."/>
+<person name="Schirmer T."/>
+<person name="Erni B."/>
+</authorList>
+<dbReference type="PubMed" id="8676384"/>
+<dbReference type="DOI" id="10.1006/jmbi.1996.0335"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.7 ANGSTROMS) OF 1-134</scope>
+<scope>DOMAIN</scope>
+<scope>ACTIVE SITE</scope>
+</reference>
+<reference key="15">
+<citation type="journal article" date="1994" name="FEBS Lett." volume="340" first="202" last="206">
+<title>Predicted topology of the N-terminal domain of the hydrophilic subunit of the mannose transporter of Escherichia coli.</title>
+<authorList>
+<person name="Markovic-Housley Z."/>
+<person name="Balbach J."/>
+<person name="Stolz B."/>
+<person name="Genovesio-Taverne J.-C."/>
+</authorList>
+<dbReference type="PubMed" id="8131846"/>
+<dbReference type="DOI" id="10.1016/0014-5793(94)80138-X"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 1-121</scope>
+</reference>
+<reference key="16">
+<citation type="journal article" date="1997" name="FEBS Lett." volume="404" first="45" last="50">
+<title>Secondary structure of the IIB domain of the Escherichia coli mannose transporter, a new fold in the class of alpha/beta twisted open-sheet structures.</title>
+<authorList>
+<person name="Gschwind R.M."/>
+<person name="Gemmecker G."/>
+<person name="Leutner M."/>
+<person name="Kessler H."/>
+<person name="Gutknecht R."/>
+<person name="Lanz R."/>
+<person name="Fluekiger K."/>
+<person name="Erni B."/>
+</authorList>
+<dbReference type="PubMed" id="9074635"/>
+<dbReference type="DOI" id="10.1016/S0014-5793(97)00084-7"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 156-323</scope>
+</reference>
+<reference key="17">
+<citation type="journal article" date="2005" name="J. Biol. Chem." volume="280" first="20775" last="20784">
+<title>Solution NMR structure of the 48-kDa IIAMannose-HPr complex of the Escherichia coli mannose phosphotransferase system.</title>
+<authorList>
+<person name="Williams D.C. Jr."/>
+<person name="Cai M."/>
+<person name="Suh J.Y."/>
+<person name="Peterkofsky A."/>
+<person name="Clore G.M."/>
+</authorList>
+<dbReference type="PubMed" id="15788390"/>
+<dbReference type="DOI" id="10.1074/jbc.M501986200"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 1-133</scope>
+<scope>SUBUNIT</scope>
+<scope>ACTIVE SITE</scope>
+</reference>
+<reference key="18">
+<citation type="journal article" date="2008" name="J. Biol. Chem." volume="283" first="11024" last="11037">
+<title>Solution NMR structures of productive and non-productive complexes between the A and B domains of the cytoplasmic subunit of the mannose transporter of the Escherichia coli phosphotransferase system.</title>
+<authorList>
+<person name="Hu J."/>
+<person name="Hu K."/>
+<person name="Williams D.C. Jr."/>
+<person name="Komlosh M.E."/>
+<person name="Cai M."/>
+<person name="Clore G.M."/>
+</authorList>
+<dbReference type="PubMed" id="18270202"/>
+<dbReference type="DOI" id="10.1074/jbc.M800312200"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 2-134 AND 159-323</scope>
+<scope>MUTAGENESIS OF HIS-10</scope>
+<scope>DOMAIN</scope>
+<scope>ACTIVE SITE</scope>
+</reference>
+<comment type="function">
+<text evidence="9 10 11 12 13 14">The phosphoenolpyruvate-dependent sugar phosphotransferase system (sugar PTS), a major carbohydrate active transport system, catalyzes the phosphorylation of incoming sugar substrates concomitantly with their translocation across the cell membrane (PubMed:2951378, PubMed:2999119, PubMed:2681202, PubMed:8262947). The enzyme II ManXYZ PTS system is involved in mannose transport (PubMed:2951378, PubMed:2999119, PubMed:2681202, PubMed:8262947). Also functions as a receptor for bacterial chemotaxis and is required for infection of the cell by bacteriophage lambda where it most likely functions as a pore for penetration of lambda DNA (PubMed:4604906, PubMed:353494).</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="9 14">[Protein]-N(pi)-phospho-L-histidine + D-mannose(Side 1) = [protein]-L-histidine + D-mannose 6-phosphate(Side 2).</text>
+</comment>
+<comment type="subunit">
+<text evidence="5 9 10 11 24">Homodimer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-554089"/>
+<interactant intactId="EBI-1125696">
+<id>P0ACN7</id>
+<label>cytR</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>2</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="6 10 11">Cytoplasm</location>
+</subcellularLocation>
+<subcellularLocation>
+<location evidence="6 11">Cell inner membrane</location>
+<topology evidence="6 11">Peripheral membrane protein</topology>
+</subcellularLocation>
+</comment>
+<comment type="domain">
+<text evidence="21 25">The PTS EIIA type-4 domain is phosphorylated by phospho-HPr on a histidyl residue. Then, it transfers the phosphoryl group to the PTS EIIB type-4 domain.</text>
+</comment>
+<comment type="domain">
+<text evidence="4 21">The PTS EIIB type-4 domain is phosphorylated by phospho-EIIA on a histidyl residue. Then, it transfers the phosphoryl group to the sugar substrate concomitantly with the sugar uptake processed by the PTS EIIC type-4 domain.</text>
+</comment>
+<dbReference type="EC" id="2.7.1.191" evidence="9 14"/>
+<dbReference type="EMBL" id="M36404">
+<property type="protein sequence ID" value="AAA24110.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="J02699">
+<property type="protein sequence ID" value="AAA24443.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74887.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15624.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="A30286">
+<property type="entry name" value="WQECM3"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416331.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000150543.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1PDO">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.70"/>
+<property type="chains" value="A=2-133"/>
+</dbReference>
+<dbReference type="PDB" id="1VRC">
+<property type="method" value="NMR"/>
+<property type="chains" value="A/B=1-133"/>
+</dbReference>
+<dbReference type="PDB" id="1VSQ">
+<property type="method" value="NMR"/>
+<property type="chains" value="A/B=2-134, C=159-323"/>
+</dbReference>
+<dbReference type="PDB" id="2JZH">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=154-323"/>
+</dbReference>
+<dbReference type="PDB" id="2JZN">
+<property type="method" value="NMR"/>
+<property type="chains" value="A/B=2-134, C=159-323"/>
+</dbReference>
+<dbReference type="PDB" id="2JZO">
+<property type="method" value="NMR"/>
+<property type="chains" value="A/B=2-134, D=159-323"/>
+</dbReference>
+<dbReference type="PDBsum" id="1PDO"/>
+<dbReference type="PDBsum" id="1VRC"/>
+<dbReference type="PDBsum" id="1VSQ"/>
+<dbReference type="PDBsum" id="2JZH"/>
+<dbReference type="PDBsum" id="2JZN"/>
+<dbReference type="PDBsum" id="2JZO"/>
+<dbReference type="ProteinModelPortal" id="P69797"/>
+<dbReference type="SMR" id="P69797"/>
+<dbReference type="BioGrid" id="4259144">
+<property type="interactions" value="308"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-35846N"/>
+<dbReference type="IntAct" id="P69797">
+<property type="interactions" value="15"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-1228428"/>
+<dbReference type="STRING" id="316385.ECDH10B_1955"/>
+<dbReference type="TCDB" id="4.A.6.1.1">
+<property type="family name" value="the pts mannose-fructose-sorbose (man) family"/>
+</dbReference>
+<dbReference type="iPTMnet" id="P69797"/>
+<dbReference type="SWISS-2DPAGE" id="P69797"/>
+<dbReference type="EPD" id="P69797"/>
+<dbReference type="PaxDb" id="P69797"/>
+<dbReference type="PRIDE" id="P69797"/>
+<dbReference type="EnsemblBacteria" id="AAC74887">
+<property type="protein sequence ID" value="AAC74887"/>
+<property type="gene ID" value="b1817"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15624">
+<property type="protein sequence ID" value="BAA15624"/>
+<property type="gene ID" value="BAA15624"/>
+</dbReference>
+<dbReference type="GeneID" id="946334"/>
+<dbReference type="KEGG" id="ecj:JW1806"/>
+<dbReference type="KEGG" id="eco:b1817"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.434"/>
+<dbReference type="EchoBASE" id="EB0562"/>
+<dbReference type="EcoGene" id="EG10567">
+<property type="gene designation" value="manX"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105DAS">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG2893">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG3444">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000140047"/>
+<dbReference type="InParanoid" id="P69797"/>
+<dbReference type="KO" id="K02793"/>
+<dbReference type="KO" id="K02794"/>
+<dbReference type="PhylomeDB" id="P69797"/>
+<dbReference type="BioCyc" id="EcoCyc:MANX-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:MANX-MONOMER"/>
+<dbReference type="EvolutionaryTrace" id="P69797"/>
+<dbReference type="PRO" id="PR:P69797"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005737">
+<property type="term" value="C:cytoplasm"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005887">
+<property type="term" value="C:integral component of plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016020">
+<property type="term" value="C:membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016301">
+<property type="term" value="F:kinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0022870">
+<property type="term" value="F:protein-N(PI)-phosphohistidine-mannose phosphotransferase system transporter activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0098708">
+<property type="term" value="P:glucose import across plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0015761">
+<property type="term" value="P:mannose transport"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009401">
+<property type="term" value="P:phosphoenolpyruvate-dependent sugar phosphotransferase system"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="CDD" id="cd00006">
+<property type="entry name" value="PTS_IIA_man"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="CDD" id="cd00001">
+<property type="entry name" value="PTS_IIB_man"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.40.35.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.40.50.510">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR013789">
+<property type="entry name" value="PTS_EIIA_man"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR004701">
+<property type="entry name" value="PTS_EIIA_man-typ"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036662">
+<property type="entry name" value="PTS_EIIA_man-typ_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR033887">
+<property type="entry name" value="PTS_IIA_man"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR004720">
+<property type="entry name" value="PTS_IIB_sorbose-sp"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036667">
+<property type="entry name" value="PTS_IIB_sorbose-sp_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR018455">
+<property type="entry name" value="PTS_IIB_sorbose-sp_subgr"/>
+</dbReference>
+<dbReference type="Pfam" id="PF03610">
+<property type="entry name" value="EIIA-man"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF03830">
+<property type="entry name" value="PTSIIB_sorb"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF52728">
+<property type="entry name" value="SSF52728"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF53062">
+<property type="entry name" value="SSF53062"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00824">
+<property type="entry name" value="EIIA-man"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00854">
+<property type="entry name" value="pts-sorbose"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51096">
+<property type="entry name" value="PTS_EIIA_TYPE_4"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51101">
+<property type="entry name" value="PTS_EIIB_TYPE_4"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0007">Acetylation</keyword>
+<keyword id="KW-0997">Cell inner membrane</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0963">Cytoplasm</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-0597">Phosphoprotein</keyword>
+<keyword id="KW-0598">Phosphotransferase system</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0762">Sugar transport</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="initiator methionine" description="Removed" evidence="15 23">
+<location>
+<position position="1"/>
+</location>
+</feature>
+<feature type="chain" description="PTS system mannose-specific EIIAB component" id="PRO_0000186653">
+<location>
+<begin position="2"/>
+<end position="323"/>
+</location>
+</feature>
+<feature type="domain" description="PTS EIIA type-4" evidence="3 21 25">
+<location>
+<begin position="2"/>
+<end position="124"/>
+</location>
+</feature>
+<feature type="domain" description="PTS EIIB type-4" evidence="4 21">
+<location>
+<begin position="157"/>
+<end position="320"/>
+</location>
+</feature>
+<feature type="region of interest" description="Hinge" evidence="22">
+<location>
+<begin position="137"/>
+<end position="155"/>
+</location>
+</feature>
+<feature type="active site" description="Tele-phosphohistidine intermediate; for EIIA activity" evidence="3 20 21 24 25">
+<location>
+<position position="10"/>
+</location>
+</feature>
+<feature type="active site" description="Pros-phosphohistidine intermediate; for EIIB activity" evidence="21 24">
+<location>
+<position position="175"/>
+</location>
+</feature>
+<feature type="site" description="Involved in the phosphoryl transfer between H-10 and H-175" evidence="24">
+<location>
+<position position="89"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphohistidine; by HPr" evidence="22 24">
+<location>
+<position position="10"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="8">
+<location>
+<position position="55"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphohistidine; by EIIA" evidence="4 24">
+<location>
+<position position="175"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="8">
+<location>
+<position position="234"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Loss of phosphotransferase activity. Unable to dimerize." evidence="14">
+<original>H</original>
+<variation>C</variation>
+<location>
+<position position="10"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Results in the formation of a single complex corresponding to the productive phosphoryl transfer complex." evidence="7">
+<original>H</original>
+<variation>E</variation>
+<location>
+<position position="10"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Slight phosphotransferase activity. Unable to dimerize." evidence="14">
+<original>W</original>
+<variation>F</variation>
+<location>
+<position position="12"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Retains more than 50% of phosphotransferase activity." evidence="14">
+<original>K</original>
+<variation>C</variation>
+<location>
+<position position="48"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Slight phosphotransferase activity. Unable to dimerize." evidence="14">
+<original>S</original>
+<variation>C</variation>
+<location>
+<position position="72"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Loss of phosphotransferase activity." evidence="14">
+<original>H</original>
+<variation>N</variation>
+<location>
+<position position="86"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Retains more than 50% of phosphotransferase activity." evidence="14">
+<original>S</original>
+<variation>C</variation>
+<location>
+<position position="110"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Loss of phosphotransferase activity." evidence="14">
+<original>H</original>
+<variation>C</variation>
+<location>
+<position position="175"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Slight phosphotransferase activity." evidence="14">
+<original>H</original>
+<variation>Q</variation>
+<location>
+<position position="219"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24110." ref="1" evidence="19">
+<original>TIAIVIGTHGWAAEQLLKTAEM</original>
+<variation>GWGCRAGCLKRQKW</variation>
+<location>
+<begin position="2"/>
+<end position="23"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24110." ref="1" evidence="19">
+<original>D</original>
+<variation>N</variation>
+<location>
+<position position="35"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24110." ref="1" evidence="19">
+<original>T</original>
+<variation>R</variation>
+<location>
+<position position="101"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24110." ref="1" evidence="19">
+<original>A</original>
+<variation>G</variation>
+<location>
+<position position="142"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="4"/>
+<end position="8"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="13"/>
+<end position="25"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="29"/>
+<end position="34"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="42"/>
+<end position="53"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="62"/>
+<end position="68"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="72"/>
+<end position="81"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="87"/>
+<end position="92"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="95"/>
+<end position="105"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="111"/>
+<end position="124"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="163"/>
+<end position="170"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="178"/>
+<end position="185"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="189"/>
+<end position="194"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="196"/>
+<end position="199"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="202"/>
+<end position="210"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="217"/>
+<end position="221"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="223"/>
+<end position="230"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="233"/>
+<end position="235"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="239"/>
+<end position="246"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="247"/>
+<end position="255"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="261"/>
+<end position="267"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="274"/>
+<end position="276"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="278"/>
+<end position="280"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="285"/>
+<end position="296"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="300"/>
+<end position="303"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="314"/>
+<end position="319"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1PDO"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1VSQ"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU00419"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU00424"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="15788390"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="16079137"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18270202"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18723842"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="2681202"/>
+</source>
+</evidence>
+<evidence key="10" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="2951378"/>
+</source>
+</evidence>
+<evidence key="11" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="2999119"/>
+</source>
+</evidence>
+<evidence key="12" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="353494"/>
+</source>
+</evidence>
+<evidence key="13" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="4604906"/>
+</source>
+</evidence>
+<evidence key="14" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8262947"/>
+</source>
+</evidence>
+<evidence key="15" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="9298646"/>
+</source>
+</evidence>
+<evidence key="16" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="2951378"/>
+</source>
+</evidence>
+<evidence key="17" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="8262947"/>
+</source>
+</evidence>
+<evidence key="18" type="ECO:0000303">
+<source ref="1"/>
+</evidence>
+<evidence key="19" type="ECO:0000305"/>
+<evidence key="20" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="15788390"/>
+</source>
+</evidence>
+<evidence key="21" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="18270202"/>
+</source>
+</evidence>
+<evidence key="22" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="2681202"/>
+</source>
+</evidence>
+<evidence key="23" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="2951378"/>
+</source>
+</evidence>
+<evidence key="24" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="8262947"/>
+</source>
+</evidence>
+<evidence key="25" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="8676384"/>
+</source>
+</evidence>
+<sequence length="323" mass="35048" checksum="A446B79421B8C040" modified="2007-01-23" version="2">
+MTIAIVIGTHGWAAEQLLKTAEMLLGEQENVGWIDFVPGENAETLIEKYNAQLAKLDTTK
+GVLFLVDTWGGSPFNAASRIVVDKEHYEVIAGVNIPMLVETLMARDDDPSFDELVALAVE
+TGREGVKALKAKPVEKAAPAPAAAAPKAAPTPAKPMGPNDYMVIGLARIDDRLIHGQVAT
+RWTKETNVSRIIVVSDEVAADTVRKTLLTQVAPPGVTAHVVDVAKMIRVYNNPKYAGERV
+MLLFTNPTDVERLVEGGVKITSVNVGGMAFRQGKTQVNNAVSVDEKDIEAFKKLNARGIE
+LEVRKVSTDPKLKMMDLISKIDK
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

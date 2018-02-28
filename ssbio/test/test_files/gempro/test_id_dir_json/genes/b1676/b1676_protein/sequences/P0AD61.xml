@@ -1,0 +1,970 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="2005-12-06" modified="2018-01-31" version="115">
+<accession>P0AD61</accession>
+<accession>P14178</accession>
+<accession>P76921</accession>
+<accession>P78165</accession>
+<accession>P78231</accession>
+<name>KPYK1_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Pyruvate kinase I</fullName>
+<ecNumber>2.7.1.40</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName>PK-1</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary">pykF</name>
+<name type="ordered locus">b1676</name>
+<name type="ordered locus">JW1666</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1989" name="Proc. Natl. Acad. Sci. U.S.A." volume="86" first="6883" last="6887">
+<title>Direct genomic sequencing of bacterial DNA: the pyruvate kinase I gene of Escherichia coli.</title>
+<authorList>
+<person name="Ohara O."/>
+<person name="Dorit R.L."/>
+<person name="Gilbert W."/>
+</authorList>
+<dbReference type="PubMed" id="2674937"/>
+<dbReference type="DOI" id="10.1073/pnas.86.18.6883"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1997" name="J. Bacteriol." volume="179" first="1105" last="1111">
+<title>Analysis of the boundaries of Salmonella pathogenicity island 2 and the corresponding chromosomal region of Escherichia coli K-12.</title>
+<authorList>
+<person name="Hensel M."/>
+<person name="Shea J.E."/>
+<person name="Baeumler A.J."/>
+<person name="Gleeson C."/>
+<person name="Blattner F.R."/>
+<person name="Holden D.W."/>
+</authorList>
+<dbReference type="PubMed" id="9023191"/>
+<dbReference type="DOI" id="10.1128/jb.179.4.1105-1111.1997"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="363" last="377">
+<title>A 570-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 28.0-40.1 min region on the linkage map.</title>
+<authorList>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kasai H."/>
+<person name="Kashimoto K."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Takeuchi Y."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097039"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.363"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<scope>SEQUENCE REVISION TO 451-470</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1991" name="Biol. Chem. Hoppe-Seyler" volume="372" first="91" last="93">
+<title>Bacterial pyruvate kinases have a shorter N-terminal domain.</title>
+<authorList>
+<person name="Valentini G."/>
+<person name="Stoppini M."/>
+<person name="Speranza M.L."/>
+<person name="Malcovati M."/>
+<person name="Ferri G."/>
+</authorList>
+<dbReference type="PubMed" id="1859631"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 1-48</scope>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1259" last="1313">
+<title>Comparing the predicted and observed properties of proteins encoded in the genome of Escherichia coli K-12.</title>
+<authorList>
+<person name="Link A.J."/>
+<person name="Robison K."/>
+<person name="Church G.M."/>
+</authorList>
+<dbReference type="PubMed" id="9298646"/>
+<dbReference type="DOI" id="10.1002/elps.1150180807"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 1-11</scope>
+<source>
+<strain>K12 / EMG2</strain>
+</source>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1989" name="Biol. Chem. Hoppe-Seyler" volume="370" first="211" last="216">
+<title>Primary structure of three peptides at the catalytic and allosteric sites of the fructose-1,6-bisphosphate-activated pyruvate kinase from Escherichia coli.</title>
+<authorList>
+<person name="Speranza M.L."/>
+<person name="Valentini G."/>
+<person name="Iadarola P."/>
+<person name="Stoppini M."/>
+<person name="Malcovati M."/>
+<person name="Ferri G."/>
+</authorList>
+<dbReference type="PubMed" id="2653362"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 293-319; 369-385 AND 389-404</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1243" last="1251">
+<title>Escherichia coli proteome analysis using the gene-protein database.</title>
+<authorList>
+<person name="VanBogelen R.A."/>
+<person name="Abshire K.Z."/>
+<person name="Moldover B."/>
+<person name="Olson E.R."/>
+<person name="Neidhardt F.C."/>
+</authorList>
+<dbReference type="PubMed" id="9298644"/>
+<dbReference type="DOI" id="10.1002/elps.1150180805"/>
+</citation>
+<scope>IDENTIFICATION BY 2D-GEL</scope>
+</reference>
+<reference key="10">
+<citation type="journal article" date="2009" name="Mol. Cell. Proteomics" volume="8" first="215" last="225">
+<title>Lysine acetylation is a highly abundant and evolutionarily conserved modification in Escherichia coli.</title>
+<authorList>
+<person name="Zhang J."/>
+<person name="Sprung R."/>
+<person name="Pei J."/>
+<person name="Tan X."/>
+<person name="Kim S."/>
+<person name="Zhu H."/>
+<person name="Liu C.F."/>
+<person name="Grishin N.V."/>
+<person name="Zhao Y."/>
+</authorList>
+<dbReference type="PubMed" id="18723842"/>
+<dbReference type="DOI" id="10.1074/mcp.M800187-MCP200"/>
+</citation>
+<scope>ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-76 AND LYS-319</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY</scope>
+<source>
+<strain>K12 / JW1106</strain>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="11">
+<citation type="journal article" date="1995" name="Structure" volume="3" first="729" last="741">
+<title>Crystal structure of Escherichia coli pyruvate kinase type I: molecular basis of the allosteric transition.</title>
+<authorList>
+<person name="Mattevi A."/>
+<person name="Valentini G."/>
+<person name="Rizzi M."/>
+<person name="Speranza M.L."/>
+<person name="Bolognesi M."/>
+<person name="Coda A."/>
+</authorList>
+<dbReference type="PubMed" id="8591049"/>
+<dbReference type="DOI" id="10.1016/S0969-2126(01)00207-6"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.5 ANGSTROMS)</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="2000" name="J. Biol. Chem." volume="275" first="18145" last="18152">
+<title>The allosteric regulation of pyruvate kinase.</title>
+<authorList>
+<person name="Valentini G."/>
+<person name="Chiarelli L."/>
+<person name="Fortin R."/>
+<person name="Speranza M.L."/>
+<person name="Galizzi A."/>
+<person name="Mattevi A."/>
+</authorList>
+<dbReference type="PubMed" id="10751408"/>
+<dbReference type="DOI" id="10.1074/jbc.M001870200"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.8 ANGSTROMS)</scope>
+</reference>
+<comment type="catalytic activity">
+<text>ATP + pyruvate = ADP + phosphoenolpyruvate.</text>
+</comment>
+<comment type="cofactor">
+<cofactor>
+<name>Mg(2+)</name>
+<dbReference type="ChEBI" id="CHEBI:18420"/>
+</cofactor>
+</comment>
+<comment type="cofactor">
+<cofactor>
+<name>K(+)</name>
+<dbReference type="ChEBI" id="CHEBI:29103"/>
+</cofactor>
+</comment>
+<comment type="enzyme regulation">
+<text>Belongs to type I PK; fructose 1,6-bisphosphate-activated.</text>
+</comment>
+<comment type="pathway">
+<text>Carbohydrate degradation; glycolysis; pyruvate from D-glyceraldehyde 3-phosphate: step 5/5.</text>
+</comment>
+<comment type="subunit">
+<text>Homotetramer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-909449"/>
+<interactant intactId="EBI-909449"/>
+<organismsDiffer>false</organismsDiffer>
+<experiments>2</experiments>
+</comment>
+<comment type="similarity">
+<text evidence="5">Belongs to the pyruvate kinase family.</text>
+</comment>
+<dbReference type="EC" id="2.7.1.40"/>
+<dbReference type="EMBL" id="M24636">
+<property type="protein sequence ID" value="AAA24392.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U68703">
+<property type="protein sequence ID" value="AAB47952.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74746.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15445.2"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="D64925">
+<property type="entry name" value="D64925"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416191.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_001295403.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1E0T">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.80"/>
+<property type="chains" value="A/B/C/D=1-470"/>
+</dbReference>
+<dbReference type="PDB" id="1E0U">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.80"/>
+<property type="chains" value="A/B/C/D=1-470"/>
+</dbReference>
+<dbReference type="PDB" id="1PKY">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="A/B/C/D=1-470"/>
+</dbReference>
+<dbReference type="PDB" id="4YNG">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.28"/>
+<property type="chains" value="A/B/C/D/E/F/G/H=1-470"/>
+</dbReference>
+<dbReference type="PDBsum" id="1E0T"/>
+<dbReference type="PDBsum" id="1E0U"/>
+<dbReference type="PDBsum" id="1PKY"/>
+<dbReference type="PDBsum" id="4YNG"/>
+<dbReference type="ProteinModelPortal" id="P0AD61"/>
+<dbReference type="SMR" id="P0AD61"/>
+<dbReference type="BioGrid" id="4260275">
+<property type="interactions" value="18"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-36221N"/>
+<dbReference type="IntAct" id="P0AD61">
+<property type="interactions" value="21"/>
+</dbReference>
+<dbReference type="STRING" id="316385.ECDH10B_1810"/>
+<dbReference type="iPTMnet" id="P0AD61"/>
+<dbReference type="SWISS-2DPAGE" id="P0AD61"/>
+<dbReference type="EPD" id="P0AD61"/>
+<dbReference type="PaxDb" id="P0AD61"/>
+<dbReference type="PRIDE" id="P0AD61"/>
+<dbReference type="EnsemblBacteria" id="AAC74746">
+<property type="protein sequence ID" value="AAC74746"/>
+<property type="gene ID" value="b1676"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15445">
+<property type="protein sequence ID" value="BAA15445"/>
+<property type="gene ID" value="BAA15445"/>
+</dbReference>
+<dbReference type="GeneID" id="946179"/>
+<dbReference type="KEGG" id="ecj:JW1666"/>
+<dbReference type="KEGG" id="eco:b1676"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.582"/>
+<dbReference type="EchoBASE" id="EB0797"/>
+<dbReference type="EcoGene" id="EG10804">
+<property type="gene designation" value="pykF"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105CA9">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0469">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000021559"/>
+<dbReference type="InParanoid" id="P0AD61"/>
+<dbReference type="KO" id="K00873"/>
+<dbReference type="PhylomeDB" id="P0AD61"/>
+<dbReference type="BioCyc" id="EcoCyc:PKI-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:PKI-MONOMER"/>
+<dbReference type="SABIO-RK" id="P0AD61"/>
+<dbReference type="UniPathway" id="UPA00109">
+<property type="reaction ID" value="UER00188"/>
+</dbReference>
+<dbReference type="EvolutionaryTrace" id="P0AD61"/>
+<dbReference type="PRO" id="PR:P0AD61"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016020">
+<property type="term" value="C:membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005524">
+<property type="term" value="F:ATP binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042802">
+<property type="term" value="F:identical protein binding"/>
+<property type="evidence" value="ECO:0000353"/>
+<property type="project" value="IntAct"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016301">
+<property type="term" value="F:kinase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0000287">
+<property type="term" value="F:magnesium ion binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0030955">
+<property type="term" value="F:potassium ion binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004743">
+<property type="term" value="F:pyruvate kinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0051289">
+<property type="term" value="P:protein homotetramerization"/>
+<property type="evidence" value="ECO:0000353"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009408">
+<property type="term" value="P:response to heat"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="CDD" id="cd00288">
+<property type="entry name" value="Pyruvate_Kinase"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.40.1380.20">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001697">
+<property type="entry name" value="Pyr_Knase"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015813">
+<property type="entry name" value="Pyrv/PenolPyrv_Kinase-like_dom"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR011037">
+<property type="entry name" value="Pyrv_Knase-like_insert_dom_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR018209">
+<property type="entry name" value="Pyrv_Knase_AS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015793">
+<property type="entry name" value="Pyrv_Knase_brl"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015795">
+<property type="entry name" value="Pyrv_Knase_C"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036918">
+<property type="entry name" value="Pyrv_Knase_C_sf"/>
+</dbReference>
+<dbReference type="PANTHER" id="PTHR11817">
+<property type="entry name" value="PTHR11817"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00224">
+<property type="entry name" value="PK"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF02887">
+<property type="entry name" value="PK_C"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PRINTS" id="PR01050">
+<property type="entry name" value="PYRUVTKNASE"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF50800">
+<property type="entry name" value="SSF50800"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF51621">
+<property type="entry name" value="SSF51621"/>
+<property type="match status" value="2"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF52935">
+<property type="entry name" value="SSF52935"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR01064">
+<property type="entry name" value="pyruv_kin"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00110">
+<property type="entry name" value="PYRUVATE_KINASE"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0007">Acetylation</keyword>
+<keyword id="KW-0021">Allosteric enzyme</keyword>
+<keyword id="KW-0067">ATP-binding</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0324">Glycolysis</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0460">Magnesium</keyword>
+<keyword id="KW-0479">Metal-binding</keyword>
+<keyword id="KW-0547">Nucleotide-binding</keyword>
+<keyword id="KW-0630">Potassium</keyword>
+<keyword id="KW-0670">Pyruvate</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<feature type="chain" description="Pyruvate kinase I" id="PRO_0000112069">
+<location>
+<begin position="1"/>
+<end position="470"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium" evidence="3">
+<location>
+<position position="34"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium" evidence="3">
+<location>
+<position position="36"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium" evidence="3">
+<location>
+<position position="66"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="3">
+<location>
+<position position="67"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="3">
+<location>
+<position position="222"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="3">
+<location>
+<position position="246"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate" evidence="3">
+<location>
+<position position="32"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate; via amide nitrogen" evidence="3">
+<location>
+<position position="245"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate; via amide nitrogen" evidence="3">
+<location>
+<position position="246"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate" evidence="3">
+<location>
+<position position="278"/>
+</location>
+</feature>
+<feature type="site" description="Transition state stabilizer" evidence="3">
+<location>
+<position position="220"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="4">
+<location>
+<position position="76"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="4">
+<location>
+<position position="319"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 6; AA sequence." ref="6" evidence="5">
+<original>G</original>
+<variation>S</variation>
+<location>
+<position position="44"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 8; AA sequence." ref="8" evidence="5">
+<original>Q</original>
+<variation>N</variation>
+<location>
+<position position="379"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 8; AA sequence." ref="8" evidence="5">
+<original>T</original>
+<variation>D</variation>
+<location>
+<position position="401"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1 and 3." ref="1 3" evidence="5">
+<original>MVSGALVPSGTTNTASVHVL</original>
+<variation>YGFWCTGTERHY</variation>
+<location>
+<begin position="451"/>
+<end position="470"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="4"/>
+<end position="9"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="12"/>
+<end position="14"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="17"/>
+<end position="26"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="28"/>
+<end position="34"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="40"/>
+<end position="57"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="62"/>
+<end position="66"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="72"/>
+<end position="74"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="78"/>
+<end position="80"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="83"/>
+<end position="85"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="90"/>
+<end position="95"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="105"/>
+<end position="109"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="113"/>
+<end position="116"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="122"/>
+<end position="125"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="126"/>
+<end position="129"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="130"/>
+<end position="138"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="141"/>
+<end position="146"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="150"/>
+<end position="152"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="157"/>
+<end position="159"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="172"/>
+<end position="184"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="187"/>
+<end position="193"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="197"/>
+<end position="208"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="209"/>
+<end position="211"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="216"/>
+<end position="221"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="224"/>
+<end position="228"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="230"/>
+<end position="236"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="237"/>
+<end position="243"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="244"/>
+<end position="250"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="253"/>
+<end position="270"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="273"/>
+<end position="277"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="278"/>
+<end position="281"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="282"/>
+<end position="285"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="292"/>
+<end position="304"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="307"/>
+<end position="311"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="313"/>
+<end position="316"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="322"/>
+<end position="336"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="355"/>
+<end position="368"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="372"/>
+<end position="377"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="379"/>
+<end position="381"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="382"/>
+<end position="388"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="393"/>
+<end position="401"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="403"/>
+<end position="408"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="409"/>
+<end position="411"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="415"/>
+<end position="419"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="426"/>
+<end position="439"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="441"/>
+<end position="443"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="448"/>
+<end position="453"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="455"/>
+<end position="457"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="464"/>
+<end position="469"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1E0T"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1PKY"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000250"/>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18723842"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000305"/>
+<sequence length="470" mass="50729" checksum="E29BF01B90327D8B" modified="2005-12-06" version="1">
+MKKTKIVCTIGPKTESEEMLAKMLDAGMNVMRLNFSHGDYAEHGQRIQNLRNVMSKTGKT
+AAILLDTKGPEIRTMKLEGGNDVSLKAGQTFTFTTDKSVIGNSEMVAVTYEGFTTDLSVG
+NTVLVDDGLIGMEVTAIEGNKVICKVLNNGDLGENKGVNLPGVSIALPALAEKDKQDLIF
+GCEQGVDFVAASFIRKRSDVIEIREHLKAHGGENIHIISKIENQEGLNNFDEILEASDGI
+MVARGDLGVEIPVEEVIFAQKMMIEKCIRARKVVITATQMLDSMIKNPRPTRAEAGDVAN
+AILDGTDAVMLSGESAKGKYPLEAVSIMATICERTDRVMNSRLEFNNDNRKLRITEAVCR
+GAVETAEKLDAPLIVVATQGGKSARAVRKYFPDATILALTTNEKTAHQLVLSKGVVPQLV
+KEITSTDDFYRLGKELALQSGLAHKGDVVVMVSGALVPSGTTNTASVHVL
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

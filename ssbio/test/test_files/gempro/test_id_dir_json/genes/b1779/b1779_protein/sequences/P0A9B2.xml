@@ -1,0 +1,1293 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-04-01" modified="2018-01-31" version="122">
+<accession>P0A9B2</accession>
+<accession>P06977</accession>
+<name>G3P1_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName evidence="13">Glyceraldehyde-3-phosphate dehydrogenase A</fullName>
+<shortName evidence="13">GAPDH-A</shortName>
+<ecNumber evidence="8">1.2.1.12</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName evidence="13">NAD-dependent glyceraldehyde-3-phosphate dehydrogenase</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary" evidence="13">gapA</name>
+<name type="ordered locus">b1779</name>
+<name type="ordered locus">JW1768</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1985" name="Eur. J. Biochem." volume="150" first="61" last="66">
+<title>Nucleotide sequence of the Escherichia coli gap gene. Different evolutionary behavior of the NAD+-binding domain and of the catalytic domain of D-glyceraldehyde-3-phosphate dehydrogenase.</title>
+<authorList>
+<person name="Branlant G."/>
+<person name="Branlant C."/>
+</authorList>
+<dbReference type="PubMed" id="2990926"/>
+<dbReference type="DOI" id="10.1111/j.1432-1033.1985.tb08988.x"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="2">
+<citation type="submission" date="1990-09" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Nelson K."/>
+</authorList>
+</citation>
+<scope>SEQUENCE REVISION TO 295-300</scope>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="363" last="377">
+<title>A 570-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 28.0-40.1 min region on the linkage map.</title>
+<authorList>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kasai H."/>
+<person name="Kashimoto K."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Takeuchi Y."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097039"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.363"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="submission" date="1994-09" db="UniProtKB">
+<authorList>
+<person name="Pasquali C."/>
+<person name="Sanchez J.-C."/>
+<person name="Ravier F."/>
+<person name="Golaz O."/>
+<person name="Hughes G.J."/>
+<person name="Frutiger S."/>
+<person name="Paquet N."/>
+<person name="Wilkins M."/>
+<person name="Appel R.D."/>
+<person name="Bairoch A."/>
+<person name="Hochstrasser D.F."/>
+</authorList>
+</citation>
+<scope>PROTEIN SEQUENCE OF 2-13</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1259" last="1313">
+<title>Comparing the predicted and observed properties of proteins encoded in the genome of Escherichia coli K-12.</title>
+<authorList>
+<person name="Link A.J."/>
+<person name="Robison K."/>
+<person name="Church G.M."/>
+</authorList>
+<dbReference type="PubMed" id="9298646"/>
+<dbReference type="DOI" id="10.1002/elps.1150180807"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 2-13</scope>
+<source>
+<strain>K12 / EMG2</strain>
+</source>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1991" name="Proc. Natl. Acad. Sci. U.S.A." volume="88" first="6667" last="6671">
+<title>Nucleotide polymorphism and evolution in the glyceraldehyde-3-phosphate dehydrogenase gene (gapA) in natural populations of Salmonella and Escherichia coli.</title>
+<authorList>
+<person name="Nelson K."/>
+<person name="Whittam T.S."/>
+<person name="Selander R.K."/>
+</authorList>
+<dbReference type="PubMed" id="1862091"/>
+<dbReference type="DOI" id="10.1073/pnas.88.15.6667"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 7-314</scope>
+<source>
+<strain>A8190</strain>
+<strain>E2666-74</strain>
+<strain>E3406</strain>
+<strain>E830587</strain>
+<strain>E851819</strain>
+<strain>ECOR 14</strain>
+<strain>ECOR 32</strain>
+<strain>ECOR 40</strain>
+<strain>ECOR 52</strain>
+<strain>ECOR 58</strain>
+<strain>ECOR 64</strain>
+<strain>ECOR 70</strain>
+</source>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1994" name="Genetics" volume="138" first="993" last="1003">
+<title>Detecting selective sweeps in naturally occurring Escherichia coli.</title>
+<authorList>
+<person name="Guttman D.S."/>
+<person name="Dykhuizen D.E."/>
+</authorList>
+<dbReference type="PubMed" id="7896119"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 10-321</scope>
+<source>
+<strain>ECOR 10</strain>
+<strain>ECOR 16</strain>
+<strain>ECOR 38</strain>
+<strain>ECOR 39</strain>
+<strain>ECOR 4</strain>
+<strain>ECOR 40</strain>
+<strain>ECOR 49</strain>
+<strain>ECOR 65</strain>
+<strain>ECOR 68</strain>
+<strain>ECOR 8</strain>
+<strain>O2:HN / ECOR 50 / P97 / UPEC</strain>
+</source>
+</reference>
+<reference key="10">
+<citation type="journal article" date="1990" name="J. Mol. Evol." volume="31" first="383" last="388">
+<title>A naturally occurring horizontal gene transfer from a eukaryote to a prokaryote.</title>
+<authorList>
+<person name="Doolittle R.F."/>
+<person name="Feng D.F."/>
+<person name="Anderson K.L."/>
+<person name="Alberro M.R."/>
+</authorList>
+<dbReference type="PubMed" id="2124629"/>
+<dbReference type="DOI" id="10.1007/BF02106053"/>
+</citation>
+<scope>GENE TRANSFER DISCUSSION</scope>
+</reference>
+<reference key="11">
+<citation type="journal article" date="1989" name="Biochemistry" volume="28" first="2586" last="2592">
+<title>Role of the histidine 176 residue in glyceraldehyde-3-phosphate dehydrogenase as probed by site-directed mutagenesis.</title>
+<authorList>
+<person name="Soukri A."/>
+<person name="Mougin A."/>
+<person name="Corbier C."/>
+<person name="Wonacott A."/>
+<person name="Branlant C."/>
+<person name="Branlant G."/>
+</authorList>
+<dbReference type="PubMed" id="2659073"/>
+<dbReference type="DOI" id="10.1021/bi00432a036"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>BIOPHYSICOCHEMICAL PROPERTIES</scope>
+<scope>MUTAGENESIS OF HIS-177</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1243" last="1251">
+<title>Escherichia coli proteome analysis using the gene-protein database.</title>
+<authorList>
+<person name="VanBogelen R.A."/>
+<person name="Abshire K.Z."/>
+<person name="Moldover B."/>
+<person name="Olson E.R."/>
+<person name="Neidhardt F.C."/>
+</authorList>
+<dbReference type="PubMed" id="9298644"/>
+<dbReference type="DOI" id="10.1002/elps.1150180805"/>
+</citation>
+<scope>IDENTIFICATION BY 2D-GEL</scope>
+</reference>
+<reference key="13">
+<citation type="journal article" date="2009" name="Mol. Cell. Proteomics" volume="8" first="215" last="225">
+<title>Lysine acetylation is a highly abundant and evolutionarily conserved modification in Escherichia coli.</title>
+<authorList>
+<person name="Zhang J."/>
+<person name="Sprung R."/>
+<person name="Pei J."/>
+<person name="Tan X."/>
+<person name="Kim S."/>
+<person name="Zhu H."/>
+<person name="Liu C.F."/>
+<person name="Grishin N.V."/>
+<person name="Zhao Y."/>
+</authorList>
+<dbReference type="PubMed" id="18723842"/>
+<dbReference type="DOI" id="10.1074/mcp.M800187-MCP200"/>
+</citation>
+<scope>ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-132; LYS-138; LYS-192 AND LYS-249</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY</scope>
+<source>
+<strain>K12 / JW1106</strain>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="14">
+<citation type="journal article" date="2011" name="Mol. Cell. Proteomics" volume="10" first="M111.012658.01" last="M111.012658.12">
+<title>The first identification of lysine malonylation substrates and its regulatory enzyme.</title>
+<authorList>
+<person name="Peng C."/>
+<person name="Lu Z."/>
+<person name="Xie Z."/>
+<person name="Cheng Z."/>
+<person name="Chen Y."/>
+<person name="Tan M."/>
+<person name="Luo H."/>
+<person name="Zhang Y."/>
+<person name="He W."/>
+<person name="Yang K."/>
+<person name="Zwaans B.M."/>
+<person name="Tishkoff D."/>
+<person name="Ho L."/>
+<person name="Lombard D."/>
+<person name="He T.C."/>
+<person name="Dai J."/>
+<person name="Verdin E."/>
+<person name="Ye Y."/>
+<person name="Zhao Y."/>
+</authorList>
+<dbReference type="PubMed" id="21908771"/>
+<dbReference type="DOI" id="10.1074/mcp.M111.012658"/>
+</citation>
+<scope>MALONYLATION AT LYS-331</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="15">
+<citation type="journal article" date="2011" name="Nat. Chem. Biol." volume="7" first="58" last="63">
+<title>Identification of lysine succinylation as a new post-translational modification.</title>
+<authorList>
+<person name="Zhang Z."/>
+<person name="Tan M."/>
+<person name="Xie Z."/>
+<person name="Dai L."/>
+<person name="Chen Y."/>
+<person name="Zhao Y."/>
+</authorList>
+<dbReference type="PubMed" id="21151122"/>
+<dbReference type="DOI" id="10.1038/nchembio.495"/>
+</citation>
+<scope>SUCCINYLATION AT LYS-115; LYS-124; LYS-132; LYS-192; LYS-213; LYS-217; LYS-225; LYS-249; LYS-257; LYS-261 AND LYS-331</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="16">
+<citation type="journal article" date="1996" name="J. Mol. Biol." volume="257" first="814" last="838">
+<title>Comparison of the structures of wild-type and a N313T mutant of Escherichia coli glyceraldehyde 3-phosphate dehydrogenases: implication for NAD binding and cooperativity.</title>
+<authorList>
+<person name="Duee E."/>
+<person name="Olivier-Deyris L."/>
+<person name="Fanchon E."/>
+<person name="Corbier C."/>
+<person name="Branlant G."/>
+<person name="Dideberg O."/>
+</authorList>
+<dbReference type="PubMed" id="8636984"/>
+<dbReference type="DOI" id="10.1006/jmbi.1996.0204"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.8 ANGSTROMS) OF WILD-TYPE AND THR-313 MUTANT IN COMPLEX WITH NAD</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="17">
+<citation type="journal article" date="2000" name="Biochemistry" volume="39" first="10702" last="10710">
+<title>Structural analysis of glyceraldehyde 3-phosphate dehydrogenase from Escherichia coli: direct evidence of substrate binding and cofactor-induced conformational changes.</title>
+<authorList>
+<person name="Yun M."/>
+<person name="Park C.-G."/>
+<person name="Kim J.-Y."/>
+<person name="Park H.-W."/>
+</authorList>
+<dbReference type="PubMed" id="10978154"/>
+<dbReference type="DOI" id="10.1021/bi9927080"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.0 ANGSTROMS) IN COMPLEX WITH NAD AND GLYCERALDEHYDE 3-PHOSPHATE</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="18">
+<citation type="submission" date="2004-01" db="PDB data bank">
+<title>Crystal structure of MES buffer bound form of glyceraldehyde 3-phosphate dehydrogenase from Escherichia coli.</title>
+<authorList>
+<person name="Shin D.H."/>
+<person name="Thor J."/>
+<person name="Yokota H."/>
+<person name="Kim R."/>
+<person name="Kim S.H."/>
+</authorList>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.04 ANGSTROMS) IN COMPLEX WITH SUBSTRATE ANALOG</scope>
+</reference>
+<reference key="19">
+<citation type="journal article" date="2009" name="J. Biol. Chem." volume="284" first="22703" last="22712">
+<title>Structure of insoluble rat sperm glyceraldehyde-3-phosphate dehydrogenase (GAPDH) via heterotetramer formation with Escherichia coli GAPDH reveals target for contraceptive design.</title>
+<authorList>
+<person name="Frayne J."/>
+<person name="Taylor A."/>
+<person name="Cameron G."/>
+<person name="Hadfield A.T."/>
+</authorList>
+<dbReference type="PubMed" id="19542219"/>
+<dbReference type="DOI" id="10.1074/jbc.M109.004648"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.20 ANGSTROMS) IN COMPLEX WITH NAD AND SUBSTRATE ANALOG</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<comment type="function">
+<text evidence="8">Catalyzes the oxidative phosphorylation of glyceraldehyde 3-phosphate (G3P) to 1,3-bisphosphoglycerate (BPG) using the cofactor NAD. The first reaction step involves the formation of a hemiacetal intermediate between G3P and a cysteine residue, and this hemiacetal intermediate is then oxidized to a thioester, with concomitant reduction of NAD to NADH. The reduced NADH is then exchanged with the second NAD, and the thioester is attacked by a nucleophilic inorganic phosphate to produce BPG.</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="8">D-glyceraldehyde 3-phosphate + phosphate + NAD(+) = 3-phospho-D-glyceroyl phosphate + NADH.</text>
+</comment>
+<comment type="biophysicochemical properties">
+<kinetics>
+<KM evidence="8">15 uM for BPG</KM>
+<KM evidence="8">42 uM for NAD</KM>
+<KM evidence="8">1500 uM for G3P</KM>
+<text>Kcat is 1056 sec(-1) for dehydrogenase activity.</text>
+</kinetics>
+</comment>
+<comment type="pathway" evidence="14">
+<text>Carbohydrate degradation; glycolysis; pyruvate from D-glyceraldehyde 3-phosphate: step 1/5.</text>
+</comment>
+<comment type="subunit">
+<text evidence="3 5 9">Homotetramer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-368904"/>
+<interactant intactId="EBI-546726">
+<id>P0A9H9</id>
+<label>cheZ</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>2</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="14">Cytoplasm</location>
+</subcellularLocation>
+</comment>
+<comment type="similarity">
+<text evidence="14">Belongs to the glyceraldehyde-3-phosphate dehydrogenase family.</text>
+</comment>
+<dbReference type="EC" id="1.2.1.12" evidence="8"/>
+<dbReference type="EMBL" id="X02662">
+<property type="protein sequence ID" value="CAA26498.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74849.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15576.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66870">
+<property type="protein sequence ID" value="AAA23838.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66871">
+<property type="protein sequence ID" value="AAA23839.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66872">
+<property type="protein sequence ID" value="AAA02930.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66873">
+<property type="protein sequence ID" value="AAA23840.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66874">
+<property type="protein sequence ID" value="AAA23841.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66875">
+<property type="protein sequence ID" value="AAA23842.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66876">
+<property type="protein sequence ID" value="AAA23843.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66877">
+<property type="protein sequence ID" value="AAA23844.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66878">
+<property type="protein sequence ID" value="AAA23845.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66879">
+<property type="protein sequence ID" value="AAA23846.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66880">
+<property type="protein sequence ID" value="AAA23847.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66881">
+<property type="protein sequence ID" value="AAA23848.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M66882">
+<property type="protein sequence ID" value="AAA23849.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07750">
+<property type="protein sequence ID" value="AAC43271.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07751">
+<property type="protein sequence ID" value="AAC43272.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07752">
+<property type="protein sequence ID" value="AAC43273.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07754">
+<property type="protein sequence ID" value="AAC43274.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07765">
+<property type="protein sequence ID" value="AAC43284.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07768">
+<property type="protein sequence ID" value="AAC43285.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07769">
+<property type="protein sequence ID" value="AAC43286.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07770">
+<property type="protein sequence ID" value="AAC43287.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07771">
+<property type="protein sequence ID" value="AAC43288.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07772">
+<property type="protein sequence ID" value="AAC43289.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U07773">
+<property type="protein sequence ID" value="AAC43290.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="A25209">
+<property type="entry name" value="DEECG3"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416293.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000153502.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1DC3">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="A/B=2-331"/>
+</dbReference>
+<dbReference type="PDB" id="1DC4">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="A/B=2-331"/>
+</dbReference>
+<dbReference type="PDB" id="1DC5">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.00"/>
+<property type="chains" value="A/B=2-331"/>
+</dbReference>
+<dbReference type="PDB" id="1DC6">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.00"/>
+<property type="chains" value="A/B=2-331"/>
+</dbReference>
+<dbReference type="PDB" id="1GAD">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.80"/>
+<property type="chains" value="O/P=2-331"/>
+</dbReference>
+<dbReference type="PDB" id="1GAE">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.17"/>
+<property type="chains" value="O/P=2-331"/>
+</dbReference>
+<dbReference type="PDB" id="1S7C">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.04"/>
+<property type="chains" value="A=1-331"/>
+</dbReference>
+<dbReference type="PDB" id="2VYN">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.20"/>
+<property type="chains" value="A/B/C=1-331"/>
+</dbReference>
+<dbReference type="PDB" id="2VYV">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.38"/>
+<property type="chains" value="A/B/C=1-331"/>
+</dbReference>
+<dbReference type="PDBsum" id="1DC3"/>
+<dbReference type="PDBsum" id="1DC4"/>
+<dbReference type="PDBsum" id="1DC5"/>
+<dbReference type="PDBsum" id="1DC6"/>
+<dbReference type="PDBsum" id="1GAD"/>
+<dbReference type="PDBsum" id="1GAE"/>
+<dbReference type="PDBsum" id="1S7C"/>
+<dbReference type="PDBsum" id="2VYN"/>
+<dbReference type="PDBsum" id="2VYV"/>
+<dbReference type="ProteinModelPortal" id="P0A9B2"/>
+<dbReference type="SMR" id="P0A9B2"/>
+<dbReference type="BioGrid" id="4260308">
+<property type="interactions" value="24"/>
+</dbReference>
+<dbReference type="BioGrid" id="851992">
+<property type="interactions" value="1"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-31848N"/>
+<dbReference type="IntAct" id="P0A9B2">
+<property type="interactions" value="27"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-1255410"/>
+<dbReference type="STRING" id="316385.ECDH10B_1917"/>
+<dbReference type="DrugBank" id="DB03814">
+<property type="generic name" value="2-(N-Morpholino)-Ethanesulfonic Acid"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB02263">
+<property type="generic name" value="Glyceraldehyde-3-Phosphate"/>
+</dbReference>
+<dbReference type="iPTMnet" id="P0A9B2"/>
+<dbReference type="SWISS-2DPAGE" id="P0A9B2"/>
+<dbReference type="EPD" id="P0A9B2"/>
+<dbReference type="PaxDb" id="P0A9B2"/>
+<dbReference type="PRIDE" id="P0A9B2"/>
+<dbReference type="EnsemblBacteria" id="AAC74849">
+<property type="protein sequence ID" value="AAC74849"/>
+<property type="gene ID" value="b1779"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15576">
+<property type="protein sequence ID" value="BAA15576"/>
+<property type="gene ID" value="BAA15576"/>
+</dbReference>
+<dbReference type="GeneID" id="947679"/>
+<dbReference type="KEGG" id="ecj:JW1768"/>
+<dbReference type="KEGG" id="eco:b1779"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.475"/>
+<dbReference type="EchoBASE" id="EB0362"/>
+<dbReference type="EcoGene" id="EG10367">
+<property type="gene designation" value="gapA"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105C17">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0057">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000071678"/>
+<dbReference type="InParanoid" id="P0A9B2"/>
+<dbReference type="KO" id="K00134"/>
+<dbReference type="PhylomeDB" id="P0A9B2"/>
+<dbReference type="BioCyc" id="EcoCyc:GAPDH-A-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:GAPDH-A-MONOMER"/>
+<dbReference type="BRENDA" id="1.2.1.12">
+<property type="organism ID" value="2026"/>
+</dbReference>
+<dbReference type="SABIO-RK" id="P0A9B2"/>
+<dbReference type="UniPathway" id="UPA00109">
+<property type="reaction ID" value="UER00184"/>
+</dbReference>
+<dbReference type="EvolutionaryTrace" id="P0A9B2"/>
+<dbReference type="PRO" id="PR:P0A9B2"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016020">
+<property type="term" value="C:membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004365">
+<property type="term" value="F:glyceraldehyde-3-phosphate dehydrogenase (NAD+) (phosphorylating) activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0051287">
+<property type="term" value="F:NAD binding"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0050661">
+<property type="term" value="F:NADP binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006006">
+<property type="term" value="P:glucose metabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006096">
+<property type="term" value="P:glycolytic process"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR020831">
+<property type="entry name" value="GlycerAld/Erythrose_P_DH"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR020830">
+<property type="entry name" value="GlycerAld_3-P_DH_AS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR020829">
+<property type="entry name" value="GlycerAld_3-P_DH_cat"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR020828">
+<property type="entry name" value="GlycerAld_3-P_DH_NAD(P)-bd"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR006424">
+<property type="entry name" value="Glyceraldehyde-3-P_DH_1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036291">
+<property type="entry name" value="NAD(P)-bd_dom_sf"/>
+</dbReference>
+<dbReference type="PANTHER" id="PTHR10836">
+<property type="entry name" value="PTHR10836"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF02800">
+<property type="entry name" value="Gp_dh_C"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00044">
+<property type="entry name" value="Gp_dh_N"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF000149">
+<property type="entry name" value="GAP_DH"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PRINTS" id="PR00078">
+<property type="entry name" value="G3PDHDRGNASE"/>
+</dbReference>
+<dbReference type="SMART" id="SM00846">
+<property type="entry name" value="Gp_dh_N"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF51735">
+<property type="entry name" value="SSF51735"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR01534">
+<property type="entry name" value="GAPDH-I"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00071">
+<property type="entry name" value="GAPDH"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0007">Acetylation</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0963">Cytoplasm</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0324">Glycolysis</keyword>
+<keyword id="KW-0520">NAD</keyword>
+<keyword id="KW-0547">Nucleotide-binding</keyword>
+<keyword id="KW-0560">Oxidoreductase</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<feature type="initiator methionine" description="Removed" evidence="10 12">
+<location>
+<position position="1"/>
+</location>
+</feature>
+<feature type="chain" description="Glyceraldehyde-3-phosphate dehydrogenase A" id="PRO_0000145648">
+<location>
+<begin position="2"/>
+<end position="331"/>
+</location>
+</feature>
+<feature type="nucleotide phosphate-binding region" description="NAD" evidence="3 5 9 11">
+<location>
+<begin position="12"/>
+<end position="13"/>
+</location>
+</feature>
+<feature type="region of interest" description="Glyceraldehyde 3-phosphate binding" evidence="3">
+<location>
+<begin position="149"/>
+<end position="151"/>
+</location>
+</feature>
+<feature type="region of interest" description="Glyceraldehyde 3-phosphate binding" evidence="3">
+<location>
+<begin position="209"/>
+<end position="210"/>
+</location>
+</feature>
+<feature type="active site" description="Nucleophile" evidence="15">
+<location>
+<position position="150"/>
+</location>
+</feature>
+<feature type="binding site" description="NAD" evidence="3 5 9">
+<location>
+<position position="34"/>
+</location>
+</feature>
+<feature type="binding site" description="NAD; via carbonyl oxygen" evidence="3 5">
+<location>
+<position position="78"/>
+</location>
+</feature>
+<feature type="binding site" description="NAD" evidence="5">
+<location>
+<position position="120"/>
+</location>
+</feature>
+<feature type="binding site" description="Glyceraldehyde 3-phosphate" evidence="2">
+<location>
+<position position="180"/>
+</location>
+</feature>
+<feature type="binding site" description="Glyceraldehyde 3-phosphate" evidence="5 11 15">
+<location>
+<position position="232"/>
+</location>
+</feature>
+<feature type="binding site" description="NAD" evidence="3 5 9">
+<location>
+<position position="314"/>
+</location>
+</feature>
+<feature type="site" description="Activates thiol group during catalysis" evidence="8">
+<location>
+<position position="177"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="115"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="124"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine; alternate" evidence="4">
+<location>
+<position position="132"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine; alternate" evidence="6">
+<location>
+<position position="132"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="4">
+<location>
+<position position="138"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine; alternate" evidence="4">
+<location>
+<position position="192"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine; alternate" evidence="6">
+<location>
+<position position="192"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="213"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="217"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="225"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="4">
+<location>
+<position position="249"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="249"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="257"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="6">
+<location>
+<position position="261"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-malonyllysine; alternate" evidence="7">
+<location>
+<position position="331"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine; alternate" evidence="6">
+<location>
+<position position="331"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In strain: ECOR 70.">
+<original>Y</original>
+<variation>I</variation>
+<location>
+<position position="43"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In strain: E830587.">
+<original>G</original>
+<variation>D</variation>
+<location>
+<position position="266"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In strain: E2666-74.">
+<original>E</original>
+<variation>A</variation>
+<location>
+<position position="267"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Reduces activity about 50-fold." evidence="8">
+<original>H</original>
+<variation>N</variation>
+<location>
+<position position="177"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="3"/>
+<end position="8"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="12"/>
+<end position="22"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="25"/>
+<end position="33"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="38"/>
+<end position="46"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="49"/>
+<end position="51"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="58"/>
+<end position="61"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="64"/>
+<end position="67"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="70"/>
+<end position="75"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="80"/>
+<end position="83"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="85"/>
+<end position="88"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="91"/>
+<end position="95"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="97"/>
+<end position="99"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="103"/>
+<end position="106"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="108"/>
+<end position="111"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="115"/>
+<end position="121"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="124"/>
+<end position="126"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="132"/>
+<end position="134"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="136"/>
+<end position="138"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="143"/>
+<end position="146"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="150"/>
+<end position="166"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="168"/>
+<end position="177"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="183"/>
+<end position="187"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="194"/>
+<end position="197"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="200"/>
+<end position="202"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="205"/>
+<end position="208"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="211"/>
+<end position="214"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="215"/>
+<end position="218"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="220"/>
+<end position="222"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="225"/>
+<end position="232"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="239"/>
+<end position="249"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="253"/>
+<end position="265"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="266"/>
+<end position="271"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="272"/>
+<end position="275"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="281"/>
+<end position="284"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="289"/>
+<end position="294"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="295"/>
+<end position="297"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="299"/>
+<end position="302"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="305"/>
+<end position="312"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="316"/>
+<end position="328"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1GAD"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000250">
+<source>
+<dbReference type="UniProtKB" id="P00362"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10978154"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18723842"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="19542219"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="21151122"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="21908771"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="2659073"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8636984"/>
+</source>
+</evidence>
+<evidence key="10" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="9298646"/>
+</source>
+</evidence>
+<evidence key="11" type="ECO:0000269">
+<source ref="18"/>
+</evidence>
+<evidence key="12" type="ECO:0000269">
+<source ref="6"/>
+</evidence>
+<evidence key="13" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="2659073"/>
+</source>
+</evidence>
+<evidence key="14" type="ECO:0000305"/>
+<evidence key="15" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="10978154"/>
+</source>
+</evidence>
+<sequence length="331" mass="35532" checksum="B3A460AA6D59E46D" modified="2007-01-23" version="2">
+MTIKVGINGFGRIGRIVFRAAQKRSDIEIVAINDLLDADYMAYMLKYDSTHGRFDGTVEV
+KDGHLIVNGKKIRVTAERDPANLKWDEVGVDVVAEATGLFLTDETARKHITAGAKKVVMT
+GPSKDNTPMFVKGANFDKYAGQDIVSNASCTTNCLAPLAKVINDNFGIIEGLMTTVHATT
+ATQKTVDGPSHKDWRGGRGASQNIIPSSTGAAKAVGKVLPELNGKLTGMAFRVPTPNVSV
+VDLTVRLEKAATYEQIKAAVKAAAEGEMKGVLGYTEDDVVSTDFNGEVCTSVFDAKAGIA
+LNDNFVKLVSWYDNETGYSNKVLDLIAHISK
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

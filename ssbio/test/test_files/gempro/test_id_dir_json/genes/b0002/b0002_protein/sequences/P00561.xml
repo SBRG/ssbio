@@ -1,0 +1,660 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1986-07-21" modified="2018-01-31" version="180">
+<accession>P00561</accession>
+<accession>Q47659</accession>
+<accession>Q6LEL0</accession>
+<name>AK1H_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Bifunctional aspartokinase/homoserine dehydrogenase 1</fullName>
+</recommendedName>
+<alternativeName>
+<fullName>Aspartokinase I/homoserine dehydrogenase I</fullName>
+<shortName>AKI-HDI</shortName>
+</alternativeName>
+<domain>
+<recommendedName>
+<fullName>Aspartokinase</fullName>
+<ecNumber>2.7.2.4</ecNumber>
+</recommendedName>
+</domain>
+<domain>
+<recommendedName>
+<fullName>Homoserine dehydrogenase</fullName>
+<ecNumber>1.1.1.3</ecNumber>
+</recommendedName>
+</domain>
+</protein>
+<gene>
+<name type="primary">thrA</name>
+<name type="synonym">thrA1</name>
+<name type="synonym">thrA2</name>
+<name type="ordered locus">b0002</name>
+<name type="ordered locus">JW0001</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1980" name="Proc. Natl. Acad. Sci. U.S.A." volume="77" first="5730" last="5733">
+<title>Nucleotide sequence of the thrA gene of Escherichia coli.</title>
+<authorList>
+<person name="Katinka M."/>
+<person name="Cossart P."/>
+<person name="Sibilli L."/>
+<person name="Saint-Girons I."/>
+<person name="Chalvignac M.A."/>
+<person name="le Bras G."/>
+<person name="Cohen G.N."/>
+<person name="Yaniv M."/>
+</authorList>
+<dbReference type="PubMed" id="7003595"/>
+<dbReference type="DOI" id="10.1073/pnas.77.10.5730"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1992" name="Nucleic Acids Res." volume="20" first="3305" last="3308">
+<title>Systematic sequencing of the Escherichia coli genome: analysis of the 0-2.4 min region.</title>
+<authorList>
+<person name="Yura T."/>
+<person name="Mori H."/>
+<person name="Nagai H."/>
+<person name="Nagata T."/>
+<person name="Ishihama A."/>
+<person name="Fujita N."/>
+<person name="Isono K."/>
+<person name="Mizobuchi K."/>
+<person name="Nakata A."/>
+</authorList>
+<dbReference type="PubMed" id="1630901"/>
+<dbReference type="DOI" id="10.1093/nar/20.13.3305"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1995" name="Nucleic Acids Res." volume="23" first="2105" last="2119">
+<title>Analysis of the Escherichia coli genome VI: DNA sequence of the region from 92.8 through 100 minutes.</title>
+<authorList>
+<person name="Burland V.D."/>
+<person name="Plunkett G. III"/>
+<person name="Sofia H.J."/>
+<person name="Daniels D.L."/>
+<person name="Blattner F.R."/>
+</authorList>
+<dbReference type="PubMed" id="7610040"/>
+<dbReference type="DOI" id="10.1093/nar/23.12.2105"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<scope>SEQUENCE REVISION</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1982" name="J. Biol. Chem." volume="257" first="3896" last="3904">
+<title>Initiation, pausing, and termination of transcription in the threonine operon regulatory region of Escherichia coli.</title>
+<authorList>
+<person name="Gardner J.F."/>
+</authorList>
+<dbReference type="PubMed" id="6277952"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-10</scope>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1985" name="J. Mol. Biol." volume="183" first="529" last="541">
+<title>Identification and characterization of mutants affecting transcription termination at the threonine operon attenuator.</title>
+<authorList>
+<person name="Lynn S.P."/>
+<person name="Bauer C.E."/>
+<person name="Chapman K.A."/>
+<person name="Gardner J.F."/>
+</authorList>
+<dbReference type="PubMed" id="2410621"/>
+<dbReference type="DOI" id="10.1016/0022-2836(85)90169-X"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-10</scope>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1979" name="Biochimie" volume="61" first="733" last="739">
+<title>The primary structure of Escherichia coli K 12 aspartokinase I-homoserine dehydrogenase I: sequence of cyanogen bromide peptide CB 3.</title>
+<authorList>
+<person name="Sibilli L."/>
+<person name="le Bras G."/>
+<person name="Cossart P."/>
+<person name="Chalvignac M.A."/>
+<person name="le Bras G."/>
+<person name="Briley P.A."/>
+<person name="Cohen G.N."/>
+</authorList>
+<dbReference type="PubMed" id="387092"/>
+<dbReference type="DOI" id="10.1016/S0300-9084(79)80174-1"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 51-129</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1983" name="J. Biol. Chem." volume="258" first="3028" last="3031">
+<title>Nucleotide sequence of the metL gene of Escherichia coli. Its product, the bifunctional aspartokinase II-homoserine dehydrogenase II, and the bifunctional product of the thrA gene, aspartokinase I-homoserine dehydrogenase I, derive from a common ancestor.</title>
+<authorList>
+<person name="Zakin M.M."/>
+<person name="Duchange N."/>
+<person name="Ferrara P."/>
+<person name="Cohen G.N."/>
+</authorList>
+<dbReference type="PubMed" id="6298218"/>
+</citation>
+<scope>SEQUENCE REVISION TO 11</scope>
+</reference>
+<reference key="10">
+<citation type="journal article" date="1979" name="Mol. Gen. Genet." volume="175" first="39" last="44">
+<title>Construction and expression of a hybrid plasmid containing the Escherichia coli thrA and thrB genes.</title>
+<authorList>
+<person name="Cossart P."/>
+<person name="Katinka M."/>
+<person name="Yaniv M."/>
+</authorList>
+<dbReference type="PubMed" id="390305"/>
+<dbReference type="DOI" id="10.1007/BF00267853"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 553-588</scope>
+</reference>
+<comment type="catalytic activity">
+<text>L-homoserine + NAD(P)(+) = L-aspartate 4-semialdehyde + NAD(P)H.</text>
+</comment>
+<comment type="catalytic activity">
+<text>ATP + L-aspartate = ADP + 4-phospho-L-aspartate.</text>
+</comment>
+<comment type="enzyme regulation">
+<text>The enzyme activities are regulated allosterically by L-threonine.</text>
+</comment>
+<comment type="pathway">
+<text>Amino-acid biosynthesis; L-lysine biosynthesis via DAP pathway; (S)-tetrahydrodipicolinate from L-aspartate: step 1/4.</text>
+</comment>
+<comment type="pathway">
+<text>Amino-acid biosynthesis; L-methionine biosynthesis via de novo pathway; L-homoserine from L-aspartate: step 1/3.</text>
+</comment>
+<comment type="pathway">
+<text>Amino-acid biosynthesis; L-methionine biosynthesis via de novo pathway; L-homoserine from L-aspartate: step 3/3.</text>
+</comment>
+<comment type="pathway">
+<text>Amino-acid biosynthesis; L-threonine biosynthesis; L-threonine from L-aspartate: step 1/5.</text>
+</comment>
+<comment type="pathway">
+<text>Amino-acid biosynthesis; L-threonine biosynthesis; L-threonine from L-aspartate: step 3/5.</text>
+</comment>
+<comment type="subunit">
+<text>Homotetramer.</text>
+</comment>
+<comment type="miscellaneous">
+<text>Aspartokinase II-homoserine dehydrogenase II and aspartokinase III also catalyze the same reaction(s).</text>
+</comment>
+<comment type="similarity">
+<text evidence="3">In the N-terminal section; belongs to the aspartokinase family.</text>
+</comment>
+<comment type="similarity">
+<text evidence="3">In the C-terminal section; belongs to the homoserine dehydrogenase family.</text>
+</comment>
+<dbReference type="EC" id="2.7.2.4"/>
+<dbReference type="EC" id="1.1.1.3"/>
+<dbReference type="EMBL" id="V00361">
+<property type="protein sequence ID" value="CAA23660.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="J01706">
+<property type="protein sequence ID" value="AAA83914.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U14003">
+<property type="protein sequence ID" value="AAA97301.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC73113.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAB96579.2"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="V00360">
+<property type="protein sequence ID" value="CAA23659.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="X68872">
+<property type="protein sequence ID" value="CAA48734.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M28570">
+<property type="protein sequence ID" value="AAA24673.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M10644">
+<property type="protein sequence ID" value="AAA24671.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="B64720">
+<property type="entry name" value="DEECK"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_414543.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_001264707.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="ProteinModelPortal" id="P00561"/>
+<dbReference type="SMR" id="P00561"/>
+<dbReference type="BioGrid" id="4261933">
+<property type="interactions" value="229"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-2907N"/>
+<dbReference type="IntAct" id="P00561">
+<property type="interactions" value="7"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-1288804"/>
+<dbReference type="STRING" id="316385.ECDH10B_0002"/>
+<dbReference type="BindingDB" id="P00561"/>
+<dbReference type="EPD" id="P00561"/>
+<dbReference type="PaxDb" id="P00561"/>
+<dbReference type="PRIDE" id="P00561"/>
+<dbReference type="EnsemblBacteria" id="AAC73113">
+<property type="protein sequence ID" value="AAC73113"/>
+<property type="gene ID" value="b0002"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAB96579">
+<property type="protein sequence ID" value="BAB96579"/>
+<property type="gene ID" value="BAB96579"/>
+</dbReference>
+<dbReference type="GeneID" id="945803"/>
+<dbReference type="KEGG" id="ecj:JW0001"/>
+<dbReference type="KEGG" id="eco:b0002"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.2281"/>
+<dbReference type="EchoBASE" id="EB0991"/>
+<dbReference type="EcoGene" id="EG10998">
+<property type="gene designation" value="thrA"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105CFH">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0460">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0527">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000271593"/>
+<dbReference type="InParanoid" id="P00561"/>
+<dbReference type="KO" id="K12524"/>
+<dbReference type="PhylomeDB" id="P00561"/>
+<dbReference type="BioCyc" id="EcoCyc:ASPKINIHOMOSERDEHYDROGI-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:ASPKINIHOMOSERDEHYDROGI-MONOMER"/>
+<dbReference type="SABIO-RK" id="P00561"/>
+<dbReference type="UniPathway" id="UPA00034">
+<property type="reaction ID" value="UER00015"/>
+</dbReference>
+<dbReference type="UniPathway" id="UPA00050">
+<property type="reaction ID" value="UER00063"/>
+</dbReference>
+<dbReference type="UniPathway" id="UPA00050">
+<property type="reaction ID" value="UER00461"/>
+</dbReference>
+<dbReference type="UniPathway" id="UPA00051">
+<property type="reaction ID" value="UER00462"/>
+</dbReference>
+<dbReference type="UniPathway" id="UPA00051">
+<property type="reaction ID" value="UER00465"/>
+</dbReference>
+<dbReference type="PRO" id="PR:P00561"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005737">
+<property type="term" value="C:cytoplasm"/>
+<property type="evidence" value="ECO:0000318"/>
+<property type="project" value="GO_Central"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004072">
+<property type="term" value="F:aspartate kinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005524">
+<property type="term" value="F:ATP binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004412">
+<property type="term" value="F:homoserine dehydrogenase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0050661">
+<property type="term" value="F:NADP binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009090">
+<property type="term" value="P:homoserine biosynthetic process"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009089">
+<property type="term" value="P:lysine biosynthetic process via diaminopimelate"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009088">
+<property type="term" value="P:threonine biosynthetic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-UniPathway"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.40.1160.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036393">
+<property type="entry name" value="AceGlu_kinase-like_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR002912">
+<property type="entry name" value="ACT_dom"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001048">
+<property type="entry name" value="Asp/Glu/Uridylate_kinase"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR005106">
+<property type="entry name" value="Asp/hSer_DH_NAD-bd"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001341">
+<property type="entry name" value="Asp_kinase"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR018042">
+<property type="entry name" value="Aspartate_kinase_CS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR011147">
+<property type="entry name" value="Bifunc_aspartokin/hSer_DH"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR027795">
+<property type="entry name" value="GATS-like_ACT_dom"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001342">
+<property type="entry name" value="HDH_cat"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR019811">
+<property type="entry name" value="HDH_CS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036291">
+<property type="entry name" value="NAD(P)-bd_dom_sf"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00696">
+<property type="entry name" value="AA_kinase"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF01842">
+<property type="entry name" value="ACT"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF13840">
+<property type="entry name" value="ACT_7"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00742">
+<property type="entry name" value="Homoserine_dh"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF03447">
+<property type="entry name" value="NAD_binding_3"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF000727">
+<property type="entry name" value="ThrA"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF51735">
+<property type="entry name" value="SSF51735"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF53633">
+<property type="entry name" value="SSF53633"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00657">
+<property type="entry name" value="asp_kinases"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51671">
+<property type="entry name" value="ACT"/>
+<property type="match status" value="2"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00324">
+<property type="entry name" value="ASPARTOKINASE"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS01042">
+<property type="entry name" value="HOMOSER_DHGENASE"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0021">Allosteric enzyme</keyword>
+<keyword id="KW-0028">Amino-acid biosynthesis</keyword>
+<keyword id="KW-0067">ATP-binding</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0511">Multifunctional enzyme</keyword>
+<keyword id="KW-0521">NADP</keyword>
+<keyword id="KW-0547">Nucleotide-binding</keyword>
+<keyword id="KW-0560">Oxidoreductase</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0677">Repeat</keyword>
+<keyword id="KW-0791">Threonine biosynthesis</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<feature type="chain" description="Bifunctional aspartokinase/homoserine dehydrogenase 1" id="PRO_0000066681">
+<location>
+<begin position="1"/>
+<end position="820"/>
+</location>
+</feature>
+<feature type="domain" description="ACT 1" evidence="2">
+<location>
+<begin position="320"/>
+<end position="394"/>
+</location>
+</feature>
+<feature type="domain" description="ACT 2" evidence="2">
+<location>
+<begin position="401"/>
+<end position="478"/>
+</location>
+</feature>
+<feature type="nucleotide phosphate-binding region" description="NADP" evidence="1">
+<location>
+<begin position="471"/>
+<end position="478"/>
+</location>
+</feature>
+<feature type="region of interest" description="Aspartokinase">
+<location>
+<begin position="1"/>
+<end position="249"/>
+</location>
+</feature>
+<feature type="region of interest" description="Interface">
+<location>
+<begin position="250"/>
+<end position="470"/>
+</location>
+</feature>
+<feature type="region of interest" description="Homoserine dehydrogenase">
+<location>
+<begin position="471"/>
+<end position="820"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>V</original>
+<variation>L</variation>
+<location>
+<position position="11"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 8; AA sequence." ref="8" evidence="3">
+<original>Q</original>
+<variation>E</variation>
+<location>
+<position position="113"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>D</original>
+<variation>N</variation>
+<location>
+<position position="230"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>Q</original>
+<variation>L</variation>
+<location>
+<position position="375"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>T</original>
+<variation>A</variation>
+<location>
+<position position="393"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>M</original>
+<variation>L</variation>
+<location>
+<position position="406"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>D</original>
+<variation>N</variation>
+<location>
+<position position="553"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 10; AAA24671." ref="10" evidence="3">
+<original>DY</original>
+<variation>IT</variation>
+<location>
+<begin position="587"/>
+<end position="588"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>T</original>
+<variation>I</variation>
+<location>
+<position position="607"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; CAA23660/AAA83914." ref="1" evidence="3">
+<original>T</original>
+<variation>R</variation>
+<location>
+<position position="658"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000255"/>
+<evidence key="2" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU01007"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000305"/>
+<sequence length="820" mass="89120" checksum="0BF28E9EECAB10ED" modified="2003-08-29" version="2">
+MRVLKFGGTSVANAERFLRVADILESNARQGQVATVLSAPAKITNHLVAMIEKTISGQDA
+LPNISDAERIFAELLTGLAAAQPGFPLAQLKTFVDQEFAQIKHVLHGISLLGQCPDSINA
+ALICRGEKMSIAIMAGVLEARGHNVTVIDPVEKLLAVGHYLESTVDIAESTRRIAASRIP
+ADHMVLMAGFTAGNEKGELVVLGRNGSDYSAAVLAACLRADCCEIWTDVDGVYTCDPRQV
+PDARLLKSMSYQEAMELSYFGAKVLHPRTITPIAQFQIPCLIKNTGNPQAPGTLIGASRD
+EDELPVKGISNLNNMAMFSVSGPGMKGMVGMAARVFAAMSRARISVVLITQSSSEYSISF
+CVPQSDCVRAERAMQEEFYLELKEGLLEPLAVTERLAIISVVGDGMRTLRGISAKFFAAL
+ARANINIVAIAQGSSERSISVVVNNDDATTGVRVTHQMLFNTDQVIEVFVIGVGGVGGAL
+LEQLKRQQSWLKNKHIDLRVCGVANSKALLTNVHGLNLENWQEELAQAKEPFNLGRLIRL
+VKEYHLLNPVIVDCTSSQAVADQYADFLREGFHVVTPNKKANTSSMDYYHQLRYAAEKSR
+RKFLYDTNVGAGLPVIENLQNLLNAGDELMKFSGILSGSLSYIFGKLDEGMSFSEATTLA
+REMGYTEPDPRDDLSGMDVARKLLILARETGRELELADIEIEPVLPAEFNAEGDVAAFMA
+NLSQLDDLFAARVAKARDEGKVLRYVGNIDEDGVCRVKIAEVDGNDPLFKVKNGENALAF
+YSHYYQPLPLVLRGYGAGNDVTAAGVFADLLRTLSWKLGV
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

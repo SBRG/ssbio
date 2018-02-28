@@ -1,0 +1,59 @@
+ENTRY       b3603             CDS       T00007
+NAME        lldP
+DEFINITION  (RefSeq) L-lactate permease
+ORTHOLOGY   K00427  L-lactate permease
+ORGANISM    eco  Escherichia coli K-12 MG1655
+BRITE       Transporters [BR:eco02000]
+             Other Transporters
+              Electrochemical potential-driven transporters [TC:2]
+               b3603 (lldP)
+POSITION    3777399..3779054
+MOTIF       Pfam: Lactate_perm
+DBLINKS     NCBI-GeneID: 948114
+            NCBI-ProteinID: NP_418060
+            Pasteur: lldP
+            RegulonDB: ECK120001887
+            ECOCYC: EG11961
+            ASAP: ABE-0011777
+            UniProt: P33231
+AASEQ       551
+            MNLWQQNYDPAGNIWLSSLIASLPILFFFFALIKLKLKGYVAASWTVAIALAVALLFYKM
+            PVANALASVVYGFFYGLWPIAWIIIAAVFVYKISVKTGQFDIIRSSILSITPDQRLQMLI
+            VGFCFGAFLEGAAGFGAPVAITAALLVGLGFKPLYAAGLCLIVNTAPVAFGAMGIPILVA
+            GQVTGIDSFEIGQMVGRQLPFMTIIVLFWIMAIMDGWRGIKETWPAVVVAGGSFAIAQYL
+            SSNFIGPELPDIISSLVSLLCLTLFLKRWQPVRVFRFGDLGASQVDMTLAHTGYTAGQVL
+            RAWTPFLFLTATVTLWSIPPFKALFASGGALYEWVINIPVPYLDKLVARMPPVVSEATAY
+            AAVFKFDWFSATGTAILFAALLSIVWLKMKPSDAISTFGSTLKELALPIYSIGMVLAFAF
+            ISNYSGLSSTLALALAHTGHAFTFFSPFLGWLGVFLTGSDTSSNALFAALQATAAQQIGV
+            SDLLLVAANTTGGVTGKMISPQSIAIACAAVGLVGKESDLFRFTVKHSLIFTCIVGVITT
+            LQAYVLTWMIP
+NTSEQ       1656
+            atgaatctctggcaacaaaactacgatcccgccgggaatatctggctttccagtctgata
+            gcatcgcttcccatcctgtttttcttctttgcgctgattaagctcaaactgaaaggatac
+            gtcgccgcctcgtggacggtggcaatcgcccttgccgtggctttgctgttctataaaatg
+            ccggtcgctaacgcgctggcctcggtggtttatggtttcttctacgggttgtggcccatc
+            gcgtggatcattattgcagcggtgttcgtctataagatctcggtgaaaaccgggcagttt
+            gacatcattcgctcgtctattctttcgataacccctgaccagcgtctgcaaatgctgatc
+            gtcggtttctgtttcggcgcgttccttgaaggagccgcaggctttggcgcaccggtagca
+            attaccgccgcattgctggtcggcctgggttttaaaccgctgtacgccgccgggctgtgc
+            ctgattgttaacaccgcgccagtggcatttggtgcgatgggcattccaatcctggttgcc
+            ggacaggtaacaggtatcgacagctttgagattggtcagatggtggggcggcagctaccg
+            tttatgaccattatcgtgctgttctggatcatggcgattatggacggctggcgcggtatc
+            aaagagacgtggcctgcggtcgtggttgcgggcggctcgtttgccatcgctcagtacctt
+            agctctaacttcattgggccggagctgccggacattatctcttcgctggtatcactgctc
+            tgcctgacgctgttcctcaaacgctggcagccagtgcgtgtattccgttttggtgatttg
+            ggggcgtcacaggttgatatgacgctggcccacaccggttacactgcgggtcaggtgtta
+            cgtgcctggacaccgttcctgttcctgacagctaccgtaacactgtggagtatcccgccg
+            tttaaagccctgttcgcatcgggtggcgcgctgtatgagtgggtgatcaatattccggtg
+            ccgtacctcgataaactggttgcccgtatgccgccagtggtcagcgaggctacagcctat
+            gccgccgtgtttaagtttgactggttctctgccaccggcaccgccattctgtttgctgca
+            ctgctctcgattgtctggctgaagatgaaaccgtctgacgctatcagcaccttcggcagc
+            acgctgaaagaactggctctgcccatctactccatcggtatggtgctggcattcgccttt
+            atttcgaactattccggactgtcatcaacactggcgctggcactggcgcacaccggtcat
+            gcattcaccttcttctcgccgttcctcggctggctgggggtattcctgaccgggtcggat
+            acctcatctaacgccctgttcgccgcgctgcaagccaccgcagcacaacaaattggcgtc
+            tctgatctgttgctggttgccgccaataccaccggtggcgtcaccggtaagatgatctcc
+            ccgcaatctatcgctatcgcctgtgcggcggtaggcctggtgggcaaagagtctgatttg
+            ttccgctttactgtcaaacacagcctgatcttcacctgtatagtgggcgtgatcaccacg
+            cttcaggcttatgtcttaacgtggatgattccttaa
+///

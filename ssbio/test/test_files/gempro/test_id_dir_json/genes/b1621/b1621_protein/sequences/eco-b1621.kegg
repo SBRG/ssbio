@@ -1,0 +1,85 @@
+ENTRY       b1621             CDS       T00007
+NAME        malX
+DEFINITION  (RefSeq) maltose and glucose-specific PTS enzyme IIB component and IIC component
+ORTHOLOGY   K02790  PTS system, maltose/glucose-specific IIB component [EC:2.7.1.199 2.7.1.208]
+            K02791  PTS system, maltose/glucose-specific IIC component
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00010  Glycolysis / Gluconeogenesis
+            eco00500  Starch and sucrose metabolism
+            eco00520  Amino sugar and nucleotide sugar metabolism
+            eco02060  Phosphotransferase system (PTS)
+MODULE      eco_M00266  PTS system, maltose/glucose-specific II component
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00010 Glycolysis / Gluconeogenesis
+                b1621 (malX)
+               00500 Starch and sucrose metabolism
+                b1621 (malX)
+               00520 Amino sugar and nucleotide sugar metabolism
+                b1621 (malX)
+             Environmental Information Processing
+              Membrane transport
+               02060 Phosphotransferase system (PTS)
+                b1621 (malX)
+            Enzymes [BR:eco01000]
+             2. Transferases
+              2.7  Transferring phosphorus-containing groups
+               2.7.1  Phosphotransferases with an alcohol group as acceptor
+                2.7.1.199  protein-Npi-phosphohistidine---D-glucose phosphotransferase
+                 b1621 (malX)
+                2.7.1.208  protein-Npi-phosphohistidine---maltose phosphotransferase
+                 b1621 (malX)
+            Transporters [BR:eco02000]
+             Phosphotransferase System (PTS)
+              Enzyme II [TC:4.A]
+               Maltose/glucose-specific II component [MD:M00266]
+                b1621 (malX)
+POSITION    1699355..1700947
+MOTIF       Pfam: PTS_EIIC PTS_EIIB Monooxygenase_B
+DBLINKS     NCBI-GeneID: 946009
+            NCBI-ProteinID: NP_416138
+            Pasteur: malX
+            RegulonDB: ECK120000556
+            ECOCYC: EG10563
+            ASAP: ABE-0005429
+            UniProt: P19642
+AASEQ       530
+            MTAKTAPKVTLWEFFQQLGKTFMLPVALLSFCGIMLGIGSSLSSHDVITLIPVLGNPVLQ
+            AIFTWMSKIGSFAFSFLPVMFCIAIPLGLARENKGVAAFAGFIGYAVMNLAVNFWLTNKG
+            ILPTTDAAVLKANNIQSILGIQSIDTGILGAVIAGIIVWMLHERFHNIRLPDALAFFGGT
+            RFVPIISSLVMGLVGLVIPLVWPIFAMGISGLGHMINSAGDFGPMLFGTGERLLLPFGLH
+            HILVALIRFTDAGGTQEVCGQTVSGALTIFQAQLSCPTTHGFSESATRFLSQGKMPAFLG
+            GLPGAALAMYHCARPENRHKIKGLLISGLIACVVGGTTEPLEFLFLFVAPVLYVIHALLT
+            GLGFTVMSVLGVTIGNTDGNIIDFVVFGILHGLSTKWYMVPVVAAIWFVVYYVIFRFAIT
+            RFNLKTPGRDSEVASSIEKAVAGAPGKSGYNVPAILEALGGADNIVSLDNCITRLRLSVK
+            DMSLVNVQALKDNRAIGVVQLNQHNLQVVIGPQVQSVKDEMAGLMHTVQA
+NTSEQ       1593
+            atgacggcgaaaacagcaccgaaagtcacgctgtgggagttcttccagcagttaggcaaa
+            accttcatgttacccgtggcattattgtcgttctgcggcattatgctcggcattggtagt
+            tctcttagcagccatgatgtcataaccctgatcccggtcctgggcaaccccgtgttgcag
+            gctatctttacctggatgagtaagattggctcgtttgcttttagtttcctgcctgtcatg
+            ttctgtatcgccatcccgctgggcctggcacgcgaaaataaaggcgtagcggcattcgct
+            ggcttcatcggttatgcggtaatgaacctcgcggtaaacttctggttgaccaataaaggc
+            attctgccaaccacggatgccgcggttctgaaagccaataacatccagagcattcttggg
+            atccagtcgatcgataccgggatcctcggtgcggtgatcgccggtattatcgtctggatg
+            ctgcatgagcgtttccataatatccgcctgccggatgcgctggcattcttcggcggtacg
+            cgcttcgtaccaattatctcctcgctggtgatgggccttgtcggcctggtgattccatta
+            gtctggccgattttcgccatgggtattagcggcttgggccatatgataaacagcgcgggt
+            gatttcggaccgatgctgtttggtaccggtgaacgtctgctgttgccgtttggtctgcat
+            cacattctggtggcattaattcgctttaccgacgcaggcggcacgcaggaagtctgcggt
+            caaaccgtcagcggcgcactgaccatcttccaggcgcaattgagttgcccgaccactcac
+            ggtttttctgaaagcgccacgcgtttcctttcgcaaggtaaaatgcctgcgtttctcggc
+            ggtctgccaggtgcagcgttagctatgtatcactgcgcgcgcccggaaaatcgccataaa
+            attaaaggtctgctgatttctggcctgatcgcctgcgtcgttggcggcactaccgaaccg
+            ctggaattcctgttcctgttcgtagcgccagttctgtatgtcatccacgcgctgttaacc
+            ggcctcggcttcaccgtcatgtctgtgctcggcgtcaccatcggtaataccgacggcaat
+            atcatcgacttcgtggtgttcggtattttgcatggtctgtcaaccaagtggtacatggtg
+            ccagtggtggcggcaatctggtttgtcgtttactacgtcatcttccgtttcgctatcacc
+            cgcttcaatctgaaaaccccggggcgcgatagcgaagttgccagctcaatcgaaaaagcc
+            gttgccggtgcgccgggtaaatcaggttacaacgttcctgcaatcctcgaagcattaggc
+            ggtgccgacaatattgtcagcctcgataactgcattacccgtctgcgtttgtctgtgaaa
+            gatatgtcgcttgttaatgtgcaggcactgaaggacaatcgggcaattggcgtagtacaa
+            cttaatcaacataacctgcaggttgttatcgggccacaagttcagtcagtaaaagatgaa
+            atggccggtctgatgcatactgtccaggcataa
+///

@@ -1,0 +1,55 @@
+ENTRY       b3493             CDS       T00007
+NAME        pitA
+DEFINITION  (RefSeq) phosphate transporter, low-affinity; tellurite importer
+ORTHOLOGY   K16322  low-affinity inorganic phosphate transporter
+ORGANISM    eco  Escherichia coli K-12 MG1655
+BRITE       Transporters [BR:eco02000]
+             Other Transporters
+              Electrochemical potential-driven transporters [TC:2]
+               b3493 (pitA)
+POSITION    3637642..3639141
+MOTIF       Pfam: PHO4
+DBLINKS     NCBI-GeneID: 948009
+            NCBI-ProteinID: NP_417950
+            Pasteur: pitA
+            RegulonDB: ECK120002114
+            ECOCYC: EG12230
+            ASAP: ABE-0011407
+            UniProt: P0AFJ7
+AASEQ       499
+            MLHLFAGLDLHTGLLLLLALAFVLFYEAINGFHDTANAVATVIYTRAMRSQLAVVMAAVF
+            NFLGVLLGGLSVAYAIVHMLPTDLLLNMGSSHGLAMVFSMLLAAIIWNLGTWYFGLPASS
+            SHTLIGAIIGIGLTNALMTGTSVVDALNIPKVLSIFGSLIVSPIVGLVFAGGLIFLLRRY
+            WSGTKKRARIHLTPAEREKKDGKKKPPFWTRIALILSAIGVAFSHGANDGQKGIGLVMLV
+            LIGVAPAGFVVNMNATGYEITRTRDAINNVEAYFEQHPALLKQATGADQLVPAPEAGATQ
+            PAEFHCHPSNTINALNRLKGMLTTDVESYDKLSLDQRSQMRRIMLCVSDTIDKVVKMPGV
+            SADDQRLLKKLKSDMLSTIEYAPVWIIMAVALALGIGTMIGWRRVATTIGEKIGKKGMTY
+            AQGMSAQMTAAVSIGLASYTGMPVSTTHVLSSSVAGTMVVDGGGLQRKTVTSILMAWVFT
+            LPAAVLLSGGLYWLSLQFL
+NTSEQ       1500
+            atgctacatttgtttgctggcctggatttgcataccgggctgttattattgcttgcactg
+            gcttttgtgctgttctacgaagccatcaatggtttccatgacacagccaacgccgtggca
+            accgttatctatacccgcgcgatgcgttctcagctcgccgtggttatggcggcggtattc
+            aactttttgggtgttttgctgggtggtctgagtgttgcctatgccattgtgcatatgctg
+            ccgacggatctgctgcttaatatgggatcgtctcatggccttgccatggtgttctctatg
+            ttgctggcggcgattatctggaacctgggtacctggtactttggtttacctgcatccagc
+            tctcatacgctgattggcgcgatcatcgggattggtttaaccaatgcgttgatgaccggg
+            acgtcagtggtggatgcactcaatatcccgaaagtattaagtattttcggttctctgatc
+            gtttcccctattgtcggcctggtgtttgctggcggtctgattttcttgctgcgtcgctac
+            tggagcggcaccaagaaacgcgcccgtatccacctgaccccagcggagcgtgaaaagaaa
+            gacggcaagaaaaagccgccgttctggacgcgtattgcgctgatcctttccgctatcggc
+            gtggcgttttcgcacggcgcgaacgatggtcagaaaggcattggtctggttatgttggta
+            ttgattggcgtcgcgccagcaggcttcgtggtgaacatgaatgccactggctacgaaatc
+            acccgtacccgtgatgccatcaacaacgtcgaagcttactttgagcagcatcctgcgctg
+            ctcaaacaggctaccggtgctgatcagttagtaccggctccggaagctggcgcaacgcaa
+            cctgcggagttccactgccatccgtcgaataccattaacgcgctcaaccgcctgaaaggt
+            atgttgaccaccgatgtggaaagctacgacaagctgtcgcttgatcaacgtagccagatg
+            cgccgcattatgctgtgcgtttctgacactatcgacaaagtggtgaagatgcctggcgtg
+            agtgctgacgatcagcgcctgttgaagaaactgaagtccgacatgcttagcaccatcgag
+            tatgcaccggtgtggatcatcatggcggtcgcgctggcgttaggtatcggtacgatgatt
+            ggctggcgccgtgtggcaacgactatcggtgagaaaatcggtaagaaaggcatgacctac
+            gctcaggggatgtctgcccagatgacggcggcagtgtctatcggcctggcgagttatacc
+            gggatgccggtttccactactcacgtactctcctcttctgtcgcggggacgatggtggta
+            gatggtggcggcttacagcgtaaaaccgtgaccagcattctgatggcctgggtgtttacc
+            cttccggctgcggtactgctttccggcgggctgtactggctctccttgcagttcctgtaa
+///

@@ -1,0 +1,54 @@
+ENTRY       b1380             CDS       T00007
+NAME        ldhA
+DEFINITION  (RefSeq) fermentative D-lactate dehydrogenase, NAD-dependent
+ORTHOLOGY   K03778  D-lactate dehydrogenase [EC:1.1.1.28]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00620  Pyruvate metabolism
+            eco01120  Microbial metabolism in diverse environments
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00620 Pyruvate metabolism
+                b1380 (ldhA)
+            Enzymes [BR:eco01000]
+             1. Oxidoreductases
+              1.1  Acting on the CH-OH group of donors
+               1.1.1  With NAD+ or NADP+ as acceptor
+                1.1.1.28  D-lactate dehydrogenase
+                 b1380 (ldhA)
+POSITION    complement(1441854..1442843)
+MOTIF       Pfam: 2-Hacid_dh_C 2-Hacid_dh NAD_binding_2 XdhC_C AdoHcyase_NAD CoA_binding_2
+DBLINKS     NCBI-GeneID: 946315
+            NCBI-ProteinID: NP_415898
+            Pasteur: ldhA
+            RegulonDB: ECK120002700
+            ECOCYC: G592
+            ASAP: ABE-0004619
+            UniProt: P52643
+STRUCTURE   PDB: 3WX0
+AASEQ       329
+            MKLAVYSTKQYDKKYLQQVNESFGFELEFFDFLLTEKTAKTANGCEAVCIFVNDDGSRPV
+            LEELKKHGVKYIALRCAGFNNVDLDAAKELGLKVVRVPAYDPEAVAEHAIGMMMTLNRRI
+            HRAYQRTRDANFSLEGLTGFTMYGKTAGVIGTGKIGVAMLRILKGFGMRLLAFDPYPSAA
+            ALELGVEYVDLPTLFSESDVISLHCPLTPENYHLLNEAAFEQMKNGVMIVNTSRGALIDS
+            QAAIEALKNQKIGSLGMDVYENERDLFFEDKSNDVIQDDVFRRLSACHNVLFTGHQAFLT
+            AEALTSISQTTLQNLSNLEKGETCPNELV
+NTSEQ       990
+            atgaaactcgccgtttatagcacaaaacagtacgacaagaagtacctgcaacaggtgaac
+            gagtcctttggctttgagctggaattttttgactttctgctgacggaaaaaaccgctaaa
+            actgccaatggctgcgaagcggtatgtattttcgtaaacgatgacggcagccgcccggtg
+            ctggaagagctgaaaaagcacggcgttaaatatatcgccctgcgctgtgccggtttcaat
+            aacgtcgaccttgacgcggcaaaagaactggggctgaaagtagtccgtgttccagcctat
+            gatccagaggccgttgctgaacacgccatcggtatgatgatgacgctgaaccgccgtatt
+            caccgcgcgtatcagcgtacccgtgatgctaacttctctctggaaggtctgaccggcttt
+            actatgtatggcaaaacggcaggcgttatcggtaccggtaaaatcggtgtggcgatgctg
+            cgcattctgaaaggttttggtatgcgtctgctggcgttcgatccgtatccaagtgcagcg
+            gcgctggaactcggtgtggagtatgtcgatctgccaaccctgttctctgaatcagacgtt
+            atctctctgcactgcccgctgacaccggaaaactatcatctgttgaacgaagccgccttc
+            gaacagatgaaaaatggcgtgatgatcgtcaataccagtcgcggtgcattgattgattct
+            caggcagcaattgaagcgctgaaaaatcagaaaattggttcgttgggtatggacgtgtat
+            gagaacgaacgcgatctattctttgaagataaatccaacgacgtgatccaggatgacgta
+            ttccgtcgcctgtctgcctgccacaacgtgctgtttaccgggcaccaggcattcctgaca
+            gcagaagctctgaccagtatttctcagactacgctgcaaaacttaagcaatctggaaaaa
+            ggcgaaacctgcccgaacgaactggtttaa
+///

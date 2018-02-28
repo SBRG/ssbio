@@ -1,0 +1,43 @@
+ENTRY       b0875             CDS       T00007
+NAME        aqpZ
+DEFINITION  (RefSeq) aquaporin Z
+ORTHOLOGY   K06188  aquaporin Z
+ORGANISM    eco  Escherichia coli K-12 MG1655
+BRITE       Transporters [BR:eco02000]
+             Other Transporters
+              Aquaporins and small neutral solute transporters [TC:1.A.8]
+               Aquaporins
+                b0875 (aqpZ)
+            Ion channels [BR:eco04040]
+             Non-ion channels
+              Aquaporins
+               b0875 (aqpZ)
+POSITION    complement(915352..916047)
+MOTIF       Pfam: MIP
+DBLINKS     NCBI-GeneID: 945497
+            NCBI-ProteinID: NP_415396
+            Pasteur: aqpZ
+            RegulonDB: ECK120002435
+            ECOCYC: EG13270
+            ASAP: ABE-0002976
+            UniProt: P60844
+STRUCTURE   PDB: 2O9G 2O9E 2O9D 3NK5 3NKA 1RC2 2O9F 3NKC 2ABM
+AASEQ       231
+            MFRKLAAECFGTFWLVFGGCGSAVLAAGFPELGIGFAGVALAFGLTVLTMAFAVGHISGG
+            HFNPAVTIGLWAGGRFPAKEVVGYVIAQVVGGIVAAALLYLIASGKTGFDAAASGFASNG
+            YGEHSPGGYSMLSALVVELVLSAGFLLVIHGATDKFAPAGFAPIAIGLALTLIHLISIPV
+            TNTSVNPARSTAVAIFQGGWALEQLWFFWVVPIVGGIIGGLIYRTLLEKRD
+NTSEQ       696
+            atgttcagaaaattagcagctgaatgttttggtactttctggcttgtttttggtggctgt
+            ggtagtgctgtactggccgcaggcttcccggaattaggcattggttttgccggcgtggcg
+            ttggcgttcggtctgaccgttctgacgatggcctttgctgttggtcatatttctggtggt
+            cattttaacccggcggtcactattggtttatgggctggcggacgttttccggcaaaagaa
+            gtcgttggctacgtaattgcccaggttgtcggcggtattgttgcagcggcgctgctgtat
+            ttaattgccagtggtaaaacgggttttgacgcggcagccagcggttttgcttctaacggt
+            tatggcgagcattcaccaggcggttattccatgctttccgcgctggtagttgaactggta
+            ttgagtgcaggtttcctgttggtgatccacggcgcaaccgacaaattcgcgccggcaggt
+            tttgcgccgatcgctattggtctggccttaaccctgattcacttaattagtattccggtg
+            actaacacttctgttaacccggcgcgcagcaccgcggttgctatcttccagggcggctgg
+            gcattagaacaactgtggttcttctgggtggtgccaattgtcggcggcattatcggtggt
+            ctgatttaccggaccctgctggaaaagcgtgattaa
+///

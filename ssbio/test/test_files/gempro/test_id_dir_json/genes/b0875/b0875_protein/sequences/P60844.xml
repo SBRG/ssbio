@@ -1,0 +1,903 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="2004-04-13" modified="2017-10-25" version="130">
+<accession>P60844</accession>
+<accession>P48838</accession>
+<accession>P75827</accession>
+<accession>Q47159</accession>
+<name>AQPZ_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Aquaporin Z</fullName>
+</recommendedName>
+<alternativeName>
+<fullName>Bacterial nodulin-like intrinsic protein</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary">aqpZ</name>
+<name type="synonym">bniP</name>
+<name type="ordered locus">b0875</name>
+<name type="ordered locus">JW0859</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1995" name="J. Biol. Chem." volume="270" first="29063" last="29066">
+<title>Molecular cloning and characterization of AqpZ, a water channel from Escherichia coli.</title>
+<authorList>
+<person name="Calamita G."/>
+<person name="Bishai W.R."/>
+<person name="Preston G.M."/>
+<person name="Guggino W.B."/>
+<person name="Agre P."/>
+</authorList>
+<dbReference type="PubMed" id="7493926"/>
+<dbReference type="DOI" id="10.1074/jbc.270.49.29063"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12 / DH5-alpha</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="submission" date="1995-03" db="EMBL/GenBank/DDBJ databases">
+<title>Cloning and expression of a new member of aquaporin water channel family of E. coli.</title>
+<authorList>
+<person name="Fushimi K."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>LE392</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1997" name="Biochem. Mol. Biol. Int." volume="41" first="995" last="1003">
+<title>Isolation of a gene encoding nodulin-like intrinsic protein of Escherichia coli.</title>
+<authorList>
+<person name="Fushimi K."/>
+<person name="Bai L."/>
+<person name="Marumo F."/>
+<person name="Sasaki S."/>
+</authorList>
+<dbReference type="PubMed" id="9137831"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="137" last="155">
+<title>A 718-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 12.7-28.0 min region on the linkage map.</title>
+<authorList>
+<person name="Oshima T."/>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Honjo A."/>
+<person name="Ikemoto K."/>
+<person name="Inada T."/>
+<person name="Itoh T."/>
+<person name="Kajihara M."/>
+<person name="Kanai K."/>
+<person name="Kashimoto K."/>
+<person name="Kimura S."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Masuda S."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Motomura K."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Tagami H."/>
+<person name="Takemoto K."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Yano M."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="8905232"/>
+<dbReference type="DOI" id="10.1093/dnares/3.3.137"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1999" name="J. Bacteriol." volume="181" first="4193" last="4197">
+<title>Visualization of AqpZ-mediated water permeability in Escherichia coli by cryoelectron microscopy.</title>
+<authorList>
+<person name="Delamarche C."/>
+<person name="Thomas D."/>
+<person name="Rolland J.-P."/>
+<person name="Froger A."/>
+<person name="Gouranton J."/>
+<person name="Svelto M."/>
+<person name="Agre P."/>
+<person name="Calamita G."/>
+</authorList>
+<dbReference type="PubMed" id="10400575"/>
+</citation>
+<scope>FUNCTION</scope>
+<source>
+<strain>K12 / DH5-alpha</strain>
+</source>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1999" name="J. Mol. Biol." volume="291" first="1169" last="1179">
+<title>Functional reconstitution and characterization of AqpZ, the E. coli water channel protein.</title>
+<authorList>
+<person name="Borgnia M.J."/>
+<person name="Kozono D."/>
+<person name="Calamita G."/>
+<person name="Maloney P.C."/>
+<person name="Agre P."/>
+</authorList>
+<dbReference type="PubMed" id="10518952"/>
+<dbReference type="DOI" id="10.1006/jmbi.1999.3032"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>SUBUNIT</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<scope>MUTAGENESIS OF CYS-9; CYS-20; THR-183 AND ARG-189</scope>
+<source>
+<strain>K12 / DH5-alpha</strain>
+</source>
+</reference>
+<reference key="9">
+<citation type="journal article" date="2001" name="Proc. Natl. Acad. Sci. U.S.A." volume="98" first="9624" last="9629">
+<title>Highly selective water channel activity measured by voltage clamp: Analysis of planar lipid bilayers reconstituted with purified AqpZ.</title>
+<authorList>
+<person name="Pohl P."/>
+<person name="Saparov S.M."/>
+<person name="Borgnia M.J."/>
+<person name="Agre P."/>
+</authorList>
+<dbReference type="PubMed" id="11493683"/>
+<dbReference type="DOI" id="10.1073/pnas.161299398"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CHARACTERIZATION OF MEMBRANE SELECTIVITY</scope>
+<source>
+<strain>K12 / DH5-alpha</strain>
+</source>
+</reference>
+<reference key="10">
+<citation type="journal article" date="1999" name="J. Mol. Biol." volume="291" first="1181" last="1190">
+<title>Structure of the water channel AqpZ from Escherichia coli revealed by electron crystallography.</title>
+<authorList>
+<person name="Ringler P."/>
+<person name="Borgnia M.J."/>
+<person name="Stahlberg H."/>
+<person name="Maloney P.C."/>
+<person name="Agre P."/>
+<person name="Engel A."/>
+</authorList>
+<dbReference type="PubMed" id="10518953"/>
+<dbReference type="DOI" id="10.1006/jmbi.1999.3031"/>
+</citation>
+<scope>CRYSTALLIZATION</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="11">
+<citation type="journal article" date="1999" name="EMBO J." volume="18" first="4981" last="4987">
+<title>High resolution AFM topographs of the Escherichia coli water channel aquaporin Z.</title>
+<authorList>
+<person name="Scheuring S."/>
+<person name="Ringler P."/>
+<person name="Borgnia M.J."/>
+<person name="Stahlberg H."/>
+<person name="Mueller D.J."/>
+<person name="Agre P."/>
+<person name="Engel A."/>
+</authorList>
+<dbReference type="PubMed" id="10487750"/>
+<dbReference type="DOI" id="10.1093/emboj/18.18.4981"/>
+</citation>
+<scope>SUBUNIT</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<scope>TOPOLOGY</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="2005" name="Science" volume="308" first="1321" last="1323">
+<title>Global topology analysis of the Escherichia coli inner membrane proteome.</title>
+<authorList>
+<person name="Daley D.O."/>
+<person name="Rapp M."/>
+<person name="Granseth E."/>
+<person name="Melen K."/>
+<person name="Drew D."/>
+<person name="von Heijne G."/>
+</authorList>
+<dbReference type="PubMed" id="15919996"/>
+<dbReference type="DOI" id="10.1126/science.1109730"/>
+</citation>
+<scope>TOPOLOGY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="13">
+<citation type="journal article" date="2003" name="PLoS Biol." volume="1" first="334" last="340">
+<title>Architecture and selectivity in aquaporins: 2.5 A X-ray structure of aquaporin Z.</title>
+<authorList>
+<person name="Savage D.F."/>
+<person name="Egea P.F."/>
+<person name="Robles-Colmenares Y."/>
+<person name="O'Connell J.D. III"/>
+<person name="Stroud R.M."/>
+</authorList>
+<dbReference type="PubMed" id="14691544"/>
+<dbReference type="DOI" id="10.1371/journal.pbio.0000072"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.5 ANGSTROMS)</scope>
+</reference>
+<reference key="14">
+<citation type="journal article" date="2000" name="Mol. Microbiol." volume="37" first="254" last="262">
+<title>The Escherichia coli aquaporin-Z water channel.</title>
+<authorList>
+<person name="Calamita G."/>
+</authorList>
+<dbReference type="PubMed" id="10931322"/>
+<dbReference type="DOI" id="10.1046/j.1365-2958.2000.02016.x"/>
+</citation>
+<scope>REVIEW</scope>
+</reference>
+<comment type="function">
+<text evidence="4 6 8">Channel that permits osmotically driven movement of water in both directions. It is involved in the osmoregulation and in the maintenance of cell turgor during volume expansion in rapidly growing cells. It mediates rapid entry or exit of water in response to abrupt changes in osmolarity.</text>
+</comment>
+<comment type="subunit">
+<text evidence="5 6 7">Homotetramer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-957663"/>
+<interactant intactId="EBI-957663"/>
+<organismsDiffer>false</organismsDiffer>
+<experiments>4</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="5 6">Cell inner membrane</location>
+<topology evidence="5 6">Multi-pass membrane protein</topology>
+</subcellularLocation>
+</comment>
+<comment type="induction">
+<text>By extracellular hypoosmotic conditions, especially during the mid-logarithmic phase of growth.</text>
+</comment>
+<comment type="domain">
+<text>Aquaporins contain two tandem repeats each containing three membrane-spanning domains and a pore-forming loop with the signature motif Asn-Pro-Ala (NPA).</text>
+</comment>
+<comment type="miscellaneous">
+<text evidence="10">It is a remarkably rigid tetramer that does not dissociate even when solubilized in SDS.</text>
+</comment>
+<comment type="similarity">
+<text evidence="9">Belongs to the MIP/aquaporin (TC 1.A.8) family.</text>
+</comment>
+<dbReference type="EMBL" id="U38664">
+<property type="protein sequence ID" value="AAC43518.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="D49469">
+<property type="protein sequence ID" value="BAA08441.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC73962.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA35589.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="C64826">
+<property type="entry name" value="C64826"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_415396.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_001298299.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1RC2">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="A/B=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="2ABM">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="3.20"/>
+<property type="chains" value="A/B/C/D/E/F/G/H=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="2O9D">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.30"/>
+<property type="chains" value="A/B=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="2O9E">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.20"/>
+<property type="chains" value="A=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="2O9F">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.55"/>
+<property type="chains" value="A/B=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="2O9G">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.90"/>
+<property type="chains" value="A=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="3NK5">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.40"/>
+<property type="chains" value="A/B=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="3NKA">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="A/B=1-231"/>
+</dbReference>
+<dbReference type="PDB" id="3NKC">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="3.10"/>
+<property type="chains" value="A/B=1-231"/>
+</dbReference>
+<dbReference type="PDBsum" id="1RC2"/>
+<dbReference type="PDBsum" id="2ABM"/>
+<dbReference type="PDBsum" id="2O9D"/>
+<dbReference type="PDBsum" id="2O9E"/>
+<dbReference type="PDBsum" id="2O9F"/>
+<dbReference type="PDBsum" id="2O9G"/>
+<dbReference type="PDBsum" id="3NK5"/>
+<dbReference type="PDBsum" id="3NKA"/>
+<dbReference type="PDBsum" id="3NKC"/>
+<dbReference type="ProteinModelPortal" id="P60844"/>
+<dbReference type="SMR" id="P60844"/>
+<dbReference type="BioGrid" id="4260000">
+<property type="interactions" value="107"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-35499N"/>
+<dbReference type="STRING" id="316385.ECDH10B_0945"/>
+<dbReference type="DrugBank" id="DB03152">
+<property type="generic name" value="B-2-Octylglucoside"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB07923">
+<property type="generic name" value="octyl alpha-L-altropyranoside"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB07924">
+<property type="generic name" value="octyl beta-D-galactopyranoside"/>
+</dbReference>
+<dbReference type="TCDB" id="1.A.8.3.1">
+<property type="family name" value="the major intrinsic protein (mip) family"/>
+</dbReference>
+<dbReference type="PaxDb" id="P60844"/>
+<dbReference type="PRIDE" id="P60844"/>
+<dbReference type="EnsemblBacteria" id="AAC73962">
+<property type="protein sequence ID" value="AAC73962"/>
+<property type="gene ID" value="b0875"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA35589">
+<property type="protein sequence ID" value="BAA35589"/>
+<property type="gene ID" value="BAA35589"/>
+</dbReference>
+<dbReference type="GeneID" id="945497"/>
+<dbReference type="KEGG" id="ecj:JW0859"/>
+<dbReference type="KEGG" id="eco:b0875"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.1402"/>
+<dbReference type="EchoBASE" id="EB1283"/>
+<dbReference type="EcoGene" id="EG13270">
+<property type="gene designation" value="aqpZ"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105D8C">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0580">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000288286"/>
+<dbReference type="InParanoid" id="P60844"/>
+<dbReference type="KO" id="K06188"/>
+<dbReference type="PhylomeDB" id="P60844"/>
+<dbReference type="BioCyc" id="EcoCyc:AQPZ-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:AQPZ-MONOMER"/>
+<dbReference type="EvolutionaryTrace" id="P60844"/>
+<dbReference type="PRO" id="PR:P60844"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016021">
+<property type="term" value="C:integral component of membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoliWiki"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005887">
+<property type="term" value="C:integral component of plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005886">
+<property type="term" value="C:plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042802">
+<property type="term" value="F:identical protein binding"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0015250">
+<property type="term" value="F:water channel activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009992">
+<property type="term" value="P:cellular water homeostasis"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006970">
+<property type="term" value="P:response to osmotic stress"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006833">
+<property type="term" value="P:water transport"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="CDD" id="cd00333">
+<property type="entry name" value="MIP"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="1.20.1080.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="HAMAP" id="MF_01146">
+<property type="entry name" value="Aquaporin_Z"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR023271">
+<property type="entry name" value="Aquaporin-like"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR034294">
+<property type="entry name" value="Aquaporin_transptr"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR023743">
+<property type="entry name" value="Aquaporin_Z"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR000425">
+<property type="entry name" value="MIP"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR022357">
+<property type="entry name" value="MIP_CS"/>
+</dbReference>
+<dbReference type="PANTHER" id="PTHR19139">
+<property type="entry name" value="PTHR19139"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00230">
+<property type="entry name" value="MIP"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PRINTS" id="PR00783">
+<property type="entry name" value="MINTRINSICP"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF81338">
+<property type="entry name" value="SSF81338"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00861">
+<property type="entry name" value="MIP"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00221">
+<property type="entry name" value="MIP"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0997">Cell inner membrane</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0677">Repeat</keyword>
+<keyword id="KW-0812">Transmembrane</keyword>
+<keyword id="KW-1133">Transmembrane helix</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="chain" description="Aquaporin Z" id="PRO_0000063989">
+<location>
+<begin position="1"/>
+<end position="231"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="3">
+<location>
+<begin position="1"/>
+<end position="8"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Name=1" evidence="3">
+<location>
+<begin position="9"/>
+<end position="29"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="3">
+<location>
+<begin position="30"/>
+<end position="33"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Name=2" evidence="3">
+<location>
+<begin position="34"/>
+<end position="54"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="3">
+<location>
+<begin position="55"/>
+<end position="81"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Name=3" evidence="3">
+<location>
+<begin position="82"/>
+<end position="102"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="3">
+<location>
+<begin position="103"/>
+<end position="130"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Name=4" evidence="3">
+<location>
+<begin position="131"/>
+<end position="151"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="3">
+<location>
+<begin position="152"/>
+<end position="155"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Name=5" evidence="3">
+<location>
+<begin position="156"/>
+<end position="176"/>
+</location>
+</feature>
+<feature type="topological domain" description="Periplasmic" evidence="3">
+<location>
+<begin position="177"/>
+<end position="201"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Name=6" evidence="3">
+<location>
+<begin position="202"/>
+<end position="222"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="3">
+<location>
+<begin position="223"/>
+<end position="231"/>
+</location>
+</feature>
+<feature type="short sequence motif" description="NPA 1">
+<location>
+<begin position="63"/>
+<end position="65"/>
+</location>
+</feature>
+<feature type="short sequence motif" description="NPA 2">
+<location>
+<begin position="186"/>
+<end position="188"/>
+</location>
+</feature>
+<feature type="site" description="Involved in tetramerization or stability of the tetramer">
+<location>
+<position position="20"/>
+</location>
+</feature>
+<feature type="site" description="Selectivity filter">
+<location>
+<position position="43"/>
+</location>
+</feature>
+<feature type="site" description="Selectivity filter">
+<location>
+<position position="174"/>
+</location>
+</feature>
+<feature type="site" description="Selectivity filter">
+<location>
+<position position="183"/>
+</location>
+</feature>
+<feature type="site" description="Selectivity filter">
+<location>
+<position position="189"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="No effect." evidence="6">
+<original>C</original>
+<variation>S</variation>
+<location>
+<position position="9"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Loss of oligomerization; no alteration of water permeability." evidence="6">
+<original>C</original>
+<variation>S</variation>
+<location>
+<position position="20"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="No effect." evidence="6">
+<original>T</original>
+<variation>C</variation>
+<location>
+<position position="183"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Loss of function." evidence="6">
+<original>R</original>
+<variation>V</variation>
+<variation>S</variation>
+<location>
+<position position="189"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 2; BAA08441." ref="2" evidence="9">
+<original>W</original>
+<variation>C</variation>
+<location>
+<position position="14"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 2; BAA08441." ref="2" evidence="9">
+<original>A</original>
+<variation>P</variation>
+<location>
+<position position="26"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAC43518." ref="1" evidence="9">
+<original>L</original>
+<variation>V</variation>
+<location>
+<position position="99"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="1"/>
+<end position="25"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="26"/>
+<end position="28"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="30"/>
+<end position="32"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="35"/>
+<end position="58"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="64"/>
+<end position="72"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="78"/>
+<end position="80"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="81"/>
+<end position="103"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="111"/>
+<end position="114"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="115"/>
+<end position="117"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="122"/>
+<end position="124"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="125"/>
+<end position="127"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="131"/>
+<end position="152"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="162"/>
+<end position="181"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="187"/>
+<end position="197"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="200"/>
+<end position="203"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="205"/>
+<end position="226"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="2O9F"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="2O9G"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000255"/>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10400575"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10487750"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10518952"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10518953"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="11493683"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000305"/>
+<evidence key="10" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="10518952"/>
+</source>
+</evidence>
+<sequence length="231" mass="23703" checksum="3BDE1A932D45CF14" modified="2004-04-13" version="1">
+MFRKLAAECFGTFWLVFGGCGSAVLAAGFPELGIGFAGVALAFGLTVLTMAFAVGHISGG
+HFNPAVTIGLWAGGRFPAKEVVGYVIAQVVGGIVAAALLYLIASGKTGFDAAASGFASNG
+YGEHSPGGYSMLSALVVELVLSAGFLLVIHGATDKFAPAGFAPIAIGLALTLIHLISIPV
+TNTSVNPARSTAVAIFQGGWALEQLWFFWVVPIVGGIIGGLIYRTLLEKRD
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

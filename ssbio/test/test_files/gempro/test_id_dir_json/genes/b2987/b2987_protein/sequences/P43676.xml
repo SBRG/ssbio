@@ -1,0 +1,352 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1995-11-01" modified="2017-07-05" version="117">
+<accession>P43676</accession>
+<accession>Q2M9K8</accession>
+<name>PITB_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Probable low-affinity inorganic phosphate transporter 2</fullName>
+</recommendedName>
+</protein>
+<gene>
+<name type="primary">pitB</name>
+<name type="ordered locus">b2987</name>
+<name type="ordered locus">JW2955</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1995" name="J. Biol. Chem." volume="270" first="14031" last="14041">
+<title>Glutathionylspermidine metabolism in Escherichia coli. Purification, cloning, overproduction, and characterization of a bifunctional glutathionylspermidine synthetase/amidase.</title>
+<authorList>
+<person name="Bollinger J.M. Jr."/>
+<person name="Kwon D.S."/>
+<person name="Huisman G.W."/>
+<person name="Kolter R."/>
+<person name="Walsh C.T."/>
+</authorList>
+<dbReference type="PubMed" id="7775463"/>
+<dbReference type="DOI" id="10.1074/jbc.270.23.14031"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-217</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="2005" name="Science" volume="308" first="1321" last="1323">
+<title>Global topology analysis of the Escherichia coli inner membrane proteome.</title>
+<authorList>
+<person name="Daley D.O."/>
+<person name="Rapp M."/>
+<person name="Granseth E."/>
+<person name="Melen K."/>
+<person name="Drew D."/>
+<person name="von Heijne G."/>
+</authorList>
+<dbReference type="PubMed" id="15919996"/>
+<dbReference type="DOI" id="10.1126/science.1109730"/>
+</citation>
+<scope>SUBCELLULAR LOCATION</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<comment type="function">
+<text evidence="1">Low-affinity inorganic phosphate transport.</text>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="3">Cell inner membrane</location>
+<topology evidence="3">Multi-pass membrane protein</topology>
+</subcellularLocation>
+</comment>
+<comment type="similarity">
+<text evidence="4">Belongs to the inorganic phosphate transporter (PiT) (TC 2.A.20) family. Pit subfamily.</text>
+</comment>
+<dbReference type="EMBL" id="U28377">
+<property type="protein sequence ID" value="AAA69154.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC76023.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAE77048.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U23148">
+<property type="protein sequence ID" value="AAC43340.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="A65085">
+<property type="entry name" value="A65085"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_417461.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000933250.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="ProteinModelPortal" id="P43676"/>
+<dbReference type="BioGrid" id="4261181">
+<property type="interactions" value="18"/>
+</dbReference>
+<dbReference type="STRING" id="316385.ECDH10B_3164"/>
+<dbReference type="TCDB" id="2.A.20.1.2">
+<property type="family name" value="the inorganic phosphate transporter (pit) family"/>
+</dbReference>
+<dbReference type="PaxDb" id="P43676"/>
+<dbReference type="PRIDE" id="P43676"/>
+<dbReference type="EnsemblBacteria" id="AAC76023">
+<property type="protein sequence ID" value="AAC76023"/>
+<property type="gene ID" value="b2987"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAE77048">
+<property type="protein sequence ID" value="BAE77048"/>
+<property type="gene ID" value="BAE77048"/>
+</dbReference>
+<dbReference type="GeneID" id="947475"/>
+<dbReference type="KEGG" id="ecj:JW2955"/>
+<dbReference type="KEGG" id="eco:b2987"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.3743"/>
+<dbReference type="EchoBASE" id="EB2721"/>
+<dbReference type="EcoGene" id="EG12883">
+<property type="gene designation" value="pitB"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105CJ3">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0306">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000231893"/>
+<dbReference type="InParanoid" id="P43676"/>
+<dbReference type="KO" id="K16322"/>
+<dbReference type="PhylomeDB" id="P43676"/>
+<dbReference type="BioCyc" id="EcoCyc:PITB-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:PITB-MONOMER"/>
+<dbReference type="PRO" id="PR:P43676"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016021">
+<property type="term" value="C:integral component of membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005887">
+<property type="term" value="C:integral component of plasma membrane"/>
+<property type="evidence" value="ECO:0000255"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005886">
+<property type="term" value="C:plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005315">
+<property type="term" value="F:inorganic phosphate transmembrane transporter activity"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0035435">
+<property type="term" value="P:phosphate ion transmembrane transport"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001204">
+<property type="entry name" value="Phos_transporter"/>
+</dbReference>
+<dbReference type="PANTHER" id="PTHR11101">
+<property type="entry name" value="PTHR11101"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF01384">
+<property type="entry name" value="PHO4"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="inferred from homology"/>
+<keyword id="KW-0997">Cell inner membrane</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-0592">Phosphate transport</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0812">Transmembrane</keyword>
+<keyword id="KW-1133">Transmembrane helix</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="chain" description="Probable low-affinity inorganic phosphate transporter 2" id="PRO_0000080785">
+<location>
+<begin position="1"/>
+<end position="499"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="5"/>
+<end position="25"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="52"/>
+<end position="72"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="94"/>
+<end position="114"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="124"/>
+<end position="144"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="155"/>
+<end position="175"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="207"/>
+<end position="227"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="233"/>
+<end position="253"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="382"/>
+<end position="402"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="430"/>
+<end position="450"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical" evidence="2">
+<location>
+<begin position="473"/>
+<end position="493"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 3; AAC43340." ref="3" evidence="4">
+<original>S</original>
+<variation>C</variation>
+<location>
+<position position="182"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 3; AAC43340." ref="3" evidence="4">
+<original>A</original>
+<variation>G</variation>
+<location>
+<position position="213"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000250"/>
+<evidence key="2" type="ECO:0000255"/>
+<evidence key="3" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="15919996"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000305"/>
+<sequence length="499" mass="53809" checksum="1D3677057FAB295B" modified="1995-11-01" version="1">
+MLNLFVGLDIYTGLLLLLALAFVLFYEAINGFHDTANAVAAVIYTRAMQPQLAVVMAAFF
+NFFGVLLGGLSVAYAIVHMLPTDLLLNMGSTHGLAMVFSMLLAAIIWNLGTWFFGLPASS
+SHTLIGAIIGIGLTNALLTGSSVMDALNLREVTKIFSSLIVSPIVGLVIAGGLIFLLRRY
+WSGTKKRDRIHRIPEDRKKKKGKRKPPFWTRIALIVSAAGVAFSHGANDGQKGIGLVMLV
+LVGIAPAGFVVNMNASGYEITRTRDAVTNFEHYLQQHPELPQKLIAMEPPLPAASTDGTQ
+VTEFHCHPANTFDAIARVKTMLPGNMESYEPLSVSQRSQLRRIMLCISDTSAKLAKLPGV
+SKEDQNLLKKLRSDMLSTIEYAPVWIIMAVALALGIGTMIGWRRVAMTIGEKIGKRGMTY
+AQGMAAQMTAAVSIGLASYIGMPVSTTHVLSSAVAGTMVVDGGGLQRKTVTSILMAWVFT
+LPAAIFLSGGLYWIALQLI
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

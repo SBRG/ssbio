@@ -1,0 +1,794 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-04-01" modified="2018-01-31" version="116">
+<accession>P0AA04</accession>
+<accession>P05525</accession>
+<accession>P07006</accession>
+<name>PTHP_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Phosphocarrier protein HPr</fullName>
+</recommendedName>
+<alternativeName>
+<fullName>Histidine-containing protein</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary">ptsH</name>
+<name type="synonym">hpr</name>
+<name type="ordered locus">b2415</name>
+<name type="ordered locus">JW2408</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1988" name="J. Bacteriol." volume="170" first="3827" last="3837">
+<title>The ptsH, ptsI, and crr genes of the Escherichia coli phosphoenolpyruvate-dependent phosphotransferase system: a complex operon with several modes of transcription.</title>
+<authorList>
+<person name="de Reuse H."/>
+<person name="Danchin A."/>
+</authorList>
+<dbReference type="PubMed" id="2457575"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1985" name="Gene" volume="35" first="199" last="207">
+<title>Analysis of the ptsH-ptsI-crr region in Escherichia coli K-12: nucleotide sequence of the ptsH gene.</title>
+<authorList>
+<person name="de Reuse H."/>
+<person name="Roy A."/>
+<person name="Danchin A."/>
+</authorList>
+<dbReference type="PubMed" id="2411636"/>
+<dbReference type="DOI" id="10.1016/0378-1119(85)90172-6"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1987" name="J. Biol. Chem." volume="262" first="16241" last="16253">
+<title>Sugar transport by the bacterial phosphotransferase system. Molecular cloning and structural analysis of the Escherichia coli ptsH, ptsI, and crr genes.</title>
+<authorList>
+<person name="Saffen D.W."/>
+<person name="Presper K.A."/>
+<person name="Doering T.L."/>
+<person name="Roseman S."/>
+</authorList>
+<dbReference type="PubMed" id="2960675"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1988" name="J. Bacteriol." volume="170" first="3150" last="3157">
+<title>DNA sequences of the cysK regions of Salmonella typhimurium and Escherichia coli and linkage of the cysK regions to ptsH.</title>
+<authorList>
+<person name="Byrne C.R."/>
+<person name="Monroe R.S."/>
+<person name="Ward K.A."/>
+<person name="Kredich N.M."/>
+</authorList>
+<dbReference type="PubMed" id="3290198"/>
+<dbReference type="DOI" id="10.1128/jb.170.7.3150-3157.1988"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="1997" name="DNA Res." volume="4" first="91" last="113">
+<title>Construction of a contiguous 874-kb sequence of the Escherichia coli-K12 genome corresponding to 50.0-68.8 min on the linkage map and analysis of its sequence features.</title>
+<authorList>
+<person name="Yamamoto Y."/>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kimura S."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mitsuhashi N."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Oshima T."/>
+<person name="Oyama S."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Satoh Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takahashi H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Uehara K."/>
+<person name="Wada C."/>
+<person name="Yamagata S."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9205837"/>
+<dbReference type="DOI" id="10.1093/dnares/4.2.91"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="7">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1998" name="FEMS Microbiol. Lett." volume="169" first="375" last="382">
+<title>Small genes/gene-products in Escherichia coli K-12.</title>
+<authorList>
+<person name="Wasinger V.C."/>
+<person name="Humphery-Smith I."/>
+</authorList>
+<dbReference type="PubMed" id="9868784"/>
+<dbReference type="DOI" id="10.1111/j.1574-6968.1998.tb13343.x"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 1-20</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1259" last="1313">
+<title>Comparing the predicted and observed properties of proteins encoded in the genome of Escherichia coli K-12.</title>
+<authorList>
+<person name="Link A.J."/>
+<person name="Robison K."/>
+<person name="Church G.M."/>
+</authorList>
+<dbReference type="PubMed" id="9298646"/>
+<dbReference type="DOI" id="10.1002/elps.1150180807"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 1-12</scope>
+<source>
+<strain>K12 / EMG2</strain>
+</source>
+</reference>
+<reference key="10">
+<citation type="submission" date="1996-02" db="UniProtKB">
+<authorList>
+<person name="Frutiger S."/>
+<person name="Hughes G.J."/>
+<person name="Pasquali C."/>
+<person name="Hochstrasser D.F."/>
+</authorList>
+</citation>
+<scope>PROTEIN SEQUENCE OF 1-12</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="11">
+<citation type="journal article" date="1990" name="Biochemistry" volume="29" first="8164" last="8171">
+<title>Effect of phosphorylation on hydrogen-bonding interactions of the active site histidine of the phosphocarrier protein HPr of the phosphoenolpyruvate-dependent phosphotransferase system determined by 15N NMR spectroscopy.</title>
+<authorList>
+<person name="van Dijk A.A."/>
+<person name="de Lange L.C."/>
+<person name="Bachovchin W.W."/>
+<person name="Robillard G.T."/>
+</authorList>
+<dbReference type="PubMed" id="2261470"/>
+<dbReference type="DOI" id="10.1021/bi00487a026"/>
+</citation>
+<scope>ACTIVE SITE HIS-15</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1243" last="1251">
+<title>Escherichia coli proteome analysis using the gene-protein database.</title>
+<authorList>
+<person name="VanBogelen R.A."/>
+<person name="Abshire K.Z."/>
+<person name="Moldover B."/>
+<person name="Olson E.R."/>
+<person name="Neidhardt F.C."/>
+</authorList>
+<dbReference type="PubMed" id="9298644"/>
+<dbReference type="DOI" id="10.1002/elps.1150180805"/>
+</citation>
+<scope>IDENTIFICATION BY 2D-GEL</scope>
+</reference>
+<reference key="13">
+<citation type="journal article" date="1993" name="J. Biol. Chem." volume="268" first="22490" last="22501">
+<title>The 2.0-A resolution structure of Escherichia coli histidine-containing phosphocarrier protein HPr. A redetermination.</title>
+<authorList>
+<person name="Jia Z."/>
+<person name="Quail J.W."/>
+<person name="Waygood E.B."/>
+<person name="Delbaere L.T.J."/>
+</authorList>
+<dbReference type="PubMed" id="8226757"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.0 ANGSTROMS)</scope>
+</reference>
+<reference key="14">
+<citation type="journal article" date="1996" name="Biochemistry" volume="35" first="11260" last="11267">
+<title>Mutation of serine-46 to aspartate in the histidine-containing protein of Escherichia coli mimics the inactivation by phosphorylation of serine-46 in HPrs from Gram-positive bacteria.</title>
+<authorList>
+<person name="Napper S."/>
+<person name="Anderson J.W."/>
+<person name="Georges F."/>
+<person name="Quail J.W."/>
+<person name="Delbaere L.T.J."/>
+<person name="Waygood E.B."/>
+</authorList>
+<dbReference type="PubMed" id="8784179"/>
+<dbReference type="DOI" id="10.1021/bi9603480"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.5 ANGSTROMS)</scope>
+</reference>
+<reference key="15">
+<citation type="journal article" date="1986" name="Biochemistry" volume="25" first="7774" last="7781">
+<title>Two-dimensional 1H NMR studies of histidine-containing protein from Escherichia coli. 3. Secondary and tertiary structure as determined by NMR.</title>
+<authorList>
+<person name="Klevit R.E."/>
+<person name="Waygood E.B."/>
+</authorList>
+<dbReference type="PubMed" id="3542036"/>
+<dbReference type="DOI" id="10.1021/bi00371a073"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<reference key="16">
+<citation type="journal article" date="1991" name="Biochemistry" volume="30" first="11842" last="11850">
+<title>Reexamination of the secondary and tertiary structure of histidine-containing protein from Escherichia coli by homonuclear and heteronuclear NMR spectroscopy.</title>
+<authorList>
+<person name="Hammen P.K."/>
+<person name="Waygood E.B."/>
+<person name="Klevit R.E."/>
+</authorList>
+<dbReference type="PubMed" id="1751501"/>
+<dbReference type="DOI" id="10.1021/bi00115a014"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<reference key="17">
+<citation type="journal article" date="1992" name="Eur. J. Biochem." volume="210" first="881" last="891">
+<title>Determination of the three-dimensional solution structure of the histidine-containing phosphocarrier protein HPr from Escherichia coli using multidimensional NMR spectroscopy.</title>
+<authorList>
+<person name="van Nuland N.A.J."/>
+<person name="Groetzinger J."/>
+<person name="Dijkstra K."/>
+<person name="Scheek R.M."/>
+<person name="Robillard G.T."/>
+</authorList>
+<dbReference type="PubMed" id="1483471"/>
+<dbReference type="DOI" id="10.1111/j.1432-1033.1992.tb17492.x"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<reference key="18">
+<citation type="journal article" date="1994" name="J. Mol. Biol." volume="237" first="544" last="559">
+<title>The high-resolution structure of the histidine-containing phosphocarrier protein HPr from Escherichia coli determined by restrained molecular dynamics from nuclear magnetic resonance nuclear Overhauser effect data.</title>
+<authorList>
+<person name="van Nuland N.A.J."/>
+<person name="Hangyi I.W."/>
+<person name="van Schaik R.C."/>
+<person name="Berendsen H.J."/>
+<person name="van Gunsteren W.F."/>
+<person name="Scheek R.M."/>
+<person name="Robillard G.T."/>
+</authorList>
+<dbReference type="PubMed" id="8158637"/>
+<dbReference type="DOI" id="10.1006/jmbi.1994.1254"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<reference key="19">
+<citation type="journal article" date="1995" name="J. Mol. Biol." volume="246" first="180" last="193">
+<title>High-resolution structure of the phosphorylated form of the histidine-containing phosphocarrier protein HPr from Escherichia coli determined by restrained molecular dynamics from NMR-NOE data.</title>
+<authorList>
+<person name="van Nuland N.A.J."/>
+<person name="Boelens R."/>
+<person name="Scheek R.M."/>
+<person name="Robillard G.T."/>
+</authorList>
+<dbReference type="PubMed" id="7853396"/>
+<dbReference type="DOI" id="10.1006/jmbi.1994.0075"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<reference key="20">
+<citation type="journal article" date="1996" name="Protein Sci." volume="5" first="442" last="446">
+<title>Phosphorylation-induced torsion-angle strain in the active center of HPr, detected by NMR and restrained molecular dynamics refinement.</title>
+<authorList>
+<person name="van Nuland N.A.J."/>
+<person name="Wiersma J.A."/>
+<person name="van der Spoel D."/>
+<person name="de Groot B.L."/>
+<person name="Scheek R.M."/>
+<person name="Robillard G.T."/>
+</authorList>
+<dbReference type="PubMed" id="8868480"/>
+<dbReference type="DOI" id="10.1002/pro.5560050305"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<reference key="21">
+<citation type="journal article" date="1999" name="Nat. Struct. Biol." volume="6" first="166" last="173">
+<title>Solution structure of the 40,000 Mr phosphoryl transfer complex between the N-terminal domain of enzyme I and HPr.</title>
+<authorList>
+<person name="Garrett D.S."/>
+<person name="Seok Y.-J."/>
+<person name="Peterkofsky A."/>
+<person name="Gronenborn A.M."/>
+<person name="Clore G.M."/>
+</authorList>
+<dbReference type="PubMed" id="10048929"/>
+<dbReference type="DOI" id="10.1038/5854"/>
+</citation>
+<scope>STRUCTURE BY NMR</scope>
+</reference>
+<comment type="function">
+<text>General (non sugar-specific) component of the phosphoenolpyruvate-dependent sugar phosphotransferase system (sugar PTS). This major carbohydrate active-transport system catalyzes the phosphorylation of incoming sugar substrates concomitantly with their translocation across the cell membrane. The phosphoryl group from phosphoenolpyruvate (PEP) is transferred to the phosphoryl carrier protein HPr by enzyme I. Phospho-HPr then transfers it to the PTS EIIA domain.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-902853"/>
+<interactant intactId="EBI-545674">
+<id>P11989</id>
+<label>bglG</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>5</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-902853"/>
+<interactant intactId="EBI-551533">
+<id>P08839</id>
+<label>ptsI</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>4</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location>Cytoplasm</location>
+</subcellularLocation>
+</comment>
+<comment type="similarity">
+<text evidence="5">Belongs to the HPr family.</text>
+</comment>
+<dbReference type="EMBL" id="M10425">
+<property type="protein sequence ID" value="AAA24438.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="J02796">
+<property type="protein sequence ID" value="AAA24440.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M21994">
+<property type="protein sequence ID" value="AAA24384.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M21451">
+<property type="protein sequence ID" value="AAA23655.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC75468.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA16289.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="A29785">
+<property type="entry name" value="WQECPH"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416910.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000487600.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1CM2">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.80"/>
+<property type="chains" value="A=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1CM3">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.60"/>
+<property type="chains" value="A=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1GGR">
+<property type="method" value="NMR"/>
+<property type="chains" value="B=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1HDN">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1J6T">
+<property type="method" value="NMR"/>
+<property type="chains" value="B=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1OPD">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.50"/>
+<property type="chains" value="A=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1PFH">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1POH">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.00"/>
+<property type="chains" value="A=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="1VRC">
+<property type="method" value="NMR"/>
+<property type="chains" value="C/D=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="2JEL">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="P=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="2LRK">
+<property type="method" value="NMR"/>
+<property type="chains" value="D=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="2LRL">
+<property type="method" value="NMR"/>
+<property type="chains" value="D=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="2XDF">
+<property type="method" value="NMR"/>
+<property type="chains" value="C/D=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="3CCD">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.00"/>
+<property type="chains" value="A/B=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="3EZA">
+<property type="method" value="NMR"/>
+<property type="chains" value="B=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="3EZB">
+<property type="method" value="NMR"/>
+<property type="chains" value="B=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="3EZE">
+<property type="method" value="NMR"/>
+<property type="chains" value="B=1-85"/>
+</dbReference>
+<dbReference type="PDB" id="4XWJ">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.10"/>
+<property type="chains" value="B=1-85"/>
+</dbReference>
+<dbReference type="PDBsum" id="1CM2"/>
+<dbReference type="PDBsum" id="1CM3"/>
+<dbReference type="PDBsum" id="1GGR"/>
+<dbReference type="PDBsum" id="1HDN"/>
+<dbReference type="PDBsum" id="1J6T"/>
+<dbReference type="PDBsum" id="1OPD"/>
+<dbReference type="PDBsum" id="1PFH"/>
+<dbReference type="PDBsum" id="1POH"/>
+<dbReference type="PDBsum" id="1VRC"/>
+<dbReference type="PDBsum" id="2JEL"/>
+<dbReference type="PDBsum" id="2LRK"/>
+<dbReference type="PDBsum" id="2LRL"/>
+<dbReference type="PDBsum" id="2XDF"/>
+<dbReference type="PDBsum" id="3CCD"/>
+<dbReference type="PDBsum" id="3EZA"/>
+<dbReference type="PDBsum" id="3EZB"/>
+<dbReference type="PDBsum" id="3EZE"/>
+<dbReference type="PDBsum" id="4XWJ"/>
+<dbReference type="ProteinModelPortal" id="P0AA04"/>
+<dbReference type="SMR" id="P0AA04"/>
+<dbReference type="BioGrid" id="4259700">
+<property type="interactions" value="557"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-35731N"/>
+<dbReference type="IntAct" id="P0AA04">
+<property type="interactions" value="10"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-8085981"/>
+<dbReference type="STRING" id="316385.ECDH10B_2580"/>
+<dbReference type="TCDB" id="8.A.8.1.1">
+<property type="family name" value="the phosphotransferase system hpr (hpr) family"/>
+</dbReference>
+<dbReference type="iPTMnet" id="P0AA04"/>
+<dbReference type="SWISS-2DPAGE" id="P0AA04"/>
+<dbReference type="EPD" id="P0AA04"/>
+<dbReference type="PaxDb" id="P0AA04"/>
+<dbReference type="PRIDE" id="P0AA04"/>
+<dbReference type="EnsemblBacteria" id="AAC75468">
+<property type="protein sequence ID" value="AAC75468"/>
+<property type="gene ID" value="b2415"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA16289">
+<property type="protein sequence ID" value="BAA16289"/>
+<property type="gene ID" value="BAA16289"/>
+</dbReference>
+<dbReference type="GeneID" id="34152663"/>
+<dbReference type="GeneID" id="946886"/>
+<dbReference type="KEGG" id="ecj:JW2408"/>
+<dbReference type="KEGG" id="eco:b2415"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.4316"/>
+<dbReference type="EchoBASE" id="EB0781"/>
+<dbReference type="EcoGene" id="EG10788">
+<property type="gene designation" value="ptsH"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG1925">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000278399"/>
+<dbReference type="InParanoid" id="P0AA04"/>
+<dbReference type="KO" id="K02784"/>
+<dbReference type="PhylomeDB" id="P0AA04"/>
+<dbReference type="BioCyc" id="EcoCyc:PTSH-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:PTSH-MONOMER"/>
+<dbReference type="EvolutionaryTrace" id="P0AA04"/>
+<dbReference type="PRO" id="PR:P0AA04"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0019197">
+<property type="term" value="C:phosphoenolpyruvate-dependent sugar phosphotransferase complex"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008047">
+<property type="term" value="F:enzyme activator activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoliWiki"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016301">
+<property type="term" value="F:kinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008965">
+<property type="term" value="F:phosphoenolpyruvate-protein phosphotransferase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009401">
+<property type="term" value="P:phosphoenolpyruvate-dependent sugar phosphotransferase system"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0045819">
+<property type="term" value="P:positive regulation of glycogen catabolic process"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="CDD" id="cd00367">
+<property type="entry name" value="PTS-HPr_like"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.30.1340.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR000032">
+<property type="entry name" value="HPr-like"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR035895">
+<property type="entry name" value="HPr-like_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001020">
+<property type="entry name" value="PTS_HPr_His_P_site"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR002114">
+<property type="entry name" value="PTS_HPr_Ser_P_site"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00381">
+<property type="entry name" value="PTS-HPr"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PRINTS" id="PR00107">
+<property type="entry name" value="PHOSPHOCPHPR"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF55594">
+<property type="entry name" value="SSF55594"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR01003">
+<property type="entry name" value="PTS_HPr_family"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51350">
+<property type="entry name" value="PTS_HPR_DOM"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00369">
+<property type="entry name" value="PTS_HPR_HIS"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00589">
+<property type="entry name" value="PTS_HPR_SER"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0963">Cytoplasm</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0598">Phosphotransferase system</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0762">Sugar transport</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="chain" description="Phosphocarrier protein HPr" id="PRO_0000107850">
+<location>
+<begin position="1"/>
+<end position="85"/>
+</location>
+</feature>
+<feature type="domain" description="HPr" evidence="3">
+<location>
+<begin position="1"/>
+<end position="85"/>
+</location>
+</feature>
+<feature type="active site" description="Pros-phosphohistidine intermediate" evidence="3 4">
+<location>
+<position position="15"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="2"/>
+<end position="7"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="10"/>
+<end position="12"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="16"/>
+<end position="26"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="31"/>
+<end position="37"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="40"/>
+<end position="43"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="47"/>
+<end position="50"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="60"/>
+<end position="67"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="70"/>
+<end position="81"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1HDN"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3CCD"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU00681"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="2261470"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000305"/>
+<sequence length="85" mass="9119" checksum="E5C8879C0A95AD41" modified="1988-04-01" version="1">
+MFQQEVTITAPNGLHTRPAAQFVKEAKGFTSEITVTSNGKSASAKSLFKLQTLGLTQGTV
+VTISAEGEDEQKAVEHLVKLMAELE
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

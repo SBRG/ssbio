@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1986-07-21" modified="2018-01-31" version="61">
+<accession>P0AD88</accession>
+<accession>P03059</accession>
+<name>LPT_SHIFL</name>
+<protein>
+<recommendedName>
+<fullName evidence="1">thr operon leader peptide</fullName>
+</recommendedName>
+<alternativeName>
+<fullName evidence="1">thr operon attenuator</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary" evidence="1">thrL</name>
+<name type="ordered locus">SF0001</name>
+<name type="ordered locus">S0001</name>
+</gene>
+<organism>
+<name type="scientific">Shigella flexneri</name>
+<dbReference type="NCBI Taxonomy" id="623"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Shigella</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="2002" name="Nucleic Acids Res." volume="30" first="4432" last="4441">
+<title>Genome sequence of Shigella flexneri 2a: insights into pathogenicity through comparison with genomes of Escherichia coli K12 and O157.</title>
+<authorList>
+<person name="Jin Q."/>
+<person name="Yuan Z."/>
+<person name="Xu J."/>
+<person name="Wang Y."/>
+<person name="Shen Y."/>
+<person name="Lu W."/>
+<person name="Wang J."/>
+<person name="Liu H."/>
+<person name="Yang J."/>
+<person name="Yang F."/>
+<person name="Zhang X."/>
+<person name="Zhang J."/>
+<person name="Yang G."/>
+<person name="Wu H."/>
+<person name="Qu D."/>
+<person name="Dong J."/>
+<person name="Sun L."/>
+<person name="Xue Y."/>
+<person name="Zhao A."/>
+<person name="Gao Y."/>
+<person name="Zhu J."/>
+<person name="Kan B."/>
+<person name="Ding K."/>
+<person name="Chen S."/>
+<person name="Cheng H."/>
+<person name="Yao Z."/>
+<person name="He B."/>
+<person name="Chen R."/>
+<person name="Ma D."/>
+<person name="Qiang B."/>
+<person name="Wen Y."/>
+<person name="Hou Y."/>
+<person name="Yu J."/>
+</authorList>
+<dbReference type="PubMed" id="12384590"/>
+<dbReference type="DOI" id="10.1093/nar/gkf566"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>301 / Serotype 2a</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="2003" name="Infect. Immun." volume="71" first="2775" last="2786">
+<title>Complete genome sequence and comparative genomics of Shigella flexneri serotype 2a strain 2457T.</title>
+<authorList>
+<person name="Wei J."/>
+<person name="Goldberg M.B."/>
+<person name="Burland V."/>
+<person name="Venkatesan M.M."/>
+<person name="Deng W."/>
+<person name="Fournier G."/>
+<person name="Mayhew G.F."/>
+<person name="Plunkett G. III"/>
+<person name="Rose D.J."/>
+<person name="Darling A."/>
+<person name="Mau B."/>
+<person name="Perna N.T."/>
+<person name="Payne S.M."/>
+<person name="Runyen-Janecky L.J."/>
+<person name="Zhou S."/>
+<person name="Schwartz D.C."/>
+<person name="Blattner F.R."/>
+</authorList>
+<dbReference type="PubMed" id="12704152"/>
+<dbReference type="DOI" id="10.1128/IAI.71.5.2775-2786.2003"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>ATCC 700930 / 2457T / Serotype 2a</strain>
+</source>
+</reference>
+<comment type="function">
+<text evidence="1">This protein is involved in control of the biosynthesis of threonine.</text>
+</comment>
+<comment type="similarity">
+<text evidence="1">Belongs to the thr operon leader peptide family.</text>
+</comment>
+<dbReference type="EMBL" id="AE005674">
+<property type="protein sequence ID" value="AAN41668.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AE014073">
+<property type="protein sequence ID" value="AAP15548.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_705961.1">
+<property type="nucleotide sequence ID" value="NC_004337.2"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_001386572.1">
+<property type="nucleotide sequence ID" value="NZ_NMXZ01000015.1"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="AAN41668">
+<property type="protein sequence ID" value="AAN41668"/>
+<property type="gene ID" value="SF0001"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="AAP15548">
+<property type="protein sequence ID" value="AAP15548"/>
+<property type="gene ID" value="S0001"/>
+</dbReference>
+<dbReference type="GeneID" id="1027248"/>
+<dbReference type="GeneID" id="31660324"/>
+<dbReference type="KEGG" id="sfl:SF0001"/>
+<dbReference type="KEGG" id="sfx:S0001"/>
+<dbReference type="KO" id="K08278"/>
+<dbReference type="Proteomes" id="UP000001006">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000002673">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009088">
+<property type="term" value="P:threonine biosynthetic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0031556">
+<property type="term" value="P:transcriptional attenuation by ribosome"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="HAMAP" id="MF_01907">
+<property type="entry name" value="Leader_Thr"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR011720">
+<property type="entry name" value="Thr_lead_pept"/>
+</dbReference>
+<dbReference type="Pfam" id="PF08254">
+<property type="entry name" value="Leader_Thr"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR02077">
+<property type="entry name" value="thr_lead_pep"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="inferred from homology"/>
+<keyword id="KW-0028">Amino-acid biosynthesis</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0428">Leader peptide</keyword>
+<keyword id="KW-0791">Threonine biosynthesis</keyword>
+<feature type="peptide" description="thr operon leader peptide" id="PRO_0000044010">
+<location>
+<begin position="1"/>
+<end position="21"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000255">
+<source>
+<dbReference type="HAMAP-Rule" id="MF_01907"/>
+</source>
+</evidence>
+<sequence length="21" mass="2138" checksum="6A9C9167F89EECE4" modified="1986-07-21" version="1">
+MKRISTTITTTITITTGNGAG
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

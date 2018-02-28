@@ -1,0 +1,57 @@
+ENTRY       b1818             CDS       T00007
+NAME        manY
+DEFINITION  (RefSeq) mannose-specific enzyme IIC component of PTS
+ORTHOLOGY   K02795  PTS system, mannose-specific IIC component
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00051  Fructose and mannose metabolism
+            eco00520  Amino sugar and nucleotide sugar metabolism
+            eco01100  Metabolic pathways
+            eco02060  Phosphotransferase system (PTS)
+MODULE      eco_M00276  PTS system, mannose-specific II component
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00051 Fructose and mannose metabolism
+                b1818 (manY)
+               00520 Amino sugar and nucleotide sugar metabolism
+                b1818 (manY)
+             Environmental Information Processing
+              Membrane transport
+               02060 Phosphotransferase system (PTS)
+                b1818 (manY)
+            Transporters [BR:eco02000]
+             Phosphotransferase System (PTS)
+              Enzyme II [TC:4.A]
+               Mannose-specific II component [MD:M00276]
+                b1818 (manY)
+POSITION    1903082..1903882
+MOTIF       Pfam: EII-Sor
+DBLINKS     NCBI-GeneID: 946332
+            NCBI-ProteinID: NP_416332
+            Pasteur: manY
+            RegulonDB: ECK120000561
+            ECOCYC: EG10568
+            ASAP: ABE-0006056
+            UniProt: P69801
+AASEQ       266
+            MEITTLQIVLVFIVACIAGMGSILDEFQFHRPLIACTLVGIVLGDMKTGIIIGGTLEMIA
+            LGWMNIGAAVAPDAALASIISTILVIAGHQSIGAGIALAIPLAAAGQVLTIIVRTITVAF
+            QHAADKAADNGNLTAISWIHVSSLFLQAMRVAIPAVIVALSVGTSEVQNMLNAIPEVVTN
+            GLNIAGGMIVVVGYAMVINMMRAGYLMPFFYLGFVTAAFTNFNLVALGVIGTVMAVLYIQ
+            LSPKYNRVAGAPAQAAGNNDLDNELD
+NTSEQ       801
+            atggagattaccactcttcaaattgtgctggtatttatcgtagcctgtatcgcaggtatg
+            ggatcaatcctcgatgaatttcagtttcaccgtccgctaatcgcgtgtaccctggtgggt
+            atcgttcttggggatatgaaaaccggtattattatcggtggtacgctggaaatgatcgcg
+            ctgggctggatgaacatcggtgctgcagttgcgcctgacgccgctctggcttctatcatt
+            tctaccattctggttatcgcaggtcatcagagcattggtgcaggtatcgcactggcaatc
+            cctctggccgctgcgggccaggtactgaccatcatcgttcgtactattaccgttgctttc
+            cagcacgctgcggataaggctgctgataacggcaacctgacagcgatttcctggatccac
+            gtttcttctctgttcctgcaagcaatgcgtgtggctattccggccgtcatcgttgcgctg
+            tctgttggtaccagcgaagtacagaacatgctgaatgcgattccggaagtggtgaccaat
+            ggtctgaatatcgccggtggcatgatcgtggtggttggttatgcgatggttatcaacatg
+            atgcgtgctggctacctgatgccgttcttctacctcggcttcgtaaccgcagcattcacc
+            aactttaacctggttgctctgggtgtgattggtactgttatggcagtgctctacatccaa
+            cttagcccgaaatacaaccgcgtagccggtgcgcctgctcaggcagctggtaacaacgat
+            ctcgataacgaactggactaa
+///

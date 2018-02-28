@@ -1,0 +1,72 @@
+ENTRY       b1723             CDS       T00007
+NAME        pfkB
+DEFINITION  (RefSeq) 6-phosphofructokinase II
+ORTHOLOGY   K16370  6-phosphofructokinase 2 [EC:2.7.1.11]
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco00010  Glycolysis / Gluconeogenesis
+            eco00030  Pentose phosphate pathway
+            eco00051  Fructose and mannose metabolism
+            eco00052  Galactose metabolism
+            eco00680  Methane metabolism
+            eco01100  Metabolic pathways
+            eco01110  Biosynthesis of secondary metabolites
+            eco01120  Microbial metabolism in diverse environments
+            eco01130  Biosynthesis of antibiotics
+            eco01200  Carbon metabolism
+            eco01230  Biosynthesis of amino acids
+MODULE      eco_M00001  Glycolysis (Embden-Meyerhof pathway), glucose => pyruvate
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Metabolism
+              Carbohydrate metabolism
+               00010 Glycolysis / Gluconeogenesis
+                b1723 (pfkB)
+               00030 Pentose phosphate pathway
+                b1723 (pfkB)
+               00051 Fructose and mannose metabolism
+                b1723 (pfkB)
+               00052 Galactose metabolism
+                b1723 (pfkB)
+              Energy metabolism
+               00680 Methane metabolism
+                b1723 (pfkB)
+            Enzymes [BR:eco01000]
+             2. Transferases
+              2.7  Transferring phosphorus-containing groups
+               2.7.1  Phosphotransferases with an alcohol group as acceptor
+                2.7.1.11  6-phosphofructokinase
+                 b1723 (pfkB)
+POSITION    1806370..1807299
+MOTIF       Pfam: PfkB Phos_pyr_kin DUF2617
+DBLINKS     NCBI-GeneID: 946230
+            NCBI-ProteinID: NP_416237
+            Pasteur: pfkB
+            RegulonDB: ECK120000692
+            ECOCYC: EG10700
+            ASAP: ABE-0005748
+            UniProt: P06999
+STRUCTURE   PDB: 3UMO 3UMP 3CQD 3N1C 3UQD 3UQE
+AASEQ       309
+            MVRIYTLTLAPSLDSATITPQIYPEGKLRCTAPVFEPGGGGINVARAIAHLGGSATAIFP
+            AGGATGEHLVSLLADENVPVATVEAKDWTRQNLHVHVEASGEQYRFVMPGAALNEDEFRQ
+            LEEQVLEIESGAILVISGSLPPGVKLEKLTQLISAAQKQGIRCIVDSSGEALSAALAIGN
+            IELVKPNQKELSALVNRELTQPDDVRKAAQEIVNSGKAKRVVVSLGPQGALGVDSENCIQ
+            VVPPPVKSQSTVGAGDSMVGAMTLKLAENASLEEMVRFGVAAGSAATLNQGTRLCSHDDT
+            QKIYAYLSR
+NTSEQ       930
+            atggtacgtatctatacgttgacacttgcgccctctctcgatagcgcaacaattaccccg
+            caaatttatcccgaaggaaaactgcgctgtaccgcaccggtgttcgaacccgggggcggc
+            ggcatcaacgtcgcccgcgccattgcccatcttggaggcagtgccacagcgatcttcccg
+            gcgggtggcgcgaccggcgaacacctggtttcactgttggcggatgaaaatgtccccgtc
+            gctactgtagaagccaaagactggacccggcagaatttacacgtacatgtggaagcaagc
+            ggtgagcagtatcgttttgttatgccaggcgcggcattaaatgaagatgagtttcgccag
+            cttgaagagcaagttctggaaattgaatccggggccatcctggtcataagcggaagcctg
+            ccgccaggtgtgaagctggaaaaattaacccaactgatttccgctgcgcaaaaacaaggg
+            atccgctgcatcgtcgacagttctggcgaagcgttaagtgcagcactggcaattggtaac
+            atcgagttggttaagcctaaccaaaaagaactcagtgcgctggtgaatcgcgaactcacc
+            cagccggacgatgtccgcaaagccgcgcaggaaatcgttaatagcggcaaggccaaacgg
+            gttgtcgtttccctgggtccacaaggagcgctgggtgttgatagtgaaaactgtattcag
+            gtggtgccaccaccggtgaaaagccagagtaccgttggcgctggtgacagcatggtcggc
+            gcgatgacactgaaactggcagaaaatgcctctcttgaagagatggttcgttttggcgta
+            gctgcggggagtgcagccacactcaatcagggaacacgtctgtgctcccatgacgatacg
+            caaaaaatttacgcttacctttcccgctaa
+///

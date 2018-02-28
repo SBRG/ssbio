@@ -1,0 +1,1195 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-11-01" modified="2018-01-31" version="183">
+<accession>P08839</accession>
+<name>PT1_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName evidence="8">Phosphoenolpyruvate-protein phosphotransferase</fullName>
+<ecNumber evidence="5">2.7.3.9</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName evidence="8">Phosphotransferase system, enzyme I</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary" evidence="8">ptsI</name>
+<name type="ordered locus">b2416</name>
+<name type="ordered locus">JW2409</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1987" name="J. Biol. Chem." volume="262" first="16241" last="16253">
+<title>Sugar transport by the bacterial phosphotransferase system. Molecular cloning and structural analysis of the Escherichia coli ptsH, ptsI, and crr genes.</title>
+<authorList>
+<person name="Saffen D.W."/>
+<person name="Presper K.A."/>
+<person name="Doering T.L."/>
+<person name="Roseman S."/>
+</authorList>
+<dbReference type="PubMed" id="2960675"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1988" name="J. Bacteriol." volume="170" first="3827" last="3837">
+<title>The ptsH, ptsI, and crr genes of the Escherichia coli phosphoenolpyruvate-dependent phosphotransferase system: a complex operon with several modes of transcription.</title>
+<authorList>
+<person name="de Reuse H."/>
+<person name="Danchin A."/>
+</authorList>
+<dbReference type="PubMed" id="2457575"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1997" name="DNA Res." volume="4" first="91" last="113">
+<title>Construction of a contiguous 874-kb sequence of the Escherichia coli-K12 genome corresponding to 50.0-68.8 min on the linkage map and analysis of its sequence features.</title>
+<authorList>
+<person name="Yamamoto Y."/>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kimura S."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mitsuhashi N."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Oshima T."/>
+<person name="Oyama S."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Satoh Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takahashi H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Uehara K."/>
+<person name="Wada C."/>
+<person name="Yamagata S."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9205837"/>
+<dbReference type="DOI" id="10.1093/dnares/4.2.91"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1985" name="Gene" volume="35" first="199" last="207">
+<title>Analysis of the ptsH-ptsI-crr region in Escherichia coli K-12: nucleotide sequence of the ptsH gene.</title>
+<authorList>
+<person name="de Reuse H."/>
+<person name="Roy A."/>
+<person name="Danchin A."/>
+</authorList>
+<dbReference type="PubMed" id="2411636"/>
+<dbReference type="DOI" id="10.1016/0378-1119(85)90172-6"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-56</scope>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1988" name="J. Bacteriol." volume="170" first="3150" last="3157">
+<title>DNA sequences of the cysK regions of Salmonella typhimurium and Escherichia coli and linkage of the cysK regions to ptsH.</title>
+<authorList>
+<person name="Byrne C.R."/>
+<person name="Monroe R.S."/>
+<person name="Ward K.A."/>
+<person name="Kredich N.M."/>
+</authorList>
+<dbReference type="PubMed" id="3290198"/>
+<dbReference type="DOI" id="10.1128/jb.170.7.3150-3157.1988"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-54</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1259" last="1313">
+<title>Comparing the predicted and observed properties of proteins encoded in the genome of Escherichia coli K-12.</title>
+<authorList>
+<person name="Link A.J."/>
+<person name="Robison K."/>
+<person name="Church G.M."/>
+</authorList>
+<dbReference type="PubMed" id="9298646"/>
+<dbReference type="DOI" id="10.1002/elps.1150180807"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 1-11</scope>
+<source>
+<strain>K12 / EMG2</strain>
+</source>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1995" name="J. Biol. Chem." volume="270" first="4822" last="4839">
+<title>Novel proteins of the phosphotransferase system encoded within the rpoN operon of Escherichia coli. Enzyme IIANtr affects growth on organic nitrogen and the conditional lethality of an erats mutant.</title>
+<authorList>
+<person name="Powell B.S."/>
+<person name="Court D.L."/>
+<person name="Inada T."/>
+<person name="Nakamura Y."/>
+<person name="Michotey V."/>
+<person name="Cui X."/>
+<person name="Reizer A."/>
+<person name="Saier M.H. Jr."/>
+<person name="Reizer J."/>
+</authorList>
+<dbReference type="PubMed" id="7876255"/>
+<dbReference type="DOI" id="10.1074/jbc.270.9.4822"/>
+</citation>
+<scope>FUNCTION IN NITROGEN-METABOLIC PTS</scope>
+</reference>
+<reference key="10">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1243" last="1251">
+<title>Escherichia coli proteome analysis using the gene-protein database.</title>
+<authorList>
+<person name="VanBogelen R.A."/>
+<person name="Abshire K.Z."/>
+<person name="Moldover B."/>
+<person name="Olson E.R."/>
+<person name="Neidhardt F.C."/>
+</authorList>
+<dbReference type="PubMed" id="9298644"/>
+<dbReference type="DOI" id="10.1002/elps.1150180805"/>
+</citation>
+<scope>IDENTIFICATION BY 2D-GEL</scope>
+</reference>
+<reference key="11">
+<citation type="journal article" date="2003" name="Biochemistry" volume="42" first="4744" last="4750">
+<title>Enzyme I of the phosphotransferase system: induced-fit protonation of the reaction transition state by Cys-502.</title>
+<authorList>
+<person name="Garcia-Alles L.F."/>
+<person name="Alfonso I."/>
+<person name="Erni B."/>
+</authorList>
+<dbReference type="PubMed" id="12705838"/>
+<dbReference type="DOI" id="10.1021/bi034007f"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>BIOPHYSICOCHEMICAL PROPERTIES</scope>
+<scope>MUTAGENESIS OF HIS-189 AND CYS-502</scope>
+<scope>ENZYME REGULATION</scope>
+<scope>SUBSTRATE SPECIFICITY</scope>
+<scope>ACTIVE SITE</scope>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="1996" name="Structure" volume="4" first="861" last="872">
+<title>The first step in sugar transport: crystal structure of the amino terminal domain of enzyme I of the E. coli PEP: sugar phosphotransferase system and a model of the phosphotransfer complex with HPr.</title>
+<authorList>
+<person name="Liao D.-I."/>
+<person name="Silverton E."/>
+<person name="Seok Y.-J."/>
+<person name="Lee B.R."/>
+<person name="Peterkofsky A."/>
+<person name="Davies D.R."/>
+</authorList>
+<dbReference type="PubMed" id="8805571"/>
+<dbReference type="DOI" id="10.1016/S0969-2126(96)00092-5"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.5 ANGSTROMS) OF 1-259</scope>
+</reference>
+<reference key="13">
+<citation type="journal article" date="1997" name="Biochemistry" volume="36" first="2517" last="2530">
+<title>Solution structure of the 30 kDa N-terminal domain of enzyme I of the Escherichia coli phosphoenolpyruvate:sugar phosphotransferase system by multidimensional NMR.</title>
+<authorList>
+<person name="Garrett D.S."/>
+<person name="Seok Y.-J."/>
+<person name="Liao D.-I."/>
+<person name="Peterkofsky A."/>
+<person name="Gronenborn A.M."/>
+<person name="Clore G.M."/>
+</authorList>
+<dbReference type="PubMed" id="9054557"/>
+<dbReference type="DOI" id="10.1021/bi962924y"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 1-259</scope>
+</reference>
+<reference key="14">
+<citation type="journal article" date="1998" name="Protein Sci." volume="7" first="789" last="793">
+<title>Tautomeric state and pKa of the phosphorylated active site histidine in the N-terminal domain of enzyme I of the Escherichia coli phosphoenolpyruvate:sugar phosphotransferase system.</title>
+<authorList>
+<person name="Garrett D.S."/>
+<person name="Seok Y.-J."/>
+<person name="Peterkofsky A."/>
+<person name="Clore G.M."/>
+<person name="Gronenborn A.M."/>
+</authorList>
+<dbReference type="PubMed" id="9541412"/>
+<dbReference type="DOI" id="10.1002/pro.5560070329"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 1-259</scope>
+</reference>
+<reference key="15">
+<citation type="journal article" date="1999" name="Nat. Struct. Biol." volume="6" first="166" last="173">
+<title>Solution structure of the 40,000 Mr phosphoryl transfer complex between the N-terminal domain of enzyme I and HPr.</title>
+<authorList>
+<person name="Garrett D.S."/>
+<person name="Seok Y.-J."/>
+<person name="Peterkofsky A."/>
+<person name="Gronenborn A.M."/>
+<person name="Clore G.M."/>
+</authorList>
+<dbReference type="PubMed" id="10048929"/>
+<dbReference type="DOI" id="10.1038/5854"/>
+</citation>
+<scope>STRUCTURE BY NMR OF 1-259</scope>
+</reference>
+<reference key="16">
+<citation type="journal article" date="2006" name="Proc. Natl. Acad. Sci. U.S.A." volume="103" first="16218" last="16223">
+<title>Structure of phosphorylated enzyme I, the phosphoenolpyruvate:sugar phosphotransferase system sugar translocation signal protein.</title>
+<authorList>
+<person name="Teplyakov A."/>
+<person name="Lim K."/>
+<person name="Zhu P.-P."/>
+<person name="Kapadia G."/>
+<person name="Chen C.C.H."/>
+<person name="Schwartz J."/>
+<person name="Howard A."/>
+<person name="Reddy P.T."/>
+<person name="Peterkofsky A."/>
+<person name="Herzberg O."/>
+</authorList>
+<dbReference type="PubMed" id="17053069"/>
+<dbReference type="DOI" id="10.1073/pnas.0607587103"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.7 ANGSTROMS) IN COMPLEX WITH SUBSTRATE ANALOG AND MAGNESIUM IONS</scope>
+<scope>FUNCTION</scope>
+<scope>COFACTOR</scope>
+<scope>SUBUNIT</scope>
+<scope>ACTIVE SITE</scope>
+<scope>REACTION MECHANISM</scope>
+</reference>
+<comment type="function">
+<text evidence="5 6 7">General (non sugar-specific) component of the phosphoenolpyruvate-dependent sugar phosphotransferase system (sugar PTS). This major carbohydrate active-transport system catalyzes the phosphorylation of incoming sugar substrates concomitantly with their translocation across the cell membrane. Enzyme I transfers the phosphoryl group from phosphoenolpyruvate (PEP) to the phosphoryl carrier protein (HPr) (PubMed:7876255, PubMed:12705838, PubMed:17053069). Can also use (Z)-3-fluoro-PEP (ZFPEP), (Z)-3-methyl-PEP (ZMePEP), (Z)-3-chloro-PEP (ZClPEP) and (E)-3-chloro-PEP (EClPEP) as alternative phosphoryl donors (PubMed:12705838).</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="5">Phosphoenolpyruvate + protein L-histidine = pyruvate + protein N(pi)-phospho-L-histidine.</text>
+</comment>
+<comment type="cofactor">
+<cofactor evidence="6">
+<name>Mg(2+)</name>
+<dbReference type="ChEBI" id="CHEBI:18420"/>
+</cofactor>
+</comment>
+<comment type="enzyme regulation">
+<text evidence="5">Inhibited by oxalate.</text>
+</comment>
+<comment type="biophysicochemical properties">
+<kinetics>
+<KM evidence="5">0.11 mM for ZFPEP</KM>
+<KM evidence="5">0.12 mM for EClPEP</KM>
+<KM evidence="5">0.14 mM for PEP</KM>
+<KM evidence="5">0.25 mM for ZClPEP</KM>
+<KM evidence="5">0.43 mM for ZMePEP</KM>
+<text evidence="5">Kcat is 3830 min(-1) with PEP as substrate. Kcat is 370 min(-1) with ZFPEP as substrate. Kcat is 285 min(-1) with ZMePEP as substrate. Kcat is 15.8 min(-1) with ZClPEP as substrate. Kcat is 2.8 min(-1) with EClPEP as substrate.</text>
+</kinetics>
+</comment>
+<comment type="subunit">
+<text evidence="5 6">Homodimer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-551533"/>
+<interactant intactId="EBI-551533"/>
+<organismsDiffer>false</organismsDiffer>
+<experiments>2</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-551533"/>
+<interactant intactId="EBI-545674">
+<id>P11989</id>
+<label>bglG</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-551533"/>
+<interactant intactId="EBI-902853">
+<id>P0AA04</id>
+<label>ptsH</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>4</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="9">Cytoplasm</location>
+</subcellularLocation>
+</comment>
+<comment type="domain">
+<text evidence="6">The N-terminal domain contains the HPr binding site, the central domain the pyrophosphate/phosphate carrier histidine, and the C-terminal domain the pyruvate binding site.</text>
+</comment>
+<comment type="miscellaneous">
+<text evidence="6">The reaction takes place in three steps, mediated by a phosphocarrier histidine residue located on the surface of the central domain. The two first partial reactions are catalyzed at an active site located on the N-terminal domain, and the third partial reaction is catalyzed at an active site located on the C-terminal domain. For catalytic turnover, the central domain swivels from the concave surface of the N-terminal domain to that of the C-terminal domain.</text>
+</comment>
+<comment type="miscellaneous">
+<text evidence="7">Enzyme I of the sugar PTS has been shown to phosphorylate NPr of the nitrogen-metabolic PTS, though much less efficiently than it does HPr. This process may link carbon and nitrogen assimilation.</text>
+</comment>
+<comment type="similarity">
+<text evidence="9">Belongs to the PEP-utilizing enzyme family.</text>
+</comment>
+<dbReference type="EC" id="2.7.3.9" evidence="5"/>
+<dbReference type="EMBL" id="J02796">
+<property type="protein sequence ID" value="AAA24441.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M10425">
+<property type="protein sequence ID" value="AAA24439.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC75469.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA16290.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M21994">
+<property type="protein sequence ID" value="AAA24385.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M21451">
+<property type="protein sequence ID" value="AAA23656.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="B29785">
+<property type="entry name" value="WQECPI"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416911.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000623140.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1EZA">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="1EZB">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="1EZC">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="1EZD">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="1ZYM">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.50"/>
+<property type="chains" value="A/B=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="2EZA">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="2EZB">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="2EZC">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="2HWG">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.70"/>
+<property type="chains" value="A/B=1-575"/>
+</dbReference>
+<dbReference type="PDB" id="2KX9">
+<property type="method" value="Other"/>
+<property type="chains" value="A/B=1-573"/>
+</dbReference>
+<dbReference type="PDB" id="2L5H">
+<property type="method" value="Other"/>
+<property type="chains" value="A/B=1-573"/>
+</dbReference>
+<dbReference type="PDB" id="2MP0">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="2N5T">
+<property type="method" value="Other"/>
+<property type="chains" value="A/B=1-575"/>
+</dbReference>
+<dbReference type="PDB" id="2XDF">
+<property type="method" value="Other"/>
+<property type="chains" value="A/B=1-573"/>
+</dbReference>
+<dbReference type="PDB" id="3EZA">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-249"/>
+</dbReference>
+<dbReference type="PDB" id="3EZB">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDB" id="3EZE">
+<property type="method" value="NMR"/>
+<property type="chains" value="A=1-258"/>
+</dbReference>
+<dbReference type="PDBsum" id="1EZA"/>
+<dbReference type="PDBsum" id="1EZB"/>
+<dbReference type="PDBsum" id="1EZC"/>
+<dbReference type="PDBsum" id="1EZD"/>
+<dbReference type="PDBsum" id="1ZYM"/>
+<dbReference type="PDBsum" id="2EZA"/>
+<dbReference type="PDBsum" id="2EZB"/>
+<dbReference type="PDBsum" id="2EZC"/>
+<dbReference type="PDBsum" id="2HWG"/>
+<dbReference type="PDBsum" id="2KX9"/>
+<dbReference type="PDBsum" id="2L5H"/>
+<dbReference type="PDBsum" id="2MP0"/>
+<dbReference type="PDBsum" id="2N5T"/>
+<dbReference type="PDBsum" id="2XDF"/>
+<dbReference type="PDBsum" id="3EZA"/>
+<dbReference type="PDBsum" id="3EZB"/>
+<dbReference type="PDBsum" id="3EZE"/>
+<dbReference type="ProteinModelPortal" id="P08839"/>
+<dbReference type="SMR" id="P08839"/>
+<dbReference type="BioGrid" id="4260570">
+<property type="interactions" value="498"/>
+</dbReference>
+<dbReference type="BioGrid" id="851219">
+<property type="interactions" value="1"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-10603N"/>
+<dbReference type="IntAct" id="P08839">
+<property type="interactions" value="14"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-5290328"/>
+<dbReference type="STRING" id="316385.ECDH10B_2581"/>
+<dbReference type="TCDB" id="8.A.7.1.1">
+<property type="family name" value="the phosphotransferase system enzyme i (ei) family"/>
+</dbReference>
+<dbReference type="SWISS-2DPAGE" id="P08839"/>
+<dbReference type="EPD" id="P08839"/>
+<dbReference type="PaxDb" id="P08839"/>
+<dbReference type="PRIDE" id="P08839"/>
+<dbReference type="EnsemblBacteria" id="AAC75469">
+<property type="protein sequence ID" value="AAC75469"/>
+<property type="gene ID" value="b2416"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA16290">
+<property type="protein sequence ID" value="BAA16290"/>
+<property type="gene ID" value="BAA16290"/>
+</dbReference>
+<dbReference type="GeneID" id="946879"/>
+<dbReference type="KEGG" id="ecj:JW2409"/>
+<dbReference type="KEGG" id="eco:b2416"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.4315"/>
+<dbReference type="EchoBASE" id="EB0782"/>
+<dbReference type="EcoGene" id="EG10789">
+<property type="gene designation" value="ptsI"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105BZ3">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG1080">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000278513"/>
+<dbReference type="InParanoid" id="P08839"/>
+<dbReference type="KO" id="K08483"/>
+<dbReference type="PhylomeDB" id="P08839"/>
+<dbReference type="BioCyc" id="EcoCyc:PTSI-MONOMER"/>
+<dbReference type="BRENDA" id="2.7.3.9">
+<property type="organism ID" value="2026"/>
+</dbReference>
+<dbReference type="SABIO-RK" id="P08839"/>
+<dbReference type="EvolutionaryTrace" id="P08839"/>
+<dbReference type="PRO" id="PR:P08839"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0019197">
+<property type="term" value="C:phosphoenolpyruvate-dependent sugar phosphotransferase complex"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042802">
+<property type="term" value="F:identical protein binding"/>
+<property type="evidence" value="ECO:0000353"/>
+<property type="project" value="IntAct"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016301">
+<property type="term" value="F:kinase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0000287">
+<property type="term" value="F:magnesium ion binding"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0046872">
+<property type="term" value="F:metal ion binding"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008965">
+<property type="term" value="F:phosphoenolpyruvate-protein phosphotransferase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009401">
+<property type="term" value="P:phosphoenolpyruvate-dependent sugar phosphotransferase system"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="Gene3D" id="1.10.274.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR008279">
+<property type="entry name" value="PEP-util_enz_mobile_dom"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR018274">
+<property type="entry name" value="PEP_util_AS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR000121">
+<property type="entry name" value="PEP_util_C"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR023151">
+<property type="entry name" value="PEP_util_CS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036637">
+<property type="entry name" value="Phosphohistidine_dom_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR024692">
+<property type="entry name" value="PTS_EI"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR006318">
+<property type="entry name" value="PTS_EI-like"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR008731">
+<property type="entry name" value="PTS_EIN"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036618">
+<property type="entry name" value="PtsI_HPr-bd_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015813">
+<property type="entry name" value="Pyrv/PenolPyrv_Kinase-like_dom"/>
+</dbReference>
+<dbReference type="Pfam" id="PF05524">
+<property type="entry name" value="PEP-utilisers_N"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00391">
+<property type="entry name" value="PEP-utilizers"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF02896">
+<property type="entry name" value="PEP-utilizers_C"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF000732">
+<property type="entry name" value="PTS_enzyme_I"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF47831">
+<property type="entry name" value="SSF47831"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF51621">
+<property type="entry name" value="SSF51621"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF52009">
+<property type="entry name" value="SSF52009"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR01417">
+<property type="entry name" value="PTS_I_fam"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00742">
+<property type="entry name" value="PEP_ENZYMES_2"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00370">
+<property type="entry name" value="PEP_ENZYMES_PHOS_SITE"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0963">Cytoplasm</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0460">Magnesium</keyword>
+<keyword id="KW-0479">Metal-binding</keyword>
+<keyword id="KW-0598">Phosphotransferase system</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0762">Sugar transport</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<keyword id="KW-0813">Transport</keyword>
+<feature type="chain" description="Phosphoenolpyruvate-protein phosphotransferase" id="PRO_0000147067">
+<location>
+<begin position="1"/>
+<end position="575"/>
+</location>
+</feature>
+<feature type="region of interest" description="PEP binding" evidence="6">
+<location>
+<begin position="454"/>
+<end position="455"/>
+</location>
+</feature>
+<feature type="active site" description="Tele-phosphohistidine intermediate" evidence="5 6">
+<location>
+<position position="189"/>
+</location>
+</feature>
+<feature type="active site" description="Proton donor" evidence="5 10">
+<location>
+<position position="502"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="6">
+<location>
+<position position="431"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="6">
+<location>
+<position position="455"/>
+</location>
+</feature>
+<feature type="binding site" description="PEP" evidence="4">
+<location>
+<position position="296"/>
+</location>
+</feature>
+<feature type="binding site" description="PEP" evidence="6">
+<location>
+<position position="332"/>
+</location>
+</feature>
+<feature type="binding site" description="PEP" evidence="4">
+<location>
+<position position="465"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Very strong decrease of the affinity and catalytic efficiency for PEP. Inactive; when associated with A-502." evidence="5">
+<original>H</original>
+<variation>A</variation>
+<location>
+<position position="189"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Inactive; when associated with A-189." evidence="5">
+<original>C</original>
+<variation>A</variation>
+<location>
+<position position="502"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="5"/>
+<end position="8"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="12"/>
+<end position="18"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="33"/>
+<end position="35"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="36"/>
+<end position="65"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="67"/>
+<end position="80"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="83"/>
+<end position="96"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="100"/>
+<end position="112"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="113"/>
+<end position="115"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="116"/>
+<end position="118"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="121"/>
+<end position="142"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="149"/>
+<end position="151"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="156"/>
+<end position="159"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="165"/>
+<end position="170"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="173"/>
+<end position="175"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="176"/>
+<end position="180"/>
+</location>
+</feature>
+<feature type="strand" evidence="3">
+<location>
+<begin position="183"/>
+<end position="185"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="186"/>
+<end position="188"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="189"/>
+<end position="197"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="201"/>
+<end position="203"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="208"/>
+<end position="211"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="217"/>
+<end position="220"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="222"/>
+<end position="225"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="227"/>
+<end position="230"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="233"/>
+<end position="239"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="240"/>
+<end position="243"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="244"/>
+<end position="247"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="254"/>
+<end position="256"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="270"/>
+<end position="277"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="279"/>
+<end position="286"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="290"/>
+<end position="296"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="297"/>
+<end position="301"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="304"/>
+<end position="306"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="310"/>
+<end position="323"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="324"/>
+<end position="326"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="329"/>
+<end position="332"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="337"/>
+<end position="339"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="343"/>
+<end position="345"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="353"/>
+<end position="355"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="360"/>
+<end position="363"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="367"/>
+<end position="380"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="386"/>
+<end position="392"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="396"/>
+<end position="415"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="425"/>
+<end position="430"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="433"/>
+<end position="437"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="439"/>
+<end position="443"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="447"/>
+<end position="451"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="453"/>
+<end position="461"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="468"/>
+<end position="473"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="476"/>
+<end position="478"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="479"/>
+<end position="494"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="498"/>
+<end position="501"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="504"/>
+<end position="507"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="509"/>
+<end position="511"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="512"/>
+<end position="517"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="522"/>
+<end position="525"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="527"/>
+<end position="529"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="530"/>
+<end position="538"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="542"/>
+<end position="554"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="558"/>
+<end position="572"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1ZYM"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="2HWG"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3EZA"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000250">
+<source>
+<dbReference type="UniProtKB" id="P23533"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="12705838"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="17053069"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7876255"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="2960675"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000305"/>
+<evidence key="10" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="17053069"/>
+</source>
+</evidence>
+<sequence length="575" mass="63562" checksum="4278F0838855E950" modified="1988-11-01" version="1">
+MISGILASPGIAFGKALLLKEDEIVIDRKKISADQVDQEVERFLSGRAKASAQLETIKTK
+AGETFGEEKEAIFEGHIMLLEDEELEQEIIALIKDKHMTADAAAHEVIEGQASALEELDD
+EYLKERAADVRDIGKRLLRNILGLKIIDLSAIQDEVILVAADLTPSETAQLNLKKVLGFI
+TDAGGRTSHTSIMARSLELPAIVGTGSVTSQVKNDDYLILDAVNNQVYVNPTNEVIDKMR
+AVQEQVASEKAELAKLKDLPAITLDGHQVEVCANIGTVRDVEGAERNGAEGVGLYRTEFL
+FMDRDALPTEEEQFAAYKAVAEACGSQAVIVRTMDIGGDKELPYMNFPKEENPFLGWRAI
+RIAMDRREILRDQLRAILRASAFGKLRIMFPMIISVEEVRALRKEIEIYKQELRDEGKAF
+DESIEIGVMVETPAAATIARHLAKEVDFFSIGTNDLTQYTLAVDRGNDMISHLYQPMSPS
+VLNLIKQVIDASHAEGKWTGMCGELAGDERATLLLLGMGLDEFSMSAISIPRIKKIIRNT
+NFEDAKVLAEQALAQPTTDELMTLVNKFIEEKTIC
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

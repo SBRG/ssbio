@@ -1,0 +1,37 @@
+ENTRY       b2415             CDS       T00007
+NAME        ptsH
+DEFINITION  (RefSeq) phosphohistidinoprotein-hexose phosphotransferase component of PTS system (Hpr)
+ORTHOLOGY   K02784  phosphocarrier protein HPr
+ORGANISM    eco  Escherichia coli K-12 MG1655
+PATHWAY     eco02060  Phosphotransferase system (PTS)
+BRITE       KEGG Orthology (KO) [BR:eco00001]
+             Environmental Information Processing
+              Membrane transport
+               02060 Phosphotransferase system (PTS)
+                b2415 (ptsH)
+            Transporters [BR:eco02000]
+             Phosphotransferase System (PTS)
+              Enzyme I and HPr
+               Phosphocarrier protein HPr [TC:8.A.8 4.A.2]
+                b2415 (ptsH)
+POSITION    2533764..2534021
+MOTIF       Pfam: PTS-HPr DUF1906
+DBLINKS     NCBI-GeneID: 946886
+            NCBI-ProteinID: NP_416910
+            Pasteur: ptsH
+            RegulonDB: ECK120000779
+            ECOCYC: EG10788
+            ASAP: ABE-0007962
+            UniProt: P0AA04
+STRUCTURE   PDB: 3CCD 1OPD 1CM3 1CM2 1POH 4XWJ 2JEL 2LRK 2LRL 2XDF 1VRC
+                 1J6T 1GGR 3EZE 3EZA 3EZB 1PFH 1HDN
+AASEQ       85
+            MFQQEVTITAPNGLHTRPAAQFVKEAKGFTSEITVTSNGKSASAKSLFKLQTLGLTQGTV
+            VTISAEGEDEQKAVEHLVKLMAELE
+NTSEQ       258
+            atgttccagcaagaagttaccattaccgctccgaacggtctgcacacccgccctgctgcc
+            cagtttgtaaaagaagctaagggcttcacttctgaaattactgtgacttccaacggcaaa
+            agcgccagcgcgaaaagcctgtttaaactgcagactctgggcctgactcaaggtaccgtt
+            gtgactatctccgcagaaggcgaagacgagcagaaagcggttgaacatctggttaaactg
+            atggcggaactcgagtaa
+///

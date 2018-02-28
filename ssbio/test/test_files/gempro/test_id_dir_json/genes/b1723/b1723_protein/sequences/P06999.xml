@@ -1,0 +1,923 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-04-01" modified="2018-01-31" version="153">
+<accession>P06999</accession>
+<accession>P78065</accession>
+<accession>P78260</accession>
+<name>PFKB_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>ATP-dependent 6-phosphofructokinase isozyme 2</fullName>
+<shortName>ATP-PFK 2</shortName>
+<shortName>Phosphofructokinase 2</shortName>
+<ecNumber>2.7.1.11</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName>6-phosphofructokinase isozyme II</fullName>
+</alternativeName>
+<alternativeName>
+<fullName>Phosphohexokinase 2</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary">pfkB</name>
+<name type="ordered locus">b1723</name>
+<name type="ordered locus">JW5280</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1984" name="Gene" volume="28" first="337" last="342">
+<title>Nucleotide sequence of gene pfkB encoding the minor phosphofructokinase of Escherichia coli K-12.</title>
+<authorList>
+<person name="Daldal F."/>
+</authorList>
+<dbReference type="PubMed" id="6235149"/>
+<dbReference type="DOI" id="10.1016/0378-1119(84)90151-3"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="363" last="377">
+<title>A 570-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 28.0-40.1 min region on the linkage map.</title>
+<authorList>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kasai H."/>
+<person name="Kashimoto K."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Takeuchi Y."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097039"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.363"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="1983" name="J. Mol. Biol." volume="168" first="285" last="305">
+<title>Molecular cloning of the gene for phosphofructokinase-2 of Escherichia coli and the nature of a mutation, pfkB1, causing a high level of the enzyme.</title>
+<authorList>
+<person name="Daldal F."/>
+</authorList>
+<dbReference type="PubMed" id="6310120"/>
+<dbReference type="DOI" id="10.1016/S0022-2836(83)80019-9"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-38</scope>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1243" last="1251">
+<title>Escherichia coli proteome analysis using the gene-protein database.</title>
+<authorList>
+<person name="VanBogelen R.A."/>
+<person name="Abshire K.Z."/>
+<person name="Moldover B."/>
+<person name="Olson E.R."/>
+<person name="Neidhardt F.C."/>
+</authorList>
+<dbReference type="PubMed" id="9298644"/>
+<dbReference type="DOI" id="10.1002/elps.1150180805"/>
+</citation>
+<scope>IDENTIFICATION BY 2D-GEL</scope>
+</reference>
+<reference key="7">
+<citation type="journal article" date="2006" name="Biochemistry" volume="45" first="9291" last="9299">
+<title>Evidence for a catalytic Mg2+ ion and effect of phosphate on the activity of Escherichia coli phosphofructokinase-2: regulatory properties of a ribokinase family member.</title>
+<authorList>
+<person name="Parducci R.E."/>
+<person name="Cabrera R."/>
+<person name="Baez M."/>
+<person name="Guixe V."/>
+</authorList>
+<dbReference type="PubMed" id="16866375"/>
+<dbReference type="DOI" id="10.1021/bi060026o"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>COFACTOR</scope>
+<scope>MUTAGENESIS OF GLU-190</scope>
+<scope>ENZYME REGULATION</scope>
+</reference>
+<reference key="8">
+<citation type="journal article" date="2008" name="J. Mol. Biol." volume="383" first="588" last="602">
+<title>Crystallographic structure of phosphofructokinase-2 from Escherichia coli in complex with two ATP molecules. Implications for substrate inhibition.</title>
+<authorList>
+<person name="Cabrera R."/>
+<person name="Ambrosio A.L."/>
+<person name="Garratt R.C."/>
+<person name="Guixe V."/>
+<person name="Babul J."/>
+</authorList>
+<dbReference type="PubMed" id="18762190"/>
+<dbReference type="DOI" id="10.1016/j.jmb.2008.08.029"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.98 ANGSTROMS) IN COMPLEX WITH SUBSTRATE ATP AND ALLOSTERIC INHIBITOR ATP</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="2011" name="J. Biol. Chem." volume="286" first="5774" last="5783">
+<title>The crystal complex of phosphofructokinase-2 of Escherichia coli with fructose-6-phosphate: kinetic and structural analysis of the allosteric ATP inhibition.</title>
+<authorList>
+<person name="Cabrera R."/>
+<person name="Baez M."/>
+<person name="Pereira H.M."/>
+<person name="Caniuguir A."/>
+<person name="Garratt R.C."/>
+<person name="Babul J."/>
+</authorList>
+<dbReference type="PubMed" id="21147773"/>
+<dbReference type="DOI" id="10.1074/jbc.M110.163162"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.00 ANGSTROMS) IN COMPLEX WITH FRUCTOSE-6-PHOSPHATE</scope>
+</reference>
+<reference key="10">
+<citation type="submission" date="2011-11" db="PDB data bank">
+<title>Structure of E. coli PFK2 in complex with substrates and products.</title>
+<authorList>
+<person name="Pereira H.M."/>
+<person name="Caniuguir A."/>
+<person name="Baez M."/>
+<person name="Cabrera R."/>
+<person name="Garratt R.C."/>
+<person name="Babul J."/>
+</authorList>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.14 ANGSTROMS) IN COMPLEX WITH ADP; ATP; FRUCTOSE-1-6-DIPHOSPHATE AND FRUCTOSE-6-PHOSPHATE</scope>
+</reference>
+<reference key="11">
+<citation type="submission" date="2011-11" db="PDB data bank">
+<title>Structure of E. coli PFK2 mutant Y23D.</title>
+<authorList>
+<person name="Pereira H.M."/>
+<person name="Caniuguir A."/>
+<person name="Baez M."/>
+<person name="Cabrera R."/>
+<person name="Garratt R.C."/>
+<person name="Babul J."/>
+</authorList>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (2.20 ANGSTROMS) IN COMPLEX WITH ATP AND DIPHOSPHATE</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="2013" name="Biophys. J." volume="105" first="185" last="193">
+<title>A ribokinase family conserved monovalent cation binding site enhances the MgATP-induced inhibition in E. coli phosphofructokinase-2.</title>
+<authorList>
+<person name="Baez M."/>
+<person name="Cabrera R."/>
+<person name="Pereira H.M."/>
+<person name="Blanco A."/>
+<person name="Villalobos P."/>
+<person name="Ramirez-Sarmiento C.A."/>
+<person name="Caniuguir A."/>
+<person name="Guixe V."/>
+<person name="Garratt R.C."/>
+<person name="Babul J."/>
+</authorList>
+<dbReference type="PubMed" id="23823238"/>
+<dbReference type="DOI" id="10.1016/j.bpj.2013.05.028"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.70 ANGSTROMS) IN COMPLEX WITH ATP AND POTASSIUM</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>BIOPHYSICOCHEMICAL PROPERTIES</scope>
+<scope>ENZYME REGULATION</scope>
+</reference>
+<comment type="function">
+<text evidence="4">Catalyzes the phosphorylation of D-fructose 6-phosphate to fructose 1,6-bisphosphate by ATP, the first committing step of glycolysis.</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="4 7">ATP + D-fructose 6-phosphate = ADP + D-fructose 1,6-bisphosphate.</text>
+</comment>
+<comment type="cofactor">
+<cofactor evidence="4">
+<name>Mg(2+)</name>
+<dbReference type="ChEBI" id="CHEBI:18420"/>
+</cofactor>
+</comment>
+<comment type="enzyme regulation">
+<text evidence="4 7">Allosterically inhibited by ATP. Allosteric ATP-binding requires the presence of the substrate ATP. Inhibited by monovalent cations with ionic radii larger than Na(+) (e.g. K(+), Cs(+)). The monovalent cations increase the affinity of the allosteric site for ATP. PFK-2 is sensitive to inhibition by fructose 1,6-diphosphate.</text>
+</comment>
+<comment type="biophysicochemical properties">
+<kinetics>
+<KM evidence="7">8 uM for ATP</KM>
+<KM evidence="7">6 uM for fructose 6-phosphate</KM>
+</kinetics>
+</comment>
+<comment type="pathway">
+<text>Carbohydrate degradation; glycolysis; D-glyceraldehyde 3-phosphate and glycerone phosphate from D-glucose: step 3/4.</text>
+</comment>
+<comment type="subunit">
+<text evidence="5 6 7 8 9">Homodimer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-6966085"/>
+<interactant intactId="EBI-6966085"/>
+<organismsDiffer>false</organismsDiffer>
+<experiments>2</experiments>
+</comment>
+<comment type="miscellaneous">
+<text>Only 10% of the activity present in the wild-type strain is phosphofructokinase-2.</text>
+</comment>
+<comment type="miscellaneous">
+<text>This enzyme is not to be confused with 6-phosphofructo-2-kinase which is also called phosphofructokinase 2.</text>
+</comment>
+<comment type="miscellaneous">
+<text>E.coli has two 6-phosphofructokinases enzymes.</text>
+</comment>
+<comment type="similarity">
+<text evidence="10">Belongs to the carbohydrate kinase PfkB family.</text>
+</comment>
+<dbReference type="EC" id="2.7.1.11"/>
+<dbReference type="EMBL" id="K02500">
+<property type="protein sequence ID" value="AAA24321.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74793.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15500.2"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="K00128">
+<property type="protein sequence ID" value="AAA24320.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="C64931">
+<property type="entry name" value="KIECFB"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416237.3">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000251727.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="3CQD">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.98"/>
+<property type="chains" value="A/B=1-309"/>
+</dbReference>
+<dbReference type="PDB" id="3N1C">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.00"/>
+<property type="chains" value="A/B/C/D=1-309"/>
+</dbReference>
+<dbReference type="PDB" id="3UMO">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.70"/>
+<property type="chains" value="A/B=1-309"/>
+</dbReference>
+<dbReference type="PDB" id="3UMP">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.85"/>
+<property type="chains" value="A/B=1-309"/>
+</dbReference>
+<dbReference type="PDB" id="3UQD">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.14"/>
+<property type="chains" value="A/B/C/D=1-309"/>
+</dbReference>
+<dbReference type="PDB" id="3UQE">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.20"/>
+<property type="chains" value="A/B=1-309"/>
+</dbReference>
+<dbReference type="PDBsum" id="3CQD"/>
+<dbReference type="PDBsum" id="3N1C"/>
+<dbReference type="PDBsum" id="3UMO"/>
+<dbReference type="PDBsum" id="3UMP"/>
+<dbReference type="PDBsum" id="3UQD"/>
+<dbReference type="PDBsum" id="3UQE"/>
+<dbReference type="ProteinModelPortal" id="P06999"/>
+<dbReference type="SMR" id="P06999"/>
+<dbReference type="BioGrid" id="4263076">
+<property type="interactions" value="14"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-10465N"/>
+<dbReference type="MINT" id="MINT-8178151"/>
+<dbReference type="STRING" id="316385.ECDH10B_1861"/>
+<dbReference type="SWISS-2DPAGE" id="P06999"/>
+<dbReference type="EPD" id="P06999"/>
+<dbReference type="PaxDb" id="P06999"/>
+<dbReference type="PRIDE" id="P06999"/>
+<dbReference type="EnsemblBacteria" id="AAC74793">
+<property type="protein sequence ID" value="AAC74793"/>
+<property type="gene ID" value="b1723"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15500">
+<property type="protein sequence ID" value="BAA15500"/>
+<property type="gene ID" value="BAA15500"/>
+</dbReference>
+<dbReference type="GeneID" id="946230"/>
+<dbReference type="KEGG" id="ecj:JW5280"/>
+<dbReference type="KEGG" id="eco:b1723"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.533"/>
+<dbReference type="EchoBASE" id="EB0694"/>
+<dbReference type="EcoGene" id="EG10700">
+<property type="gene designation" value="pfkB"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105DE4">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG1105">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000265281"/>
+<dbReference type="InParanoid" id="P06999"/>
+<dbReference type="KO" id="K16370"/>
+<dbReference type="PhylomeDB" id="P06999"/>
+<dbReference type="BioCyc" id="EcoCyc:6PFK-2-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:6PFK-2-MONOMER"/>
+<dbReference type="BRENDA" id="2.7.1.11">
+<property type="organism ID" value="2026"/>
+</dbReference>
+<dbReference type="SABIO-RK" id="P06999"/>
+<dbReference type="UniPathway" id="UPA00109">
+<property type="reaction ID" value="UER00182"/>
+</dbReference>
+<dbReference type="EvolutionaryTrace" id="P06999"/>
+<dbReference type="PRO" id="PR:P06999"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0003872">
+<property type="term" value="F:6-phosphofructokinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005524">
+<property type="term" value="F:ATP binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042802">
+<property type="term" value="F:identical protein binding"/>
+<property type="evidence" value="ECO:0000353"/>
+<property type="project" value="IntAct"/>
+</dbReference>
+<dbReference type="GO" id="GO:0000287">
+<property type="term" value="F:magnesium ion binding"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009024">
+<property type="term" value="F:tagatose-6-phosphate kinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006974">
+<property type="term" value="P:cellular response to DNA damage stimulus"/>
+<property type="evidence" value="ECO:0000270"/>
+<property type="project" value="EcoliWiki"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006096">
+<property type="term" value="P:glycolytic process"/>
+<property type="evidence" value="ECO:0000315"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="CDD" id="cd01164">
+<property type="entry name" value="FruK_PfkB_like"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.40.1190.20">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR002173">
+<property type="entry name" value="Carboh/pur_kinase_PfkB_CS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR011611">
+<property type="entry name" value="PfkB_dom"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR029056">
+<property type="entry name" value="Ribokinase-like"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR017583">
+<property type="entry name" value="Tagatose/fructose_Pkinase"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00294">
+<property type="entry name" value="PfkB"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF000535">
+<property type="entry name" value="1PFK/6PFK/LacC"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF53613">
+<property type="entry name" value="SSF53613"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR03168">
+<property type="entry name" value="1-PFK"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00583">
+<property type="entry name" value="PFKB_KINASES_1"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00584">
+<property type="entry name" value="PFKB_KINASES_2"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0067">ATP-binding</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0324">Glycolysis</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0460">Magnesium</keyword>
+<keyword id="KW-0479">Metal-binding</keyword>
+<keyword id="KW-0547">Nucleotide-binding</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<feature type="chain" description="ATP-dependent 6-phosphofructokinase isozyme 2" id="PRO_0000080083">
+<location>
+<begin position="1"/>
+<end position="309"/>
+</location>
+</feature>
+<feature type="nucleotide phosphate-binding region" description="ATP" evidence="7 8 9">
+<location>
+<begin position="185"/>
+<end position="187"/>
+</location>
+</feature>
+<feature type="nucleotide phosphate-binding region" description="ATP" evidence="7 8 9">
+<location>
+<begin position="224"/>
+<end position="229"/>
+</location>
+</feature>
+<feature type="region of interest" description="Substrate binding">
+<location>
+<begin position="12"/>
+<end position="14"/>
+</location>
+</feature>
+<feature type="region of interest" description="Substrate binding">
+<location>
+<begin position="27"/>
+<end position="29"/>
+</location>
+</feature>
+<feature type="region of interest" description="Substrate binding">
+<location>
+<begin position="39"/>
+<end position="43"/>
+</location>
+</feature>
+<feature type="region of interest" description="Substrate binding">
+<location>
+<begin position="90"/>
+<end position="92"/>
+</location>
+</feature>
+<feature type="region of interest" description="Allosteric inhibitor ATP binding">
+<location>
+<begin position="187"/>
+<end position="189"/>
+</location>
+</feature>
+<feature type="active site" evidence="3">
+<location>
+<position position="256"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium; catalytic" evidence="10">
+<location>
+<position position="190"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="7">
+<location>
+<position position="250"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="7">
+<location>
+<position position="252"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="7">
+<location>
+<position position="286"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="7">
+<location>
+<position position="289"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="7">
+<location>
+<position position="291"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium; via carbonyl oxygen" evidence="7">
+<location>
+<position position="293"/>
+</location>
+</feature>
+<feature type="binding site" description="Allosteric inhibitor ATP; shared with dimeric partner" evidence="5">
+<location>
+<position position="27"/>
+</location>
+</feature>
+<feature type="binding site" description="ATP; shared with dimeric partner" evidence="7 8 9">
+<location>
+<position position="27"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate">
+<location>
+<position position="139"/>
+</location>
+</feature>
+<feature type="binding site" description="ATP" evidence="7 8 9">
+<location>
+<position position="248"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate">
+<location>
+<position position="256"/>
+</location>
+</feature>
+<feature type="binding site" description="ATP; via carbonyl oxygen" evidence="7 8 9">
+<location>
+<position position="280"/>
+</location>
+</feature>
+<feature type="binding site" description="ATP" evidence="7 8 9">
+<location>
+<position position="284"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Causes a 50-fold decrease in the kcat value and a 15-fold increment in the apparent KM for ATP." evidence="4">
+<original>E</original>
+<variation>Q</variation>
+<location>
+<position position="190"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24321 and 5; AAA24320." ref="1 5" evidence="10">
+<original>GKLRCTAPVFEPG</original>
+<variation>ENCAVPHRCSNP</variation>
+<location>
+<begin position="26"/>
+<end position="38"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24321." ref="1" evidence="10">
+<original>AAQKQGIRCIVDSSGEA</original>
+<variation>LRKNKGSAASSTVLGQG</variation>
+<location>
+<begin position="155"/>
+<end position="171"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24321." ref="1" evidence="10">
+<original>PV</original>
+<variation>AL</variation>
+<location>
+<begin position="245"/>
+<end position="246"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 1; AAA24321." ref="1" evidence="10">
+<original>SM</original>
+<variation>RL</variation>
+<location>
+<begin position="257"/>
+<end position="258"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="4"/>
+<end position="7"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="12"/>
+<end position="20"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="24"/>
+<end position="29"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="34"/>
+<end position="39"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="40"/>
+<end position="50"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="55"/>
+<end position="61"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="63"/>
+<end position="75"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="80"/>
+<end position="84"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="93"/>
+<end position="97"/>
+</location>
+</feature>
+<feature type="turn" evidence="2">
+<location>
+<begin position="98"/>
+<end position="100"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="103"/>
+<end position="107"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="115"/>
+<end position="125"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="133"/>
+<end position="138"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="146"/>
+<end position="158"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="162"/>
+<end position="166"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="169"/>
+<end position="175"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="176"/>
+<end position="178"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="181"/>
+<end position="184"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="188"/>
+<end position="195"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="204"/>
+<end position="214"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="217"/>
+<end position="219"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="221"/>
+<end position="224"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="226"/>
+<end position="228"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="230"/>
+<end position="233"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="238"/>
+<end position="241"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="254"/>
+<end position="267"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="272"/>
+<end position="286"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="289"/>
+<end position="292"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="297"/>
+<end position="307"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3CQD"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3UMO"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000250"/>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="16866375"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18762190"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="21147773"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="23823238"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000269">
+<source ref="10"/>
+</evidence>
+<evidence key="9" type="ECO:0000269">
+<source ref="11"/>
+</evidence>
+<evidence key="10" type="ECO:0000305"/>
+<sequence length="309" mass="32456" checksum="A93BEBE0D5801309" modified="1997-11-01" version="2">
+MVRIYTLTLAPSLDSATITPQIYPEGKLRCTAPVFEPGGGGINVARAIAHLGGSATAIFP
+AGGATGEHLVSLLADENVPVATVEAKDWTRQNLHVHVEASGEQYRFVMPGAALNEDEFRQ
+LEEQVLEIESGAILVISGSLPPGVKLEKLTQLISAAQKQGIRCIVDSSGEALSAALAIGN
+IELVKPNQKELSALVNRELTQPDDVRKAAQEIVNSGKAKRVVVSLGPQGALGVDSENCIQ
+VVPPPVKSQSTVGAGDSMVGAMTLKLAENASLEEMVRFGVAAGSAATLNQGTRLCSHDDT
+QKIYAYLSR
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

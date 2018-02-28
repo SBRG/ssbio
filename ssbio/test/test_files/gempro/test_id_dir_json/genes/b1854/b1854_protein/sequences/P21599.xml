@@ -1,0 +1,623 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1991-05-01" modified="2018-01-31" version="164">
+<accession>P21599</accession>
+<name>KPYK2_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Pyruvate kinase II</fullName>
+<ecNumber>2.7.1.40</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName>PK-2</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary">pykA</name>
+<name type="ordered locus">b1854</name>
+<name type="ordered locus">JW1843</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="submission" date="1991-08" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Bledig S.A."/>
+<person name="Fotheringham I.G."/>
+<person name="Hunter M.G."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="379" last="392">
+<title>A 460-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 40.1-50.0 min region on the linkage map.</title>
+<authorList>
+<person name="Itoh T."/>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Kasai H."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097040"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.379"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="1992" name="J. Bacteriol." volume="174" first="702" last="710">
+<title>Isolation and characterization of the Escherichia coli msbB gene, a multicopy suppressor of null mutations in the high-temperature requirement gene htrB.</title>
+<authorList>
+<person name="Karow M.L."/>
+<person name="Georgopoulos C."/>
+</authorList>
+<dbReference type="PubMed" id="1732206"/>
+<dbReference type="DOI" id="10.1128/jb.174.3.702-710.1992"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 319-480</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="submission" date="1992-03" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Engel H."/>
+<person name="Smink A.J."/>
+<person name="Keck W."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 323-480</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1991" name="Biol. Chem. Hoppe-Seyler" volume="372" first="91" last="93">
+<title>Bacterial pyruvate kinases have a shorter N-terminal domain.</title>
+<authorList>
+<person name="Valentini G."/>
+<person name="Stoppini M."/>
+<person name="Speranza M.L."/>
+<person name="Malcovati M."/>
+<person name="Ferri G."/>
+</authorList>
+<dbReference type="PubMed" id="1859631"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 2-44</scope>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1993" name="Biol. Chem. Hoppe-Seyler" volume="374" first="69" last="74">
+<title>Divergent binding sites in pyruvate kinases I and II from Escherichia coli.</title>
+<authorList>
+<person name="Valentini G."/>
+<person name="Stoppini M."/>
+<person name="Iadarola P."/>
+<person name="Malcovati M."/>
+<person name="Ferri G."/>
+<person name="Speranza M.L."/>
+</authorList>
+<dbReference type="PubMed" id="8439398"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 64-77; 83-107; 251-272 AND 337-353</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="2009" name="Mol. Cell. Proteomics" volume="8" first="215" last="225">
+<title>Lysine acetylation is a highly abundant and evolutionarily conserved modification in Escherichia coli.</title>
+<authorList>
+<person name="Zhang J."/>
+<person name="Sprung R."/>
+<person name="Pei J."/>
+<person name="Tan X."/>
+<person name="Kim S."/>
+<person name="Zhu H."/>
+<person name="Liu C.F."/>
+<person name="Grishin N.V."/>
+<person name="Zhao Y."/>
+</authorList>
+<dbReference type="PubMed" id="18723842"/>
+<dbReference type="DOI" id="10.1074/mcp.M800187-MCP200"/>
+</citation>
+<scope>ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-351</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY</scope>
+<source>
+<strain>K12 / JW1106</strain>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<comment type="catalytic activity">
+<text>ATP + pyruvate = ADP + phosphoenolpyruvate.</text>
+</comment>
+<comment type="cofactor">
+<cofactor>
+<name>Mg(2+)</name>
+<dbReference type="ChEBI" id="CHEBI:18420"/>
+</cofactor>
+</comment>
+<comment type="cofactor">
+<cofactor>
+<name>K(+)</name>
+<dbReference type="ChEBI" id="CHEBI:29103"/>
+</cofactor>
+</comment>
+<comment type="enzyme regulation">
+<text>Allosterically activated by AMP and by several sugar phosphates. Belongs to type II PK.</text>
+</comment>
+<comment type="pathway">
+<text>Carbohydrate degradation; glycolysis; pyruvate from D-glyceraldehyde 3-phosphate: step 5/5.</text>
+</comment>
+<comment type="subunit">
+<text>Homotetramer.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-368956"/>
+<interactant intactId="EBI-368956"/>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-368956"/>
+<interactant intactId="EBI-556569">
+<id>P23930</id>
+<label>lnt</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-368956"/>
+<interactant intactId="EBI-556578">
+<id>P19642</id>
+<label>malX</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>4</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-368956"/>
+<interactant intactId="EBI-548921">
+<id>P08390</id>
+<label>usg</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-368956"/>
+<interactant intactId="EBI-552531">
+<id>P52052</id>
+<label>yggR</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>4</experiments>
+</comment>
+<comment type="similarity">
+<text evidence="4">Belongs to the pyruvate kinase family.</text>
+</comment>
+<comment type="sequence caution" evidence="4">
+<conflict type="frameshift">
+<sequence resource="EMBL-CDS" id="AAA96707" version="1"/>
+</conflict>
+<location>
+<position position="441"/>
+</location>
+</comment>
+<dbReference type="EC" id="2.7.1.40"/>
+<dbReference type="EMBL" id="M63703">
+<property type="protein sequence ID" value="AAA24473.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74924.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15662.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M77039">
+<property type="status" value="NOT_ANNOTATED_CDS"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M87660">
+<property type="protein sequence ID" value="AAA96707.1"/>
+<property type="status" value="ALT_FRAME"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="S29790">
+<property type="entry name" value="S29790"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416368.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000091148.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="ProteinModelPortal" id="P21599"/>
+<dbReference type="SMR" id="P21599"/>
+<dbReference type="BioGrid" id="4263205">
+<property type="interactions" value="9"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-10622N"/>
+<dbReference type="IntAct" id="P21599">
+<property type="interactions" value="18"/>
+</dbReference>
+<dbReference type="MINT" id="MINT-1238649"/>
+<dbReference type="STRING" id="316385.ECDH10B_1995"/>
+<dbReference type="iPTMnet" id="P21599"/>
+<dbReference type="EPD" id="P21599"/>
+<dbReference type="PaxDb" id="P21599"/>
+<dbReference type="PRIDE" id="P21599"/>
+<dbReference type="EnsemblBacteria" id="AAC74924">
+<property type="protein sequence ID" value="AAC74924"/>
+<property type="gene ID" value="b1854"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15662">
+<property type="protein sequence ID" value="BAA15662"/>
+<property type="gene ID" value="BAA15662"/>
+</dbReference>
+<dbReference type="GeneID" id="946527"/>
+<dbReference type="KEGG" id="ecj:JW1843"/>
+<dbReference type="KEGG" id="eco:b1854"/>
+<dbReference type="PATRIC" id="fig|511145.12.peg.1933"/>
+<dbReference type="EchoBASE" id="EB0796"/>
+<dbReference type="EcoGene" id="EG10803">
+<property type="gene designation" value="pykA"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105CA9">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0469">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000021558"/>
+<dbReference type="InParanoid" id="P21599"/>
+<dbReference type="KO" id="K00873"/>
+<dbReference type="PhylomeDB" id="P21599"/>
+<dbReference type="BioCyc" id="EcoCyc:PKII-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:PKII-MONOMER"/>
+<dbReference type="UniPathway" id="UPA00109">
+<property type="reaction ID" value="UER00188"/>
+</dbReference>
+<dbReference type="PRO" id="PR:P21599"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005524">
+<property type="term" value="F:ATP binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042802">
+<property type="term" value="F:identical protein binding"/>
+<property type="evidence" value="ECO:0000353"/>
+<property type="project" value="IntAct"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016301">
+<property type="term" value="F:kinase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0000287">
+<property type="term" value="F:magnesium ion binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0030955">
+<property type="term" value="F:potassium ion binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004743">
+<property type="term" value="F:pyruvate kinase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0051289">
+<property type="term" value="P:protein homotetramerization"/>
+<property type="evidence" value="ECO:0000353"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="CDD" id="cd00288">
+<property type="entry name" value="Pyruvate_Kinase"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.40.1380.20">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001697">
+<property type="entry name" value="Pyr_Knase"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015813">
+<property type="entry name" value="Pyrv/PenolPyrv_Kinase-like_dom"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR011037">
+<property type="entry name" value="Pyrv_Knase-like_insert_dom_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR018209">
+<property type="entry name" value="Pyrv_Knase_AS"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015793">
+<property type="entry name" value="Pyrv_Knase_brl"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015795">
+<property type="entry name" value="Pyrv_Knase_C"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036918">
+<property type="entry name" value="Pyrv_Knase_C_sf"/>
+</dbReference>
+<dbReference type="PANTHER" id="PTHR11817">
+<property type="entry name" value="PTHR11817"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00224">
+<property type="entry name" value="PK"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF02887">
+<property type="entry name" value="PK_C"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PRINTS" id="PR01050">
+<property type="entry name" value="PYRUVTKNASE"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF50800">
+<property type="entry name" value="SSF50800"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF51621">
+<property type="entry name" value="SSF51621"/>
+<property type="match status" value="2"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF52935">
+<property type="entry name" value="SSF52935"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR01064">
+<property type="entry name" value="pyruv_kin"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS00110">
+<property type="entry name" value="PYRUVATE_KINASE"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0007">Acetylation</keyword>
+<keyword id="KW-0021">Allosteric enzyme</keyword>
+<keyword id="KW-0067">ATP-binding</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0324">Glycolysis</keyword>
+<keyword id="KW-0418">Kinase</keyword>
+<keyword id="KW-0460">Magnesium</keyword>
+<keyword id="KW-0479">Metal-binding</keyword>
+<keyword id="KW-0547">Nucleotide-binding</keyword>
+<keyword id="KW-0630">Potassium</keyword>
+<keyword id="KW-0670">Pyruvate</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<feature type="initiator methionine" description="Removed" evidence="2">
+<location>
+<position position="1"/>
+</location>
+</feature>
+<feature type="chain" description="Pyruvate kinase II" id="PRO_0000112073">
+<location>
+<begin position="2"/>
+<end position="480"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium" evidence="1">
+<location>
+<position position="38"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium" evidence="1">
+<location>
+<position position="40"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Potassium" evidence="1">
+<location>
+<position position="70"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="1">
+<location>
+<position position="225"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="1">
+<location>
+<position position="252"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate" evidence="1">
+<location>
+<position position="36"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate; via amide nitrogen" evidence="1">
+<location>
+<position position="251"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate; via amide nitrogen" evidence="1">
+<location>
+<position position="252"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate" evidence="1">
+<location>
+<position position="284"/>
+</location>
+</feature>
+<feature type="site" description="Transition state stabilizer" evidence="1">
+<location>
+<position position="223"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="3">
+<location>
+<position position="351"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 7; AA sequence." ref="7" evidence="4">
+<original>R</original>
+<variation>C</variation>
+<location>
+<position position="20"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 7; AA sequence." ref="7" evidence="4">
+<original>S</original>
+<variation>G</variation>
+<location>
+<position position="43"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 6; AAA96707." ref="6" evidence="4">
+<original>A</original>
+<variation>R</variation>
+<location>
+<position position="323"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 6; AAA96707." ref="6" evidence="4">
+<location>
+<position position="383"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000250"/>
+<evidence key="2" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1859631"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18723842"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000305"/>
+<sequence length="480" mass="51357" checksum="C37F004C374D27E9" modified="2007-01-23" version="3">
+MSRRLRRTKIVTTLGPATDRDNNLEKVIAAGANVVRMNFSHGSPEDHKMRADKVREIAAK
+LGRHVAILGDLQGPKIRVSTFKEGKVFLNIGDKFLLDANLGKGEGDKEKVGIDYKGLPAD
+VVPGDILLLDDGRVQLKVLEVQGMKVFTEVTVGGPLSNNKGINKLGGGLSAEALTEKDKA
+DIKTAALIGVDYLAVSFPRCGEDLNYARRLARDAGCDAKIVAKVERAEAVCSQDAMDDII
+LASDVVMVARGDLGVEIGDPELVGIQKALIRRARQLNRAVITATQMMESMITNPMPTRAE
+VMDVANAVLDGTDAVMLSAETAAGQYPSETVAAMARVCLGAEKIPSINVSKHRLDVQFDN
+VEEAIAMSAMYAANHLKGVTAIITMTESGRTALMTSRISSGLPIFAMSRHERTLNLTALY
+RGVTPVHFDSANDGVAAASEAVNLLRDKGYLMSGDLVIVTQGDVMSTVGSTNTTRILTVE
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

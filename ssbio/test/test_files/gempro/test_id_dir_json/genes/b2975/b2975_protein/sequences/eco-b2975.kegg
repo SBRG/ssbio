@@ -1,0 +1,60 @@
+ENTRY       b2975             CDS       T00007
+NAME        glcA
+DEFINITION  (RefSeq) glycolate transporter
+ORTHOLOGY   K02550  glycolate permease
+ORGANISM    eco  Escherichia coli K-12 MG1655
+BRITE       Transporters [BR:eco02000]
+             Other Transporters
+              Electrochemical potential-driven transporters [TC:2]
+               b2975 (glcA)
+POSITION    complement(3119597..3121279)
+MOTIF       Pfam: Lactate_perm WAPL
+DBLINKS     NCBI-GeneID: 947259
+            NCBI-ProteinID: NP_417449
+            Pasteur: yghK
+            RegulonDB: ECK120004102
+            ECOCYC: G7542
+            ASAP: ABE-0009763
+            UniProt: Q46839
+AASEQ       560
+            MVTWTQMYMPMGGLGLSALVALIPIIFFFVALAVLRLKGHVAGAITLILSILIAIFAFKM
+            PIDMAFAAAGYGFIYGLWPIAWIIVAAVFLYKLTVASGQFDIIRSSVISITDDQRLQVLL
+            IGFSFGALLEGAAGFGAPVAITGALLVGLGFKPLYAAGLCLIANTAPVAFGALGVPILVA
+            GQVTGIDPFHIGAMAGRQLPFLSVLVPFWLVAMMDGWKGVKETWPAALVAGGSFAVTQFF
+            TSNYIGPELPDITSALVSIVSLALFLKVWRPKNTETAISMGQSAGAMVVNKPSSGGPVPS
+            EYSLGQIIRAWSPFLILTVLVTIWTMKPFKALFAPGGAFYSLVINFQIPHLHQQVLKAAP
+            IVAQPTPMDAVFKFDPLSAGGTAIFIAAIISIFILGVGIKKGIGVFAETLISLKWPILSI
+            GMVLAFAFVTNYSGMSTTLALVLAGTGVMFPFFSPFLGWLGVFLTGSDTSSNALFGSLQS
+            TTAQQINVSDTLLVAANTSGGVTGKMISPQSIAVACAATGMVGRESELFRYTVKHSLIFA
+            SVIGIITLLQAYVFTGMLVS
+NTSEQ       1683
+            atggttacctggacccaaatgtatatgccgatgggaggactggggctatccgctctggtc
+            gccctgatcccgataatattcttcttcgttgcactcgcggtattacgtctgaaaggacat
+            gtcgctggagcaataacccttatattatctatcctgattgcaatattcgcctttaaaatg
+            ccgattgatatggcatttgctgctgcgggctatggctttatttatggattatggccaata
+            gcgtggattattgtcgcggcggtgttcctgtataaattaaccgttgccagcgggcagttc
+            gatattatccgcagctcggttatctccatcaccgacgatcagcgtttgcaggtgttactg
+            attggtttctcctttggtgcgttgctggaaggagcggctggctttggtgcgccggtggcg
+            attaccggtgcgctgctggtgggcctgggcttcaaaccgttatacgcggcggggctgtgt
+            ctgattgccaatactgcgccggtggcgtttggtgcgttgggcgtgccgattctggtcgcc
+            ggtcaggtaacgggaatcgatccgttccacattggcgcaatggcgggacgtcagttaccg
+            ttcctgtcggttcttgtgccgttctggctggtagcaatgatggacggctggaaaggggtg
+            aaagagacgtggccagcggcgctggttgctgggggaagcttcgctgtcactcagttcttt
+            acctctaactatattggtccggaactgccggatattacttcggcgctggtgagtatcgtc
+            tcactcgctttattccttaaagtctggcggccgaaaaataccgaaacggcaatcagcatg
+            ggacaatccgcaggtgcgatggtggtaaataagccatcttctggcggtcccgtgccttca
+            gaatatagtctggggcaaatcattcgagcgtggtcaccgtttttaatcttaacggtgctg
+            gtcaccatctggaccatgaagccgtttaaagcgttatttgctccgggcggcgcgttttat
+            tcactggtgattaatttccagatccctcatttgcatcaacaagtgttgaaagcggcaccc
+            attgtcgcccaaccaacgccaatggatgcggtgtttaaattcgaccccctctcggctggc
+            ggcaccgctatttttattgcggcgattatctctatcttcatcctcggtgtggggatcaag
+            aaaggtattggcgtctttgccgaaacgctaattagcttgaagtggccgatactgtcgatt
+            ggcatggtgctggcgttcgccttcgtcaccaactattctggcatgtccaccacgctggcg
+            ctggtactggcaggtacaggcgtgatgttcccgttcttctcaccgtttctcggctggctg
+            ggcgtattccttaccggctcggacacctcctctaacgccctgtttggttcactgcaatcg
+            accacggcgcagcaaatcaacgtctctgacaccctgctggtggcagcaaacaccagcggc
+            ggcgtaactggcaagatgatctccccgcaatctatcgccgtggcctgcgccgcgacgggc
+            atggtgggccgagaatctgaactgttccgctacaccgtgaagcacagtctgatttttgcc
+            agcgttatcggcattatcaccctgctgcaggcgtatgtgtttaccgggatgttagtctcg
+            taa
+///

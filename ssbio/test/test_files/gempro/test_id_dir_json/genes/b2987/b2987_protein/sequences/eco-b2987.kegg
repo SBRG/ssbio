@@ -1,0 +1,55 @@
+ENTRY       b2987             CDS       T00007
+NAME        pitB
+DEFINITION  (RefSeq) phosphate transporter
+ORTHOLOGY   K16322  low-affinity inorganic phosphate transporter
+ORGANISM    eco  Escherichia coli K-12 MG1655
+BRITE       Transporters [BR:eco02000]
+             Other Transporters
+              Electrochemical potential-driven transporters [TC:2]
+               b2987 (pitB)
+POSITION    complement(3134872..3136371)
+MOTIF       Pfam: PHO4 Myc_target_1
+DBLINKS     NCBI-GeneID: 947475
+            NCBI-ProteinID: NP_417461
+            Pasteur: pitB
+            RegulonDB: ECK120002422
+            ECOCYC: EG12883
+            ASAP: ABE-0009800
+            UniProt: P43676
+AASEQ       499
+            MLNLFVGLDIYTGLLLLLALAFVLFYEAINGFHDTANAVAAVIYTRAMQPQLAVVMAAFF
+            NFFGVLLGGLSVAYAIVHMLPTDLLLNMGSTHGLAMVFSMLLAAIIWNLGTWFFGLPASS
+            SHTLIGAIIGIGLTNALLTGSSVMDALNLREVTKIFSSLIVSPIVGLVIAGGLIFLLRRY
+            WSGTKKRDRIHRIPEDRKKKKGKRKPPFWTRIALIVSAAGVAFSHGANDGQKGIGLVMLV
+            LVGIAPAGFVVNMNASGYEITRTRDAVTNFEHYLQQHPELPQKLIAMEPPLPAASTDGTQ
+            VTEFHCHPANTFDAIARVKTMLPGNMESYEPLSVSQRSQLRRIMLCISDTSAKLAKLPGV
+            SKEDQNLLKKLRSDMLSTIEYAPVWIIMAVALALGIGTMIGWRRVAMTIGEKIGKRGMTY
+            AQGMAAQMTAAVSIGLASYIGMPVSTTHVLSSAVAGTMVVDGGGLQRKTVTSILMAWVFT
+            LPAAIFLSGGLYWIALQLI
+NTSEQ       1500
+            atgctaaatttatttgttggccttgatatatacacagggcttttgttattgcttgctctg
+            gcatttgtgttgttctacgaagcaatcaatggttttcatgacacggcgaatgcggtggca
+            gccgttatttatactcgtgccatgcaaccacaacttgctgtggtgatggcggcatttttt
+            aacttttttggcgtgttattgggcggacttagcgttgcctatgccattgtccatatgttg
+            ccaaccgatttgttgctgaatatggggtcaacccacggcctggcgatggtcttttccatg
+            ctgctggcggcgattatctggaacctgggaacgtggttcttcggtttaccggcctccagt
+            tcgcacaccttgattggtgcgattatcggcatcggtttaaccaacgcgctgttaaccggc
+            tcatcggtgatggatgcgttaaacctgcgtgaagtgaccaaaattttctcctcgctgatt
+            gtttcccctatcgtcggcctggtcattgcgggaggcctgatattcctgctgcgacgctac
+            tggagcgggacgaaaaagcgtgaccgtattcaccgcattccggaagatcgcaaaaagaaa
+            aaaggcaaacgtaaaccgccattctggacgcgtattgcgctgattgtttccgctgcgggc
+            gtggcgttttcgcacggcgcgaacgacggacaaaaagggatcggcctggtaatgctggta
+            ctggtggggattgcccctgctggcttcgtcgtcaatatgaatgcgtccggctatgaaatt
+            acccgtacccgcgatgccgttaccaacttcgaacactacctgcaacagcatcctgaactg
+            ccgcagaagttgattgcgatggaacctccattgcctgcagcatcgactgatggcacgcaa
+            gtaacagagtttcactgtcatccggcaaatacctttgatgctattgcgcgcgttaaaacg
+            atgctgccaggcaatatggaaagttacgagccgttaagcgtgagtcagcgcagccagctg
+            cgccgcattatgctgtgcatctctgatacctccgcgaagctagcgaaactgccaggcgtc
+            agtaaagaagaccagaacctgctgaaaaaacttcgcagcgatatgttaagcaccattgag
+            tacgctccggtgtggatcatcatggcggtagcactggcgctcggcattggcaccatgatt
+            ggctggcgtcgtgtagcgatgaccatcggtgagaagattggtaagcgcggcatgacgtat
+            gcgcaaggcatggcggcacaaatgacggcggcagtgtctatcggtcttgccagttatatt
+            gggatgcccgtctccacaacacacgtcctctcgtctgcagttgcagggacgatggtggtg
+            gacggcggtgggttacagcgtaaaacggtaaccagcatcctgatggcgtgggtatttact
+            ttaccggcggcaatttttctttctggtgggctgtactggatagcattgcagttgatttaa
+///

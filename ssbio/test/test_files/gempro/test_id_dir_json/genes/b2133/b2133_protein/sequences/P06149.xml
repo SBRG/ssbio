@@ -1,0 +1,965 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-01-01" modified="2018-01-31" version="157">
+<accession>P06149</accession>
+<accession>Q2MAU6</accession>
+<name>DLD_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName evidence="2 15">Quinone-dependent D-lactate dehydrogenase</fullName>
+<ecNumber evidence="2 6 10">1.1.5.12</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName evidence="15">(R)-lactate:quinone 2-oxidoreductase</fullName>
+</alternativeName>
+<alternativeName>
+<fullName evidence="2 12 13">D-lactate dehydrogenase</fullName>
+<shortName evidence="2 11">D-LDH</shortName>
+</alternativeName>
+<alternativeName>
+<fullName evidence="15">Respiratory D-lactate dehydrogenase</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary" evidence="2 14">dld</name>
+<name type="ordered locus">b2133</name>
+<name type="ordered locus">JW2121</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1984" name="Eur. J. Biochem." volume="144" first="367" last="373">
+<title>Nucleotide sequence of the respiratory D-lactate dehydrogenase gene of Escherichia coli.</title>
+<authorList>
+<person name="Campbell H.D."/>
+<person name="Rogers B.L."/>
+<person name="Young I.G."/>
+</authorList>
+<dbReference type="PubMed" id="6386470"/>
+<dbReference type="DOI" id="10.1111/j.1432-1033.1984.tb08473.x"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<strain>K12</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1985" name="J. Bacteriol." volume="161" first="1059" last="1068">
+<title>Overproduction and nucleotide sequence of the respiratory D-lactate dehydrogenase of Escherichia coli.</title>
+<authorList>
+<person name="Rule G.S."/>
+<person name="Pratt E.A."/>
+<person name="Chin C.C.Q."/>
+<person name="Wold F."/>
+<person name="Ho C."/>
+</authorList>
+<dbReference type="PubMed" id="3882663"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<scope>PROTEIN SEQUENCE OF 2-18</scope>
+</reference>
+<reference key="3">
+<citation type="submission" date="1993-10" db="EMBL/GenBank/DDBJ databases">
+<title>Automated multiplex sequencing of the E.coli genome.</title>
+<authorList>
+<person name="Richterich P."/>
+<person name="Lakey N."/>
+<person name="Gryan G."/>
+<person name="Jaehn L."/>
+<person name="Mintz L."/>
+<person name="Robison K."/>
+<person name="Church G.M."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / BHB2600</strain>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1997" name="Electrophoresis" volume="18" first="1243" last="1251">
+<title>Escherichia coli proteome analysis using the gene-protein database.</title>
+<authorList>
+<person name="VanBogelen R.A."/>
+<person name="Abshire K.Z."/>
+<person name="Moldover B."/>
+<person name="Olson E.R."/>
+<person name="Neidhardt F.C."/>
+</authorList>
+<dbReference type="PubMed" id="9298644"/>
+<dbReference type="DOI" id="10.1002/elps.1150180805"/>
+</citation>
+<scope>IDENTIFICATION BY 2D-GEL</scope>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1973" name="Biochemistry" volume="12" first="2468" last="2474">
+<title>Membrane D-lactate dehydrogenase from Escherichia coli. Purification and properties.</title>
+<authorList>
+<person name="Futai M."/>
+</authorList>
+<dbReference type="PubMed" id="4575624"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>COFACTOR</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+</reference>
+<reference key="8">
+<citation type="journal article" date="1973" name="J. Biol. Chem." volume="248" first="7012" last="7017">
+<title>Mechanisms of active transport in isolated bacterial membrane vesicles. XV. Purification and properties of the membrane-bound D-lactate dehydrogenase from Escherichia coli.</title>
+<authorList>
+<person name="Kohn L.D."/>
+<person name="Kaback H.R."/>
+</authorList>
+<dbReference type="PubMed" id="4582730"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>COFACTOR</scope>
+<scope>ENZYME REGULATION</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<source>
+<strain>ML 308-225</strain>
+</source>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1975" name="J. Biol. Chem." volume="250" first="4291" last="4296">
+<title>Localization of D-lactate dehydrogenase in native and reconstituted Escherichia coli membrane vesicles.</title>
+<authorList>
+<person name="Short S.A."/>
+<person name="Kaback H.R."/>
+<person name="Kohn L.D."/>
+</authorList>
+<dbReference type="PubMed" id="1092688"/>
+</citation>
+<scope>SUBCELLULAR LOCATION</scope>
+<source>
+<strain>ML 308-225</strain>
+</source>
+</reference>
+<reference key="10">
+<citation type="journal article" date="1986" name="Biochemistry" volume="25" first="2321" last="2327">
+<title>D-lactate oxidation and generation of the proton electrochemical gradient in membrane vesicles from Escherichia coli GR19N and in proteoliposomes reconstituted with purified D-lactate dehydrogenase and cytochrome o oxidase.</title>
+<authorList>
+<person name="Matsushita K."/>
+<person name="Kaback H.R."/>
+</authorList>
+<dbReference type="PubMed" id="3013300"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+</reference>
+<reference key="11">
+<citation type="journal article" date="1990" name="Biochemistry" volume="29" first="3256" last="3262">
+<title>Site-specific incorporation of 5-fluorotryptophan as a probe of the structure and function of the membrane-bound D-lactate dehydrogenase of Escherichia coli: a 19F nuclear magnetic resonance study.</title>
+<authorList>
+<person name="Peersen O.B."/>
+<person name="Pratt E.A."/>
+<person name="Truong H.T."/>
+<person name="Ho C."/>
+<person name="Rule G.S."/>
+</authorList>
+<dbReference type="PubMed" id="2185834"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>BIOPHYSICOCHEMICAL PROPERTIES</scope>
+</reference>
+<reference key="12">
+<citation type="journal article" date="1995" name="Biochim. Biophys. Acta" volume="1252" first="269" last="277">
+<title>Stopped-flow kinetic and biophysical studies of membrane-associated D-lactate dehydrogenase of Escherichia coli.</title>
+<authorList>
+<person name="Sun Z.Y."/>
+<person name="Dowd S.R."/>
+<person name="Felix C."/>
+<person name="Hyde J.S."/>
+<person name="Ho C."/>
+</authorList>
+<dbReference type="PubMed" id="7578233"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>COFACTOR</scope>
+</reference>
+<reference key="13">
+<citation type="journal article" date="2000" name="Proc. Natl. Acad. Sci. U.S.A." volume="97" first="9413" last="9418">
+<title>The crystal structure of D-lactate dehydrogenase, a peripheral membrane respiratory enzyme.</title>
+<authorList>
+<person name="Dym O."/>
+<person name="Pratt E.A."/>
+<person name="Ho C."/>
+<person name="Eisenberg D."/>
+</authorList>
+<dbReference type="PubMed" id="10944213"/>
+<dbReference type="DOI" id="10.1073/pnas.97.17.9413"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.9 ANGSTROMS) OF MUTANT TRP-368 IN COMPLEX WITH FAD</scope>
+<scope>COFACTOR</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<scope>DOMAIN</scope>
+</reference>
+<comment type="function">
+<text evidence="5 6 8 9 10">Catalyzes the oxidation of D-lactate to pyruvate. Electrons derived from D-lactate oxidation are transferred to the ubiquinone/cytochrome electron transfer chain, where they may be used to provide energy for the active transport of a variety of amino acids and sugars across the membrane.</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="2 6 10">(R)-lactate + a quinone = pyruvate + a quinol.</text>
+</comment>
+<comment type="cofactor">
+<cofactor evidence="2 4 8 9 10">
+<name>FAD</name>
+<dbReference type="ChEBI" id="CHEBI:57692"/>
+</cofactor>
+</comment>
+<comment type="enzyme regulation">
+<text evidence="9">Inhibited by 2-hydroxy-3-butynoic acid, but not by p-chloromercuribenzoate, n-ethylmaleimide, or 5,5'-dithiobis(2-nitrobenzoic acid).</text>
+</comment>
+<comment type="biophysicochemical properties">
+<kinetics>
+<KM evidence="5">0.16 mM for D-lactate</KM>
+</kinetics>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location evidence="2 3 8 9">Cell inner membrane</location>
+<topology evidence="2 3">Peripheral membrane protein</topology>
+<orientation evidence="2 3">Cytoplasmic side</orientation>
+</subcellularLocation>
+<text evidence="16">May bind the membrane through electrostatic rather than hydrophobic forces.</text>
+</comment>
+<comment type="domain">
+<text evidence="4">Contains 3 domains: the flavin adenine dinucleotide (FAD)-binding domain, the cap domain and the membrane-binding domain.</text>
+</comment>
+<comment type="similarity">
+<text evidence="2 15">Belongs to the quinone-dependent D-lactate dehydrogenase family.</text>
+</comment>
+<comment type="sequence caution" evidence="15">
+<conflict type="erroneous initiation">
+<sequence resource="EMBL-CDS" id="AAA60530" version="1"/>
+</conflict>
+<text>Translation N-terminally extended.</text>
+</comment>
+<dbReference type="EC" id="1.1.5.12" evidence="2 6 10"/>
+<dbReference type="EMBL" id="M10038">
+<property type="protein sequence ID" value="AAA23688.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="X01067">
+<property type="protein sequence ID" value="CAA25531.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00007">
+<property type="protein sequence ID" value="AAA60530.1"/>
+<property type="status" value="ALT_INIT"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC75194.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAE76610.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="A21893">
+<property type="entry name" value="DEECDL"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416637.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000097403.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="PDB" id="1F0X">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.90"/>
+<property type="chains" value="A/B=1-571"/>
+</dbReference>
+<dbReference type="PDBsum" id="1F0X"/>
+<dbReference type="ProteinModelPortal" id="P06149"/>
+<dbReference type="SMR" id="P06149"/>
+<dbReference type="BioGrid" id="4260452">
+<property type="interactions" value="15"/>
+</dbReference>
+<dbReference type="IntAct" id="P06149">
+<property type="interactions" value="17"/>
+</dbReference>
+<dbReference type="STRING" id="316385.ECDH10B_2289"/>
+<dbReference type="BindingDB" id="P06149"/>
+<dbReference type="DrugBank" id="DB03147">
+<property type="generic name" value="Flavin adenine dinucleotide"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00756">
+<property type="generic name" value="Hexachlorophene"/>
+</dbReference>
+<dbReference type="EPD" id="P06149"/>
+<dbReference type="PaxDb" id="P06149"/>
+<dbReference type="PRIDE" id="P06149"/>
+<dbReference type="EnsemblBacteria" id="AAC75194">
+<property type="protein sequence ID" value="AAC75194"/>
+<property type="gene ID" value="b2133"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAE76610">
+<property type="protein sequence ID" value="BAE76610"/>
+<property type="gene ID" value="BAE76610"/>
+</dbReference>
+<dbReference type="GeneID" id="946653"/>
+<dbReference type="KEGG" id="ecj:JW2121"/>
+<dbReference type="KEGG" id="eco:b2133"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.110"/>
+<dbReference type="EchoBASE" id="EB0227"/>
+<dbReference type="EcoGene" id="EG10231">
+<property type="gene designation" value="dld"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105CXG">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0277">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000122232"/>
+<dbReference type="InParanoid" id="P06149"/>
+<dbReference type="KO" id="K03777"/>
+<dbReference type="BioCyc" id="EcoCyc:DLACTDEHYDROGFAD-MONOMER"/>
+<dbReference type="BioCyc" id="MetaCyc:DLACTDEHYDROGFAD-MONOMER"/>
+<dbReference type="BRENDA" id="1.1.1.28">
+<property type="organism ID" value="2026"/>
+</dbReference>
+<dbReference type="EvolutionaryTrace" id="P06149"/>
+<dbReference type="PRO" id="PR:P06149"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0031234">
+<property type="term" value="C:extrinsic component of cytoplasmic side of plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005887">
+<property type="term" value="C:integral component of plasma membrane"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005886">
+<property type="term" value="C:plasma membrane"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0051990">
+<property type="term" value="F:(R)-2-hydroxyglutarate dehydrogenase activity"/>
+<property type="evidence" value="ECO:0000318"/>
+<property type="project" value="GO_Central"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004458">
+<property type="term" value="F:D-lactate dehydrogenase (cytochrome) activity"/>
+<property type="evidence" value="ECO:0000318"/>
+<property type="project" value="GO_Central"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009055">
+<property type="term" value="F:electron transfer activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0071949">
+<property type="term" value="F:FAD binding"/>
+<property type="evidence" value="ECO:0000318"/>
+<property type="project" value="GO_Central"/>
+</dbReference>
+<dbReference type="GO" id="GO:0050660">
+<property type="term" value="F:flavin adenine dinucleotide binding"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016901">
+<property type="term" value="F:oxidoreductase activity, acting on the CH-OH group of donors, quinone or similar compound as acceptor"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0048038">
+<property type="term" value="F:quinone binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009060">
+<property type="term" value="P:aerobic respiration"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0009061">
+<property type="term" value="P:anaerobic respiration"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0019516">
+<property type="term" value="P:lactate oxidation"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0022904">
+<property type="term" value="P:respiratory electron transport chain"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="EcoCyc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0055085">
+<property type="term" value="P:transmembrane transport"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.30.1370.20">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.30.43.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.30.465.10">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.30.70.610">
+<property type="match status" value="2"/>
+</dbReference>
+<dbReference type="HAMAP" id="MF_02092">
+<property type="entry name" value="DLDH_Dld"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR016169">
+<property type="entry name" value="CO_DH_flavot_FAD-bd_sub2"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR016172">
+<property type="entry name" value="D-lactate_DH_C-sub1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR016173">
+<property type="entry name" value="D-lactate_DH_C-sub2"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR012256">
+<property type="entry name" value="D_lactate_DH"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR016166">
+<property type="entry name" value="FAD-bd_2"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR036318">
+<property type="entry name" value="FAD-bd_2-like_sf"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR016167">
+<property type="entry name" value="FAD-bd_2_sub1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR016164">
+<property type="entry name" value="FAD-linked_Oxase-like_C"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR015409">
+<property type="entry name" value="Lactate_DH_C"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR006094">
+<property type="entry name" value="Oxid_FAD_bind_N"/>
+</dbReference>
+<dbReference type="Pfam" id="PF01565">
+<property type="entry name" value="FAD_binding_4"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Pfam" id="PF09330">
+<property type="entry name" value="Lact-deh-memb"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF000101">
+<property type="entry name" value="D-lactate_dh"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF55103">
+<property type="entry name" value="SSF55103"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF56176">
+<property type="entry name" value="SSF56176"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51387">
+<property type="entry name" value="FAD_PCMH"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0997">Cell inner membrane</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0274">FAD</keyword>
+<keyword id="KW-0285">Flavoprotein</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-0560">Oxidoreductase</keyword>
+<keyword id="KW-0874">Quinone</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<feature type="initiator methionine" description="Removed" evidence="7">
+<location>
+<position position="1"/>
+</location>
+</feature>
+<feature type="chain" description="Quinone-dependent D-lactate dehydrogenase" id="PRO_0000079928">
+<location>
+<begin position="2"/>
+<end position="571"/>
+</location>
+</feature>
+<feature type="domain" description="FAD-binding PCMH-type" evidence="2">
+<location>
+<begin position="42"/>
+<end position="213"/>
+</location>
+</feature>
+<feature type="nucleotide phosphate-binding region" description="FAD" evidence="1 2 4">
+<location>
+<begin position="76"/>
+<end position="80"/>
+</location>
+</feature>
+<feature type="nucleotide phosphate-binding region" description="FAD" evidence="1 2 4">
+<location>
+<begin position="84"/>
+<end position="85"/>
+</location>
+</feature>
+<feature type="binding site" description="FAD; via amide nitrogen" evidence="1 2 4">
+<location>
+<position position="143"/>
+</location>
+</feature>
+<feature type="binding site" description="FAD" evidence="1 2 4">
+<location>
+<position position="150"/>
+</location>
+</feature>
+<feature type="binding site" description="FAD; via amide nitrogen" evidence="1 2 4">
+<location>
+<position position="160"/>
+</location>
+</feature>
+<feature type="binding site" description="FAD; via amide nitrogen and carbonyl oxygen" evidence="1 2 4">
+<location>
+<position position="262"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="10"/>
+<end position="20"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="22"/>
+<end position="24"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="29"/>
+<end position="36"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="39"/>
+<end position="41"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="47"/>
+<end position="50"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="55"/>
+<end position="67"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="71"/>
+<end position="77"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="81"/>
+<end position="83"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="96"/>
+<end position="100"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="107"/>
+<end position="110"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="111"/>
+<end position="114"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="115"/>
+<end position="118"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="124"/>
+<end position="131"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="132"/>
+<end position="134"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="143"/>
+<end position="147"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="151"/>
+<end position="156"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="174"/>
+<end position="179"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="185"/>
+<end position="189"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="191"/>
+<end position="193"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="199"/>
+<end position="207"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="213"/>
+<end position="215"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="228"/>
+<end position="233"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="247"/>
+<end position="249"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="259"/>
+<end position="268"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="277"/>
+<end position="284"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="286"/>
+<end position="299"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="305"/>
+<end position="311"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="312"/>
+<end position="318"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="379"/>
+<end position="387"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="389"/>
+<end position="396"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="400"/>
+<end position="414"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="418"/>
+<end position="421"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="424"/>
+<end position="434"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="437"/>
+<end position="447"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="449"/>
+<end position="451"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="452"/>
+<end position="461"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="475"/>
+<end position="478"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="481"/>
+<end position="489"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="490"/>
+<end position="493"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="494"/>
+<end position="502"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="507"/>
+<end position="520"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="527"/>
+<end position="529"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="532"/>
+<end position="534"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="539"/>
+<end position="548"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="556"/>
+<end position="560"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="1F0X"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000255">
+<source>
+<dbReference type="HAMAP-Rule" id="MF_02092"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1092688"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10944213"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="2185834"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="3013300"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="3882663"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="4575624"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="4582730"/>
+</source>
+</evidence>
+<evidence key="10" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7578233"/>
+</source>
+</evidence>
+<evidence key="11" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="3882663"/>
+</source>
+</evidence>
+<evidence key="12" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="4575624"/>
+</source>
+</evidence>
+<evidence key="13" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="4582730"/>
+</source>
+</evidence>
+<evidence key="14" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="6386470"/>
+</source>
+</evidence>
+<evidence key="15" type="ECO:0000305"/>
+<evidence key="16" type="ECO:0000305">
+<source>
+<dbReference type="PubMed" id="10944213"/>
+</source>
+</evidence>
+<sequence length="571" mass="64612" checksum="77FB2C467CB4389F" modified="2007-01-23" version="3">
+MSSMTTTDNKAFLNELARLVGSSHLLTDPAKTARYRKGFRSGQGDALAVVFPGSLLELWR
+VLKACVTADKIILMQAANTGLTEGSTPNGNDYDRDVVIISTLRLDKLHVLGKGEQVLAYP
+GTTLYSLEKALKPLGREPHSVIGSSCIGASVIGGICNNSGGSLVQRGPAYTEMSLFARIN
+EDGKLTLVNHLGIDLGETPEQILSKLDDDRIKDDDVRHDGRHAHDYDYVHRVRDIEADTP
+ARYNADPDRLFESSGCAGKLAVFAVRLDTFEAEKNQQVFYIGTNQPEVLTEIRRHILANF
+ENLPVAGEYMHRDIYDIAEKYGKDTFLMIDKLGTDKMPFFFNLKGRTDAMLEKVKFFRPH
+FTDRAMQKFGHLFPSHLPPRMKNWRDKYEHHLLLKMAGDGVGEAKSWLVDYFKQAEGDFF
+VCTPEEGSKAFLHRFAAAGAAIRYQAVHSDEVEDILALDIALRRNDTEWYEHLPPEIDSQ
+LVHKLYYGHFMCYVFHQDYIVKKGVDVHALKEQMLELLQQRGAQYPAEHNVGHLYKAPET
+LQKFYRENDPTNSMNPGIGKTSKRKNWQEVE
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>

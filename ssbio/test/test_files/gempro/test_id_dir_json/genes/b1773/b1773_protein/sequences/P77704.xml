@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="2002-03-27" modified="2017-10-25" version="117">
+<accession>P77704</accession>
+<name>YDJI_ECOLI</name>
+<protein>
+<recommendedName>
+<fullName>Uncharacterized protein YdjI</fullName>
+</recommendedName>
+</protein>
+<gene>
+<name type="primary">ydjI</name>
+<name type="ordered locus">b1773</name>
+<name type="ordered locus">JW1762</name>
+</gene>
+<organism>
+<name type="scientific">Escherichia coli (strain K12)</name>
+<dbReference type="NCBI Taxonomy" id="83333"/>
+<lineage>
+<taxon>Bacteria</taxon>
+<taxon>Proteobacteria</taxon>
+<taxon>Gammaproteobacteria</taxon>
+<taxon>Enterobacterales</taxon>
+<taxon>Enterobacteriaceae</taxon>
+<taxon>Escherichia</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1996" name="DNA Res." volume="3" first="363" last="377">
+<title>A 570-kb DNA sequence of the Escherichia coli K-12 genome corresponding to the 28.0-40.1 min region on the linkage map.</title>
+<authorList>
+<person name="Aiba H."/>
+<person name="Baba T."/>
+<person name="Fujita K."/>
+<person name="Hayashi K."/>
+<person name="Inada T."/>
+<person name="Isono K."/>
+<person name="Itoh T."/>
+<person name="Kasai H."/>
+<person name="Kashimoto K."/>
+<person name="Kimura S."/>
+<person name="Kitakawa M."/>
+<person name="Kitagawa M."/>
+<person name="Makino K."/>
+<person name="Miki T."/>
+<person name="Mizobuchi K."/>
+<person name="Mori H."/>
+<person name="Mori T."/>
+<person name="Motomura K."/>
+<person name="Nakade S."/>
+<person name="Nakamura Y."/>
+<person name="Nashimoto H."/>
+<person name="Nishio Y."/>
+<person name="Oshima T."/>
+<person name="Saito N."/>
+<person name="Sampei G."/>
+<person name="Seki Y."/>
+<person name="Sivasundaram S."/>
+<person name="Tagami H."/>
+<person name="Takeda J."/>
+<person name="Takemoto K."/>
+<person name="Takeuchi Y."/>
+<person name="Wada C."/>
+<person name="Yamamoto Y."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="9097039"/>
+<dbReference type="DOI" id="10.1093/dnares/3.6.363"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1997" name="Science" volume="277" first="1453" last="1462">
+<title>The complete genome sequence of Escherichia coli K-12.</title>
+<authorList>
+<person name="Blattner F.R."/>
+<person name="Plunkett G. III"/>
+<person name="Bloch C.A."/>
+<person name="Perna N.T."/>
+<person name="Burland V."/>
+<person name="Riley M."/>
+<person name="Collado-Vides J."/>
+<person name="Glasner J.D."/>
+<person name="Rode C.K."/>
+<person name="Mayhew G.F."/>
+<person name="Gregor J."/>
+<person name="Davis N.W."/>
+<person name="Kirkpatrick H.A."/>
+<person name="Goeden M.A."/>
+<person name="Rose D.J."/>
+<person name="Mau B."/>
+<person name="Shao Y."/>
+</authorList>
+<dbReference type="PubMed" id="9278503"/>
+<dbReference type="DOI" id="10.1126/science.277.5331.1453"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / MG1655 / ATCC 47076</strain>
+</source>
+</reference>
+<reference key="3">
+<citation type="journal article" date="2006" name="Mol. Syst. Biol." volume="2" first="E1" last="E5">
+<title>Highly accurate genome sequences of Escherichia coli K-12 strains MG1655 and W3110.</title>
+<authorList>
+<person name="Hayashi K."/>
+<person name="Morooka N."/>
+<person name="Yamamoto Y."/>
+<person name="Fujita K."/>
+<person name="Isono K."/>
+<person name="Choi S."/>
+<person name="Ohtsubo E."/>
+<person name="Baba T."/>
+<person name="Wanner B.L."/>
+<person name="Mori H."/>
+<person name="Horiuchi T."/>
+</authorList>
+<dbReference type="PubMed" id="16738553"/>
+<dbReference type="DOI" id="10.1038/msb4100049"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<source>
+<strain>K12 / W3110 / ATCC 27325 / DSM 5911</strain>
+</source>
+</reference>
+<dbReference type="EMBL" id="U00096">
+<property type="protein sequence ID" value="AAC74843.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AP009048">
+<property type="protein sequence ID" value="BAA15564.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="PIR" id="E64937">
+<property type="entry name" value="E64937"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_416287.1">
+<property type="nucleotide sequence ID" value="NC_000913.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="WP_000878893.1">
+<property type="nucleotide sequence ID" value="NZ_LN832404.1"/>
+</dbReference>
+<dbReference type="ProteinModelPortal" id="P77704"/>
+<dbReference type="SMR" id="P77704"/>
+<dbReference type="BioGrid" id="4259348">
+<property type="interactions" value="46"/>
+</dbReference>
+<dbReference type="DIP" id="DIP-28071N"/>
+<dbReference type="IntAct" id="P77704">
+<property type="interactions" value="8"/>
+</dbReference>
+<dbReference type="STRING" id="316407.1742884"/>
+<dbReference type="PaxDb" id="P77704"/>
+<dbReference type="PRIDE" id="P77704"/>
+<dbReference type="EnsemblBacteria" id="AAC74843">
+<property type="protein sequence ID" value="AAC74843"/>
+<property type="gene ID" value="b1773"/>
+</dbReference>
+<dbReference type="EnsemblBacteria" id="BAA15564">
+<property type="protein sequence ID" value="BAA15564"/>
+<property type="gene ID" value="BAA15564"/>
+</dbReference>
+<dbReference type="GeneID" id="946291"/>
+<dbReference type="KEGG" id="ecj:JW1762"/>
+<dbReference type="KEGG" id="eco:b1773"/>
+<dbReference type="PATRIC" id="fig|1411691.4.peg.481"/>
+<dbReference type="EchoBASE" id="EB3258"/>
+<dbReference type="EcoGene" id="EG13485">
+<property type="gene designation" value="ydjI"/>
+</dbReference>
+<dbReference type="eggNOG" id="ENOG4105D2N">
+<property type="taxonomic scope" value="Bacteria"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG0191">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="HOGENOM" id="HOG000227793"/>
+<dbReference type="InParanoid" id="P77704"/>
+<dbReference type="PhylomeDB" id="P77704"/>
+<dbReference type="BioCyc" id="EcoCyc:G6960-MONOMER"/>
+<dbReference type="PRO" id="PR:P77704"/>
+<dbReference type="Proteomes" id="UP000000318">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="Proteomes" id="UP000000625">
+<property type="component" value="Chromosome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016832">
+<property type="term" value="F:aldehyde-lyase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008270">
+<property type="term" value="F:zinc ion binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005975">
+<property type="term" value="P:carbohydrate metabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="CDD" id="cd00947">
+<property type="entry name" value="TBP_aldolase_IIB"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="Gene3D" id="3.20.20.70">
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR013785">
+<property type="entry name" value="Aldolase_TIM"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR000771">
+<property type="entry name" value="FBA_II"/>
+</dbReference>
+<dbReference type="Pfam" id="PF01116">
+<property type="entry name" value="F_bP_aldolase"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF001359">
+<property type="entry name" value="F_bP_aldolase_II"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR00167">
+<property type="entry name" value="cbbA"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="predicted"/>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<feature type="chain" description="Uncharacterized protein YdjI" id="PRO_0000201326">
+<location>
+<begin position="1"/>
+<end position="278"/>
+</location>
+</feature>
+<sequence length="278" mass="30810" checksum="85D1EE2FD4A41774" modified="1997-02-01" version="1">
+MLADIRYWENDATNKHYAIAHFNVWNAEMLMGVIDAAEEAKSPVIISFGTGFVGNTSFED
+FSHMMVSMAQKATVPVITHWDHGRSMEIIHNAWTHGMNSLMRDASAFDFEENIRLTKEAV
+DFFHPLGIPVEAELGHVGNETVYEEALAGYHYTDPDQAAEFVERTGCDSLAVAIGNQHGV
+YTSEPQLNFEVVKRVRDAVSVPLVLHGASGISDADIKTAISLGIAKINIHTELCQAAMVA
+VKENQDQPFLHLEREVRKAVKERALEKIKLFGSDGKAE
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+</copyright>
+</uniprot>
