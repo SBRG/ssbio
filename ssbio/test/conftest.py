@@ -43,6 +43,20 @@ def test_files_outputs(test_files):
 
 
 @pytest.fixture(scope='module')
+def test_files_atlas(test_files):
+    """ATLAS files"""
+    # ssbio/test/test_files/atlas
+    return op.join(test_files, 'atlas')
+
+
+@pytest.fixture(scope='module')
+def test_files_gempro(test_files):
+    """GEMPRO files"""
+    # ssbio/test/test_files/atlas
+    return op.join(test_files, 'gempro')
+
+
+@pytest.fixture(scope='module')
 def test_gem_small_json(test_files_models):
     """Mini JSON GEM for testing (E. coli)"""
     # ssbio/test/test_files/models/mini.json
