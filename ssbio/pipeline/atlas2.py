@@ -18,6 +18,7 @@ import ssbio.protein.sequence.properties.residues
 import ssbio.protein.sequence.utils.alignment
 import ssbio.protein.sequence.utils.blast
 import ssbio.protein.sequence.utils.fasta
+from joblib import Parallel, delayed
 from ssbio import utils
 from ssbio.core.object import Object
 from ssbio.pipeline.gempro import GEMPRO
@@ -74,29 +75,7 @@ class ATLAS2(Object):
             self.reference_gempro.genome_path = self.reference_gempro.write_representative_sequences_file(outname=self.reference_gempro.id)
         else:
             self.reference_gempro.genome_path = reference_genome_path
-            # TODO: must also check if reference_genome_path gene IDs can be matched to the reference_gempro
-
-        self._empty_reference_gempro = None
-
-    def set_empty_reference_gempro(self):
-        logging.disable(logging.WARNING)
-
-        if self.reference_gempro.model:
-            # If there is a SBML model associated with the GEMPRO, copy that model
-
-            self._empty_reference_gempro = GEMPRO(gem_name='Copied reference GEM-PRO',
-                                                  gem=self.reference_gempro.model.copy())
-            # Reset the GenePro attributes
-            for x in self._empty_reference_gempro.genes:
-                x.reset_protein()
-        else:
-            # Otherwise, just copy the list of genes over and rename the IDs
-            strain_genes = [x.id for x in self.reference_gempro.functional_genes]
-            if len(strain_genes) == 0:
-                raise ValueError('GEM-PRO has no genes, unable to run multi-strain analysis')
-            self._empty_reference_gempro = GEMPRO(gem_name='Copied reference GEM-PRO', genes_list=strain_genes)
-
-        logging.disable(logging.NOTSET)
+            # TODO: must also have a check if reference_genome_path gene IDs can be matched to the reference_gempro
 
     @property
     def root_dir(self):
@@ -179,6 +158,8 @@ class ATLAS2(Object):
         """Load in a dictionary of strain IDs to their protein FASTA files"""
         logging.disable(logging.WARNING)
         for strain_id, strain_fasta_file in strains_to_fasta_files.items():
+            if self.strains.has_id(strain_id):
+                continue
             strain_gp = GEMPRO(gem_name=strain_id)
             strain_gp.genome_path = strain_fasta_file
             self.strains.append(strain_gp)
@@ -330,7 +311,44 @@ class ATLAS2(Object):
         log.info('{} genes to be analyzed, originally {}'.format(len(self.reference_gempro.functional_genes), initial_num_genes))
         log.info('{} strains to be analyzed, originally {}'.format(len(self.strains), initial_num_strains))
 
-    def build_strain_specific_models(self, sc=None, save_models=False, force_rerun=False):
+    def _build_strain_specific_model(self, strain_gp, force_rerun=False):
+        already_saved_model = op.join(self.model_dir, '{}_gp.pckl'.format(strain_gp.id))
+
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_model):
+            logging.disable(logging.WARNING)
+            if self.reference_gempro.model:
+                strain_gp.load_cobra_model(deepcopy(self.reference_gempro.model))
+                # Reset the GenePro attributes
+                for x in strain_gp.genes:
+                    x.reset_protein()
+            else:
+                # Otherwise, just copy the list of genes over and rename the IDs
+                strain_genes = [x.id for x in self.reference_gempro.functional_genes]
+                strain_gp.add_gene_ids(strain_genes)
+            logging.disable(logging.NOTSET)
+
+            # Get a list of genes which do not have orthology in the strain
+            genes_to_remove = self.df_orthology_matrix[pd.isnull(self.df_orthology_matrix[strain_gp.id])][strain_gp.id].index.tolist()
+
+            # Mark genes non-functional
+            strain_genes = [x.id for x in strain_gp.genes]
+            genes_to_remove = list(set(genes_to_remove).intersection(set(strain_genes)))
+
+            if len(genes_to_remove) > 0:
+                # If a COBRApy model exists, utilize the delete_model_genes method
+                if strain_gp.model:
+                    cobra.manipulation.delete_model_genes(strain_gp.model, genes_to_remove)
+                # Otherwise, just mark the genes as non-functional
+                else:
+                    for g in genes_to_remove:
+                        strain_gp.genes.get_by_id(g).functional = False
+
+            strain_gp.save_pickle(outfile=already_saved_model)
+            return strain_gp
+        else:
+            return ssbio.io.load_pickle(already_saved_model)
+
+    def build_strain_specific_models(self, joblib=False, cores=1, backend='threading', force_rerun=False):
         """Using the orthologous genes matrix, create and modify the strain specific models based on if orthologous
         genes exist.
         """
@@ -338,137 +356,121 @@ class ATLAS2(Object):
         if len(self.df_orthology_matrix) == 0:
             raise RuntimeError('Empty orthology matrix, please calculate first!')
 
-        # Make sure to set a copy of the original model to a empty reference one
-        self.set_empty_reference_gempro()
-
-        # Create an emptied copy of the reference GEM-PRO
-        def build_strain_specific_model(strain_gempro, empty_reference_gempro=self._empty_reference_gempro,
-                                        orth_matrix=self.df_orthology_matrix,
-                                        save_model=save_models, model_dir=self.model_dir,
-                                        force_rerun=force_rerun):
-            already_saved_model = op.join(model_dir, '{}.json'.format(strain_gempro.id))
-
-            if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_model):
-                # For each genome, load the metabolic model or genes from the reference GEM-PRO
-                if empty_reference_gempro.model:
-                    logging.disable(logging.WARNING)
-                    # TODO: investigate if this creates a new copy and all references to old model are unlinked
-                    strain_gempro.load_cobra_model(empty_reference_gempro.model)
-                    logging.disable(logging.NOTSET)
-                    strain_gempro.model._trimmed = False
-                    strain_gempro.model._trimmed_genes = []
-                    strain_gempro.model._trimmed_reactions = {}
-                elif empty_reference_gempro.genes:
-                    strain_gempro.genes = deepcopy(empty_reference_gempro.genes)
-
-                # Get a list of genes which do not have orthology in the strain
-                genes_to_remove = orth_matrix[pd.isnull(orth_matrix[strain_gempro.id])][strain_gempro.id].index.tolist()
-
-                # Mark genes non-functional
-                strain_genes = [x.id for x in strain_gempro.genes]
-                genes_to_remove = list(set(genes_to_remove).intersection(set(strain_genes)))
-
-                if len(genes_to_remove) > 0:
-                    # If a COBRApy model exists, utilize the delete_model_genes method
-                    if strain_gempro.model:
-                        cobra.manipulation.delete_model_genes(strain_gempro.model, genes_to_remove)
-                    # Otherwise, just mark the genes as non-functional
-                    else:
-                        for g in genes_to_remove:
-                            strain_gempro.genes.get_by_id(g).functional = False
-
-                if save_model:
-                    cobra.io.save_json_model(model=strain_gempro.model,
-                                             filename=op.join(model_dir, '{}.json'.format(strain_gempro.id)))
-
-                return strain_gempro
-
-            else:
-                return GEMPRO(gem_name=strain_gempro.id, gem_file_path=already_saved_model, gem_file_type='json')
-
         log.info('Building strain specific models...')
-        if sc:
-            strains_rdd = sc.parallelize(self.strains)
-            result = strains_rdd.map(build_strain_specific_model).collect()
-            self.strains = DictList(result)
+        if joblib:
+            loaded_strains = DictList(Parallel(n_jobs=cores, backend=backend)(delayed(self._build_strain_specific_model)(s, force_rerun=force_rerun) for s in self.strains))
         else:
+            loaded_strains = DictList()
             for s in tqdm(self.strains):
-                build_strain_specific_model(s)
+                loaded_strains.append(self._build_strain_specific_model(s, force_rerun=force_rerun))
 
-    def load_strains_sequences_to_strains(self, sc=None, save_models=False):
-        def load_sequences_to_strain(strain_gempro, orth_matrix=self.df_orthology_matrix,
-                                     save_model=save_models, model_dir=self.model_dir):
+        self.strains = loaded_strains
+
+    def _load_sequences_to_strain(self, strain_gempro, force_rerun=False):
+        already_saved_model = op.join(self.model_dir, '{}_gp_withseqs.pckl'.format(strain_gempro.id))
+
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_model):
             strain_sequences = SeqIO.index(strain_gempro.genome_path, 'fasta')
             # strain_sequences = SeqIO.to_dict(SeqIO.parse(strain_gempro.genome_path, 'fasta'))
             for strain_gene in strain_gempro.functional_genes:
                 # Pull the gene ID of the strain from the orthology matrix
-                strain_gene_key = orth_matrix.at[strain_gene.id, strain_gempro.id]
+                strain_gene_key = self.df_orthology_matrix.at[strain_gene.id, strain_gempro.id]
                 # Load into the strain GEM-PRO
                 new_id = '{}_{}'.format(strain_gene.id, strain_gempro.id)
                 if strain_gene.protein.sequences.has_id(new_id):
                     continue
                 strain_gene.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
                                                          set_as_representative=True)
-            if save_model:
-                strain_gempro.save_json(outfile=op.join(model_dir, '{}_gp.json'.format(strain_gempro.id)))
-                strain_gempro.save_pickle(outfile=op.join(model_dir, '{}_gp.pckl'.format(strain_gempro.id)))
+
+            strain_gempro.save_pickle(outfile=already_saved_model)
             return strain_gempro
-
-        log.info('Loading sequences to strain GEM-PROs...')
-        if sc:
-            strains_rdd = sc.parallelize(self.strains)
-            result = strains_rdd.map(load_sequences_to_strain).collect()
-            self.strains = DictList(result)
         else:
-            for s in tqdm(self.strains):
-                load_sequences_to_strain(s)
+            return ssbio.io.load_pickle(already_saved_model)
 
-    def load_strains_sequences_to_reference(self, sc=None):
-        def load_sequences_to_reference_gene(g, strain_gempros=self.strains,
-                                             orth_matrix=self.df_orthology_matrix):
-            for strain_gempro in strain_gempros:
+    def load_sequences_to_strains(self, joblib=False, cores=1, backend='threading', force_rerun=False):
+        log.info('Loading sequences to strain GEM-PROs...')
+        if joblib:
+            loaded_strains = DictList(Parallel(n_jobs=cores, backend=backend)(delayed(self._load_sequences_to_strain)(s, force_rerun) for s in self.strains))
+        else:
+            loaded_strains = DictList()
+            for s in tqdm(self.strains):
+                loaded_strains.append(self._load_sequences_to_strain(s, force_rerun))
+        self.strains = loaded_strains
+
+    def _load_sequences_to_reference_gene(self, g, force_rerun=False):
+        already_saved_protein = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs.pckl'.format(g.id))
+
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_protein):
+            for strain_gempro in self.strains:
                 strain_sequences = SeqIO.index(strain_gempro.genome_path, 'fasta')
                 strain_gene = strain_gempro.genes.get_by_id(g.id)
                 if strain_gene.functional:
                     # Pull the gene ID of the strain from the orthology matrix
-                    strain_gene_key = orth_matrix.at[strain_gene.id, strain_gempro.id]
+                    strain_gene_key = self.df_orthology_matrix.at[strain_gene.id, strain_gempro.id]
                     new_id = '{}_{}'.format(strain_gene.id, strain_gempro.id)
                     if g.protein.sequences.has_id(new_id):
                         continue
                     g.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
                                                    set_as_representative=False)
-            return g
 
+            g.protein.save_pickle(outfile=already_saved_protein)
+        # else:
+        #     g.protein = ssbio.io.load_pickle(already_saved_protein)
+
+    def _load_sequences_to_reference_gene_lite(self, g, strain_infodict, force_rerun=False):
+        already_saved_protein = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs.pckl'.format(g.id))
+
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_protein):
+            for strain, info in strain_infodict.items():
+                strain_sequences = SeqIO.index(strain_infodict['genome_path'], 'fasta')
+                strain_gene_functional = strain_infodict['genes'][g.id]
+                if strain_gene_functional:
+                    # Pull the gene ID of the strain from the orthology matrix
+                    strain_gene_key = self.df_orthology_matrix.at[g.id, strain]
+                    new_id = '{}_{}'.format(g.id, strain)
+                    if g.protein.sequences.has_id(new_id):
+                        continue
+                    g.protein.load_manual_sequence(seq=strain_sequences[strain_gene_key], ident=new_id,
+                                                   set_as_representative=False)
+
+            g.protein.save_pickle(outfile=already_saved_protein)
+        # else:
+        #     g.protein = ssbio.io.load_pickle(already_saved_protein)
+
+        del g.protein
+
+    def load_sequences_to_reference(self, strain_infodict=None, joblib=False, cores=1, backend='threading', force_rerun=False):
         log.info('Loading sequences to reference GEM-PRO...')
-        if sc:
-            genes_rdd = sc.parallelize(self.reference_gempro.functional_genes)
-            result = genes_rdd.map(load_sequences_to_reference_gene).collect()
-            for modified_g in result:
-                original_gene = self.reference_gempro.genes.get_by_id(modified_g.id)
-                original_gene.copy_modified_gene(modified_g)
+        if joblib:
+            Parallel(n_jobs=cores, backend=backend)(delayed(self._load_sequences_to_reference_gene_lite)(g, strain_infodict, force_rerun) for g in self.reference_gempro.functional_genes)
         else:
             for g in tqdm(self.reference_gempro.functional_genes):
-                load_sequences_to_reference_gene(g)
+                self._load_sequences_to_reference_gene(g, force_rerun)
 
-    def align_orthologous_genes_pairwise(self, sc=None, gapopen=10, gapextend=0.5):
-        """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it."""
-        def run_alignments(g, outdir=self.sequences_by_gene_dir):
+    def _align_orthologous_gene_pairwise(self, g, gapopen=10, gapextend=0.5, engine='needle', parse=True, force_rerun=False):
+        if not g.protein.representative_sequence:
+            log.error('{}: no representative sequence to align to'.format(g.id))
+            return
+        already_saved_protein = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs_aln.pckl'.format(g.id))
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=already_saved_protein):
             if len(g.protein.sequences) > 1:
-                alignment_dir = op.join(outdir, g.id)
+                alignment_dir = op.join(self.sequences_by_gene_dir, g.id)
                 ssbio.utils.make_dir(alignment_dir)
-                g.protein.pairwise_align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend,
-                                                                     outdir=alignment_dir, parse=True)
-            return g
+                g.protein.pairwise_align_sequences_to_representative(gapopen=gapopen, gapextend=gapextend, engine=engine,
+                                                                     outdir=alignment_dir, parse=parse, force_rerun=force_rerun)
+            g.protein.save_pickle(outfile=already_saved_protein)
+        else:
+            g.protein = ssbio.io.load_pickle(already_saved_protein)
 
-        if sc:
-            genes_rdd = sc.parallelize(self.reference_gempro.functional_genes)
-            result = genes_rdd.map(run_alignments).collect()
-            for modified_g in result:
-                original_gene = self.reference_gempro.genes.get_by_id(modified_g.id)
-                original_gene.copy_modified_gene(modified_g)
+    def align_orthologous_genes_pairwise(self, joblib=False, cores=1, backend='threading', gapopen=10, gapextend=0.5,
+                                         engine='needle', parse=True, force_rerun=False):
+        """For each gene in the base strain, run a pairwise alignment for all orthologous gene sequences to it."""
+        log.info('Aligning sequences to reference GEM-PRO...')
+        if joblib:
+            Parallel(n_jobs=cores, backend=backend)(delayed(self._align_orthologous_gene_pairwise)(g, gapopen=gapopen, gapextend=gapextend, engine=engine, parse=parse, force_rerun=force_rerun) for g in self.reference_gempro.functional_genes)
         else:
             for g in tqdm(self.reference_gempro.functional_genes):
-                run_alignments(g)
+                self._align_orthologous_gene_pairwise(g, gapopen=gapopen, gapextend=gapextend, engine=engine, parse=parse, force_rerun=force_rerun)
 
 def get_atlas_summary_df(self):
     """Create a single data frame which summarizes all genes per row.
