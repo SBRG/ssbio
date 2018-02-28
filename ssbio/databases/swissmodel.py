@@ -158,3 +158,72 @@ class SWISSMODEL():
                     uniprot_to_swissmodel[uni].append(file_path)
                 else:
                     log.warning('{}: no file {} found for model'.format(u, ))
+
+def get_oligomeric_state(swiss_model_path):
+    """Parse the oligomeric prediction in a SWISS-MODEL repository file
+
+    As of 2018-02-26, works on all E. coli models. Untested on other pre-made organism models.
+
+    Args:
+        swiss_model_path (str): Path to SWISS-MODEL PDB file
+
+    Returns:
+        dict: Information parsed about the oligomeric state
+
+    """
+    oligo_info = {}
+    with open(swiss_model_path, 'r') as f:
+        for line in f:
+            if line.startswith('REMARK   3 MODEL INFORMATION'):
+                break
+        for i in range(10):
+            line = f.readline()
+            if 'ENGIN' in line:
+                oligo_info['ENGIN'] = line.rstrip().split(' ')[-1]
+            elif 'OSTAT' in line:
+                oligo_info['OSTAT'] = line.rstrip().split(' ')[-1]
+            elif 'OSRSN' in line:
+                oligo_info['OSRSN'] = line.rstrip().split(' ')[-1]
+            elif 'QSPRD' in line:
+                oligo_info['QSPRD'] = line.rstrip().split(' ')[-1]
+            elif 'GMQE' in line:
+                oligo_info['GMQE'] = line.rstrip().split(' ')[-1]
+            elif 'QMN4' in line:
+                oligo_info['QMN4'] = line.rstrip().split(' ')[-1]
+            elif 'MODT' in line:
+                oligo_info['MODT'] = line.rstrip().split(' ')[-1]
+    return oligo_info
+
+
+def translate_ostat(ostat):
+    """Translate the OSTAT field to an integer.
+
+    As of 2018-02-26, works on all E. coli models. Untested on other pre-made organism models.
+
+    Args:
+        ostat (str): Predicted oligomeric state of the PDB file
+
+    Returns:
+        int: Translated string to integer
+
+    """
+    ostat_lower = ostat.strip().lower()
+    if ostat_lower == 'monomer':
+        return 1
+    elif ostat_lower == 'homo-dimer':
+        return 2
+    elif ostat_lower == 'homo-trimer':
+        return 3
+    elif ostat_lower == 'homo-tetramer':
+        return 4
+    elif ostat_lower == 'homo-pentamer':
+        return 5
+    elif ostat_lower == 'homo-hexamer':
+        return 6
+    elif ostat_lower == 'homo-heptamer':
+        return 7
+    elif ostat_lower == 'homo-octamer':
+        return 8
+    else:
+        num = int(ostat_lower.split('-')[1])
+        return num
