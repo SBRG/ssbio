@@ -15,6 +15,7 @@ from collections import defaultdict
 from six.moves.urllib.error import URLError
 
 from Bio.Seq import Seq
+from Bio import SeqIO
 from Bio.SeqFeature import SeqFeature, FeatureLocation
 from Bio.PDB.PDBExceptions import PDBException, PDBConstructionException
 from msgpack.exceptions import ExtraData
@@ -687,6 +688,26 @@ class Protein(Object):
 
         for r in result:
             self.sequence_alignments.append(r)
+
+    def write_all_sequences_file(self, outname, outdir=None):
+        """Write all the stored sequences as a single FASTA file. By default, sets IDs to model gene IDs.
+
+        Args:
+            outname (str): Name of the output FASTA file without the extension
+            outdir (str): Path to output directory for the file, default is the sequences directory
+
+        """
+
+        if not outdir:
+            outdir = self.sequence_dir
+            if not outdir:
+                raise ValueError('Output directory must be specified')
+
+        outfile = op.join(outdir, outname + '.faa')
+        SeqIO.write(self.sequences, outfile, "fasta")
+
+        log.info('{}: wrote all protein sequences to file'.format(outfile))
+        return outfile
 
     def get_sequence_properties(self, representative_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
@@ -1772,6 +1793,10 @@ class Protein(Object):
         if self.representative_structure and not force_rerun:
             log.debug('{}: representative structure already set'.format(self.id))
             return self.representative_structure
+
+        if self.representative_structure and force_rerun:
+            log.debug('{}: representative structure previously set, unsetting'.format(self.id))
+            self.representative_structure = None
 
         if not pdb_file_type:
             pdb_file_type = self.pdb_file_type
