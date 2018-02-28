@@ -1047,10 +1047,15 @@ class GEMPRO(Object):
                     new_homology.load_structure_path(new_homology.clean_structure(outdir=outdir, force_rerun=force_rerun),
                                                      hdict['file_type'])
                 else:
-                    if ssbio.utils.force_rerun(force_rerun, op.basename(hdict['model_file'])):
+                    copy_to = op.join(outdir, op.basename(hdict['model_file']))
+                    if ssbio.utils.force_rerun(force_rerun, copy_to):
                         # Just copy the file to the structure directory and store the file name
+                        log.debug('{}: copying model from original directory to GEM-PRO directory'.format(op.basename(hdict['model_file'])))
                         shutil.copy2(hdict['model_file'], outdir)
-                        new_homology.load_structure_path(op.join(outdir, hdict['model_file']), hdict['file_type'])
+                        new_homology.load_structure_path(copy_to, hdict['file_type'])
+                    else:
+                        log.debug('{}: homology model already copied to directory'.format(copy_to))
+                        new_homology.load_structure_path(copy_to, hdict['file_type'])
 
                 # TODO: need to better handle other info in the provided dictionary, if any
                 new_homology.update(hdict)
