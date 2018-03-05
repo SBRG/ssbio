@@ -16,10 +16,10 @@ from six.moves.urllib.error import URLError
 
 from Bio.Seq import Seq
 from Bio import SeqIO
-from Bio.SeqFeature import SeqFeature, FeatureLocation
+from Bio.SeqFeature import SeqFeature, FeatureLocation, CompoundLocation
 from Bio.PDB.PDBExceptions import PDBException, PDBConstructionException
 from msgpack.exceptions import ExtraData
-
+from more_itertools import locate
 from cobra.core import DictList
 import ssbio.utils
 import ssbio.databases.pdb
@@ -1695,6 +1695,65 @@ class Protein(Object):
                           '{structprop_resid}{structprop_resnum}'.format(**format_data))
 
         return final_mapping
+
+    def get_seqprop_subsequence_from_structchain_property(self,
+                                                          property_key, property_value, condition,
+                                                          seqprop=None, structprop=None, chain_id=None,
+                                                          use_representatives=False):
+        """Get a subsequence as a new SeqProp object given a certain property you want to find in the
+        given StructProp's chain's letter_annotation
+
+        This is similar to the :func:`ssbio.protein.sequence.seqprop.SeqProp.get_subsequence_from_property` method but instead of
+        filtering by the SeqProp's letter_annotation we use the StructProp annotation, and map back to the SeqProp.
+
+        Args:
+            seqprop (SeqRecord, SeqProp): SeqRecord or SeqProp object that has properties stored in its ``letter_annotations`` attribute
+            property_key (str): Property key in the ``letter_annotations`` attribute that you want to filter using
+            property_value (str): Property value that you want to filter by
+            condition (str): ``<``, ``=``, ``>``, ``>=``, or ``<=`` to filter the values by
+
+        Returns:
+            SeqProp: New SeqProp object that you can run computations on or just extract its properties
+
+        """
+        if use_representatives:
+            seqprop = self.representative_sequence
+            structprop = self.representative_structure
+            chain_id = self.representative_chain
+            if not structprop:
+                raise ValueError('No representative structure set, please specify sequence, structure, and chain ID')
+        else:
+            if not seqprop or not structprop or not chain_id:
+                raise ValueError('Please specify sequence, structure, and chain ID')
+
+        chain_prop = structprop.chains.get_by_id(chain_id)
+
+        # Get the subsequence from the structure
+        chain_subseq, subfeat_resnums = chain_prop.get_subsequence_from_property(property_key=property_key,
+                                                                                 property_value=property_value,
+                                                                                 condition=condition,
+                                                                                 return_resnums=True)
+
+        # Map subsequence feature resnums back to the seqprop
+        mapping_dict = self.map_structprop_resnums_to_seqprop_resnums(resnums=subfeat_resnums, structprop=structprop,
+                                                                      chain_id=chain_id,
+                                                                      seqprop=seqprop,
+                                                                      use_representatives=use_representatives)
+
+        # Now create a new SeqProp using these resnums
+        biop_compound_list = []
+        for structprop_resnum, seqprop_resnum in mapping_dict.items():
+            feat = FeatureLocation(seqprop_resnum - 1, seqprop_resnum)
+            biop_compound_list.append(feat)
+        sub_feature_location = CompoundLocation(biop_compound_list)
+        sub_feature = sub_feature_location.extract(seqprop)
+
+        new_sp = SeqProp(id='{}-{}->{}_{}_{}_{}_extracted'.format(structprop.id, chain_id, seqprop.id,
+                                                                  property_key, condition, property_value),
+                         seq=sub_feature)
+        new_sp.letter_annotations = chain_subseq.letter_annotations
+
+        return new_sp
 
     def _representative_structure_setter(self, structprop, keep_chain, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None, force_rerun=False):
