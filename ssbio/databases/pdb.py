@@ -73,6 +73,8 @@ class PDBProp(StructProp):
                                                              'pdb, mmCif, xml, or mmtf')
 
         # XTODO: check if outfile exists using ssbio.utils.force_rerun, pdblist seems to take long if it exists
+        # I know why - it's because we're renaming the ent to pdb. need to have mapping from file type to final extension
+        # Then check if file exists, if not then download again
         p = PDBList()
         with ssbio.utils.suppress_stdout():
             structure_file = p.retrieve_pdb_file(pdb_code=self.id, pdir=outdir, file_format=file_type, overwrite=force_rerun)

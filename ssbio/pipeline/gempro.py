@@ -1268,7 +1268,8 @@ class GEMPRO(Object):
             itasser_installation (str): Path to I-TASSER folder, i.e. ``~/software/I-TASSER4.4``
             itlib_folder (str): Path to ITLIB folder, i.e. ``~/software/ITLIB``
             runtype: How you will be running I-TASSER - local, slurm, or torque
-            create_in_dir (str): Local directory where folders will be created
+            create_in_dir (str): Local directory where folders will be created, if not provided default is the
+                GEM-PRO's ``data_dir``
             execute_from_dir (str): Optional path to execution directory - use this if you are copying the homology
                 models to another location such as a supercomputer for running
             all_genes (bool): If all genes should be prepped, or only those without any mapped structures
