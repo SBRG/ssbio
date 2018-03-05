@@ -21,7 +21,7 @@ class ChainProp(Object):
     def reset_seq_record(self):
         self.seq_record = None
 
-    def get_subsequence_from_property(self, property_key, property_value, condition):
+    def get_subsequence_from_property(self, property_key, property_value, condition, return_resnums=False):
         """Get a subsequence as a new SeqProp object given a certain property you want to find in
         this chain's letter_annotation
 
@@ -31,6 +31,7 @@ class ChainProp(Object):
             property_key (str): Property key in the ``letter_annotations`` attribute that you want to filter using
             property_value (str): Property value that you want to filter by
             condition (str): ``<``, ``=``, ``>``, ``>=``, or ``<=`` to filter the values by
+            return_resnums (bool): If resnums should be returned as well
 
         Returns:
             SeqProp: New SeqProp object that you can run computations on or just extract its properties
@@ -53,8 +54,12 @@ class ChainProp(Object):
         sub_feature_location = CompoundLocation(biop_compound_list)
         sub_feature = sub_feature_location.extract(self.seq_record)
 
-        new_sp = SeqProp(id='{}_{}_{}_{}_extracted'.format(self.id, property_key, condition, property_value),
+        new_sp = SeqProp(id='{}-{}_{}_{}_{}_extracted'.format(self.pdb_parent, self.id, property_key,
+                                                              condition, property_value),
                          seq=sub_feature)
         new_sp.letter_annotations = sub_feature.letter_annotations
 
-        return new_sp
+        if return_resnums:
+            return new_sp, [x + 1 for x in subfeat_indices]
+        else:
+            return new_sp
