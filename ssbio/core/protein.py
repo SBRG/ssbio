@@ -1386,6 +1386,32 @@ class Protein(Object):
                 self.sequence_alignments.remove(aln.id)
             self.sequence_alignments.append(aln)
 
+    def _get_seqprop_to_seqprop_alignment(self, seqprop1, seqprop2):
+        """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
+        if isinstance(seqprop1, str):
+            seqprop1_id = seqprop1
+        else:
+            seqprop1_id = seqprop1.id
+        if isinstance(seqprop2, str):
+            seqprop2_id = seqprop2
+        else:
+            seqprop2_id = seqprop2.id
+
+        aln_id = '{}_{}'.format(seqprop1_id, seqprop2_id)
+
+        if self.sequence_alignments.has_id(aln_id):
+            alignment = self.sequence_alignments.get_by_id(aln_id)
+            return alignment
+        else:
+            raise ValueError('{}: sequence alignment not found, please run the alignment first'.format(aln_id))
+
+    def get_seqprop_to_seqprop_alignment_stats(self, seqprop1, seqprop2):
+        """Get the sequence alignment information for a sequence to a structure's chain."""
+        alignment = self._get_seqprop_to_seqprop_alignment(seqprop1=seqprop1, seqprop2=seqprop2)
+        # XTODO should move the below function to protein.sequence.alignment
+        return ssbio.protein.structure.properties.quality.seq_to_struct_alignment_stats(reference_seq_aln=alignment[0],
+                                                                                        structure_seq_aln=alignment[1])
+
     def _get_seqprop_to_structprop_alignment(self, seqprop, structprop, chain_id):
         """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
         full_structure_id = '{}-{}'.format(structprop.id, chain_id)
@@ -1501,14 +1527,15 @@ class Protein(Object):
             seqprop = self.representative_sequence
             structprop = self.representative_structure
             chain_id = self.representative_chain
+            if not structprop:
+                raise ValueError('No representative structure set, please specify sequence, structure, and chain ID')
             full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
-            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
         else:
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
             full_structure_id = '{}-{}'.format(structprop.id, chain_id)
-            aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
 
+        aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
         access_key = '{}_chain_index'.format(aln_id)
         if access_key not in seqprop.letter_annotations:
             raise KeyError('{}: structure mapping {} not available in sequence letter annotations. Was alignment parsed? '
@@ -1548,8 +1575,10 @@ class Protein(Object):
 
         if use_representatives:
             seqprop = self.representative_sequence
-            structprop = self.representative_structure  # TODO: add checks for if repstruct exists
+            structprop = self.representative_structure
             chain_id = self.representative_chain
+            if not structprop:
+                raise ValueError('No representative structure set, please specify sequence, structure, and chain ID')
         else:
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
@@ -1613,60 +1642,59 @@ class Protein(Object):
             dict: Mapping of structure residue numbers to sequence residue numbers
 
         """
-        pass
-        # TODO: implementation
-        # resnums = ssbio.utils.force_list(resnums)
-        #
-        # if use_representatives:
-        #     seqprop = self.representative_sequence
-        #     structprop = self.representative_structure
-        #     chain_id = self.representative_chain
-        # else:
-        #     if not seqprop or not structprop or not chain_id:
-        #         raise ValueError('Please specify sequence, structure, and chain ID')
-        #
-        # mapping_to_repchain_index = self.map_seqprop_resnums_to_structprop_chain_index(resnums=resnums,
-        #                                                                                seqprop=seqprop,
-        #                                                                                structprop=structprop,
-        #                                                                                chain_id=chain_id,
-        #                                                                                use_representatives=use_representatives)
-        #
-        # chain = structprop.chains.get_by_id(chain_id)
-        # chain_structure_resnum_mapping = chain.seq_record.letter_annotations['structure_resnums']
-        #
-        # final_mapping = {}
-        # for k, v in mapping_to_repchain_index.items():
-        #     k = int(k)
-        #     rn = chain_structure_resnum_mapping[v]
-        #
-        #     if rn == float('Inf'):
-        #         log.warning('{}-{}, {}: structure file does not contain coordinates for this residue'.format(structprop.id,
-        #                                                                                                      chain_id,
-        #                                                                                                      k))
-        #     else:
-        #         rn = int(rn)
-        #         final_mapping[k] = rn
-        #
-        #         # Additionally report if residues are the same - they could be different in the structure though
-        #         format_data = {'seqprop_id'       : seqprop.id,
-        #                        'seqprop_resid'    : seqprop[k - 1],
-        #                        'seqprop_resnum'   : k,
-        #                        'structprop_id'    : structprop.id,
-        #                        'structprop_chid'  : chain_id,
-        #                        'structprop_resid' : chain.seq_record[rn - 1],
-        #                        'structprop_resnum': rn}
-        #
-        #         if seqprop[k-1] != chain.seq_record[rn-1]:
-        #             log.warning('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} does not match to '
-        #                         'structure {structprop_id}-{structprop_chid} residue '
-        #                         '{structprop_resid}{structprop_resnum}. NOTE: this may be due to '
-        #                         'structural differences'.format(**format_data))
-        #         else:
-        #             log.debug('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} is mapped to '
-        #                       'structure {structprop_id}-{structprop_chid} residue '
-        #                       '{structprop_resid}{structprop_resnum}'.format(**format_data))
-        #
-        # return final_mapping
+        resnums = ssbio.utils.force_list(resnums)
+
+        if use_representatives:
+            seqprop = self.representative_sequence
+            structprop = self.representative_structure
+            chain_id = self.representative_chain
+            if not structprop:
+                raise ValueError('No representative structure set, please specify sequence, structure, and chain ID')
+
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
+        else:
+            if not seqprop or not structprop or not chain_id:
+                raise ValueError('Please specify sequence, structure, and chain ID')
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id)
+
+        aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
+        access_key = '{}_chain_index'.format(aln_id)
+        if access_key not in seqprop.letter_annotations:
+            raise KeyError(
+                '{}: structure mapping {} not available in sequence letter annotations. Was alignment parsed? '
+                'Run ``align_seqprop_to_structprop`` with ``parse=True``.'.format(access_key, aln_id))
+
+        final_mapping = {}
+        for resnum in resnums:
+            resnum = int(resnum)
+
+            struct_res_singleaa = structprop.chains.get_by_id(chain_id).seq_record[resnum - 1]
+            sp_idx = seqprop.letter_annotations[access_key].index(resnum)
+            seq_res_singleaa = seqprop[sp_idx]
+            sp_resnum = sp_idx + 1
+
+            final_mapping[resnum] = sp_resnum
+
+            # Additionally report if residues are the same - they could be different in the structure though
+            format_data = {'seqprop_id'       : seqprop.id,
+                           'seqprop_resid'    : seq_res_singleaa,
+                           'seqprop_resnum'   : sp_resnum,
+                           'structprop_id'    : structprop.id,
+                           'structprop_chid'  : chain_id,
+                           'structprop_resid' : struct_res_singleaa,
+                           'structprop_resnum': resnum}
+
+            if struct_res_singleaa != seq_res_singleaa:
+                log.warning('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} does not match to '
+                            'structure {structprop_id}-{structprop_chid} residue '
+                            '{structprop_resid}{structprop_resnum}. NOTE: this may be due to '
+                            'structural differences'.format(**format_data))
+            else:
+                log.debug('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} is mapped to '
+                          'structure {structprop_id}-{structprop_chid} residue '
+                          '{structprop_resid}{structprop_resnum}'.format(**format_data))
+
+        return final_mapping
 
     def _representative_structure_setter(self, structprop, keep_chain, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None, force_rerun=False):
@@ -2359,6 +2387,56 @@ class Protein(Object):
                     view.add_ball_and_stick(selection=str(impres_mapped), color='black')
                     view.add_label(selection=':{} and {}'.format(chain_id, impres_mapped), label_type='res', color='black')
                     log.info('{} at sequence residue {}, structure residue {}'.format(f.type, f.location.end, impres_mapped))
+
+            # Display transmembrane regions
+            if f.type.lower() == 'transmembrane region':
+                impres = self.map_seqprop_resnums_to_structprop_resnums(resnums=[f.location.start + 1,
+                                                                                 f.location.end],
+                                                                        seqprop=seqprop,
+                                                                        structprop=structprop,
+                                                                        chain_id=chain_id,
+                                                                        use_representatives=use_representatives)
+
+                # TODO: need to check if f.location.start was mapped and if not, try incrementing. or  input the list
+                # of resnums, not just the start and end
+                if f.location.start + 1 in impres and f.location.end in impres:
+                    mapped_start = impres[f.location.start + 1]
+                    mapped_end = impres[f.location.end]
+                    view.add_cartoon(selection=':{} and ( {}-{} )'.format(chain_id,
+                                                                          mapped_start,
+                                                                          mapped_end),
+                                     aspectRatio=9,
+                                     color='black')
+                    log.info('{} at sequence region {}-{}, structure residues {}-{}'.format(f.type,
+                                                                                            f.location.start,
+                                                                                            f.location.end,
+                                                                                            mapped_start,
+                                                                                            mapped_end))
+
+            # Display topological domains
+            if f.type.lower() == 'topological domain':
+                impres = self.map_seqprop_resnums_to_structprop_resnums(resnums=[f.location.start + 1,
+                                                                                 f.location.end],
+                                                                        seqprop=seqprop,
+                                                                        structprop=structprop,
+                                                                        chain_id=chain_id,
+                                                                        use_representatives=use_representatives)
+
+                # TODO: need to check if f.location.start was mapped and if not, try incrementing. or  input the list
+                # of resnums, not just the start and end
+                if f.location.start + 1 in impres and f.location.end in impres:
+                    mapped_start = impres[f.location.start + 1]
+                    mapped_end = impres[f.location.end]
+                    view.add_cartoon(selection=':{} and ( {}-{} )'.format(chain_id,
+                                                                          mapped_start,
+                                                                          mapped_end),
+                                     aspectRatio=9,
+                                     color='green')
+                    log.info('{} at sequence region {}-{}, structure residues {}-{}'.format(f.type,
+                                                                                            f.location.start,
+                                                                                            f.location.end,
+                                                                                            mapped_start,
+                                                                                            mapped_end))
 
     def add_mutations_to_nglview(self, view, alignment_type='seqalign', alignment_ids=None,
                                  seqprop=None, structprop=None, chain_id=None, use_representatives=False,

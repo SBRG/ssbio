@@ -17,6 +17,7 @@ import warnings
 import gzip
 from collections import OrderedDict
 from collections import Callable
+import operator
 
 log = logging.getLogger(__name__)
 
@@ -995,3 +996,14 @@ def label_sequential_regions(inlist):
                         enumerate([list(group) for group in mit.consecutive_groups(iterable)])})
 
     return labeled
+
+
+def check_condition(left, condition, right):
+    ops = {'>': operator.gt,
+           '<': operator.lt,
+           '>=': operator.ge,
+           '<=': operator.le,
+           '=': operator.eq}
+    if condition not in ops:
+        raise KeyError('{}: condition not supported'.format(condition))
+    return ops[condition](left, right)
