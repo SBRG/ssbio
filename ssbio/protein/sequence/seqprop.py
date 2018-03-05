@@ -14,8 +14,8 @@ from Bio import SeqIO
 from BCBio import GFF
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.SeqFeature import SeqFeature, FeatureLocation, ExactPosition
-
+from Bio.SeqFeature import SeqFeature, FeatureLocation, ExactPosition, CompoundLocation
+from more_itertools import locate
 from ssbio.core.object import Object
 import ssbio.utils
 import ssbio.databases.pdb
@@ -560,6 +560,56 @@ class SeqProp(SeqRecord):
                              id=feat_id)
 
         self.features.append(newfeat)
+
+    def get_subsequence_from_property(self, property_key, property_value, condition):
+        """Get a subsequence as a new SeqProp object given a certain property you want to find in the
+        original SeqProp's letter_annotation
+
+        This can be used to do something like extract the subsequence of exposed residues, so you can can run
+        calculations on that subsequence. Useful if you have questions like "are there any predicted surface exposed
+        cysteines in my protein sequence?"
+
+        Example:
+            >>> sp = SeqProp(id='tester', seq='MQSLE')
+            >>> sp.letter_annotations['a_key'] = [2, 2, 3, 1, 0]
+            >>> pk = 'a_key'
+            >>> pv = 2
+            >>> cond = '<'
+            >>> new_sp = sp.get_subsequence_from_property(pk, pv, cond)
+            >>> new_sp.letter_annotations[pk]
+            [1, 0]
+            >>> new_sp
+            SeqProp(seq=Seq('LE', ExtendedIUPACProtein()), id='tester_a_key_<_2_extracted', name='<unknown name>', description='<unknown description>', dbxrefs=[])
+
+        Args:
+            property_key (str): Property key in the ``letter_annotations`` attribute that you want to filter using
+            property_value (str): Property value that you want to filter by
+            condition (str): ``<``, ``=``, ``>``, ``>=``, or ``<=`` to filter the values by
+
+        Returns:
+            SeqProp: New SeqProp object that you can run computations on or just extract its properties
+
+        """
+
+        if property_key not in self.letter_annotations:
+            raise KeyError('{}: {} not contained in the letter annotations'.format(self.id, property_key))
+
+        subfeat_indices = list(
+            locate(self.letter_annotations[property_key], lambda x: ssbio.utils.check_condition(x, condition, property_value)))
+
+        biop_compound_list = []
+        for idx in subfeat_indices:
+            feat = FeatureLocation(idx, idx + 1)
+            biop_compound_list.append(feat)
+
+        sub_feature_location = CompoundLocation(biop_compound_list)
+        sub_feature = sub_feature_location.extract(self)
+
+        new_sp = SeqProp(id='{}_{}_{}_{}_extracted'.format(self.id, property_key, condition, property_value),
+                         seq=sub_feature)
+        new_sp.letter_annotations = sub_feature.letter_annotations
+
+        return new_sp
 
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""
