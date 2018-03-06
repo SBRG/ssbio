@@ -561,7 +561,7 @@ class SeqProp(SeqRecord):
 
         self.features.append(newfeat)
 
-    def get_subsequence_from_property(self, property_key, property_value, condition):
+    def get_subsequence_from_property(self, property_key, property_value, condition, return_resnums=False):
         """Get a subsequence as a new SeqProp object given a certain property you want to find in the
         original SeqProp's letter_annotation
 
@@ -609,7 +609,10 @@ class SeqProp(SeqRecord):
                          seq=sub_feature)
         new_sp.letter_annotations = sub_feature.letter_annotations
 
-        return new_sp
+        if return_resnums:
+            return new_sp, [x + 1 for x in subfeat_indices]
+        else:
+            return new_sp
 
     def get_biopython_pepstats(self):
         """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""

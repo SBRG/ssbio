@@ -545,6 +545,39 @@ def map_resnum_a_to_resnum_b(a_resnum, a_aln, b_aln):
     return int(b_resnum)
 
 
+def pairwise_alignment_stats(reference_seq_aln, other_seq_aln):
+    """Get a report of a pairwise alignment.
+
+    Args:
+        reference_seq_aln (str, Seq, SeqRecord): Reference sequence, alignment form
+        other_seq_aln (str, Seq, SeqRecord): Other sequence, alignment form
+
+    Returns:
+        dict: Dictionary of information on mutations, insertions, sequence identity, etc.
+
+    """
+    if len(reference_seq_aln) != len(other_seq_aln):
+        raise ValueError('Sequence lengths not equal - was an alignment run?')
+
+    reference_seq_aln = ssbio.protein.sequence.utils.cast_to_str(reference_seq_aln)
+    other_seq_aln = ssbio.protein.sequence.utils.cast_to_str(other_seq_aln)
+
+    infodict = {}
+
+    # Percent identity to the reference sequence
+    stats_percent_ident = get_percent_identity(a_aln_seq=reference_seq_aln, b_aln_seq=other_seq_aln)
+    infodict['percent_identity'] = stats_percent_ident
+
+    # Other alignment results
+    aln_df = get_alignment_df(a_aln_seq=reference_seq_aln, b_aln_seq=other_seq_aln)
+    infodict['deletions'] = get_deletions(aln_df)
+    infodict['insertions'] = get_insertions(aln_df)
+    infodict['mutations'] = get_mutations(aln_df)
+    infodict['unresolved'] = get_unresolved(aln_df)
+
+    return infodict
+
+
 def needle_statistics(infile):
     """Reads in a needle alignment file and spits out statistics of the alignment.
 

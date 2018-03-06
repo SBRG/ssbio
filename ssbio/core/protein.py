@@ -23,6 +23,7 @@ from more_itertools import locate
 from cobra.core import DictList
 import ssbio.utils
 import ssbio.databases.pdb
+import ssbio.databases.pdbflex
 import ssbio.protein.sequence.utils.alignment
 import ssbio.protein.sequence.utils.fasta
 import ssbio.protein.structure.properties.quality
@@ -1387,7 +1388,7 @@ class Protein(Object):
             self.sequence_alignments.append(aln)
 
     def _get_seqprop_to_seqprop_alignment(self, seqprop1, seqprop2):
-        """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
+        """Return the alignment stored in self.sequence_alignments given a seqprop + another seqprop"""
         if isinstance(seqprop1, str):
             seqprop1_id = seqprop1
         else:
@@ -1409,8 +1410,8 @@ class Protein(Object):
         """Get the sequence alignment information for a sequence to a structure's chain."""
         alignment = self._get_seqprop_to_seqprop_alignment(seqprop1=seqprop1, seqprop2=seqprop2)
         # XTODO should move the below function to protein.sequence.alignment
-        return ssbio.protein.structure.properties.quality.seq_to_struct_alignment_stats(reference_seq_aln=alignment[0],
-                                                                                        structure_seq_aln=alignment[1])
+        return ssbio.protein.sequence.utils.alignment.pairwise_alignment_stats(reference_seq_aln=alignment[0],
+                                                                               other_seq_aln=alignment[1])
 
     def _get_seqprop_to_structprop_alignment(self, seqprop, structprop, chain_id):
         """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
@@ -1426,8 +1427,8 @@ class Protein(Object):
     def get_seqprop_to_structprop_alignment_stats(self, seqprop, structprop, chain_id):
         """Get the sequence alignment information for a sequence to a structure's chain."""
         alignment = self._get_seqprop_to_structprop_alignment(seqprop=seqprop, structprop=structprop, chain_id=chain_id)
-        return ssbio.protein.structure.properties.quality.seq_to_struct_alignment_stats(reference_seq_aln=alignment[0],
-                                                                                        structure_seq_aln=alignment[1])
+        return ssbio.protein.sequence.utils.alignment.pairwise_alignment_stats(reference_seq_aln=alignment[0],
+                                                                               other_seq_aln=alignment[1])
 
     def check_structure_chain_quality(self, seqprop, structprop, chain_id,
                                       seq_ident_cutoff=0.5, allow_missing_on_termini=0.2,
@@ -2764,3 +2765,55 @@ class Protein(Object):
                 setattr(self, k, DictList(v))
             else:
                 setattr(self, k, v)
+
+    def get_all_pdbflex_info(self):
+        log.info('{}: representative sequence length'.format(self.representative_sequence.seq_len))
+
+        for s in self.get_experimental_structures():
+            log.info('{};{}: chains matching protein {}'.format(s.id, s.mapped_chains, self.id))
+
+            s.download_structure_file(outdir=self.structure_dir, file_type='mmtf')
+            s.parse_structure()
+
+            for c in s.mapped_chains:
+                log.info('{}: sequence length of chain {}'.format(len(s.chains.get_by_id(c).seq_record), c))
+
+                # Retrieve PDBFlex stats
+                stats = ssbio.databases.pdbflex.get_pdbflex_info(pdb_id=s.id, chain_id=c, outdir=self.structure_dir)
+                parent = stats['parentClusterID']
+
+                if parent:
+                    # Retrieve PDBFlex representative PDBs
+                    reps = ssbio.databases.pdbflex.get_pdbflex_representatives(pdb_id=s.id, chain_id=c, outdir=self.structure_dir)
+
+                    # Store general statistics in annotations
+                    parent_stats_key = 'structural_flexibility_stats_{}_parent-pdbflex'.format(parent)
+                    parent_reps_key = 'structural_flexibility_representatives_{}_parent-pdbflex'.format(parent)
+                    if parent_stats_key not in self.representative_sequence.annotations or parent_reps_key not in self.representative_sequence.annotations:
+                        self.representative_sequence.annotations[parent_stats_key] = stats
+                        self.representative_sequence.annotations[parent_reps_key] = reps
+                        log.info('{}: stored PDB Flex stats in representative sequence for PDB parent {}'.format(
+                            self.representative_sequence.id,
+                            parent))
+                    else:
+                        log.info(
+                            '{}: existing PDB Flex stats already in representative sequence for PDB parent {}'.format(
+                                self.representative_sequence.id,
+                                parent))
+
+                    # Retrieve PDBFlex RMSDs
+                    rmsd = ssbio.databases.pdbflex.get_pdbflex_rmsd_profile(pdb_id=s.id, chain_id=c, outdir=self.structure_dir)
+                    log.info('{}: sequence length reported in PDB Flex'.format(len(rmsd['profile'])))
+
+                    # Store residue specific RMSDs in letter_annotations
+                    parent_key = 'rmsd_{}_parent-pdbflex'.format(parent)
+                    if parent_key not in self.representative_sequence.letter_annotations:
+                        self.representative_sequence.letter_annotations[parent_key] = rmsd['profile']
+                        log.info('{}: stored PDB Flex RMSD in representative sequence for PDB parent {}'.format(
+                            self.representative_sequence.id,
+                            parent))
+                    else:
+                        log.info(
+                            '{}: existing PDB Flex RMSD already in representative sequence for PDB parent {}'.format(
+                                self.representative_sequence.id,
+                                parent))
