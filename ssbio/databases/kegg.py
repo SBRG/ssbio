@@ -20,8 +20,10 @@ bs_kegg = KEGG()
 
 
 class KEGGProp(SeqProp):
-    def __init__(self, seq, id, fasta_path=None, txt_path=None, gff_path=None):
-        SeqProp.__init__(self, seq=seq, id=id, sequence_path=fasta_path, metadata_path=txt_path, feature_path=gff_path)
+    def __init__(self, seq, id, name='<unknown name>', description='<unknown description>',
+                 fasta_path=None, txt_path=None, gff_path=None):
+        SeqProp.__init__(self, id=id, seq=seq, name=name, description=description,
+                         sequence_path=fasta_path, metadata_path=txt_path, feature_path=gff_path)
         self.kegg = id
 
     @SeqProp.metadata_path.setter
