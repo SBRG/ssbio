@@ -521,6 +521,10 @@ def map_resnum_a_to_resnum_b(a_resnum, a_aln, b_aln):
     Examples:
     >>> map_resnum_a_to_resnum_b(5, '--ABCDEF', 'XXABCDEF')
     7
+    >>> map_resnum_a_to_resnum_b(5, 'ABCDEF', 'ABCD--') is None
+    True
+    >>> map_resnum_a_to_resnum_b(5, 'ABCDEF--', 'ABCD--GH') is None
+    True
 
     Args:
         a_resnum (int): Residue number in the first aligned sequence
@@ -535,11 +539,11 @@ def map_resnum_a_to_resnum_b(a_resnum, a_aln, b_aln):
     maps = aln_df[aln_df.id_a_pos == a_resnum].id_b_pos.values
 
     if len(maps) > 1:
-        print(maps)
         raise LookupError('More than one mapping for position {}'.format(a_resnum))
 
     b_resnum = maps[0]
     if np.isnan(b_resnum):
+        log.warning('Unable to map residue number {} in first sequence to second'.format(a_resnum))
         return None
 
     return int(b_resnum)

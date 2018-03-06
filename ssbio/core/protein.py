@@ -1409,9 +1409,38 @@ class Protein(Object):
     def get_seqprop_to_seqprop_alignment_stats(self, seqprop1, seqprop2):
         """Get the sequence alignment information for a sequence to a structure's chain."""
         alignment = self._get_seqprop_to_seqprop_alignment(seqprop1=seqprop1, seqprop2=seqprop2)
-        # XTODO should move the below function to protein.sequence.alignment
         return ssbio.protein.sequence.utils.alignment.pairwise_alignment_stats(reference_seq_aln=alignment[0],
                                                                                other_seq_aln=alignment[1])
+
+    def map_seqprop_resnums_to_seqprop_resnums(self, resnums, seqprop1, seqprop2):
+        """Map a residue number in any SeqProp to another SeqProp using the pairwise alignment information.
+
+        Args:
+            resnums (int, list): Residue numbers in seqprop1
+            seqprop1 (SeqProp): SeqProp object the resnums match to
+            seqprop2 (SeqProp): SeqProp object you want to map the resnums to
+
+        Returns:
+            dict: Mapping of seqprop1 residue numbers to seqprop2 residue numbers. If mappings don't exist in this
+            dictionary, that means the residue number cannot be mapped according to alignment!
+
+        """
+        resnums = ssbio.utils.force_list(resnums)
+
+        alignment = self._get_seqprop_to_seqprop_alignment(seqprop1=seqprop1, seqprop2=seqprop2)
+
+        final_mapping = {}
+        for resnum in resnums:
+            resnum = int(resnum)
+            mapped = ssbio.protein.sequence.utils.alignment.map_resnum_a_to_resnum_b(a_resnum=resnum,
+                                                                                     a_aln=alignment[0],
+                                                                                     b_aln=alignment[1])
+
+            if mapped:
+                rn = int(mapped)
+                final_mapping[resnum] = rn
+
+        return final_mapping
 
     def _get_seqprop_to_structprop_alignment(self, seqprop, structprop, chain_id):
         """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
@@ -1530,10 +1559,13 @@ class Protein(Object):
             chain_id = self.representative_chain
             if not structprop:
                 raise ValueError('No representative structure set, please specify sequence, structure, and chain ID')
-            full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
         else:
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
+
+        if structprop.id == self.representative_structure.id:
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
+        else:
             full_structure_id = '{}-{}'.format(structprop.id, chain_id)
 
         aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
@@ -1651,11 +1683,13 @@ class Protein(Object):
             chain_id = self.representative_chain
             if not structprop:
                 raise ValueError('No representative structure set, please specify sequence, structure, and chain ID')
-
-            full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
         else:
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
+
+        if structprop.id == self.representative_structure.id:
+            full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
+        else:
             full_structure_id = '{}-{}'.format(structprop.id, chain_id)
 
         aln_id = '{}_{}'.format(seqprop.id, full_structure_id)
@@ -1700,7 +1734,8 @@ class Protein(Object):
     def get_seqprop_subsequence_from_structchain_property(self,
                                                           property_key, property_value, condition,
                                                           seqprop=None, structprop=None, chain_id=None,
-                                                          use_representatives=False):
+                                                          use_representatives=False,
+                                                          return_resnums=False):
         """Get a subsequence as a new SeqProp object given a certain property you want to find in the
         given StructProp's chain's letter_annotation
 
@@ -1741,11 +1776,16 @@ class Protein(Object):
                                                                       seqprop=seqprop,
                                                                       use_representatives=use_representatives)
 
+        seqprop_resnums = []
         # Now create a new SeqProp using these resnums
         biop_compound_list = []
         for structprop_resnum, seqprop_resnum in mapping_dict.items():
             feat = FeatureLocation(seqprop_resnum - 1, seqprop_resnum)
             biop_compound_list.append(feat)
+
+            if return_resnums:
+                seqprop_resnums.append(seqprop_resnum)
+
         sub_feature_location = CompoundLocation(biop_compound_list)
         sub_feature = sub_feature_location.extract(seqprop)
 
@@ -1754,7 +1794,10 @@ class Protein(Object):
                          seq=sub_feature)
         new_sp.letter_annotations = chain_subseq.letter_annotations
 
-        return new_sp
+        if return_resnums:
+            return new_sp, seqprop_resnums
+        else:
+            return new_sp
 
     def _representative_structure_setter(self, structprop, keep_chain, clean=True, keep_chemicals=None,
                                          out_suffix='_clean', outdir=None, force_rerun=False):

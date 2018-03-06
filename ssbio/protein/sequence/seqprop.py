@@ -561,6 +561,20 @@ class SeqProp(SeqRecord):
 
         self.features.append(newfeat)
 
+    def get_subsequence(self, resnums):
+        """Get a subsequence as a new SeqProp object given a list of residue numbers"""
+        biop_compound_list = []
+        for resnum in resnums:
+            feat = FeatureLocation(resnum - 1, resnum)
+            biop_compound_list.append(feat)
+
+        sub_feature_location = CompoundLocation(biop_compound_list)
+        sub_feature = sub_feature_location.extract(self)
+
+        new_sp = SeqProp(id='{}_subseq'.format(self.id), seq=sub_feature)
+        new_sp.letter_annotations = sub_feature.letter_annotations
+        return new_sp
+
     def get_subsequence_from_property(self, property_key, property_value, condition, return_resnums=False):
         """Get a subsequence as a new SeqProp object given a certain property you want to find in the
         original SeqProp's letter_annotation
