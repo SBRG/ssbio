@@ -238,7 +238,7 @@ def calculate_bbh(blast_results_1, blast_results_2, r_name=None, g_name=None, ou
 
 
 def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None,
-                            filter_condition='OR', outname='', outdir='', force_rerun=False):
+                            outname='', outdir='', force_rerun=False):
     """Create an orthology matrix using best bidirectional BLAST hits (BBH) outputs.
 
     Args:
@@ -248,8 +248,6 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
         pid_cutoff (float): Minimum percent identity between BLAST hits to filter for in the range [0, 100]
         bitscore_cutoff (float): Minimum bitscore allowed between BLAST hits
         evalue_cutoff (float): Maximum E-value allowed between BLAST hits
-        filter_condition (str): 'OR' or 'AND', how to combine cutoff filters. 'OR' gives more results since it
-            is less stringent, as you will be filtering for hits with (>80% PID or >30 bitscore or <0.0001 evalue).
         outname: Name of output file of orthology matrix
         outdir: Path to output directory
         force_rerun (bool): Force recreation of the orthology matrix even if the outfile exists
@@ -269,9 +267,6 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
     if not pid_cutoff and not bitscore_cutoff and not evalue_cutoff:
         log.warning('No cutoffs supplied, insignificant hits may be reported')
 
-    if filter_condition not in ['OR', 'AND']:
-        raise ValueError('Invalid filter condition supplied, must be either "OR" or "AND"')
-
     if not pid_cutoff:
         pid_cutoff = 0
     if not bitscore_cutoff:
@@ -285,10 +280,7 @@ def create_orthology_matrix(r_name, genome_to_bbh_files, pid_cutoff=None, bitsco
         df_bbh = pd.read_csv(bbh_path, index_col=0)
         bidirectional = df_bbh[df_bbh.BBH == '<=>']
 
-        if filter_condition == 'OR':
-            data = bidirectional[(bidirectional.PID > pid_cutoff) | (bidirectional.eVal < evalue_cutoff) | (bidirectional.bitScore > bitscore_cutoff)]
-        elif filter_condition == 'AND':
-            data = bidirectional[(bidirectional.PID > pid_cutoff) & (bidirectional.eVal < evalue_cutoff) & (bidirectional.bitScore > bitscore_cutoff)]
+        data = bidirectional[(bidirectional.PID > pid_cutoff) & (bidirectional.eVal < evalue_cutoff) & (bidirectional.bitScore > bitscore_cutoff)]
 
         data.index = data.gene
         data2 = data[['subject']]
