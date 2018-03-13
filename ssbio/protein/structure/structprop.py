@@ -316,7 +316,17 @@ class StructProp(Object):
         return final_dict
 
     def find_disulfide_bridges(self, threshold=3.0):
-        """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp."""
+        """Run Biopython's search_ss_bonds to find potential disulfide bridges for each chain and store in ChainProp.
+
+        Will add a list of tuple pairs into the annotations field, looks like this::
+
+            [ ((' ', 79, ' '), (' ', 110, ' ')),
+              ((' ', 174, ' '), (' ', 180, ' ')),
+              ((' ', 369, ' '), (' ', 377, ' '))]
+
+        Where each pair is a pair of cysteine residues close together in space.
+
+        """
 
         if self.structure:
             parsed = self.structure
