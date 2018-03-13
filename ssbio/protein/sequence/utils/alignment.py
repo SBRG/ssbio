@@ -9,35 +9,19 @@ import subprocess
 import tempfile
 from collections import defaultdict
 from itertools import count, groupby
-
 import numpy as np
 import pandas as pd
 from Bio import AlignIO
 from Bio import pairwise2
 from Bio.Align import MultipleSeqAlignment
 from Bio.SubsMat import MatrixInfo as matlist
-
-import ssbio.protein.sequence.utils
 import ssbio.utils
+import ssbio.protein.sequence.utils
 
-log = logging.getLogger(__name__)
-
-# quiet the SettingWithCopyWarning when converting dtypes in get_deletions/mutations methods
+# Quiet the SettingWithCopyWarning when converting dtypes in get_deletions/mutations methods
 pd.options.mode.chained_assignment = None
 
-from Bio.PDB.Polypeptide import one_to_three
-
-_aa_property_dict_one = {'Tiny': ['A','C','G','S','T'],
-'Small': ['A','C','D','G','N','P','S','T','V'],
-'Aliphatic': ['A','I','L','V'],
-'Aromatic': ['F','H','W','Y'],
-'Non-polar': ['A','C','F','G','I','L','M','P','V','W','Y'],
-'Polar': ['D','E','H','K','N','Q','R','S','T'],
-'Charged': ['D','E','H','K','R'],
-'Basic': ['H','K','R'],
-'Acidic': ['D','E']}
-
-_aa_property_dict_three = {k: [one_to_three(x) for x in v] for k,v in _aa_property_dict_one.items()}
+log = logging.getLogger(__name__)
 
 
 def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=None,
@@ -515,38 +499,43 @@ def get_insertions(aln_df):
     return insertions
 
 
-def map_resnum_a_to_resnum_b(a_resnum, a_aln, b_aln):
+def map_resnum_a_to_resnum_b(resnums, a_aln, b_aln):
     """Map a residue number in a sequence to the corresponding residue number in an aligned sequence.
 
     Examples:
+    >>> map_resnum_a_to_resnum_b([1,2,3], '--ABCDEF', 'XXABCDEF')
+    {1: 3, 2: 4, 3: 5}
     >>> map_resnum_a_to_resnum_b(5, '--ABCDEF', 'XXABCDEF')
-    7
-    >>> map_resnum_a_to_resnum_b(5, 'ABCDEF', 'ABCD--') is None
-    True
-    >>> map_resnum_a_to_resnum_b(5, 'ABCDEF--', 'ABCD--GH') is None
-    True
+    {5: 7}
+    >>> map_resnum_a_to_resnum_b(5, 'ABCDEF', 'ABCD--')
+    {}
+    >>> map_resnum_a_to_resnum_b(5, 'ABCDEF--', 'ABCD--GH')
+    {}
 
     Args:
-        a_resnum (int): Residue number in the first aligned sequence
+        resnums (int, list): Residue number or numbers in the first aligned sequence
         a_aln (str, Seq, SeqRecord): Aligned sequence string
         b_aln (str, Seq, SeqRecord): Aligned sequence string
 
     Returns:
         int: Residue number in the second aligned sequence
     """
+    resnums = ssbio.utils.force_list(resnums)
 
     aln_df = get_alignment_df(a_aln, b_aln)
-    maps = aln_df[aln_df.id_a_pos == a_resnum].id_b_pos.values
 
-    if len(maps) > 1:
-        raise LookupError('More than one mapping for position {}'.format(a_resnum))
+    maps = aln_df[aln_df.id_a_pos.isin(resnums)]
 
-    b_resnum = maps[0]
-    if np.isnan(b_resnum):
-        log.warning('Unable to map residue number {} in first sequence to second'.format(a_resnum))
-        return None
+    able_to_map_to_b = maps[pd.notnull(maps.id_b_pos)]
+    successful_map_from_a = able_to_map_to_b.id_a_pos.values.tolist()
 
-    return int(b_resnum)
+    mapping = dict([(int(a), int(b)) for a,b in zip(able_to_map_to_b.id_a_pos, able_to_map_to_b.id_b_pos)])
+
+    cant_map = list(set(resnums).difference(successful_map_from_a))
+    if len(cant_map) > 0:
+        log.warning('Unable to map residue numbers {} in first sequence to second'.format(cant_map))
+
+    return mapping
 
 
 def pairwise_alignment_stats(reference_seq_aln, other_seq_aln):
