@@ -760,6 +760,18 @@ class GEMPRO(Object):
         for g in tqdm(self.genes):
             g.protein.get_sequence_properties(representative_only=representatives_only)
 
+    def get_sequence_sliding_window_properties(self, scale, window, representatives_only=True):
+        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of all protein sequences.
+        Results are stored in the protein's respective SeqProp objects at ``.annotations``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative sequences
+
+        """
+        for g in tqdm(self.genes):
+            g.protein.get_sequence_sliding_window_properties(scale=scale, window=window,
+                                                             representative_only=representatives_only)
+
     def get_scratch_predictions(self, path_to_scratch, results_dir, scratch_basename='scratch', num_cores=1,
                                 exposed_buried_cutoff=25, custom_gene_mapping=None):
         """Run and parse ``SCRATCH`` results to predict secondary structure and solvent accessibility.
@@ -1498,6 +1510,16 @@ class GEMPRO(Object):
         for modified_g in result:
             original_gene = self.genes.get_by_id(modified_g.id)
             original_gene.copy_modified_gene(modified_g)
+
+    def get_all_pdbflex_info(self):
+        logging.disable(logging.WARNING)
+        for g in tqdm(self.genes_with_a_representative_sequence):
+            try:
+                g.protein.get_all_pdbflex_info()
+            except Exception as e:
+                log.exception(e)
+                continue
+        logging.disable(logging.NOTSET)
 
     def find_disulfide_bridges(self, representatives_only=True):
         """Run Biopython's disulfide bridge finder and store found bridges.
