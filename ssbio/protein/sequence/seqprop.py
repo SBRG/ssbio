@@ -633,7 +633,7 @@ class SeqProp(SeqRecord):
 
         if self.seq:
             try:
-                pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq)
+                pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
             except KeyError as e:
                 log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
                 return
@@ -655,6 +655,30 @@ class SeqProp(SeqRecord):
         outfile = ssbio.protein.sequence.properties.residues.emboss_pepstats_on_fasta(infile=self.sequence_path)
         pepstats = ssbio.protein.sequence.properties.residues.emboss_pepstats_parser(outfile)
         self.annotations.update(pepstats)
+
+    def get_sliding_window_properties(self, scale, window):
+        """Run a property calculator given a sliding window size
+
+        Stores statistics in the ``letter_annotations`` attribute.
+
+        Todo:
+            - Add and document all scales available to set
+        """
+
+        if self.seq:
+            try:
+                prop = ssbio.protein.sequence.properties.residues.biopython_protein_scale(self.seq_str,
+                                                                                          scale=scale,
+                                                                                          window=window)
+            except KeyError as e:
+                log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
+                return
+            except ValueError as e:
+                log.error('{}: unable to run ProteinAnalysis module, {}'.format(self.id, e))
+                return
+            self.letter_annotations['{}-window{}-biop'.format(scale, window)] = prop
+        else:
+            raise ValueError('{}: no sequence available, unable to run ProteinAnalysis'.format(self.id))
 
     def blast_pdb(self, seq_ident_cutoff=0, evalue=0.0001, display_link=False,
                   outdir=None, force_rerun=False):

@@ -745,6 +745,41 @@ class Protein(Object):
                     s.get_biopython_pepstats()
                     s.get_emboss_pepstats()
 
+    def get_sequence_sliding_window_properties(self, scale, window, representative_only=True):
+        """Run Biopython ProteinAnalysis with a sliding window to calculate a given property.
+        Results are stored in the protein's respective SeqProp objects at ``.letter_annotations``
+
+        Args:
+            scale (str): Scale name
+            window (int): Sliding window size
+            representative_only (bool): If analysis should only be run on the representative sequence
+
+        """
+        if representative_only:
+            # Check if a representative sequence was set
+            if not self.representative_sequence:
+                log.warning('{}: no representative sequence set, cannot get sequence properties'.format(self.id))
+                return
+
+            # Also need to check if a sequence has been stored
+            if not self.representative_sequence.seq:
+                log.warning('{}: representative sequence {} set, but no sequence stored. '
+                            'Cannot get sequence properties.'.format(self.id, self.representative_sequence.id))
+                return
+
+            self.representative_sequence.get_sliding_window_properties(scale=scale, window=window)
+
+        if not representative_only:
+            for s in self.sequences:
+                # Need to check if a sequence has been stored
+                if not s.seq:
+                    log.warning('{}: no sequence stored. '
+                                'Cannot get sequence properties.'.format(s.id))
+                    continue
+
+                else:
+                    s.get_sliding_window_properties(scale=scale, window=window)
+
     def prep_itasser_modeling(self, itasser_installation, itlib_folder, runtype, create_in_dir=None,
                               execute_from_dir=None, print_exec=False, **kwargs):
         """Prepare to run I-TASSER homology modeling for the representative sequence.
@@ -1429,18 +1464,11 @@ class Protein(Object):
 
         alignment = self._get_seqprop_to_seqprop_alignment(seqprop1=seqprop1, seqprop2=seqprop2)
 
-        final_mapping = {}
-        for resnum in resnums:
-            resnum = int(resnum)
-            mapped = ssbio.protein.sequence.utils.alignment.map_resnum_a_to_resnum_b(a_resnum=resnum,
-                                                                                     a_aln=alignment[0],
-                                                                                     b_aln=alignment[1])
+        mapped = ssbio.protein.sequence.utils.alignment.map_resnum_a_to_resnum_b(resnums=resnums,
+                                                                                 a_aln=alignment[0],
+                                                                                 b_aln=alignment[1])
 
-            if mapped:
-                rn = int(mapped)
-                final_mapping[resnum] = rn
-
-        return final_mapping
+        return mapped
 
     def _get_seqprop_to_structprop_alignment(self, seqprop, structprop, chain_id):
         """Return the alignment stored in self.sequence_alignments given a seqprop, structuprop, and chain_id"""
@@ -2810,16 +2838,16 @@ class Protein(Object):
                 setattr(self, k, v)
 
     def get_all_pdbflex_info(self):
-        log.info('{}: representative sequence length'.format(self.representative_sequence.seq_len))
+        log.debug('{}: representative sequence length'.format(self.representative_sequence.seq_len))
 
         for s in self.get_experimental_structures():
-            log.info('{};{}: chains matching protein {}'.format(s.id, s.mapped_chains, self.id))
+            log.debug('{};{}: chains matching protein {}'.format(s.id, s.mapped_chains, self.id))
 
             s.download_structure_file(outdir=self.structure_dir, file_type='mmtf')
             s.parse_structure()
 
             for c in s.mapped_chains:
-                log.info('{}: sequence length of chain {}'.format(len(s.chains.get_by_id(c).seq_record), c))
+                log.debug('{}: sequence length of chain {}'.format(len(s.chains.get_by_id(c).seq_record), c))
 
                 # Retrieve PDBFlex stats
                 stats = ssbio.databases.pdbflex.get_pdbflex_info(pdb_id=s.id, chain_id=c, outdir=self.structure_dir)
@@ -2835,7 +2863,7 @@ class Protein(Object):
                     if parent_stats_key not in self.representative_sequence.annotations or parent_reps_key not in self.representative_sequence.annotations:
                         self.representative_sequence.annotations[parent_stats_key] = stats
                         self.representative_sequence.annotations[parent_reps_key] = reps
-                        log.info('{}: stored PDB Flex stats in representative sequence for PDB parent {}'.format(
+                        log.debug('{}: stored PDB Flex stats in representative sequence for PDB parent {}'.format(
                             self.representative_sequence.id,
                             parent))
                     else:
