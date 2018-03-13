@@ -1,27 +1,24 @@
-import logging
-
-from Bio.PDB.Polypeptide import one_to_three
+from Bio.PDB.Polypeptide import one_to_three, three_to_one
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
-
-import ssbio.protein.sequence.utils
 import ssbio.utils
+import ssbio.protein.sequence.utils
+import logging
 
 log = logging.getLogger(__name__)
 
 
 _aa_property_dict_one = {
-    'Aliphatic': ['A', 'I', 'L', 'V'],
-    'Aromatic' : ['F', 'H', 'W', 'Y'],
-    'Non-polar': ['A', 'C', 'F', 'G', 'I', 'L', 'M', 'P', 'V', 'W', 'Y'],
-    'Polar'    : ['D', 'E', 'H', 'K', 'N', 'Q', 'R', 'S', 'T'],
-    'Charged'  : ['D', 'E', 'H', 'K', 'R'],
-    'Basic'    : ['H', 'K', 'R'],
-    'Acidic'   : ['D', 'E']}
-# 'Tiny': ['A','C','G','S','T']
-# 'Small': ['A','C','D','G','N','P','S','T','V']
+    'Aliphatic': set(['A', 'I', 'L', 'V']),
+    'Aromatic' : set(['F', 'H', 'W', 'Y']),
+    'Non-polar': set(['A', 'C', 'F', 'G', 'I', 'L', 'M', 'P', 'V', 'W', 'Y']),
+    'Polar'    : set(['D', 'E', 'H', 'K', 'N', 'Q', 'R', 'S', 'T']),
+    'Charged'  : set(['D', 'E', 'H', 'K', 'R']),
+    'Basic'    : set(['H', 'K', 'R']),
+    'Acidic'   : set(['D', 'E']),
+    'Tiny'     : set(['A', 'C', 'G', 'S', 'T']),
+    'Small'    : set(['A', 'C', 'D', 'G', 'N', 'P', 'S', 'T', 'V'])}
 
 _aa_property_dict_three = {k: [one_to_three(x) for x in v] for k, v in _aa_property_dict_one.items()}
-
 
 _aa_flexibility_dict_one = {'A': -0.605,
                             'C': -0.692,
@@ -43,44 +40,98 @@ _aa_flexibility_dict_one = {'A': -0.605,
                             'V': -0.669,
                             'W': -0.727,
                             'Y': -0.721}
-
 _aa_flexibility_dict_three = {one_to_three(k): v for k, v in _aa_flexibility_dict_one.items()}
 
-_human_readable_pepstats = {'A_percent-biop': '% Ala',
-'C_percent-biop': '% Cys',
-'D_percent-biop': '% Asp',
-'E_percent-biop': '% Glu',
-'F_percent-biop': '% Phe',
-'G_percent-biop': '% Gly',
-'H_percent-biop': '% His',
-'I_percent-biop': '% Ile',
-'K_percent-biop': '% Lys',
-'L_percent-biop': '% Leu',
-'M_percent-biop': '% Met',
-'N_percent-biop': '% Asn',
-'P_percent-biop': '% Pro',
-'Q_percent-biop': '% Gln',
-'R_percent-biop': '% Arg',
-'S_percent-biop': '% Ser',
-'T_percent-biop': '% Thr',
-'V_percent-biop': '% Val',
-'W_percent-biop': '% Trp',
-'Y_percent-biop': '% Tyr',
-'aromaticity-biop': 'Aromaticity',
-'instability_index-biop': 'Instability index',
-'isoelectric_point-biop': 'Isoelectric point (pI)',
-'percent_helix_naive-biop': '% residues commonly in helix (V, I, Y, F, W, L)',
-'percent_turn_naive-biop': '% residues commonly in turn (N, P, G, S))',
-'percent_strand_naive-biop': '% residues commonly in sheet (E, M, A, L)',
-'mol_percent_tiny-pepstats': 'Molar % of tiny residues (A, C, G, S, T)',
-'mol_percent_small-pepstats': 'Molar % of small residues (A, B, C, D, G, N, P, S, T, V)',
-'mol_percent_aliphatic-pepstats': 'Molar % of aliphatic residues (A, I, L, V)',
-'mol_percent_aromatic-pepstats': 'Molar % of aromatic residues (F, H, W, Y)',
-'mol_percent_non-polar-pepstats': 'Molar % of non-polar residues (A, C, F, G, I, L, M, P, V, W, Y)',
-'mol_percent_polar-pepstats': 'Molar % of polar residues (D, E, H, K, N, Q, R, S, T, Z)',
-'mol_percent_charged-pepstats': 'Molar % of charged residues (B, D, E, H, K, R, Z)',
-'mol_percent_basic-pepstats': 'Molar % of basic residues (H, K, R)',
-'mol_percent_acidic-pepstats': 'Molar % of acidic residues (B, D, E, Z)'}
+# Kyte-Doolittle scale for hydrophobicity
+kd_hydrophobicity_one = {'A': 1.8, 'R': -4.5, 'N': -3.5, 'D': -3.5, 'C': 2.5,
+                         'Q': -3.5, 'E': -3.5, 'G': -0.4, 'H': -3.2, 'I': 4.5,
+                         'L': 3.8, 'K': -3.9, 'M': 1.9, 'F': 2.8, 'P': -1.6,
+                         'S': -0.8, 'T': -0.7, 'W': -0.9, 'Y': -1.3, 'V': 4.2}
+kd_hydrophobicity_three = {one_to_three(k): v for k, v in kd_hydrophobicity_one.items()}
+
+# https://web.expasy.org/protscale/pscale/Bulkiness.html
+## paper calls anything bigger than 18 A^2 as bulky https://www.sciencedirect.com/science/article/pii/0022519368900696
+bulkiness_three = {'Ala': 11.500,
+                   'Arg': 14.280,
+                   'Asn': 12.820,
+                   'Asp': 11.680,
+                   'Cys': 13.460,
+                   'Gln': 14.450,
+                   'Glu': 13.570,
+                   'Gly': 3.400,
+                   'His': 13.690,
+                   'Ile': 21.400,
+                   'Leu': 21.400,
+                   'Lys': 15.710,
+                   'Met': 16.250,
+                   'Phe': 19.800,
+                   'Pro': 17.430,
+                   'Ser': 9.470,
+                   'Thr': 15.770,
+                   'Trp': 21.670,
+                   'Tyr': 18.030,
+                   'Val': 21.570}
+bulkiness_one = {three_to_one(k.upper()): v for k, v in bulkiness_three.items()}
+
+_human_readable_pepstats = {'A_percent-biop'                : '% Ala',
+                            'C_percent-biop'                : '% Cys',
+                            'D_percent-biop'                : '% Asp',
+                            'E_percent-biop'                : '% Glu',
+                            'F_percent-biop'                : '% Phe',
+                            'G_percent-biop'                : '% Gly',
+                            'H_percent-biop'                : '% His',
+                            'I_percent-biop'                : '% Ile',
+                            'K_percent-biop'                : '% Lys',
+                            'L_percent-biop'                : '% Leu',
+                            'M_percent-biop'                : '% Met',
+                            'N_percent-biop'                : '% Asn',
+                            'P_percent-biop'                : '% Pro',
+                            'Q_percent-biop'                : '% Gln',
+                            'R_percent-biop'                : '% Arg',
+                            'S_percent-biop'                : '% Ser',
+                            'T_percent-biop'                : '% Thr',
+                            'V_percent-biop'                : '% Val',
+                            'W_percent-biop'                : '% Trp',
+                            'Y_percent-biop'                : '% Tyr',
+                            'aromaticity-biop'              : 'Aromaticity',
+                            'instability_index-biop'        : 'Instability index',
+                            'isoelectric_point-biop'        : 'Isoelectric point (pI)',
+                            'percent_helix_naive-biop'      : '% residues commonly in helix (V, I, Y, F, W, L)',
+                            'percent_turn_naive-biop'       : '% residues commonly in turn (N, P, G, S))',
+                            'percent_strand_naive-biop'     : '% residues commonly in sheet (E, M, A, L)',
+                            'mol_percent_tiny-pepstats'     : 'Molar % of tiny residues (A, C, G, S, T)',
+                            'mol_percent_small-pepstats'    : 'Molar % of small residues (A, B, C, D, G, N, P, S, T, V)',
+                            'mol_percent_aliphatic-pepstats': 'Molar % of aliphatic residues (A, I, L, V)',
+                            'mol_percent_aromatic-pepstats' : 'Molar % of aromatic residues (F, H, W, Y)',
+                            'mol_percent_non-polar-pepstats': 'Molar % of non-polar residues (A, C, F, G, I, L, M, P, V, W, Y)',
+                            'mol_percent_polar-pepstats'    : 'Molar % of polar residues (D, E, H, K, N, Q, R, S, T, Z)',
+                            'mol_percent_charged-pepstats'  : 'Molar % of charged residues (B, D, E, H, K, R, Z)',
+                            'mol_percent_basic-pepstats'    : 'Molar % of basic residues (H, K, R)',
+                            'mol_percent_acidic-pepstats'   : 'Molar % of acidic residues (B, D, E, Z)'}
+
+
+def biopython_protein_scale(inseq, scale, custom_scale_dict=None, window=7):
+    """Use Biopython to calculate properties using a sliding window over a sequence given a specific scale to use."""
+
+    if scale == 'kd_hydrophobicity':
+        scale_dict = kd_hydrophobicity_one
+    elif scale == 'bulkiness':
+        scale_dict = bulkiness_one
+    elif scale == 'custom':
+        scale_dict = custom_scale_dict
+    else:
+        raise ValueError('Scale not available')
+
+    inseq = ssbio.protein.sequence.utils.cast_to_str(inseq)
+    analysed_seq = ProteinAnalysis(inseq)
+    result = analysed_seq.protein_scale(param_dict=scale_dict, window=window)
+
+    # Correct list length by prepending and appending "inf" (result needs to be same length as sequence)
+    for i in range(window // 2):
+        result.insert(0, float("Inf"))
+        result.append(float("Inf"))
+
+    return result
 
 
 def biopython_protein_analysis(inseq):
@@ -106,16 +157,19 @@ def biopython_protein_analysis(inseq):
     analysed_seq = ProteinAnalysis(inseq)
 
     info_dict = {}
-    # info_dict['amino_acids_content-biop'] = analysed_seq.count_amino_acids()
+    info_dict['amino_acids_content-biop'] = analysed_seq.count_amino_acids()
     info_dict['amino_acids_percent-biop'] = analysed_seq.get_amino_acids_percent()
-    # info_dict['length-biop'] = analysed_seq.length
+    info_dict['length-biop'] = analysed_seq.length
     info_dict['monoisotopic-biop'] = analysed_seq.monoisotopic
     info_dict['molecular_weight-biop'] = analysed_seq.molecular_weight()
     info_dict['aromaticity-biop'] = analysed_seq.aromaticity()
     info_dict['instability_index-biop'] = analysed_seq.instability_index()
     # TODO: What is flexibility?
-    # info_dict['flexibility-biop'] = analysed_seq.flexibility()
+    info_dict['flexibility-biop'] = analysed_seq.flexibility()
     info_dict['isoelectric_point-biop'] = analysed_seq.isoelectric_point()
+
+    # grand average of hydrophobicity
+    info_dict['gravy-biop'] = analysed_seq.gravy()
 
     # Separated secondary_structure_fraction into each definition
     # info_dict['secondary_structure_fraction-biop'] = analysed_seq.secondary_structure_fraction()
@@ -259,38 +313,3 @@ def grantham_score(ref_aa, mut_aa):
         return score, "Moderately Conservative"
     else:
         return score, "Conservative"
-
-
-def flexibility_index(aa_one):
-    """From Smith DK, Radivoja P, ObradovicZ, et al. Improved amino acid flexibility parameters, Protein Sci.2003, 12:1060
-
-    Author: Ke Chen
-
-    Args:
-        aa_one:
-
-    Returns:
-
-    """
-    aa_flexibility_index={}
-    aa_flexibility_index['A']=-0.605
-    aa_flexibility_index['C']=-0.692
-    aa_flexibility_index['D']=-0.279
-    aa_flexibility_index['E']=-0.160
-    aa_flexibility_index['F']=-0.719
-    aa_flexibility_index['G']=-0.537
-    aa_flexibility_index['H']=-0.662
-    aa_flexibility_index['I']=-0.682
-    aa_flexibility_index['K']=-0.043
-    aa_flexibility_index['L']=-0.631
-    aa_flexibility_index['M']=-0.626
-    aa_flexibility_index['N']=-0.381
-    aa_flexibility_index['P']=-0.271
-    aa_flexibility_index['Q']=-0.368
-    aa_flexibility_index['R']=-0.448
-    aa_flexibility_index['S']=-0.424
-    aa_flexibility_index['T']=-0.525
-    aa_flexibility_index['V']=-0.669
-    aa_flexibility_index['W']=-0.727
-    aa_flexibility_index['Y']=-0.721
-    return aa_flexibility_index[aa_one]
