@@ -1512,14 +1512,17 @@ class GEMPRO(Object):
             original_gene.copy_modified_gene(modified_g)
 
     def get_all_pdbflex_info(self):
+        counter = 0
         logging.disable(logging.WARNING)
         for g in tqdm(self.genes_with_a_representative_sequence):
             try:
                 g.protein.get_all_pdbflex_info()
+                counter+=1
             except Exception as e:
-                log.exception(e)
+                # log.exception(e)
                 continue
         logging.disable(logging.NOTSET)
+        log.info('{}: successful PDB flex mappings'.format(counter))
 
     def find_disulfide_bridges(self, representatives_only=True):
         """Run Biopython's disulfide bridge finder and store found bridges.
@@ -1574,3 +1577,19 @@ class GEMPRO(Object):
             self.genes = DictList(self.genes)
         else:
             self.genes = self.model.genes
+
+    def save_protein_pickles_and_reset_protein(self):
+        """Save all Proteins as pickle files -- currently development code for parallelization purposes. Also clears the
+        protein attribute in all genes!"""
+        self.gene_protein_pickles = {}
+        for g in tqdm(self.genes):
+            initproteinpickle = op.join(g.protein.protein_dir, '{}_protein.pckl'.format(g.id))
+            g.protein.save_pickle(initproteinpickle)
+            self.gene_protein_pickles[g.id] = initproteinpickle
+            g.reset_protein()
+
+    def load_protein_pickles(self):
+        log.info('Loading Protein pickles into GEM-PRO...')
+        for g_id, protein in tqdm(self.gene_protein_pickles.items()):
+            g = self.genes.get_by_id(g_id)
+            g.protein = ssbio.io.load_pickle(protein)

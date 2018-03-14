@@ -20,6 +20,7 @@ import ssbio.protein.sequence.utils.fasta
 from joblib import Parallel, delayed
 import ssbio.utils
 import ssbio.io
+from copy import deepcopy
 from ssbio.core.object import Object
 from ssbio.pipeline.gempro import GEMPRO
 from collections import defaultdict
@@ -65,12 +66,10 @@ class ATLAS2(Object):
         self.reference_gempro = reference_gempro
         self.reference_gempro.genome_path = reference_genome_path
 
-        self.gene_protein_pickles = {}
-        for g in self.reference_gempro.genes:
-            initproteinpickle = op.join(self.sequences_by_gene_dir, '{}_protein.pckl'.format(g.id))
-            if not ssbio.utils.is_non_zero_file(initproteinpickle):
-                g.protein.save_pickle(initproteinpickle)
-            self.gene_protein_pickles[g.id] = initproteinpickle
+        self.gene_protein_pickles = deepcopy(self.reference_gempro.gene_protein_pickles)
+        if not self.gene_protein_pickles:
+            self.reference_gempro.save_protein_pickles()
+            self.gene_protein_pickles = deepcopy(self.reference_gempro.gene_protein_pickles)
 
         self.strain_ids = []
         """list: Strain IDs to analyze"""
@@ -161,7 +160,7 @@ class ATLAS2(Object):
         else:
             return None
 
-    def get_orthology_matrix(self, outfile, outdir=None, sc=None,
+    def get_orthology_matrix(self, outfile, sc, outdir=None,
                              pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None, filter_condition='OR',
                              force_rerun=False):
         """Create the orthology matrix by finding best bidirectional BLAST hits. Genes = rows, strains = columns
@@ -214,7 +213,10 @@ class ATLAS2(Object):
                 return strain_id, bbh
 
             log.info('Running bidirectional BLAST and finding best bidirectional hits (BBH)...')
-            strains_rdd = sc.parallelize([(k, v['genome_path']) for k,v in self.strain_infodict.items()])
+            for_strains_rdd = [(k, v['genome_path']) for k,v in self.strain_infodict.items()]
+            from random import shuffle
+            shuffle(for_strains_rdd)
+            strains_rdd = sc.parallelize(for_strains_rdd)
             result = strains_rdd.map(lambda x: run_bidirectional_blast(strain_id=x[0], strain_genome_path=x[1])).collect()
             bbh_files = dict(result)
             ################################################################################################################
@@ -227,7 +229,6 @@ class ATLAS2(Object):
                                                                                       pid_cutoff=pid_cutoff,
                                                                                       bitscore_cutoff=bitscore_cutoff,
                                                                                       evalue_cutoff=evalue_cutoff,
-                                                                                      filter_condition=filter_condition,
                                                                                       outname=outfile,
                                                                                       outdir=outdir,
                                                                                       force_rerun=force_rerun)
@@ -331,20 +332,17 @@ class ATLAS2(Object):
 
         return strain_id, gene_to_func
 
-    def write_strain_functional_genes(self, joblib=False, cores=1, force_rerun=False):
+    def write_strain_functional_genes(self, force_rerun=False):
         """Wrapper function for _write_strain_functional_genes"""
         if len(self.df_orthology_matrix) == 0:
             raise RuntimeError('Empty orthology matrix, please calculate first!')
         ref_functional_genes = [g.id for g in self.reference_gempro.functional_genes]
         log.info('Building strain specific models...')
-        if joblib:
-            result = DictList(Parallel(n_jobs=cores)(delayed(self._write_strain_functional_genes)(s, ref_functional_genes, self.df_orthology_matrix, force_rerun=force_rerun) for s in self.strain_ids))
-        else:
-            result = []
-            for s in tqdm(self.strain_ids):
-                result.append(self._write_strain_functional_genes(s, ref_functional_genes, self.df_orthology_matrix, force_rerun=force_rerun))
+        result = []
+        for s in tqdm(self.strain_ids):
+            result.append(self._write_strain_functional_genes(s, ref_functional_genes, self.df_orthology_matrix, force_rerun=force_rerun))
 
-        for strain_id, functional_genes in tqdm(result):
+        for strain_id, functional_genes in result:
             self.strain_infodict[strain_id]['functional_genes'] = functional_genes
 
     def _build_strain_specific_model(self, strain_id, ref_functional_genes, orth_matrix, force_rerun=False):
@@ -445,7 +443,7 @@ class ATLAS2(Object):
         protein_seqs_pickle_path = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs.pckl'.format(g_id))
 
         if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_pickle_path):
-            protein_pickle_path = op.join(self.sequences_by_gene_dir, '{}_protein.pckl'.format(g_id))
+            protein_pickle_path = self.gene_protein_pickles[g_id]
             protein_pickle = ssbio.io.load_pickle(protein_pickle_path)
 
             for strain, info in self.strain_infodict.items():
@@ -472,8 +470,9 @@ class ATLAS2(Object):
         shuffle(g_ids)
 
         def _load_sequences_to_reference_gene_sc(g_id, outdir=self.sequences_by_gene_dir,
-                                              strain_infodict=self.strain_infodict,
-                                              orth_matrix=self.df_orthology_matrix, force_rerun=force_rerun):
+                                                 g_to_pickle=self.gene_protein_pickles,
+                                                 strain_infodict=self.strain_infodict,
+                                                 orth_matrix=self.df_orthology_matrix, force_rerun=force_rerun):
             """Load orthologous strain sequences to reference Protein object, save as new pickle"""
             import ssbio.utils
             import ssbio.io
@@ -483,7 +482,7 @@ class ATLAS2(Object):
             protein_seqs_pickle_path = op.join(outdir, '{}_protein_withseqs.pckl'.format(g_id))
 
             if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_pickle_path):
-                protein_pickle_path = op.join(outdir, '{}_protein.pckl'.format(g_id))
+                protein_pickle_path = g_to_pickle[g_id]
                 protein_pickle = ssbio.io.load_pickle(protein_pickle_path)
 
                 for strain, info in strain_infodict.items():
@@ -505,8 +504,8 @@ class ATLAS2(Object):
         if sc:
             genes_rdd = sc.parallelize(g_ids)
             result = genes_rdd.map(_load_sequences_to_reference_gene_sc).collect()
-        elif joblib:
-            result = Parallel(n_jobs=cores)(delayed(self._load_sequences_to_reference_gene)(g, force_rerun) for g in g_ids)
+        # elif joblib:
+        #     result = Parallel(n_jobs=cores)(delayed(self._load_sequences_to_reference_gene)(g, force_rerun) for g in g_ids)
         else:
             result = []
             for g in tqdm(g_ids):
@@ -521,7 +520,7 @@ class ATLAS2(Object):
         protein_seqs_aln_pickle_path = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs_aln.pckl'.format(g_id))
 
         if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_aln_pickle_path):
-            protein_seqs_pickle_path = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs.pckl'.format(g_id))
+            protein_seqs_pickle_path = self.gene_protein_pickles[g_id]
             protein_pickle = ssbio.io.load_pickle(protein_seqs_pickle_path)
 
             if not protein_pickle.representative_sequence:
@@ -549,9 +548,10 @@ class ATLAS2(Object):
         g_ids = [g.id for g in self.reference_gempro.functional_genes]
         shuffle(g_ids)
 
-        def _align_orthologous_gene_pairwise_sc(g_id, gapopen=gapopen, gapextend=gapextend, engine=engine, parse=parse,
-                                               outdir=self.sequences_by_gene_dir,
-                                               force_rerun=force_rerun):
+        def _align_orthologous_gene_pairwise_sc(g_id, g_to_pickle=self.gene_protein_pickles,
+                                                gapopen=gapopen, gapextend=gapextend, engine=engine, parse=parse,
+                                                outdir=self.sequences_by_gene_dir,
+                                                force_rerun=force_rerun):
             """Align orthologous strain sequences to representative Protein sequence, save as new pickle"""
             import ssbio.utils
             import ssbio.io
@@ -560,7 +560,7 @@ class ATLAS2(Object):
             protein_seqs_aln_pickle_path = op.join(outdir, '{}_protein_withseqs_aln.pckl'.format(g_id))
 
             if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_aln_pickle_path):
-                protein_seqs_pickle_path = op.join(outdir, '{}_protein_withseqs.pckl'.format(g_id))
+                protein_seqs_pickle_path = g_to_pickle[g_id]
                 protein_pickle = ssbio.io.load_pickle(protein_seqs_pickle_path)
 
                 if not protein_pickle.representative_sequence:
@@ -580,14 +580,15 @@ class ATLAS2(Object):
 
         if sc:
             genes_rdd = sc.parallelize(g_ids)
-            result = genes_rdd.map(_align_orthologous_gene_pairwise_sc).collect()
-        elif joblib:
-            result = Parallel(n_jobs=cores)(delayed(self._align_orthologous_gene_pairwise)(g,
-                                                                                           gapopen=gapopen,
-                                                                                           gapextend=gapextend,
-                                                                                           engine=engine,
-                                                                                           parse=parse,
-                                                                                           force_rerun=force_rerun) for g in g_ids)
+            result_raw = genes_rdd.map(_align_orthologous_gene_pairwise_sc).collect()
+            result = [x for x in result_raw if x is not None]
+        # elif joblib:
+        #     result = Parallel(n_jobs=cores)(delayed(self._align_orthologous_gene_pairwise)(g,
+        #                                                                                    gapopen=gapopen,
+        #                                                                                    gapextend=gapextend,
+        #                                                                                    engine=engine,
+        #                                                                                    parse=parse,
+        #                                                                                    force_rerun=force_rerun) for g in g_ids)
         else:
             result = []
             for g in tqdm(g_ids):
