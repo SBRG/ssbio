@@ -125,7 +125,7 @@ def within(resnum, angstroms, chain_id, model, use_ca=False):
         list: List of Bio.PDB.Residue.Residue objects
 
     """
-
+    # XTODO: documentation
     atom_list = Selection.unfold_entities(model, 'A')
     ns = NeighborSearch(atom_list)
     target_residue = model[chain_id][resnum]

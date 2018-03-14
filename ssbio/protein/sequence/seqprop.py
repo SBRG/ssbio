@@ -518,7 +518,7 @@ class SeqProp(SeqRecord):
 
         self.feature_path = outfile
 
-    def add_point_feature(self, resnum, feat_type=None, feat_id=None):
+    def add_point_feature(self, resnum, feat_type=None, feat_id=None, qualifiers=None):
         """Add a feature to the features list describing a single residue.
 
         Args:
@@ -535,11 +535,12 @@ class SeqProp(SeqRecord):
             feat_type = 'Manually added protein sequence single residue feature'
         newfeat = SeqFeature(location=FeatureLocation(ExactPosition(resnum-1), ExactPosition(resnum)),
                              type=feat_type,
-                             id=feat_id)
+                             id=feat_id,
+                             qualifiers=qualifiers)
 
         self.features.append(newfeat)
 
-    def add_region_feature(self, start_resnum, end_resnum, feat_type=None, feat_id=None):
+    def add_region_feature(self, start_resnum, end_resnum, feat_type=None, feat_id=None, qualifiers=None):
         """Add a feature to the features list describing a region of the protein sequence.
 
         Args:
@@ -557,18 +558,25 @@ class SeqProp(SeqRecord):
             feat_type = 'Manually added protein sequence region feature'
         newfeat = SeqFeature(location=FeatureLocation(start_resnum-1, end_resnum),
                              type=feat_type,
-                             id=feat_id)
+                             id=feat_id,
+                             qualifiers=qualifiers)
 
         self.features.append(newfeat)
 
     def get_subsequence(self, resnums):
         """Get a subsequence as a new SeqProp object given a list of residue numbers"""
+        # XTODO: documentation
         biop_compound_list = []
         for resnum in resnums:
             feat = FeatureLocation(resnum - 1, resnum)
             biop_compound_list.append(feat)
 
-        sub_feature_location = CompoundLocation(biop_compound_list)
+        if len(biop_compound_list) == 1:
+            log.debug('Subsequence only one residue long')
+            sub_feature_location = biop_compound_list[0]
+        else:
+            sub_feature_location = CompoundLocation(biop_compound_list)
+
         sub_feature = sub_feature_location.extract(self)
 
         new_sp = SeqProp(id='{}_subseq'.format(self.id), seq=sub_feature)
@@ -664,7 +672,7 @@ class SeqProp(SeqRecord):
         Todo:
             - Add and document all scales available to set
         """
-
+        # XTODO: documentation
         if self.seq:
             try:
                 prop = ssbio.protein.sequence.properties.residues.biopython_protein_scale(self.seq_str,
