@@ -2309,7 +2309,7 @@ class Protein(Object):
             structprop = self.representative_structure
             chain_id = self.representative_chain
 
-        log.debug('Using sequence: {}, structure: {}, chain: {}'.format(seqprop.id, structprop.id, chain_id))
+        # log.debug('Using sequence: {}, structure: {}, chain: {}'.format(seqprop.id, structprop.id, chain_id))
 
         # Create a new SeqFeature
         f = SeqFeature(FeatureLocation(seq_resnum-1, seq_resnum))
@@ -2844,10 +2844,10 @@ class Protein(Object):
             log.debug('{};{}: chains matching protein {}'.format(s.id, s.mapped_chains, self.id))
 
             s.download_structure_file(outdir=self.structure_dir, file_type='mmtf')
-            s.parse_structure()
+            # s.parse_structure()
 
             for c in s.mapped_chains:
-                log.debug('{}: sequence length of chain {}'.format(len(s.chains.get_by_id(c).seq_record), c))
+                # log.debug('{}: sequence length of chain {}'.format(len(s.chains.get_by_id(c).seq_record), c))
 
                 # Retrieve PDBFlex stats
                 stats = ssbio.databases.pdbflex.get_pdbflex_info(pdb_id=s.id, chain_id=c, outdir=self.structure_dir)
