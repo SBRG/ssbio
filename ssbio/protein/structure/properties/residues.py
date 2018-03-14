@@ -108,6 +108,38 @@ def resname_in_proximity(resname, model, chains, resnums, threshold=5):
     return False
 
 
+import numpy as np
+from Bio.PDB import Selection
+from Bio.PDB import NeighborSearch
+def within(resnum, angstroms, chain_id, model, use_ca=False):
+    """See: https://www.biostars.org/p/1816/ https://www.biostars.org/p/269579/
+
+    Args:
+        resnum (int):
+        angstroms (float):
+        chain_id (str):
+        model (Model):
+        use_ca (bool): If the alpha-carbon atom should be used for the search, otherwise use the last atom of the residue
+
+    Returns:
+        list: List of Bio.PDB.Residue.Residue objects
+
+    """
+
+    atom_list = Selection.unfold_entities(model, 'A')
+    ns = NeighborSearch(atom_list)
+    target_residue = model[chain_id][resnum]
+    if use_ca:
+        target_atom = target_residue['CA']
+    else:
+        target_atom = target_residue.child_list[-1]
+    target_atom_coord = np.array(target_atom.get_coord(), 'f')
+    neighbors = ns.search(target_atom_coord, angstroms)
+    residue_list = Selection.unfold_entities(neighbors, 'R')
+
+    return residue_list
+
+
 def get_structure_seqrecords(model):
     """Get a dictionary of a PDB file's sequences.
 

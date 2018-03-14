@@ -18,8 +18,10 @@ import ssbio.protein.structure.properties.quality
 import ssbio.protein.structure.properties.freesasa as fs
 import ssbio.utils
 from ssbio.core.object import Object
+from ssbio.protein.sequence.seqprop import SeqProp
 from ssbio.protein.structure.chainprop import ChainProp
 from ssbio.protein.structure.utils.structureio import StructureIO
+from Bio.PDB.Polypeptide import Polypeptide
 
 import seaborn as sns
 import ssbio.protein.structure.utils.cleanpdb
@@ -153,9 +155,8 @@ class StructProp(Object):
             if not self.mapped_chains:
                 self.add_mapped_chain_ids(structure_chains)
 
-            self.parsed = True
-
             if store_in_memory:
+                self.parsed = True
                 self.structure = structure
 
             return structure
@@ -346,6 +347,49 @@ class StructProp(Object):
             self.chains.get_by_id(chain).seq_record.annotations['SSBOND-biopython'] = disulfide_bridges[chain]
             log.debug('{}: found {} disulfide bridges'.format(chain, len(bridges)))
             log.debug('{}: stored disulfide bridges in the chain\'s seq_record letter_annotations'.format(chain))
+
+    def get_polypeptide_within(self, chain_id, resnum, angstroms, use_ca=False):
+        """Get a Polypeptide object of the amino acids within X angstroms of the specified chain + residue number.
+
+        Args:
+            resnum (int): Residue number of the structure
+            chain_id (str): Chain ID of the residue number
+            angstroms (float): Radius of the search sphere
+            use_ca (bool): If the alpha-carbon atom should be used for searching, default is False (last atom of residue used)
+
+        Returns:
+            Bio.PDB.Polypeptide.Polypeptide: Biopython Polypeptide object
+
+        """
+        if self.structure:
+            parsed = self.structure
+        else:
+            parsed = self.parse_structure()
+
+        residue_list = ssbio.protein.structure.properties.residues.within(resnum=resnum, chain_id=chain_id,
+                                                                          model=parsed.first_model,
+                                                                          angstroms=angstroms, use_ca=use_ca)
+
+        residue_list_combined = Polypeptide(residue_list)
+        return residue_list_combined
+
+    def get_seqprop_within(self, chain_id, resnum, angstroms, use_ca=False, strip='X'):
+        """Get a SeqProp object of the amino acids within X angstroms of the specified chain + residue number.
+
+        Args:
+            resnum (int): Residue number of the structure
+            chain_id (str): Chain ID of the residue number
+            angstroms (float): Radius of the search sphere
+            use_ca (bool): If the alpha-carbon atom should be used for searching, default is False (last atom of residue used)
+            strip (str): Characters to strip from the sequence, ie. X for waters.
+
+        Returns:
+            SeqProp: Sequence that represents the amino acids in the vicinity of your residue number.
+
+        """
+        polypep = self.get_polypeptide_within(chain_id=chain_id, resnum=resnum, angstroms=angstroms, use_ca=use_ca)
+        return SeqProp(id='{}-{}_within_{}_of_{}'.format(self.id, chain_id, angstroms, resnum),
+                       seq=polypep.get_sequence().strip(strip))
 
     def get_dssp_annotations(self, outdir, force_rerun=False):
         """Run DSSP on this structure and store the DSSP annotations in the corresponding ChainProp SeqRecords
