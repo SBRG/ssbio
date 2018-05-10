@@ -24,6 +24,7 @@ from copy import deepcopy
 from ssbio.core.object import Object
 from ssbio.pipeline.gempro import GEMPRO
 from collections import defaultdict
+from more_itertools import locate
 
 try:
     from StringIO import StringIO
@@ -161,7 +162,7 @@ class ATLAS2(Object):
             return None
 
     def get_orthology_matrix(self, outfile, sc, outdir=None,
-                             pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None, filter_condition='OR',
+                             pid_cutoff=None, bitscore_cutoff=None, evalue_cutoff=None,
                              force_rerun=False):
         """Create the orthology matrix by finding best bidirectional BLAST hits. Genes = rows, strains = columns
 
@@ -462,7 +463,7 @@ class ATLAS2(Object):
 
         return g_id, protein_seqs_pickle_path
 
-    def load_sequences_to_reference(self, sc=None, joblib=False, cores=1, force_rerun=False):
+    def load_sequences_to_reference(self, sc=None, force_rerun=False):
         """Wrapper for _load_sequences_to_reference_gene"""
         log.info('Loading sequences to reference GEM-PRO...')
         from random import shuffle
@@ -504,8 +505,49 @@ class ATLAS2(Object):
         if sc:
             genes_rdd = sc.parallelize(g_ids)
             result = genes_rdd.map(_load_sequences_to_reference_gene_sc).collect()
-        # elif joblib:
-        #     result = Parallel(n_jobs=cores)(delayed(self._load_sequences_to_reference_gene)(g, force_rerun) for g in g_ids)
+        else:
+            result = []
+            for g in tqdm(g_ids):
+                result.append(self._load_sequences_to_reference_gene(g, force_rerun))
+
+        log.info('Storing paths to new Protein objects in self.gene_protein_pickles...')
+        updated = []
+        for g_id, protein_pickle in result:
+            self.gene_protein_pickles[g_id] = protein_pickle
+            updated.append(g_id)
+        not_updated = set(list(self.gene_protein_pickles.keys())).difference(updated)
+        log.info('No change to {} genes, removing from gene_protein_pickles'.format(len(not_updated)))
+        log.debug(not_updated)
+        for rem in not_updated:
+            del self.gene_protein_pickles[rem]
+
+    def store_disorder(self, sc=None, force_rerun=False):
+        """Wrapper for _store_disorder"""
+        log.info('Loading sequences to reference GEM-PRO...')
+        from random import shuffle
+        g_ids = [g.id for g in self.reference_gempro.functional_genes]
+        shuffle(g_ids)
+
+        def _store_disorder_sc(g_id, outdir=self.sequences_by_gene_dir,
+                               g_to_pickle=self.gene_protein_pickles, force_rerun=force_rerun):
+            """Load orthologous strain sequences to reference Protein object, save as new pickle"""
+            import ssbio.utils
+            import ssbio.io
+            import os.path as op
+
+            protein_seqs_pickle_path = op.join(outdir, '{}_protein_withseqs_dis.pckl'.format(g_id))
+
+            if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_pickle_path):
+                protein_pickle_path = g_to_pickle[g_id]
+                protein_pickle = ssbio.io.load_pickle(protein_pickle_path)
+                protein_pickle.get_all_disorder_predictions(representative_only=False)
+                protein_pickle.save_pickle(outfile=protein_seqs_pickle_path)
+
+            return g_id, protein_seqs_pickle_path
+
+        if sc:
+            genes_rdd = sc.parallelize(g_ids)
+            result = genes_rdd.map(_store_disorder_sc).collect()
         else:
             result = []
             for g in tqdm(g_ids):
@@ -517,7 +559,7 @@ class ATLAS2(Object):
 
     def _align_orthologous_gene_pairwise(self, g_id, gapopen=10, gapextend=0.5, engine='needle', parse=True, force_rerun=False):
         """Align orthologous strain sequences to representative Protein sequence, save as new pickle"""
-        protein_seqs_aln_pickle_path = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs_aln.pckl'.format(g_id))
+        protein_seqs_aln_pickle_path = op.join(self.sequences_by_gene_dir, '{}_protein_withseqs_dis_aln.pckl'.format(g_id))
 
         if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_aln_pickle_path):
             protein_seqs_pickle_path = self.gene_protein_pickles[g_id]
@@ -557,7 +599,7 @@ class ATLAS2(Object):
             import ssbio.io
             import os.path as op
 
-            protein_seqs_aln_pickle_path = op.join(outdir, '{}_protein_withseqs_aln.pckl'.format(g_id))
+            protein_seqs_aln_pickle_path = op.join(outdir, '{}_protein_withseqs_dis_aln.pckl'.format(g_id))
 
             if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_aln_pickle_path):
                 protein_seqs_pickle_path = g_to_pickle[g_id]
@@ -581,24 +623,94 @@ class ATLAS2(Object):
         if sc:
             genes_rdd = sc.parallelize(g_ids)
             result_raw = genes_rdd.map(_align_orthologous_gene_pairwise_sc).collect()
-            result = [x for x in result_raw if x is not None]
-        # elif joblib:
-        #     result = Parallel(n_jobs=cores)(delayed(self._align_orthologous_gene_pairwise)(g,
-        #                                                                                    gapopen=gapopen,
-        #                                                                                    gapextend=gapextend,
-        #                                                                                    engine=engine,
-        #                                                                                    parse=parse,
-        #                                                                                    force_rerun=force_rerun) for g in g_ids)
         else:
-            result = []
+            result_raw = []
             for g in tqdm(g_ids):
-                result.append(self._align_orthologous_gene_pairwise(g, gapopen=gapopen, gapextend=gapextend,
+                result_raw.append(self._align_orthologous_gene_pairwise(g, gapopen=gapopen, gapextend=gapextend,
                                                                     engine=engine, parse=parse,
                                                                     force_rerun=force_rerun))
 
+        result = [x for x in result_raw if x is not None]
         log.info('Storing paths to new Protein objects in self.gene_protein_pickles...')
         for g_id, protein_pickle in result:
             self.gene_protein_pickles[g_id] = protein_pickle
+
+    def loadseqstoref_alignorth(self, sc, start=None, end=None, force_rerun=False):
+        from random import shuffle
+        log.info('Loading sequences to reference GEM-PRO and aligning sequences...')
+
+        g_ids = [g.id for g in self.reference_gempro.functional_genes]
+
+        if start and end:
+            g_ids = g_ids[start:end]
+
+        shuffle(g_ids)
+
+        def _do_all_shit(g_id, outdir=self.sequences_by_gene_dir, g_to_pickle=self.gene_protein_pickles,
+                         strain_infodict=self.strain_infodict,
+                         orth_matrix=self.df_orthology_matrix, force_rerun=force_rerun):
+            import ssbio.utils
+            import ssbio.io
+            from Bio import SeqIO
+            import os.path as op
+
+            protein_seqs_aln_pickle_path = op.join(outdir, '{}_protein_withseqs_aln.pckl'.format(g_id))
+
+            if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_seqs_aln_pickle_path):
+                # protein_seqs_pickle_path = op.join(outdir, '{}_protein_withseqs.pckl'.format(g_id))
+                protein_pickle_path = g_to_pickle[g_id]
+                protein_pickle = ssbio.io.load_pickle(protein_pickle_path)
+                for strain, info in strain_infodict.items():
+                    strain_sequences = SeqIO.index(info['genome_path'], 'fasta')
+                    strain_gene_functional = info['functional_genes'][g_id]
+                    if strain_gene_functional:
+                        # Pull the gene ID of the strain from the orthology matrix
+                        strain_gene_key = orth_matrix.at[g_id, strain]
+                        new_id = '{}_{}'.format(g_id, strain)
+                        if protein_pickle.sequences.has_id(new_id):
+                            continue
+                        protein_pickle.load_manual_sequence(seq=strain_sequences[strain_gene_key],
+                                                            ident=new_id,
+                                                            set_as_representative=False)
+                # protein_pickle.save_pickle(outfile=protein_seqs_pickle_path)
+
+                # protein_seqs_dis_pickle_path = op.join(outdir, '{}_protein_withseqs_dis.pckl'.format(g_id))
+                # protein_pickle.get_all_disorder_predictions(representative_only=False)
+                # protein_pickle.save_pickle(outfile=protein_seqs_dis_pickle_path)
+
+                protein_seqs_aln_pickle_path = op.join(outdir, '{}_protein_withseqs_aln.pckl'.format(g_id))
+                if not protein_pickle.representative_sequence:
+                    return
+                if len(protein_pickle.sequences) < 1:
+                    return
+                alignment_dir = op.join(outdir, g_id)
+                ssbio.utils.make_dir(alignment_dir)
+                protein_pickle.pairwise_align_sequences_to_representative(gapopen=10, gapextend=0.5,
+                                                                          engine='needle', outdir=alignment_dir,
+                                                                          parse=True, force_rerun=force_rerun)
+                protein_pickle.save_pickle(outfile=protein_seqs_aln_pickle_path)
+
+            return g_id, protein_seqs_aln_pickle_path
+
+        if sc:
+            genes_rdd = sc.parallelize(g_ids)
+            result_raw = genes_rdd.map(_do_all_shit).collect()
+        else:
+            result_raw = []
+            for g in tqdm(g_ids):
+                result_raw.append(_do_all_shit(g))
+
+        result = [x for x in result_raw if x is not None]
+        log.info('Storing paths to new Protein objects in self.gene_protein_pickles...')
+        updated = []
+        for g_id, protein_pickle in result:
+            self.gene_protein_pickles[g_id] = protein_pickle
+            updated.append(g_id)
+        not_updated = set(list(self.gene_protein_pickles.keys())).difference(updated)
+        log.info('No change to {} genes, removing from gene_protein_pickles'.format(len(not_updated)))
+        log.debug(not_updated)
+        for rem in not_updated:
+            del self.gene_protein_pickles[rem]
 
     def load_protein_pickles(self):
         log.info('Loading new Protein objects back to reference GEM-PRO...')
@@ -606,276 +718,543 @@ class ATLAS2(Object):
             g = self.reference_gempro.genes.get_by_id(g_id)
             g.protein = ssbio.io.load_pickle(protein)
 
-    def get_atlas_summary_df(self):
-        """Create a single data frame which summarizes all genes per row.
 
-        Returns:
-            DataFrame: Pandas DataFrame of the results
+def calculate_residue_counts_perstrain(protein_pickle_path, outdir, pdbflex_keys_file, wt_pid_cutoff=None, force_rerun=False):
+    """Writes out a feather file for a PROTEIN counting amino acid occurences for ALL STRAINS along with SUBSEQUENCES"""
+    from collections import defaultdict
+    from ssbio.protein.sequence.seqprop import SeqProp
+    from ssbio.protein.sequence.properties.residues import _aa_property_dict_one
+    log = logging.getLogger(__name__)
 
-        """
-        all_info = []
-        for g in self.reference_gempro.functional_genes:
-            info = {}
-            info['Gene_ID'] = g.id
-            info['Gene_name'] = g.name
+    protein_id = op.splitext(op.basename(protein_pickle_path))[0].split('_')[0]
 
-            # Protein object
-            p = g.protein
-            info['Protein_sequences'] = len(p.sequences)
-            info['Protein_structures'] = len(p.structures)
+    protein_df_outfile = op.join(outdir, '{}_protein_strain_properties.fthr'.format(protein_id))
 
-            # SeqProp
-            rseq = p.representative_sequence
-            info['RepSeq_ID'] = rseq.id
-            info['RepSeq_sequence_length'] = rseq.seq_len
-            info['RepSeq_num_sequence_alignments'] = len([x for x in p.sequence_alignments if x.annotations['ssbio_type'] == 'seqalign'])
-            info['RepSeq_num_structure_alignments'] = len([x for x in p.sequence_alignments if x.annotations['ssbio_type'] == 'structalign'])
+    if ssbio.utils.force_rerun(flag=force_rerun, outfile=protein_df_outfile):
 
-            # SeqRecord annotations (properties calculated that summarize the whole sequence)
-            for annotation_name, annotation in rseq.annotations.items():
-                info['RepSeq_' + annotation_name] = annotation
+        protein = ssbio.io.load_pickle(protein_pickle_path)
 
-            # SeqRecord alignment annotations
-            all_num_mutations = []
-            all_num_deletions = []
-            all_len_deletions = []
-            all_num_insertions = []
-            all_len_insertions = []
-            all_percent_identity = []
-            all_percent_similarity = []
-            for aln in p.sequence_alignments:
-                # Gather the strain speicific stuff
-                if '{}_'.format(p.id) not in aln.annotations['b_seq']:
+        # First calculate disorder cuz i forgot to
+        protein.get_all_disorder_predictions(representative_only=True)
+
+        # Then get all subsequences
+        all_protein_subseqs = protein.get_all_subsequences(pdbflex_keys_file=pdbflex_keys_file)
+        if not all_protein_subseqs:
+            log.error('{}: cannot run subsequence calculator'.format(protein.id))
+            return
+
+        # Each strain gets a dictionary
+        strain_to_infodict = defaultdict(dict)
+
+        for seqprop_to_analyze in protein.sequences:
+            if seqprop_to_analyze.id == protein.representative_sequence.id:
+                strain_id = 'K12'
+            elif type(seqprop_to_analyze) == SeqProp and seqprop_to_analyze.id != protein.id:  # This is to filter out other KEGGProps or UniProtProps
+                strain_id = seqprop_to_analyze.id.split('_', 1)[1]  # This split should work for all strains
+            else:
+                continue
+
+            ## Additional filtering for genes marked as orthologous but actually have large deletions or something
+            ## TODO: experiment with other cutoffs?
+            if wt_pid_cutoff:
+                aln = protein.sequence_alignments.get_by_id('{0}_{0}_{1}'.format(protein.id, seqprop_to_analyze.id))
+                if aln.annotations['percent_identity'] < wt_pid_cutoff:
                     continue
-                info[aln.annotations['b_seq'].split('{}_'.format(p.id))[1]] = aln.annotations['percent_identity']
 
-                # Gather the percent identities/similarities
-                all_percent_identity.append(aln.annotations['percent_identity'])
-                all_percent_similarity.append(aln.annotations['percent_similarity'])
+            ###### Calculate "all" properties ######
+            seqprop_to_analyze.get_biopython_pepstats()
 
-                # Gather the number of residues that are mutated (filter for different mutations of same residue)
-                num_mutations = len(list(set([x[1] for x in aln.annotations['mutations']])))
-                all_num_mutations.append(num_mutations)
+            # [ALL] aa_count
+            if 'amino_acids_percent-biop' not in seqprop_to_analyze.annotations:  # May not run if weird amino acids in the sequence
+                log.warning('Protein {}, sequence {}: skipping, unable to run Biopython ProteinAnalysis'.format(protein.id,
+                                                                                                            seqprop_to_analyze.id))
+                continue
+            strain_to_infodict[strain_id].update({'aa_count_{}'.format(k): v for k, v in seqprop_to_analyze.annotations['amino_acids_content-biop'].items()})
 
-                # Gather the number of deletions as well as the length of the deletion
-                if not aln.annotations['deletions']:
-                    num_deletions = 0
-                    len_deletions = [0]
-                else:
-                    num_deletions = len(aln.annotations['deletions'])
-                    len_deletions = [x[1] for x in aln.annotations['deletions']]
-                all_num_deletions.append(num_deletions)
-                # Get the total length of the deletion for this one strain
-                avg_len_deletions = np.sum(len_deletions)
-                all_len_deletions.append(avg_len_deletions)
+            # [ALL] aa_count_total
+            strain_to_infodict[strain_id]['aa_count_total'] = seqprop_to_analyze.seq_len
 
-                # Gather the number of insertions as well as the length of the insertion
-                if not aln.annotations['insertions']:
-                    num_insertions = 0
-                    len_insertions = [0]
-                else:
-                    num_insertions = len(aln.annotations['insertions'])
-                    len_insertions = [x[1] for x in aln.annotations['insertions']]
-                all_num_insertions.append(num_insertions)
-                # Get the total length of insertion for this one strain
-                avg_len_insertions = np.sum(len_insertions)
-                all_len_insertions.append(avg_len_insertions)
+            ###### Calculate subsequence properties ######
+            for prop, propdict in all_protein_subseqs.items():
+                strain_to_infodict[strain_id].update(protein.get_subseq_props(property_dict=propdict, property_name=prop,
+                                                                              seqprop=seqprop_to_analyze))
 
-            info['ATLAS_mean_num_mutations'] = np.mean(all_num_mutations)
-            info['ATLAS_mean_num_deletions'] = np.mean(all_num_deletions)
-            info['ATLAS_mean_len_deletions'] = np.mean(all_len_deletions)
-            info['ATLAS_mean_num_insertions'] = np.mean(all_num_insertions)
-            info['ATLAS_mean_len_insertions'] = np.mean(all_len_insertions)
-            info['ATLAS_mean_percent_identity'] = np.mean(all_percent_identity)
-            info['ATLAS_mean_percent_similarity'] = np.mean(all_percent_similarity)
+        protein_df = pd.DataFrame(strain_to_infodict)
+        protein_df.reset_index().to_feather(protein_df_outfile)
 
-            # Other mutation analysis
-            single, fingerprint = p.sequence_mutation_summary()
+    return protein_pickle_path, protein_df_outfile
 
-            # Mutations that show up in more than 10% of strains
-            singles = []
-            for k, v in single.items():
-                k = [str(x) for x in k]
-                if len(v) / len(p.sequence_alignments) >= 0.01:
-                    singles.append(''.join(k))  # len(v) is the number of strains which have this mutation
-            info['ATLAS_popular_mutations'] = ';'.join(singles)
 
-            # Mutation groups that show up in more than 10% of strains
-            allfingerprints = []
-            for k, v in fingerprint.items():
-                if len(v) / len(p.sequence_alignments) >= 0.01:
-                    fingerprints = []
-                    for m in k:
-                        y = [str(x) for x in m]
-                        fingerprints.append(''.join(y))
-                    allfingerprints.append('-'.join(fingerprints))
-            info['ATLAS_popular_mutation_groups'] = ';'.join(allfingerprints)
+import ssbio.io
+import pandas as pd
+from collections import OrderedDict
 
-            # StructProp
-            rstruct = p.representative_structure
-            if rstruct:
-                if rstruct.structure_file:
-                    info['RepStruct_ID'] = rstruct.id
-                    info['RepStruct_is_experimental'] = rstruct.is_experimental
-                    info['RepStruct_description'] = rstruct.description
-                    info['RepStruct_repseq_coverage'] = p.representative_chain_seq_coverage
 
-                    # ChainProp
-                    rchain = p.representative_chain
-                    info['RepChain_ID'] = rchain
+def make_mutation_characterization_perstrain_df(protein_pickle_path, pdbflex_keys_file, outdir, wt_pid_cutoff=None, force_rerun=False):
+    from ssbio.protein.sequence.properties.residues import characterize_residue_mutation
 
-                    # ChainProp SeqRecord annotations
-                    rchain_sr = rstruct.chains.get_by_id(rchain).seq_record
-                    for annotation_name, annotation in rchain_sr.annotations.items():
-                        info['RepChain_' + annotation_name] = annotation
+    protein = ssbio.io.load_pickle(protein_pickle_path)
 
-            all_info.append(info)
+    # First calculate disorder cuz i forgot to
+    protein.get_all_disorder_predictions(representative_only=True)
 
-        cols = ['Gene_ID', 'Gene_name', 'Protein_sequences', 'Protein_structures',
-                'RepSeq_ID', 'RepSeq_sequence_length',
-                'RepSeq_num_sequence_alignments', 'RepSeq_num_structure_alignments',
-                'RepStruct_ID', 'RepChain_ID', 'RepStruct_description',
-                'RepStruct_is_experimental', 'RepStruct_repseq_coverage',
-                'ATLAS_mean_percent_identity', 'ATLAS_mean_percent_similarity', 'ATLAS_mean_num_mutations',
-                'ATLAS_popular_mutations', 'ATLAS_popular_mutation_groups', 'ATLAS_mean_num_deletions',
-                'ATLAS_mean_num_insertions', 'ATLAS_mean_len_deletions', 'ATLAS_mean_len_insertions',
-                'RepSeq_aromaticity', 'RepSeq_instability_index', 'RepSeq_isoelectric_point', 'RepSeq_molecular_weight',
-                'RepSeq_monoisotopic', 'RepSeq_num_tm_helix-tmhmm', 'RepSeq_percent_acidic', 'RepSeq_percent_aliphatic',
-                'RepSeq_percent_aromatic', 'RepSeq_percent_B-sspro8', 'RepSeq_percent_basic',
-                'RepSeq_percent_buried-accpro', 'RepSeq_percent_buried-accpro20', 'RepSeq_percent_C-sspro',
-                'RepSeq_percent_C-sspro8', 'RepSeq_percent_charged', 'RepSeq_percent_E-sspro',
-                'RepSeq_percent_E-sspro8', 'RepSeq_percent_exposed-accpro', 'RepSeq_percent_exposed-accpro20',
-                'RepSeq_percent_G-sspro8', 'RepSeq_percent_H-sspro', 'RepSeq_percent_H-sspro8',
-                'RepSeq_percent_helix_naive', 'RepSeq_percent_I-sspro8', 'RepSeq_percent_non-polar',
-                'RepSeq_percent_polar', 'RepSeq_percent_S-sspro8', 'RepSeq_percent_small',
-                'RepSeq_percent_strand_naive', 'RepSeq_percent_T-sspro8', 'RepSeq_percent_tiny',
-                'RepSeq_percent_turn_naive', 'RepChain_percent_B-dssp', 'RepChain_percent_C-dssp',
-                'RepChain_percent_E-dssp', 'RepChain_percent_G-dssp', 'RepChain_percent_H-dssp',
-                'RepChain_percent_I-dssp', 'RepChain_percent_S-dssp', 'RepChain_percent_T-dssp',
-                'RepChain_SSBOND-biopython']
-        cols.extend([x.id for x in self.strain_ids])
+    # Then get all subsequences
+    all_protein_subseqs = protein.get_all_subsequences(pdbflex_keys_file=pdbflex_keys_file)
+    if not all_protein_subseqs:
+        log.error('{}: cannot run subsequence calculator'.format(protein.id))
+        return
 
-        df_atlas_summary = pd.DataFrame(all_info, columns=cols)
-        # Drop columns that don't have anything in them
-        df_atlas_summary.dropna(axis=1, how='all', inplace=True)
+    strains_and_dfs = []
+    for sa in protein.sequence_alignments:
+        if sa.annotations['ssbio_type'] != 'seqalign':
+            continue
 
-        return df_atlas_summary
+        try:
+            # strain_id = sa.annotations['b_seq'].split('_')[1]
+            strain_id = sa.annotations['b_seq'].split('_', 1)[1]
+        except IndexError:
+            continue
 
-    def get_atlas_per_gene_mutation_df(self, gene_id):
-        """Create a single data frame which summarizes a gene and its mutations.
+        ## Additional filtering for genes marked as orthologous but actually have large deletions or something
+        ## TODO: experiment with other cutoffs?
+        if wt_pid_cutoff:
+            if sa.annotations['percent_identity'] < wt_pid_cutoff:
+                continue
 
-        Args:
-            gene_id (str): Gene ID in the base model
+        mutations = sa.annotations['mutations']
+        insertions = sa.annotations['insertions']
+        deletions = sa.annotations['deletions']
+        # XTODO: simple characterization of insertions and deletions locations
 
-        Returns:
-            DataFrame: Pandas DataFrame of the results
+        protein_dir = ssbio.utils.make_dir(op.join(outdir, protein.id + '_mutchar'))
+        outpath = op.join(protein_dir, strain_id + '_mutchar.fthr')
 
-        """
-        # TODO: also count: number of unique mutations (have to consider position, amino acid change)
-        # TODO: keep track of strain with most mutations, least mutations
-        # TODO: keep track of strains that conserve the length of the protein, others that extend or truncate it
-        # need statistical test for that too (how long is "extended"/"truncated"?)
-        # TODO: number of strains with at least 1 mutations
-        # TODO: number of strains with <5% mutated, 5-10%, etc
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=outpath):
+            strain_pre_df = []
+            if mutations:
+                for change in mutations:
+                    infodict = OrderedDict()
+                    wt = change[0]
+                    resnum = change[1]
+                    mut = change[2]
+                    infodict['wt'] = wt
+                    infodict['resnum'] = resnum
+                    infodict['mut'] = mut
 
-        g = self.reference_gempro.genes.get_by_id(gene_id)
+                    props = characterize_residue_mutation(wt, mut, use_extended_def=True)
 
-        single, fingerprint = g.protein.sequence_mutation_summary(alignment_type='seqalign')
+                    ### Grantham
+                    infodict['prot_mutdiff_grantham_2D'] = ssbio.protein.sequence.properties.residues.grantham_score(wt, mut)[0]
 
-        structure_type_suffix = 'NA'
-        appender = []
+                    ### General characterization of mutation
+                    infodict['general_polar_to_nonpolar'] = False
+                    if 'Polar' in props[wt] and 'Non-polar' in props[mut]:
+                        infodict['general_polar_to_nonpolar'] = True
+                    infodict['general_nonpolar_to_polar'] = False
+                    if 'Non-polar' in props[wt] and 'Polar' in props[mut]:
+                        infodict['general_nonpolar_to_polar'] = True
+                    infodict['general_chrg_to_notchrg'] = False
+                    if 'Charged' in props[wt] and 'Charged' not in props[mut]:
+                        infodict['general_chrg_to_notchrg'] = True
+                    infodict['general_notchrg_to_chrg'] = False
+                    if 'Charged' not in props[wt] and 'Charged' in props[mut]:
+                        infodict['general_notchrg_to_chrg'] = True
+                    infodict['general_notsmall_to_small'] = False
+                    if ('Small' not in props[wt] or 'Tiny' not in props[wt]) and ('Small' in props[mut] and 'Tiny' in props[mut]):
+                        infodict['general_notsmall_to_small'] = True
+                    infodict['general_notbulk_to_bulk'] = False
+                    if 'Bulky' not in props[wt] and 'Bulky' not in props[mut]:
+                        infodict['general_notbulk_to_bulk'] = True
+                    infodict['general_dis_to_notdis'] = False
+                    if 'Disorder promoting' in props[wt] and 'Disorder promoting' not in props[mut]:
+                        infodict['general_dis_to_notdis'] = True
+                    infodict['general_notord_to_ord'] = False
+                    if 'Order promoting' not in props[wt] and 'Order promoting' in props[mut]:
+                        infodict['general_notord_to_ord'] = True
+                    infodict['general_dis_to_ord'] = False
+                    if 'Disorder promoting' in props[wt] and 'Order promoting' in props[mut]:
+                        infodict['general_dis_to_ord'] = True
+                    infodict['general_anyres_to_gprs'] = False
+                    if 'Pathogen enriched' not in props[wt] and 'Pathogen enriched' in props[mut]:
+                        infodict['general_anyres_to_gprs'] = True
+                    # Removed since this is only relevant in TM domains, calculated below
+                    # infodict['general_tm_stabilizing'] = False
+                    # if 'TM to Thr stabilizing' in props[wt] and 'TM stabilizing' in props[mut]:
+                    #     infodict['general_tm_stabilizing'] = True
+                    infodict['general_notcarb_to_carb'] = False
+                    if 'Carbonylation susceptible' not in props[wt] and 'Carbonylation susceptible' in props[mut]:
+                        infodict['general_notcarb_to_carb'] = True
+                    infodict['general_carb_to_notcarb'] = False
+                    if 'Carbonylation susceptible' in props[wt] and 'Carbonylation susceptible' not in props[mut]:
+                        infodict['general_notcarb_to_carb'] = True
 
-        for k, strains in single.items():
-            # Mutations in the strain
-            to_append = {}
-            orig_res = k[0]
-            resnum = int(k[1])
-            mutated_res = k[2]
-            num_strains_mutated = len(strains)
-            strain_ids = [str(x.split(g.id + '_')[1]) for x in strains]
-            to_append['ref_residue'] = orig_res
-            to_append['ref_resnum'] = resnum
-            to_append['strain_residue'] = mutated_res
-            to_append['num_strains_mutated'] = num_strains_mutated
-            to_append['strains_mutated'] = ';'.join(strain_ids)
-            to_append['at_disulfide_bridge'] = False
+                    for aa in ['C', 'M', 'Y']:
+                        infodict['general_{0}_to_not{0}'.format(aa)] = False
+                        if wt == aa and mut != aa:
+                            infodict['general_{0}_to_not{0}'.format(aa)] = True
+                        infodict['general_not{0}_to_{0}'.format(aa)] = False
+                        if wt != aa and mut == aa:
+                            infodict['general_not{0}_to_{0}'.format(aa)] = True
 
-            # Residue properties
-            origres_props = ssbio.protein.sequence.properties.residues.residue_biochemical_definition(orig_res)
-            mutres_props = ssbio.protein.sequence.properties.residues.residue_biochemical_definition(mutated_res)
-            to_append['ref_residue_prop'] = origres_props
-            to_append['strain_residue_prop'] = mutres_props
+                    ### Characterization within disordered region
+                    for region in ['disorder_2D', 'disorder_3D', 'ss_disorder_2D', 'ss_disorder_3D']:
+                        infodict['mut_dis_to_ord_{}'.format(region)] = None
+                        infodict['mut_notord_to_ord_{}'.format(region)] = None
+                        infodict['mut_dis_to_notdis_{}'.format(region)] = None
 
-            # Grantham score - score a mutation based on biochemical properties
-            grantham_s, grantham_txt = ssbio.protein.sequence.properties.residues.grantham_score(orig_res, mutated_res)
-            to_append['grantham_score'] = grantham_s
-            to_append['grantham_annotation'] = grantham_txt
+                        # If there exists no region, do not characterize this mutation as something related to it
+                        if region in all_protein_subseqs:
+                            # If there exists a region, check to see if the residue number exists in it
+                            if resnum in all_protein_subseqs[region]['subseq_resnums']:
+                                # mut_dis_to_notdis
+                                prefix = 'mut_dis_to_notdis'
+                                key = '{}_{}'.format(prefix, region)
+                                if key not in infodict: raise KeyError('Forgot to initialize key')
+                                infodict[key] = False
+                                if 'Disorder promoting' in props[wt] and 'Disorder promoting' not in props[mut]:
+                                    infodict[key] = True
 
-            # Get all per residue annotations - predicted from sequence and calculated from structure
-            to_append.update(g.protein.get_residue_annotations(seq_resnum=resnum, use_representatives=True))
+                                # mut_notord_to_ord
+                                prefix = 'mut_notord_to_ord'
+                                key = '{}_{}'.format(prefix, region)
+                                if key not in infodict: raise KeyError('Forgot to initialize key')
+                                infodict[key] = False
+                                if 'Order promoting' not in props[wt] and 'Order promoting' in props[mut]:
+                                    infodict[key] = True
 
-            # Check structure type
-            if g.protein.representative_structure:
-                if g.protein.representative_structure.is_experimental:
-                    to_append['structure_type'] = 'EXP'
-                else:
-                    to_append['structure_type'] = 'HOM'
+                                # mut_dis_to_ord
+                                prefix = 'mut_dis_to_ord'
+                                key = '{}_{}'.format(prefix, region)
+                                if key not in infodict: raise KeyError('Forgot to initialize key')
+                                infodict[key] = False
+                                if 'Disorder promoting' in props[wt] and 'Order promoting' in props[mut]:
+                                    infodict[key] = True
 
-                # At disulfide bond?
-                repchain = g.protein.representative_chain
-                repchain_annotations = g.protein.representative_structure.chains.get_by_id(repchain).seq_record.annotations
-                if 'SSBOND-biopython' in repchain_annotations:
-                    structure_resnum = g.protein.map_seqprop_resnums_to_structprop_resnums(resnums=resnum,
-                                                                                           use_representatives=True)
-                    if resnum in structure_resnum:
-                        ssbonds = repchain_annotations['SSBOND-biopython']
-                        ssbonds_res = []
-                        for x in ssbonds:
-                            ssbonds_res.append(x[0])
-                            ssbonds_res.append(x[1])
+                    ### Characterization within surface exposed residues
+                    for region in ['acc_2D', 'acc_3D', 'surface_3D']:
+                        infodict['mut_carb_to_notcarb_{}'.format(region)] = None
+                        infodict['mut_cys_to_notcys_{}'.format(region)] = None
+                        infodict['mut_notmet_to_met_{}'.format(region)] = None
+                        infodict['mut_chrg_to_notchrg_{}'.format(region)] = None
+                        infodict['mut_negchrg_to_notnegchrg_{}'.format(region)] = None
+                        infodict['mut_poschrg_to_notposchrg_{}'.format(region)] = None
 
-                        if structure_resnum in ssbonds_res:
-                            to_append['at_disulfide_bridge'] = True
+                        # If there exists no region, do not characterize this mutation as something related to it
+                        if region in all_protein_subseqs:
+                            # If there exists a region, check to see if the residue number exists in it
+                            if resnum in all_protein_subseqs[region]['subseq_resnums']:
+                                # mut_carb_to_notcarb
+                                prefix = 'mut_carb_to_notcarb'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Carbonylation susceptible' in props[wt] and 'Carbonylation susceptible' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
 
-            appender.append(to_append)
+                                for aa in ['C', 'M', 'Y']:
+                                    prefix = 'mut_{0}_to_not{0}'.format(aa)
+                                    key = '{}_{}'.format(prefix, region)
+                                    infodict[key] = False
+                                    if wt == aa and mut != aa:
+                                        infodict[key] = True
 
-        if not appender:
-            return pd.DataFrame()
+                                    prefix = 'mut_not{0}_to_{0}'.format(aa)
+                                    key = '{}_{}'.format(prefix, region)
+                                    infodict[key] = False
+                                    if wt != aa and mut == aa:
+                                        infodict[key] = True
 
-        cols = ['ref_residue', 'ref_resnum', 'strain_residue', 'num_strains_mutated', 'strains_mutated',
-                'ref_residue_prop', 'strain_residue_prop', 'grantham_score', 'grantham_annotation',
-                'at_disulfide_bridge',
-                'seq_SS-sspro', 'seq_SS-sspro8', 'seq_RSA-accpro', 'seq_RSA-accpro20', 'seq_TM-tmhmm',
-                'struct_SS-dssp', 'struct_RSA-dssp', 'struct_ASA-dssp',
-                'struct_CA_DEPTH-msms', 'struct_RES_DEPTH-msms',
-                'struct_PHI-dssp', 'struct_PSI-dssp',
-                'struct_resnum', 'struct_residue'
-                'strains_mutated']
+                                # mut_chrg_to_notchrg
+                                prefix = 'mut_chrg_to_notchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Charged' in props[wt] and 'Charged' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
 
-        df_gene_summary = pd.DataFrame.from_records(appender, columns=cols)
+                                # mut_notposchrg_to_poschrg
+                                prefix = 'mut_poschrg_to_notposchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Basic' in props[wt] and 'Basic' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
 
-        # Drop columns that don't have anything in them
-        df_gene_summary.dropna(axis=1, how='all', inplace=True)
+                                # mut_notnegchrg_to_negchrg
+                                prefix = 'mut_negchrg_to_notnegchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Acidic' in props[wt] and 'Acidic' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
 
-        df_gene_summary.sort_values(by='ref_resnum', inplace=True)
-        df_gene_summary = df_gene_summary.set_index('ref_resnum')
-        return df_gene_summary
+                    ### Characterization within metal binding regions
+                    for region in ['metal_2_5D', 'metal_3D', 'csa_2_5D', 'sites_2_5D']:
+                        infodict['mut_notbulk_to_bulk_{}'.format(region)] = None
+                        infodict['mut_carb_to_notcarb_{}'.format(region)] = None
+                        infodict['mut_cys_to_notcys_{}'.format(region)] = None
+                        infodict['mut_notmet_to_met_{}'.format(region)] = None
+                        infodict['mut_chrg_to_notchrg_{}'.format(region)] = None
+                        infodict['mut_notposchrg_to_poschrg_{}'.format(region)] = None
+                        infodict['mut_notnegchrg_to_negchrg_{}'.format(region)] = None
+                        infodict['mut_poschrg_to_notposchrg_{}'.format(region)] = None
+                        infodict['mut_negchrg_to_notnegchrg_{}'.format(region)] = None
 
-    def download_mutation_images(self):
-        # TODO: dunno if this works
-        import ipywidgets
-        import math
+                        # If there exists no region, do not characterize this mutation as something related to it
+                        if region in all_protein_subseqs:
+                            # If there exists a region, check to see if the residue number exists in it
+                            if resnum in all_protein_subseqs[region]['subseq_resnums']:
+                                # mut_notbulk_to_bulk
+                                prefix = 'mut_notbulk_to_bulk'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Bulky' not in props[wt] and 'Bulky' in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
 
-        views = []
-        for g in self.reference_gempro.genes:
-            if g.protein.representative_structure:
-                view = g.protein.view_all_mutations(alignment_type='seqalign', grouped=False, structure_opacity=0.5,
-                                                    opacity_range=(0.6, 1), scale_range=(.5, 5))
-                view._remote_call("setSize", target='Widget', args=['300px', '300px'])
-                view.download_image(filename='{}_{}_mutations.png'.format(g.id, g.name))
-                views.append(view)
+                                # mut_carb_to_notcarb
+                                prefix = 'mut_carb_to_notcarb'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Carbonylation susceptible' in props[wt] and 'Carbonylation susceptible' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
 
-        hboxes = [ipywidgets.HBox(views[i * 3:i * 3 + 3])
-                  for i in range(int(math.ceil(len(views) / 3.0)))]
-        vbox = ipywidgets.VBox(hboxes)
-        return vbox
+                                for aa in ['C', 'M']:
+                                    prefix = 'mut_{0}_to_not{0}'.format(aa)
+                                    key = '{}_{}'.format(prefix, region)
+                                    infodict[key] = False
+                                    if wt == aa and mut != aa:
+                                        infodict[key] = True
+
+                                    prefix = 'mut_not{0}_to_{0}'.format(aa)
+                                    key = '{}_{}'.format(prefix, region)
+                                    infodict[key] = False
+                                    if wt != aa and mut == aa:
+                                        infodict[key] = True
+
+                                # mut_chrg_to_notchrg
+                                prefix = 'mut_chrg_to_notchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Charged' in props[wt] and 'Charged' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+                                # mut_notposchrg_to_poschrg
+                                prefix = 'mut_notposchrg_to_poschrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Basic' not in props[wt] and 'Basic' in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+                                # mut_notnegchrg_to_negchrg
+                                prefix = 'mut_notnegchrg_to_negchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Acidic' not in props[wt] and 'Acidic' in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+                                # mut_poschrg_to_notposchrg
+                                prefix = 'mut_poschrg_to_notposchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Basic' in props[wt] and 'Basic' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+                                # mut_negchrg_to_notnegchrg
+                                prefix = 'mut_negchrg_to_notnegchrg'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'Acidic' in props[wt] and 'Acidic' not in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+                    ### Characterization within TM domain
+                    for region in ['tm_2D', 'tm_3D']:
+                        infodict['mut_tmunstab_to_tmstab_{}'.format(region)] = None
+                        infodict['mut_notmet_to_met_{}'.format(region)] = None
+
+                        # If there exists no region, do not characterize this mutation as something related to it
+                        if region in all_protein_subseqs:
+                            # If there exists a region, check to see if the residue number exists in it
+                            if resnum in all_protein_subseqs[region]['subseq_resnums']:
+                                # mut_tmunstab_to_tmstab
+                                prefix = 'mut_tmunstab_to_tmstab'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if 'TM to Thr stabilizing' in props[wt] and 'TM stabilizing' in props[mut]:
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+                                # mut_notmet_to_met
+                                prefix = 'mut_notmet_to_met'
+                                key = '{}_{}'.format(prefix, region)
+                                infodict[key] = False
+                                if wt != 'M' and mut == 'M':
+                                    infodict['{}_{}'.format(prefix, region)] = True
+
+
+                    ### Singular defined domains
+                    #### DNA binding domain
+                    dna_region = 'dna_2_5D'
+                    infodict['mut_notdis_to_dis_{}'.format(dna_region)] = None
+                    infodict['mut_ord_to_notord_{}'.format(dna_region)] = None
+                    infodict['mut_ord_to_dis_{}'.format(dna_region)] = None
+                    infodict['mut_at_{}'.format(dna_region)] = False
+                    if dna_region in all_protein_subseqs:
+                        if resnum in all_protein_subseqs[dna_region]['subseq_resnums']:
+                            infodict['mut_at_{}'.format(dna_region)] = True
+                            if 'Disorder promoting' not in props[wt] and 'Disorder promoting' in props[mut]:
+                                infodict['mut_notdis_to_dis_{}'.format(dna_region)] = True
+                            else:
+                                infodict['mut_notdis_to_dis_{}'.format(dna_region)] = False
+                            if 'Order promoting' in props[wt] and 'Order promoting' not in props[mut]:
+                                infodict['mut_ord_to_notord_{}'.format(dna_region)] = True
+                            else:
+                                infodict['mut_ord_to_notord_{}'.format(dna_region)] = False
+                            if 'Order promoting' in props[wt] and 'Disorder promoting' in props[mut]:
+                                infodict['mut_ord_to_dis_{}'.format(dna_region)] = True
+                            else:
+                                infodict['mut_ord_to_dis_{}'.format(dna_region)] = False
+
+                    # Now contained in the metal one above
+                    # #### Catalytic site
+                    # csa_region = 'csa_2_5D'
+                    # infodict['mut_at_{}'.format(csa_region)] = False
+                    # if csa_region in all_protein_subseqs:
+                    #     if resnum in all_protein_subseqs[csa_region]['subseq_resnums']:
+                    #         infodict['mut_at_{}'.format(csa_region)] = True
+                    #
+                    # #### UniProt site
+                    # uni_region = 'sites_2_5D'
+                    # infodict['mut_at_{}'.format(uni_region)] = False
+                    # if uni_region in all_protein_subseqs:
+                    #     if resnum in all_protein_subseqs[uni_region]['subseq_resnums']:
+                    #         infodict['mut_at_{}'.format(uni_region)] = True
+
+                    ## XTODO: need to add these to all_protein_subseqs and also search within vicinity of them
+                    ## XTODO: do not use CarSPred, use CarbonylDB
+                    #### Experimentally determined carbonylatable residues
+                    # carbonyldb_region = 'carbonyldb_exp'
+                    # infodict['mut_at_{}'.format(carbonyldb_region)] = False
+                    # if 'experimental_carb_ox-carbonyldb_exp' in protein.representative_sequence.annotations:
+                    #     if resnum in protein.representative_sequence.annotations['experimental_cys_ox-carbonyldb_exp']:
+                    #         infodict['mut_at_{}'.format(carbonyldb_region)] = True
+
+                    #### CarSPred residue
+                    cars_region = 'predcarb_2D'
+                    infodict['mut_at_{}'.format(cars_region)] = False
+                    if 'predicted_carbonylated-carspred' in protein.representative_sequence.letter_annotations:
+                        subfeat_indices = list(locate(protein.representative_sequence.letter_annotations['predicted_carbonylated-carspred'],
+                                                      lambda x: x != (False, 0.0)))
+                        subfeat_resnums = [x+1 for x in subfeat_indices]
+                        if resnum in subfeat_resnums:
+                            infodict['mut_at_{}'.format(cars_region)] = True
+
+                    #### Experimentally determined oxidizable cysteines
+                    redoxdb_region = 'redoxdb_exp'
+                    infodict['mut_at_{}'.format(redoxdb_region)] = False
+                    if 'experimental_cys_ox-redoxdb' in protein.representative_sequence.annotations:
+                        if resnum in protein.representative_sequence.annotations['experimental_cys_ox-redoxdb']:
+                            infodict['mut_at_{}'.format(redoxdb_region)] = True
+
+                    #### Predicted disulfide bridge
+                    disbrdg_region = 'disbrdg_3D'
+                    infodict['mut_at_{}'.format(disbrdg_region)] = False
+                    if protein.representative_structure:
+                        if 'SSBOND-biopython' in protein.get_representative_chain.seq_record.annotations:
+                            struct_ssbonds = []
+                            for x in protein.get_representative_chain.seq_record.annotations['SSBOND-biopython']:
+                                for y in x:
+                                    struct_ssbonds.append(y[1])
+                            mapped = protein.map_structprop_resnums_to_seqprop_resnums(struct_ssbonds, use_representatives=True)
+                            if resnum in list(mapped.values()):
+                                infodict['mut_at_{}'.format(disbrdg_region)] = True
+
+                    #### Any available FoldX info
+                    foldx_suffix = 'foldx_3D'
+                    infodict['prop_stability_{}'.format(foldx_suffix)] = None
+                    if 'ecoref_foldx_predictions' in protein.representative_sequence.annotations:
+                        for k,v in protein.representative_sequence.annotations['ecoref_foldx_predictions'].items():
+                            foldx_calculated = ssbio.utils.split_mutation_string(k)
+                            if wt == foldx_calculated[0] and mut == foldx_calculated[2] and str(resnum) == foldx_calculated[1]:
+                                infodict['stability_{}'.format(foldx_suffix)] = v
+
+                    strain_pre_df.append(infodict)
+
+            strain_df = pd.DataFrame(strain_pre_df)
+            strain_df.index = [protein.id] * len(strain_df)
+
+            # If you want to save them use the code below but remember to require an outdir as well as write the force rerun code
+            strain_df.reset_index().to_feather(outpath)
+
+        else:
+            strain_df = pd.read_feather(outpath)
+            strain_df = strain_df.set_index(strain_df.columns[0])
+
+        strains_and_dfs.append((strain_id, strain_df))
+
+    return strains_and_dfs
+
+
+
+mut_color_mapping_human = {'mut_dis_to_ord_disorder_2D': 'deep aqua',
+'mut_notord_to_ord_disorder_2D': 'blue blue',
+'mut_dis_to_notdis_disorder_2D': 'deep aqua',
+'mut_dis_to_ord_disorder_3D': 'deep aqua',
+'mut_notord_to_ord_disorder_3D': 'blue blue',
+'mut_dis_to_notdis_disorder_3D': 'deep aqua',
+'mut_dis_to_ord_ss_disorder_2D': 'deep aqua',
+'mut_notord_to_ord_ss_disorder_2D': 'blue blue',
+'mut_dis_to_notdis_ss_disorder_2D': 'deep aqua',
+'mut_dis_to_ord_ss_disorder_3D': 'deep aqua',
+'mut_notord_to_ord_ss_disorder_3D': 'blue blue',
+'mut_dis_to_notdis_ss_disorder_3D': 'deep aqua',
+'mut_carb_to_notcarb_acc_2D': 'lime green',
+'mut_C_to_notC_acc_2D': 'violet',
+'mut_Y_to_notY_acc_2D': 'black',
+'mut_notM_to_M_acc_2D': 'orange',
+'mut_chrg_to_notchrg_acc_2D': 'hot pink',
+'mut_carb_to_notcarb_acc_3D': 'lime green',
+'mut_C_to_notC_acc_3D': 'violet',
+'mut_Y_to_notY_acc_3D': 'black',
+'mut_notM_to_M_acc_3D': 'orange',
+'mut_chrg_to_notchrg_acc_3D': 'hot pink',
+'mut_carb_to_notcarb_surface_3D': 'lime green',
+'mut_C_to_notC_surface_3D': 'violet',
+'mut_Y_to_notY_surface_3D': 'black',
+'mut_notM_to_M_surface_3D': 'orange',
+'mut_chrg_to_notchrg_surface_3D': 'hot pink',
+'mut_notbulk_to_bulk_metal_2_5D': 'pale yellow',
+'mut_carb_to_notcarb_metal_2_5D': 'lime green',
+'mut_C_to_notC_metal_2_5D': 'violet',
+'mut_notM_to_M_metal_2_5D': 'orange',
+'mut_chrg_to_notchrg_metal_2_5D': 'hot pink',
+'mut_notposchrg_to_poschrg_metal_2_5D': 'light pink',
+'mut_notnegchrg_to_negchrg_metal_2_5D': 'baby blue',
+'mut_negchrg_to_notnegchrg_metal_2_5D': 'light pink',
+'mut_negchrg_to_notnegchrg_metal_3D': 'light pink',
+'mut_poschrg_to_notposchrg_metal_2_5D': 'baby blue',
+'mut_poschrg_to_notposchrg_metal_3D': 'baby blue',
+'mut_notbulk_to_bulk_metal_3D': 'pale yellow',
+'mut_carb_to_notcarb_metal_3D': 'lime green',
+'mut_C_to_notC_metal_3D': 'violet',
+'mut_notM_to_M_metal_3D': 'orange',
+'mut_chrg_to_notchrg_metal_3D': 'hot pink',
+'mut_notposchrg_to_poschrg_metal_3D': 'light pink',
+'mut_notnegchrg_to_negchrg_metal_3D': 'baby blue',
+'mut_tmunstab_to_tmstab_tm_2D': 'bright yellow',
+'mut_notM_to_M_tm_2D': 'orange',
+'mut_tmunstab_to_tmstab_tm_3D': 'bright yellow',
+'mut_notM_to_M_tm_3D': 'orange',
+'mut_notdis_to_dis_dna_2_5D': 'bright teal',
+'mut_ord_to_notord_dna_2_5D': 'bright teal',
+'mut_ord_to_dis_dna_2_5D': 'bright teal',
+'mut_at_dna_2_5D': 'black',
+'mut_at_csa_2_5D': 'black',
+'mut_at_sites_2_5D': 'black',
+'mut_at_predcarb_2D': 'black',
+'mut_at_redoxdb_exp': 'black',
+'mut_at_disbrdg_3D': 'black',
+                           'general_notcarb_to_carb': 'red',
+                           'general_C_to_notC'  : 'violet',
+'general_Y_to_notY'  : 'black',
+                           'general_notM_to_M'  : 'orange',
+                           'general_notC_to_C':'black',
+                           'general_dis_to_notdis': 'white',
+                           'general_notord_to_ord': 'white'}
+
+import seaborn as sns
+mut_color_mapping = {k: sns.xkcd_palette([v]).as_hex()[0] for k,v in mut_color_mapping_human.items()}
