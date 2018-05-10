@@ -8,15 +8,15 @@ log = logging.getLogger(__name__)
 
 
 _aa_property_dict_one = {
-    'Aliphatic': set(['A', 'I', 'L', 'V']),
-    'Aromatic' : set(['F', 'H', 'W', 'Y']),
-    'Non-polar': set(['A', 'C', 'F', 'G', 'I', 'L', 'M', 'P', 'V', 'W', 'Y']),
-    'Polar'    : set(['D', 'E', 'H', 'K', 'N', 'Q', 'R', 'S', 'T']),
-    'Charged'  : set(['D', 'E', 'H', 'K', 'R']),
-    'Basic'    : set(['H', 'K', 'R']),
-    'Acidic'   : set(['D', 'E']),
-    'Tiny'     : set(['A', 'C', 'G', 'S', 'T']),
-    'Small'    : set(['A', 'C', 'D', 'G', 'N', 'P', 'S', 'T', 'V'])}
+    'Aliphatic': {'A', 'I', 'L', 'V'},
+    'Aromatic' : {'F', 'H', 'W', 'Y'},
+    'Non-polar': {'A', 'C', 'F', 'G', 'I', 'L', 'M', 'P', 'V', 'W', 'Y'},
+    'Polar'    : {'D', 'E', 'H', 'K', 'N', 'Q', 'R', 'S', 'T'},
+    'Charged'  : {'D', 'E', 'H', 'K', 'R'},
+    'Basic'    : {'H', 'K', 'R'},
+    'Acidic'   : {'D', 'E'},
+    'Tiny'     : {'A', 'C', 'G', 'S', 'T'},
+    'Small'    : {'A', 'C', 'D', 'G', 'N', 'P', 'S', 'T', 'V'}}
 
 _aa_property_dict_three = {k: [one_to_three(x) for x in v] for k, v in _aa_property_dict_one.items()}
 
@@ -313,3 +313,49 @@ def grantham_score(ref_aa, mut_aa):
         return score, "Moderately Conservative"
     else:
         return score, "Conservative"
+
+
+########################################################################################################
+########################################################################################################
+# DEVELOPMENT CODE BELOW
+# DEVELOPMENT CODE BELOW
+# DEVELOPMENT CODE BELOW
+# DEVELOPMENT CODE BELOW
+########################################################################################################
+########################################################################################################
+
+EXTENDED_AA_PROPERTY_DICT_ONE = {}
+EXTENDED_AA_PROPERTY_DICT_ONE['Bulky'] = {'L', 'I', 'F', 'Y', 'V', 'W'}  # https://www.sciencedirect.com/science/article/pii/0022519368900696
+EXTENDED_AA_PROPERTY_DICT_ONE['Hydrophobic extended'] = {'L', 'M', 'F', 'W', 'C', 'A', 'V', 'G', 'I', 'Y', 'H', 'T', 'S','P'}  # http://www.russelllab.org/aas/hydrophobic.html
+EXTENDED_AA_PROPERTY_DICT_ONE['Iron binding'] = {'D', 'E', 'Y', 'H', 'C'}  # http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0007269
+EXTENDED_AA_PROPERTY_DICT_ONE['Disorder promoting'] = {'P', 'E', 'S', 'K', 'Q', 'G'}  # https://www.sciencedirect.com/science/article/pii/S1570963912002889
+EXTENDED_AA_PROPERTY_DICT_ONE['Disorder promoting if in secstruct'] = {'G', 'P'}  # https://www.sciencedirect.com/science/article/pii/S2211124714003751
+EXTENDED_AA_PROPERTY_DICT_ONE['Order promoting'] = {'W', 'F', 'Y', 'I','M'}  # https://www.sciencedirect.com/science/article/pii/S2211124714003751 https://www.sciencedirect.com/science/article/pii/S1570963912002889#bb0185
+EXTENDED_AA_PROPERTY_DICT_ONE['Carbonylation susceptible'] = {'P', 'R', 'K', 'T'}  # http://onlinelibrary.wiley.com/doi/10.1002/pmic.201100223/full
+EXTENDED_AA_PROPERTY_DICT_ONE['Oxygen rich'] = {'D', 'E', 'N', 'Q', 'S', 'T', 'Y'}  # http://www.sciencedirect.com/science/article/pii/S2211124714003751
+EXTENDED_AA_PROPERTY_DICT_ONE['Prone to photooxidation'] = {'C', 'H', 'W', 'M','Y'}  # listed in decreasing order, https://www.sciencedirect.com/science/article/pii/S1011134401002081
+EXTENDED_AA_PROPERTY_DICT_ONE['Pathogen enriched'] = {'G', 'P', 'R', 'S'}  # https://www.sciencedirect.com/science/article/pii/S2211124714003751
+EXTENDED_AA_PROPERTY_DICT_ONE['TM stabilizing'] = {'T', 'C', 'S'}  # http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0003343
+EXTENDED_AA_PROPERTY_DICT_ONE['TM to Thr stabilizing'] = {'I', 'M', 'V', 'A'}  # http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0003343
+
+
+from copy import deepcopy
+
+def characterize_residue_mutation(res1, res2, use_extended_def=True):
+    # XTODO: organize, document
+    res1_props = []
+    res2_props = []
+
+    propdict = deepcopy(_aa_property_dict_one)
+
+    if use_extended_def:
+        propdict.update(EXTENDED_AA_PROPERTY_DICT_ONE)
+
+    for prop, aa_list in EXTENDED_AA_PROPERTY_DICT_ONE.items():
+        if res1 in aa_list:
+            res1_props.append(prop)
+        if res2 in aa_list:
+            res2_props.append(prop)
+
+    return {res1: res1_props,
+            res2: res2_props}

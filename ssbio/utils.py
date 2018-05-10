@@ -13,6 +13,7 @@ import subprocess
 import shlex
 import requests
 import json
+import re
 import warnings
 import gzip
 from collections import OrderedDict
@@ -182,6 +183,17 @@ def clean_single_dict(indict, prepend_to_keys=None, remove_keys_containing=None)
         outdict[prepend_to_keys + k] = v[0]
 
     return outdict
+
+
+def split_mutation_string(instring):
+    """Split a string with letters and numbers in it -- the number still stays a string though
+
+    Examples:
+        >>> split_mutation_string('A123F')
+        ['A', '123', 'F']
+
+    """
+    return re.split('(\d+)', instring)
 
 
 def double_check_attribute(object, setter, backup_attribute, custom_error_text=None):
@@ -931,7 +943,10 @@ def scale_calculator(multiplier, elements, rescale=None):
         {2: 1.0, 3: 0.5, 4: 0.5, 5: 0.75, 6: 0.5, 7: 0.5, 8: 0.5}
 
         >>> scale_calculator(1, [(2,2,2),(3,),(4,),(5,),(5,),(6,7,8)], rescale=(0.5,1))
-        {(2, 2, 2): 0.5, (5,): 1.0, (3,): 0.5, (6, 7, 8): 0.5, (4,): 0.5}
+        {(2, 2, 2): 0.5, (3,): 0.5, (6, 7, 8): 0.5, (4,): 0.5, (5,): 1.0}
+
+        >>> scale_calculator(1, {77:35, 80:35, 16:1}, rescale=(.99,1))
+        None
 
     Args:
         mutiplier (int, float): Base float to be multiplied
@@ -1003,7 +1018,8 @@ def check_condition(left, condition, right):
            '<': operator.lt,
            '>=': operator.ge,
            '<=': operator.le,
-           '=': operator.eq}
+           '=': operator.eq,
+           '!=': operator.ne}
     if condition not in ops:
         raise KeyError('{}: condition not supported'.format(condition))
     return ops[condition](left, right)
