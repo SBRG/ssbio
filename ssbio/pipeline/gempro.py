@@ -152,7 +152,7 @@ class GEMPRO(Object):
 
         # Or, load the provided FASTA file
         elif genome_path:
-            genes_and_sequences = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqs(genome_path)
+            genes_and_sequences = ssbio.protein.sequence.utils.fasta.load_fasta_file_as_dict_of_seqrecords(genome_path)
             self.add_gene_ids(list(genes_and_sequences.keys()))
             self.manual_seq_mapping(genes_and_sequences, write_fasta_files=write_protein_fasta_files)
 
@@ -288,7 +288,7 @@ class GEMPRO(Object):
 
     @property
     def functional_genes(self):
-        """DictList: All genes with a representative protein structure."""
+        """DictList: All functional genes with a representative sequence"""
         return DictList(x for x in self.genes if x.functional)
 
     # @property
@@ -749,7 +749,7 @@ class GEMPRO(Object):
         self.genome_path = outfile
         return self.genome_path
 
-    def get_sequence_properties(self, representatives_only=True):
+    def get_sequence_properties(self, clean_seq=False, representatives_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of all protein sequences.
         Results are stored in the protein's respective SeqProp objects at ``.annotations``
 
@@ -758,7 +758,7 @@ class GEMPRO(Object):
 
         """
         for g in tqdm(self.genes):
-            g.protein.get_sequence_properties(representative_only=representatives_only)
+            g.protein.get_sequence_properties(clean_seq=clean_seq, representative_only=representatives_only)
 
     def get_sequence_sliding_window_properties(self, scale, window, representatives_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of all protein sequences.
@@ -820,14 +820,22 @@ class GEMPRO(Object):
                 # Secondary structure
                 g.protein.representative_sequence.annotations.update(sspro_summary[g_id])
                 g.protein.representative_sequence.annotations.update(sspro8_summary[g_id])
-                g.protein.representative_sequence.letter_annotations['SS-sspro'] = sspro_results[g_id]
-                g.protein.representative_sequence.letter_annotations['SS-sspro8'] = sspro8_results[g_id]
+                try:
+                    g.protein.representative_sequence.letter_annotations['SS-sspro'] = sspro_results[g_id]
+                    g.protein.representative_sequence.letter_annotations['SS-sspro8'] = sspro8_results[g_id]
+                except TypeError:
+                    log.error('Gene {}, SeqProp {}: sequence length mismatch between SCRATCH results and representative '
+                              'sequence, unable to set letter annotation'.format(g_id, g.protein.representative_sequence.id))
 
                 # Solvent accessibility
                 g.protein.representative_sequence.annotations.update(accpro_summary[g_id])
                 g.protein.representative_sequence.annotations.update(accpro20_summary[g_id])
-                g.protein.representative_sequence.letter_annotations['RSA-accpro'] = accpro_results[g_id]
-                g.protein.representative_sequence.letter_annotations['RSA-accpro20'] = accpro20_results[g_id]
+                try:
+                    g.protein.representative_sequence.letter_annotations['RSA-accpro'] = accpro_results[g_id]
+                    g.protein.representative_sequence.letter_annotations['RSA-accpro20'] = accpro20_results[g_id]
+                except TypeError:
+                    log.error('Gene {}, SeqProp {}: sequence length mismatch between SCRATCH results and representative '
+                              'sequence, unable to set letter annotation'.format(g_id, g.protein.representative_sequence.id))
 
                 counter += 1
             else:
@@ -868,8 +876,12 @@ class GEMPRO(Object):
                 if not tmhmm_dict[g_id]:
                     log.error("{}: missing TMHMM results".format(g.id))
                 g.protein.representative_sequence.annotations['num_tm_helix-tmhmm'] = tmhmm_dict[g_id]['num_tm_helices']
-                g.protein.representative_sequence.letter_annotations['TM-tmhmm'] = tmhmm_dict[g_id]['sequence']
-                counter += 1
+                try:
+                    g.protein.representative_sequence.letter_annotations['TM-tmhmm'] = tmhmm_dict[g_id]['sequence']
+                    counter += 1
+                except TypeError:
+                    log.error('Gene {}, SeqProp {}: sequence length mismatch between TMHMM results and representative '
+                              'sequence, unable to set letter annotation'.format(g_id, g.protein.representative_sequence.id))
             else:
                 log.error("{}: missing TMHMM results".format(g.id))
 
@@ -1583,10 +1595,13 @@ class GEMPRO(Object):
         protein attribute in all genes!"""
         self.gene_protein_pickles = {}
         for g in tqdm(self.genes):
-            initproteinpickle = op.join(g.protein.protein_dir, '{}_protein.pckl'.format(g.id))
-            g.protein.save_pickle(initproteinpickle)
-            self.gene_protein_pickles[g.id] = initproteinpickle
-            g.reset_protein()
+            if g.protein.representative_sequence:
+                initproteinpickle = op.join(g.protein.protein_dir, '{}_protein.pckl'.format(g.id))
+                g.protein.save_pickle(initproteinpickle)
+                self.gene_protein_pickles[g.id] = initproteinpickle
+                g.reset_protein()
+            else:
+                g.reset_protein()
 
     def load_protein_pickles(self):
         log.info('Loading Protein pickles into GEM-PRO...')

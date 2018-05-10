@@ -109,6 +109,25 @@ def load_fasta_file_as_dict_of_seqs(filename):
     return results
 
 
+def load_fasta_file_as_dict_of_seqrecords(filename):
+    """Load a FASTA file and return the sequences as a dict of {ID: SeqRecord}
+
+    Args:
+        filename (str): Path to the FASTA file to load
+
+    Returns:
+        dict: Dictionary of IDs to their SeqRecords
+
+    """
+
+    results = {}
+    records = load_fasta_file(filename)
+    for r in records:
+        results[r.id] = r
+
+    return results
+
+
 def fasta_files_equal(seq_file1, seq_file2):
     """Check equality of a FASTA file to another FASTA file
 
