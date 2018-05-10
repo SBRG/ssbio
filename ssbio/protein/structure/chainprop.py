@@ -21,7 +21,39 @@ class ChainProp(Object):
     def reset_seq_record(self):
         self.seq_record = None
 
-    def get_subsequence_from_property(self, property_key, property_value, condition, return_resnums=False):
+    def get_subsequence(self, resnums, new_id=None, copy_letter_annotations=True):
+        """Get a subsequence as a new SeqProp object given a list of residue numbers"""
+        # XTODO: documentation
+
+        if not self.seq_record:
+            raise ValueError('No chain sequence stored')
+
+        biop_compound_list = []
+        for resnum in resnums:
+            feat = FeatureLocation(resnum - 1, resnum)
+            biop_compound_list.append(feat)
+
+        if len(biop_compound_list) == 0:
+            log.info('Zero length subsequences')
+            return
+        elif len(biop_compound_list) == 1:
+            log.debug('Subsequence only one residue long')
+            sub_feature_location = biop_compound_list[0]
+        else:
+            sub_feature_location = CompoundLocation(biop_compound_list)
+
+        sub_feature = sub_feature_location.extract(self.seq_record)
+
+        if not new_id:
+            new_id = '{}_subseq'.format(self.id)
+
+        new_sp = SeqProp(id=new_id, seq=sub_feature)
+        if copy_letter_annotations:
+            new_sp.letter_annotations = sub_feature.letter_annotations
+        return new_sp
+
+    def get_subsequence_from_property(self, property_key, property_value, condition, return_resnums=False,
+                                      copy_letter_annotations=True):
         """Get a subsequence as a new SeqProp object given a certain property you want to find in
         this chain's letter_annotation
 
@@ -41,25 +73,25 @@ class ChainProp(Object):
             raise ValueError('No chain sequence stored')
 
         if property_key not in self.seq_record.letter_annotations:
-            raise KeyError('{}: {} not contained in the letter annotations'.format(self.seq_record.id, property_key))
+            log.error(KeyError('{}: {} not contained in the letter annotations'.format(self.seq_record.id, property_key)))
+            return
 
-        subfeat_indices = list(locate(self.seq_record.letter_annotations[property_key],
-                                      lambda x: ssbio.utils.check_condition(x, condition, property_value)))
+        if condition == 'in':
+            subfeat_indices = list(locate(self.seq_record.letter_annotations[property_key],
+                                          lambda x: x in property_value))
+        else:
+            subfeat_indices = list(locate(self.seq_record.letter_annotations[property_key],
+                                          lambda x: ssbio.utils.check_condition(x, condition, property_value)))
+        subfeat_resnums = [x + 1 for x in subfeat_indices]
 
-        biop_compound_list = []
-        for idx in subfeat_indices:
-            feat = FeatureLocation(idx, idx + 1)
-            biop_compound_list.append(feat)
-
-        sub_feature_location = CompoundLocation(biop_compound_list)
-        sub_feature = sub_feature_location.extract(self.seq_record)
-
-        new_sp = SeqProp(id='{}-{}_{}_{}_{}_extracted'.format(self.pdb_parent, self.id, property_key,
-                                                              condition, property_value),
-                         seq=sub_feature)
-        new_sp.letter_annotations = sub_feature.letter_annotations
+        new_sp = self.get_subsequence(resnums=subfeat_resnums, new_id='{}_{}_{}_{}_extracted'.format(self.pdb_parent,
+                                                                                                     self.id,
+                                                                                                     property_key,
+                                                                                                     condition,
+                                                                                                     property_value),
+                                      copy_letter_annotations=copy_letter_annotations)
 
         if return_resnums:
-            return new_sp, [x + 1 for x in subfeat_indices]
+            return new_sp, subfeat_resnums
         else:
             return new_sp

@@ -348,19 +348,24 @@ class StructProp(Object):
             log.debug('{}: found {} disulfide bridges'.format(chain, len(bridges)))
             log.debug('{}: stored disulfide bridges in the chain\'s seq_record letter_annotations'.format(chain))
 
-    def get_polypeptide_within(self, chain_id, resnum, angstroms, use_ca=False):
+    def get_polypeptide_within(self, chain_id, resnum, angstroms, only_protein=True,
+                               use_ca=False, custom_coord=None, return_resnums=False):
         """Get a Polypeptide object of the amino acids within X angstroms of the specified chain + residue number.
 
         Args:
             resnum (int): Residue number of the structure
             chain_id (str): Chain ID of the residue number
             angstroms (float): Radius of the search sphere
+            only_protein (bool): If only protein atoms (no HETATMS) should be included in the returned sequence
             use_ca (bool): If the alpha-carbon atom should be used for searching, default is False (last atom of residue used)
+            custom_coord (list): custom XYZ coord
+            return_resnums (bool): if list of resnums should be returned
 
         Returns:
             Bio.PDB.Polypeptide.Polypeptide: Biopython Polypeptide object
 
         """
+        # XTODO: documentation, unit test
         if self.structure:
             parsed = self.structure
         else:
@@ -368,28 +373,53 @@ class StructProp(Object):
 
         residue_list = ssbio.protein.structure.properties.residues.within(resnum=resnum, chain_id=chain_id,
                                                                           model=parsed.first_model,
-                                                                          angstroms=angstroms, use_ca=use_ca)
+                                                                          angstroms=angstroms, use_ca=use_ca,
+                                                                          custom_coord=custom_coord)
 
-        residue_list_combined = Polypeptide(residue_list)
+        if only_protein:
+            filtered_residue_list = [x for x in residue_list if x.id[0] == ' ']
+        else:
+            filtered_residue_list = residue_list
+
+        residue_list_combined = Polypeptide(filtered_residue_list)
+
+        if return_resnums:
+            resnums = [int(x.id[1]) for x in filtered_residue_list]
+            return residue_list_combined, resnums
+
         return residue_list_combined
 
-    def get_seqprop_within(self, chain_id, resnum, angstroms, use_ca=False, strip='X'):
+    def get_seqprop_within(self, chain_id, resnum, angstroms, only_protein=True,
+                           use_ca=False, custom_coord=None, return_resnums=False):
         """Get a SeqProp object of the amino acids within X angstroms of the specified chain + residue number.
 
         Args:
             resnum (int): Residue number of the structure
             chain_id (str): Chain ID of the residue number
             angstroms (float): Radius of the search sphere
+            only_protein (bool): If only protein atoms (no HETATMS) should be included in the returned sequence
             use_ca (bool): If the alpha-carbon atom should be used for searching, default is False (last atom of residue used)
-            strip (str): Characters to strip from the sequence, ie. X for waters.
 
         Returns:
             SeqProp: Sequence that represents the amino acids in the vicinity of your residue number.
 
         """
-        polypep = self.get_polypeptide_within(chain_id=chain_id, resnum=resnum, angstroms=angstroms, use_ca=use_ca)
-        return SeqProp(id='{}-{}_within_{}_of_{}'.format(self.id, chain_id, angstroms, resnum),
-                       seq=polypep.get_sequence().strip(strip))
+        # XTODO: change "remove" parameter to be clean_seq and to remove all non standard amino acids
+        # TODO: make return_resnums smarter
+        polypep, resnums = self.get_polypeptide_within(chain_id=chain_id, resnum=resnum, angstroms=angstroms, use_ca=use_ca,
+                                                      only_protein=only_protein, custom_coord=custom_coord,
+                                                      return_resnums=True)
+
+        # final_seq = polypep.get_sequence()
+        # seqprop = SeqProp(id='{}-{}_within_{}_of_{}'.format(self.id, chain_id, angstroms, resnum),
+        #                   seq=final_seq)
+
+        chain_subseq = self.chains.get_by_id(chain_id).get_subsequence(resnums)
+
+        if return_resnums:
+            return chain_subseq, resnums
+        else:
+            return chain_subseq
 
     def get_dssp_annotations(self, outdir, force_rerun=False):
         """Run DSSP on this structure and store the DSSP annotations in the corresponding ChainProp SeqRecords
@@ -675,7 +705,8 @@ class StructProp(Object):
         view.add_ball_and_stick(selection='{} and not hydrogen and {}'.format(to_show_chains, to_show_res), color=res_color)
 
     def add_scaled_residues_highlight_to_nglview(self, view, structure_resnums, chain=None, color='red',
-                                                 unique_colors=False, opacity_range=(0.5,1), scale_range=(.7, 10)):
+                                                 unique_colors=False, opacity_range=(0.5,1), scale_range=(.7, 10),
+                                                 multiplier=None):
         """Add a list of residue numbers (which may contain repeating residues) to a view, or add a dictionary of
             residue numbers to counts. Size and opacity of added residues are scaled by counts.
 
@@ -701,8 +732,10 @@ class StructProp(Object):
             chain = ssbio.utils.force_list(chain)
 
         if isinstance(structure_resnums, dict):
-            opacity_dict = ssbio.utils.scale_calculator(opacity_range[0], structure_resnums, rescale=opacity_range)
-            scale_dict = ssbio.utils.scale_calculator(scale_range[0], structure_resnums, rescale=scale_range)
+            if not multiplier:
+                multiplier = 1
+            opacity_dict = ssbio.utils.scale_calculator(multiplier, structure_resnums, rescale=opacity_range)
+            scale_dict = ssbio.utils.scale_calculator(multiplier, structure_resnums, rescale=scale_range)
         else:
             opacity_dict = {x: max(opacity_range) for x in ssbio.utils.force_list(structure_resnums)}
             scale_dict = {x: max(scale_range) for x in ssbio.utils.force_list(structure_resnums)}
