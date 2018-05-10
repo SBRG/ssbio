@@ -9,6 +9,7 @@ import shutil
 import pandas as pd
 import numpy as np
 import os.path as op
+import json
 import seaborn as sns
 from slugify import Slugify
 from collections import defaultdict
@@ -41,12 +42,16 @@ custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
 
 
+class ProteinException(Exception):
+    pass
+
+
 class Protein(Object):
 
     """Store information about a protein, which represents the monomeric translated unit of a gene.
 
     The main utilities of this class are to:
-    
+
     * Load, parse, and store the same (ie. from different database sources) or similar (ie. from different strains)
       protein sequences as :ref:`SeqProp <sequence>` objects in the :attr:`~ssbio.core.protein.Protein.sequences`
       attribute
@@ -67,7 +72,7 @@ class Protein(Object):
 
     Todo:
         - Implement structural alignment objects with FATCAT
-    
+
     """
 
     __representative_sequence_attributes = ['gene', 'uniprot', 'kegg', 'pdbs',
@@ -237,6 +242,7 @@ class Protein(Object):
 
     def get_experimental_structures(self):
         """DictList: Return a DictList of all experimental structures in self.structures"""
+        # TODO: change to a property?
         if self.representative_structure:
             return DictList(x for x in self.structures if x.is_experimental and x.id != self.representative_structure.id)
         else:
@@ -244,10 +250,16 @@ class Protein(Object):
 
     def get_homology_models(self):
         """DictList: Return a DictList of all homology models in self.structures"""
+        # TODO: change to a property?
         if self.representative_structure:
             return DictList(x for x in self.structures if not x.is_experimental and x.id != self.representative_structure.id)
         else:
             return DictList(x for x in self.structures if not x.is_experimental)
+
+    @property
+    def get_representative_chain(self):
+        # XTODO: documentation
+        return self.representative_structure.chains.get_by_id(self.representative_chain)
 
     def filter_sequences(self, seq_type):
         """Return a DictList of only specified types in the sequences attribute.
@@ -338,10 +350,10 @@ class Protein(Object):
     def load_uniprot(self, uniprot_id, uniprot_seq_file=None, uniprot_xml_file=None, download=False, outdir=None,
                      set_as_representative=False, force_rerun=False):
         """Load a UniProt ID and associated sequence/metadata files into the sequences attribute.
-        
+
         Sequence and metadata files can be provided, or alternatively downloaded with the download flag set to True.
         Metadata files will be downloaded as XML files.
-        
+
         Args:
             uniprot_id (str): UniProt ID/ACC
             uniprot_seq_file (str): Path to FASTA file
@@ -469,6 +481,7 @@ class Protein(Object):
         if isinstance(seq, str) or isinstance(seq, Seq):
             if not ident:
                 raise ValueError('ID must be specified if sequence is a string or Seq object')
+            manual_sequence = SeqProp(id=ident, seq=seq)
         else:
             if not ident:
                 # Use ID from SeqRecord ID if new ID not provided
@@ -476,8 +489,8 @@ class Protein(Object):
             else:
                 # Overwrite SeqRecord ID with new ID if provided
                 seq.id = ident
+            manual_sequence = SeqProp(id=ident, seq=seq, name=seq.name, description=seq.description)
 
-        manual_sequence = SeqProp(id=ident, seq=seq)
         if write_fasta_file:
             manual_sequence.write_fasta_file(outfile=outfile, force_rerun=force_rewrite)
         self.sequences.append(manual_sequence)
@@ -710,10 +723,10 @@ class Protein(Object):
         log.info('{}: wrote all protein sequences to file'.format(outfile))
         return outfile
 
-    def get_sequence_properties(self, representative_only=True):
+    def get_sequence_properties(self, clean_seq=False, representative_only=True):
         """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
         Results are stored in the protein's respective SeqProp objects at ``.annotations``
-        
+
         Args:
             representative_only (bool): If analysis should only be run on the representative sequence
 
@@ -730,7 +743,7 @@ class Protein(Object):
                             'Cannot get sequence properties.'.format(self.id, self.representative_sequence.id))
                 return
 
-            self.representative_sequence.get_biopython_pepstats()
+            self.representative_sequence.get_biopython_pepstats(clean_seq=clean_seq)
             self.representative_sequence.get_emboss_pepstats()
 
         if not representative_only:
@@ -742,7 +755,7 @@ class Protein(Object):
                     continue
 
                 else:
-                    s.get_biopython_pepstats()
+                    s.get_biopython_pepstats(clean_seq=clean_seq)
                     s.get_emboss_pepstats()
 
     def get_sequence_sliding_window_properties(self, scale, window, representative_only=True):
@@ -1335,7 +1348,7 @@ class Protein(Object):
 
         Todo:
             * Document **kwargs for alignment options
-            
+
         """
 
         if not outdir:
@@ -1591,8 +1604,11 @@ class Protein(Object):
             if not seqprop or not structprop or not chain_id:
                 raise ValueError('Please specify sequence, structure, and chain ID')
 
-        if structprop.id == self.representative_structure.id:
-            full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
+        if self.representative_structure:
+            if structprop.id == self.representative_structure.id:
+                full_structure_id = '{}-{}'.format(structprop.id, chain_id).replace('REP-', '')
+            else:
+                full_structure_id = '{}-{}'.format(structprop.id, chain_id)
         else:
             full_structure_id = '{}-{}'.format(structprop.id, chain_id)
 
@@ -1732,6 +1748,10 @@ class Protein(Object):
             resnum = int(resnum)
 
             struct_res_singleaa = structprop.chains.get_by_id(chain_id).seq_record[resnum - 1]
+            if resnum not in seqprop.letter_annotations[access_key]:
+                log.warning('{}-{} -> {}: unable to map residue {} from structure to sequence, '
+                            'skipping'.format(structprop.id, chain_id, seqprop.id, resnum))
+                continue
             sp_idx = seqprop.letter_annotations[access_key].index(resnum)
             seq_res_singleaa = seqprop[sp_idx]
             sp_resnum = sp_idx + 1
@@ -1773,7 +1793,7 @@ class Protein(Object):
         Args:
             seqprop (SeqRecord, SeqProp): SeqRecord or SeqProp object that has properties stored in its ``letter_annotations`` attribute
             property_key (str): Property key in the ``letter_annotations`` attribute that you want to filter using
-            property_value (str): Property value that you want to filter by
+            property_value (object): Property value that you want to filter by
             condition (str): ``<``, ``=``, ``>``, ``>=``, or ``<=`` to filter the values by
 
         Returns:
@@ -1796,7 +1816,9 @@ class Protein(Object):
         chain_subseq, subfeat_resnums = chain_prop.get_subsequence_from_property(property_key=property_key,
                                                                                  property_value=property_value,
                                                                                  condition=condition,
-                                                                                 return_resnums=True)
+                                                                                 return_resnums=True) or (None, [])
+        if not chain_subseq:
+            return
 
         # Map subsequence feature resnums back to the seqprop
         mapping_dict = self.map_structprop_resnums_to_seqprop_resnums(resnums=subfeat_resnums, structprop=structprop,
@@ -1804,23 +1826,21 @@ class Protein(Object):
                                                                       seqprop=seqprop,
                                                                       use_representatives=use_representatives)
 
-        seqprop_resnums = []
-        # Now create a new SeqProp using these resnums
-        biop_compound_list = []
-        for structprop_resnum, seqprop_resnum in mapping_dict.items():
-            feat = FeatureLocation(seqprop_resnum - 1, seqprop_resnum)
-            biop_compound_list.append(feat)
+        sub_id = '{}-{}->{}_{}_{}_{}_extracted'.format(structprop.id, chain_id, seqprop.id,
+                                                       property_key, condition, property_value)
+        seqprop_resnums = [v for k,v in mapping_dict.items()]
 
-            if return_resnums:
-                seqprop_resnums.append(seqprop_resnum)
+        new_sp = seqprop.get_subsequence(resnums=seqprop_resnums, new_id=sub_id, copy_letter_annotations=False)
 
-        sub_feature_location = CompoundLocation(biop_compound_list)
-        sub_feature = sub_feature_location.extract(seqprop)
+        if not new_sp:  # XTODO: investigate errors from subsequence extraction..
+            return
 
-        new_sp = SeqProp(id='{}-{}->{}_{}_{}_{}_extracted'.format(structprop.id, chain_id, seqprop.id,
-                                                                  property_key, condition, property_value),
-                         seq=sub_feature)
-        new_sp.letter_annotations = chain_subseq.letter_annotations
+        try:
+            new_sp.letter_annotations = chain_subseq.letter_annotations
+        except TypeError:
+            # If the length of the mapped sequence does not match, log a warning and don't store letter_annotations
+            log.warning('{}: cannot store structure letter annotations in subsequence, lengths do not match. '
+                        'Likely a deletion or insertion within the structure!'.format(sub_id))
 
         if return_resnums:
             return new_sp, seqprop_resnums
@@ -2024,21 +2044,26 @@ class Protein(Object):
                                                      parse=True,
                                                      force_rerun=force_rerun)
                 except (PDBConstructionException, ExtraData, KeyError) as e:
-                    log.error('{}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(pdb, pdb_file_type))
+                    log.error('Protein {}, PDB {}: unable to parse structure file as {}. Falling back to mmCIF format.'.format(self.id, pdb, pdb_file_type))
                     print(e)
                     # Fall back to using mmCIF file if structure cannot be parsed
                     try:
                         pdb.download_structure_file(outdir=struct_outdir, file_type='mmCif',
                                                     force_rerun=force_rerun, load_header_metadata=True)
                     except (requests.exceptions.HTTPError, URLError):
-                        log.error('{}: structure file could not be downloaded'.format(pdb))
+                        log.error('Protein {}, PDB {}: structure file could not be downloaded'.format(self.id, pdb))
                         continue
-                    self.align_seqprop_to_structprop(seqprop=self.representative_sequence,
-                                                     structprop=pdb,
-                                                     outdir=seq_outdir,
-                                                     engine=engine,
-                                                     parse=True,
-                                                     force_rerun=force_rerun)
+                    try:
+                        self.align_seqprop_to_structprop(seqprop=self.representative_sequence,
+                                                         structprop=pdb,
+                                                         outdir=seq_outdir,
+                                                         engine=engine,
+                                                         parse=True,
+                                                         force_rerun=force_rerun)
+                    except (PDBConstructionException, KeyError) as e:
+                        log.error('Protein {}, PDB {}: unable to parse structure file as {}.'.format(self.id, pdb, 'mmCif'))
+                        print(e)
+                        continue
 
                 best_chain = self.find_representative_chain(seqprop=self.representative_sequence,
                                                             structprop=pdb,
@@ -2147,7 +2172,7 @@ class Protein(Object):
 
         Annotations are stored in the protein structure's chain sequence at:
         ``<chain_prop>.seq_record.letter_annotations['*-dssp']``
-            
+
         Args:
             representative_only (bool): If analysis should only be run on the representative structure
             force_rerun (bool): If calculations should be rerun even if an output file exists
@@ -2190,7 +2215,7 @@ class Protein(Object):
 
         Annotations are stored in the protein structure's chain sequence at:
         ``<chain_prop>.seq_record.letter_annotations['*-msms']``
-        
+
         Args:
             representative_only (bool): If analysis should only be run on the representative structure
             force_rerun (bool): If calculations should be rerun even if an output file exists
@@ -2255,7 +2280,7 @@ class Protein(Object):
 
         Annotations are stored in the protein structure's chain sequence at:
         ``<chain_prop>.seq_record.annotations['SSBOND-biopython']``
-        
+
         Args:
             representative_only (bool): If analysis should only be run on the representative structure
 
@@ -2383,7 +2408,7 @@ class Protein(Object):
                 }
 
             Here, we report which genes/strains have the specific combinations (or "fingerprints") of point mutations
-            
+
         Args:
             alignment_ids (str, list): Specified alignment ID or IDs to use
             alignment_type (str): Specified alignment type contained in the ``annotation`` field of an alignment object,
@@ -2838,6 +2863,14 @@ class Protein(Object):
                 setattr(self, k, v)
 
     def get_all_pdbflex_info(self):
+        """Gets ALL PDBFlex entries for all mapped structures, then stores the ones that match the repseq length
+
+        Ideas:
+            - maybe first check for quality of structure and then retrieve the pdbflex entry
+            - not sure which sequence is used in pdbflex
+
+        """
+        # XTODO: documentation
         log.debug('{}: representative sequence length'.format(self.representative_sequence.seq_len))
 
         for s in self.get_experimental_structures():
@@ -2888,3 +2921,588 @@ class Protein(Object):
                             '{}: existing PDB Flex RMSD already in representative sequence for PDB parent {}'.format(
                                 self.representative_sequence.id,
                                 parent))
+
+    ########################################################################################################
+    ########################################################################################################
+    # DEVELOPMENT CODE BELOW
+    # DEVELOPMENT CODE BELOW
+    # DEVELOPMENT CODE BELOW
+    # DEVELOPMENT CODE BELOW
+    ########################################################################################################
+    ########################################################################################################
+
+    def translate_features_to_letter_annotations(protein, more_sites=None):
+        """Store select uniprot features (sites) as letter annotations with the key as the
+        type of site and the values as a list of booleans"""
+        from ssbio.databases.uniprot import longname_sites
+        from collections import defaultdict
+
+        sites = longname_sites  ## longname_sites = ["active site", "binding site", "metal ion-binding site", "site"]
+        sites.append('nucleotide phosphate-binding region')
+        sites.append('DNA-binding region')
+        sites.append('intramembrane region')
+        sites.append("transmembrane region")
+        sites.append("catalyticResidue")
+
+        ## ADD MORE IF YOU WANT
+        if more_sites:
+            more_sites = ssbio.utils.force_list(more_sites)
+            sites.extend(more_sites)
+
+        sites = list(set(sites))
+
+        for site in sites:
+            protein.representative_sequence.letter_annotations[site] = [False] * protein.representative_sequence.seq_len
+
+        to_store = defaultdict(list)
+        for f in protein.representative_sequence.features:
+            if f.type in sites:
+                to_store[f.type].append(f)
+
+        for site, feature in to_store.items():
+            try:
+                positions = [int(f.location.start) for f in feature]
+            except TypeError:
+                log.error('Protein {}, SeqProp {}: unable to translate feature {} into letter annotation'.format(protein.id, protein.representative_sequence.id, site))
+                continue
+            feat_letter_anno = []
+            for x in range(protein.representative_sequence.seq_len):
+                if x in positions:
+                    idx = positions.index(x)
+                    if 'description' in feature[idx].qualifiers:
+                        feat_letter_anno.append(feature[idx].qualifiers['description'])
+                    else:
+                        feat_letter_anno.append(True)
+                else:
+                    feat_letter_anno.append(False)
+            protein.representative_sequence.letter_annotations[site] = feat_letter_anno
+
+    def get_generic_subseq_2D(protein, cutoff, prop, condition):
+        """Get a subsequence from REPSEQ based on a property stored in REPSEQ.letter_annotations"""
+        subseq, subseq_resnums = protein.representative_sequence.get_subsequence_from_property(property_key=prop,
+                                                                                               property_value=cutoff,
+                                                                                               condition=condition,
+                                                                                               return_resnums=True) or (
+                                     None, [])
+
+        return {'subseq_len': len(subseq_resnums), 'subseq': subseq, 'subseq_resnums': subseq_resnums}
+
+    def get_generic_subseq_3D(protein, cutoff, prop, condition):
+        """Get a subsequence from REPSEQ based on a property stored in REPSTRUCT.REPCHAIN.letter_annotations"""
+        if not protein.representative_structure:
+            log.error('{}: no representative structure, cannot search for subseq'.format(protein.id))
+            return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        subseq, subseq_resnums = protein.get_seqprop_subsequence_from_structchain_property(property_key=prop,
+                                                                                           property_value=cutoff,
+                                                                                           condition=condition,
+                                                                                           use_representatives=True,
+                                                                                           return_resnums=True) or (
+                                 None, [])
+
+        return {'subseq_len': len(subseq_resnums), 'subseq': subseq, 'subseq_resnums': subseq_resnums}
+
+    def get_generic_subseq_within_2_5D(protein, prop_name, within, filter_resnums=None):
+        """Get a subsequence from REPSEQ based on a feature stored in REPSEQ and within the set distance in REPSTRUCT.REPCHAIN.
+        If there are multiple sites within the feature, they are first searched separately for residues within the distance,
+        then the residues are combined for the final output.
+        """
+        from ssbio.biopython.Bio.Struct.Geometry import center_of_mass
+        sites = list(set(protein.representative_sequence.letter_annotations[prop_name]))
+        sites.remove(False)
+
+        if len(sites) > 0:
+            log.debug(
+                '{} unique {} sites to find subsequence within {} angstroms of'.format(len(sites), prop_name, within))
+            ps = protein.representative_structure.parse_structure()
+
+            all_subseq_resnums = []
+            for site in sites:
+                site_binding_residues, site_binding_resnums = protein.representative_sequence.get_subsequence_from_property(
+                    property_key=prop_name,
+                    property_value=site, condition='=', return_resnums=True)
+                mapping_to_structure_resnums = protein.map_seqprop_resnums_to_structprop_resnums(
+                    resnums=site_binding_resnums,
+                    use_representatives=True)
+                all_residues = []
+                for resnum in mapping_to_structure_resnums:
+                    try:
+                        target_residue = ps.first_model[protein.representative_chain][resnum]
+                    except KeyError:
+                        log.error('Protein {}, RepStruct {}-{}: cannot find resnum {}, not including in list of '
+                                  'residues to find center of mass'.format(protein.id,
+                                                                           protein.representative_structure.id,
+                                                                           protein.representative_chain, resnum))
+                        continue
+                    all_residues.append(target_residue)
+                if not all_residues:
+                    log.error('{}->{}-{}: unable to map resnums to structure'.format(site_binding_resnums,
+                                                                                     protein.representative_structure.id,
+                                                                                     protein.representative_chain))
+                    continue
+                coords = center_of_mass(all_residues, geometric=True)
+                log.debug('{}: center of mass of site {}'.format(coords, site))
+                subseq, subseq_resnums = protein.representative_structure.get_seqprop_within(
+                    chain_id=protein.representative_chain,
+                    angstroms=within, resnum=None,
+                    custom_coord=coords, return_resnums=True)
+                log.debug('{}: structure resnums within {} of site {} (resnums {})'.format(subseq_resnums, within, site,
+                                                                                           site_binding_resnums))
+                all_subseq_resnums.extend(subseq_resnums)
+        else:
+            log.debug('No {} sites'.format(prop_name))
+            return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        # Combine and filter the site binding site residue numbers (if desired)
+        if filter_resnums:
+            all_subseq_resnums = list(set(all_subseq_resnums).intersection(filter_resnums))
+        else:
+            all_subseq_resnums = list(set(all_subseq_resnums))
+
+        # Get the chain subseq so we can save letter annotations later
+        chain_subseq = protein.get_representative_chain.get_subsequence(all_subseq_resnums)
+
+        # Now get the subsequence of the repseq and return it
+        mapping_dict = protein.map_structprop_resnums_to_seqprop_resnums(resnums=all_subseq_resnums,
+                                                                         structprop=protein.representative_structure,
+                                                                         chain_id=protein.representative_chain,
+                                                                         seqprop=protein.representative_sequence)
+        sub_id = '{}-{}->{}_within_{}_{}_extracted'.format(protein.representative_structure.id,
+                                                           protein.representative_chain,
+                                                           protein.representative_sequence.id,
+                                                           within, prop_name)
+        seqprop_resnums = [v for k, v in mapping_dict.items()]
+        new_sp = protein.representative_sequence.get_subsequence(resnums=seqprop_resnums, new_id=sub_id,
+                                                                 copy_letter_annotations=False)
+        try:
+            new_sp.letter_annotations = chain_subseq.letter_annotations
+        except (AttributeError, TypeError):
+            log.error('Protein {}, StructProp {}-{}: unable to copy chain subseq letter annotations'.format(protein.id,
+                                                                                                            protein.representative_structure.id,
+                                                                                                            protein.representative_chain))
+
+        return {'subseq_len': len(seqprop_resnums), 'subseq': new_sp, 'subseq_resnums': seqprop_resnums}
+
+    def get_combo_subseq_within_2_5D(protein, props, within, filter_resnums=None):
+        """Get a subsequence from REPSEQ based on multiple features stored in REPSEQ and within the set distance in REPSTRUCT.REPCHAIN"""
+        if not protein.representative_structure:
+            log.error('{}: no representative structure, cannot search for subseq'.format(protein.id))
+            return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        all_resnums = []
+        for prop in props:
+            tmp_results = protein.get_generic_subseq_within_2_5D(prop_name=prop, within=within,
+                                                         filter_resnums=filter_resnums)
+            all_resnums.extend(tmp_results['subseq_resnums'])
+        final_resnums = list(set(all_resnums))
+        sub_id = '{}-{}->{}_within_{}_{}_extracted'.format(protein.representative_structure.id,
+                                                           protein.representative_chain,
+                                                           protein.representative_sequence.id,
+                                                           within, props)
+        new_sp = protein.representative_sequence.get_subsequence(resnums=final_resnums, new_id=sub_id,
+                                                                 copy_letter_annotations=False)
+        return {'subseq_len': len(final_resnums), 'subseq': new_sp, 'subseq_resnums': final_resnums}
+
+    def get_surface_subseq_3D(protein,
+                              depth_prop='RES_DEPTH-msms', depth_cutoff=2.5, depth_condition='<',
+                              acc_prop='RSA_ALL-freesasa_het', acc_cutoff=25, acc_condition='>'):
+        """SURFACE 3D = NOTDEEP + ACC"""
+        empty = {'surface_3D': {'subseq_len'    : 0, 'subseq': None,
+                                   'subseq_resnums': []},
+                    'notdeep_3D': {'subseq_len'    : 0, 'subseq': None,
+                                   'subseq_resnums': []},
+                    'acc_3D'    : {'subseq_len'    : 0, 'subseq': None,
+                                   'subseq_resnums': []}}
+        if not protein.representative_structure:
+            log.error('{}: no representative structure, cannot search for subseq'.format(protein.id))
+            return empty
+
+        notdeep_subseq, notdeep_subseq_resnums = protein.get_seqprop_subsequence_from_structchain_property(
+            property_key=depth_prop,
+            property_value=depth_cutoff,
+            condition=depth_condition,
+            use_representatives=True,
+            return_resnums=True) or (None, [])
+
+        acc_subseq, acc_subseq_resnums = protein.get_seqprop_subsequence_from_structchain_property(
+            property_key=acc_prop,
+            property_value=acc_cutoff,
+            condition=acc_condition,
+            use_representatives=True,
+            return_resnums=True) or (None, [])
+
+        surface_subseq_resnums = list(set(notdeep_subseq_resnums).intersection(acc_subseq_resnums))
+        surface_subseq = protein.representative_sequence.get_subsequence(surface_subseq_resnums)
+
+        all_info = {'surface_3D': {'subseq_len'    : len(surface_subseq_resnums), 'subseq': surface_subseq,
+                                   'subseq_resnums': surface_subseq_resnums},
+                    'notdeep_3D': {'subseq_len'    : len(notdeep_subseq_resnums), 'subseq': notdeep_subseq,
+                                   'subseq_resnums': notdeep_subseq_resnums},
+                    'acc_3D'    : {'subseq_len'    : len(acc_subseq_resnums), 'subseq': acc_subseq,
+                                   'subseq_resnums': acc_subseq_resnums}}
+        return all_info
+
+    def get_acc_subseq_2D(protein,
+                          acc_prop_2D='RSA-accpro20',
+                          acc_cutoff_2D=25,
+                          acc_condition_2D='>'):
+        return protein.get_generic_subseq_2D(cutoff=acc_cutoff_2D, prop=acc_prop_2D, condition=acc_condition_2D)
+
+    def get_disorder_subseq_2D(protein,
+                               disorder_prop_2D='disorder-hotloops-disembl',
+                               disorder_cutoff_2D=1,
+                               disorder_condition_2D='='):
+        return protein.get_generic_subseq_2D(prop=disorder_prop_2D, cutoff=disorder_cutoff_2D,
+                                             condition=disorder_condition_2D)
+
+    def get_disorder_subseq_3D(protein,
+                               pdbflex_keys_file,
+                               disorder_cutoff=2,
+                               disorder_condition='>'):
+        """DISORDERED REGION 3D"""
+        with open(pdbflex_keys_file, 'r') as f:
+            pdbflex_keys = json.load(f)
+
+        if protein.id not in pdbflex_keys:
+            log.warning('{}: no PDBFlex info available'.format(protein.id))
+            final_repseq_sub, final_repseq_sub_resnums = (None, [])
+
+        else:
+            # Gather disordered regions for all mapped PDBFlex keys -- gets maximum disorder
+            # TODO: should add option to do the opposite (get consensus disorder)
+            repseq_sub_resnums_all = []
+            for disorder_prop in pdbflex_keys[protein.id]:
+                repseq_sub_raw, repseq_sub_resnums_raw = protein.representative_sequence.get_subsequence_from_property(
+                        property_key=disorder_prop,
+                        property_value=disorder_cutoff,
+                        condition=disorder_condition,
+                        return_resnums=True) or (None, [])
+                repseq_sub_resnums_all.extend(repseq_sub_resnums_raw)
+
+            final_repseq_sub_resnums = list(set(repseq_sub_resnums_all))
+            final_repseq_sub = protein.representative_sequence.get_subsequence(resnums=final_repseq_sub_resnums)
+
+        return {'subseq_len'    : len(final_repseq_sub_resnums), 'subseq': final_repseq_sub,
+                'subseq_resnums': final_repseq_sub_resnums}
+
+    def get_secstruct_subseq_2D(protein, secstruct_code, secstruct_prop_2D='SS-sspro8', secstruct_condition_2D='='):
+        return protein.get_generic_subseq_2D(prop=secstruct_prop_2D,
+                                             cutoff=secstruct_code,
+                                             condition=secstruct_condition_2D)
+
+    def get_secstruct_subseq_3D(protein, secstruct_code, secstruct_prop_3D='SS-dssp', secstruct_condition_3D='='):
+        return protein.get_generic_subseq_3D(prop=secstruct_prop_3D,
+                                             cutoff=secstruct_code,
+                                             condition=secstruct_condition_3D)
+
+    def get_tm_subseq_2D(protein, tm_prop_2D='TM-tmhmm', tm_cutoff_2D='T', tm_condition_2D='='):
+        return protein.get_generic_subseq_2D(prop=tm_prop_2D,
+                                             cutoff=tm_cutoff_2D,
+                                             condition=tm_condition_2D)
+
+    def get_tm_subseq_3D(protein, tm_prop_3D='TM-gembrane', tm_cutoff_3D='T', tm_condition_3D='='):
+        return protein.get_generic_subseq_3D(prop=tm_prop_3D,
+                                             cutoff=tm_cutoff_3D,
+                                             condition=tm_condition_3D)
+
+    def get_metalbindingregion_subseq_3D(protein, within=6, use_metalpdb=False, use_uniprot_annotation=False,
+                                         use_uniprot_annotation_as_backup=True, get_only_exposed_residues=True,
+                                         acc_prop_3D='RSA_ALL-freesasa_het', acc_cutoff_3D=10, acc_condition_3D='>'):
+        from ssbio.biopython.Bio.Struct.Geometry import center_of_mass
+
+        if (use_metalpdb and use_uniprot_annotation) or (not use_metalpdb and not use_uniprot_annotation):
+            raise ValueError('One source of metals allowed')
+
+        if not protein.representative_structure:
+            log.error('{}: no representative structure, cannot search for metal binding region'.format(protein.id))
+            return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        # If you only want accesible metal binding residues, first get the list of accessible resnums
+        if get_only_exposed_residues:
+            filter_sp, filter_sp_resnums = protein.get_representative_chain.get_subsequence_from_property(
+                property_key=acc_prop_3D,
+                property_value=acc_cutoff_3D,
+                condition=acc_condition_3D,
+                return_resnums=True) or (None, [])
+
+        # Option 1: If there is a pre-set metal structure - get within X angstroms of metal cofactor resnum
+        if use_metalpdb:
+            original_structure_id = protein.representative_structure.original_structure_id
+            original_structure = protein.structures.get_by_id(original_structure_id)
+
+            if protein.representative_chain in protein.notes:
+                original_structure_chain_notes = protein.notes[protein.representative_chain]
+
+                log.debug('Using metals as found in PDB entry')
+
+                # Need to get the residue number of this metal from the original notes of this structure
+                resnums_to_get_within = list(original_structure_chain_notes.keys())
+                numsites = len(resnums_to_get_within)
+
+                # Parse structure to get the coordinates of the metals later
+                ps = original_structure.parse_structure()
+
+                # Now get subsequence within X ang of the center of the metals
+                all_subseq_resnums = []
+                for resname, resnum in resnums_to_get_within:
+                    try:
+                        target_residue = ps.first_model[protein.representative_chain][
+                            ('H_{}'.format(resname), int(resnum), ' ')]
+                    except KeyError:
+                        log.error('Protein {}, StructProp {}-{}: unable to find {}'.format(protein.id, original_structure_id, protein.representative_chain, ('H_{}'.format(resname), int(resnum), ' ')))
+                        continue
+
+                    # First get the center of this metal residue
+                    coords = center_of_mass(target_residue, geometric=True)
+                    # Then get subsequence within X angstroms using the REPSTRUCT -- we could use the original structure in the future..
+                    # TODO: add option to include original structure here, may get residues from other chains though, in which case
+                    # the within function actually needs to return chain_id + resnums, not just resnums
+                    subseq, subseq_resnums = protein.representative_structure.get_seqprop_within(
+                        chain_id=protein.representative_chain,
+                        angstroms=within, resnum=None,
+                        custom_coord=coords, return_resnums=True)
+                    all_subseq_resnums.extend(subseq_resnums)
+
+                if len(all_subseq_resnums) == 0:
+                    if use_uniprot_annotation_as_backup:
+                        log.debug('No metals found in PDB entry, checking if UniProt annotates metal binding sites')
+                        use_uniprot_annotation = True
+                    else:
+                        log.debug('No metals found in PDB entry')
+                        return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+            else:
+                if use_uniprot_annotation_as_backup:
+                    log.debug('No metals found in PDB entry, checking if UniProt annotates metal binding sites')
+                    use_uniprot_annotation = True
+                else:
+                    log.debug('No metals found in PDB entry')
+                    return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        # Option 2: If there is no pre-set metal structure, but metal binding residues annotated...
+        if use_uniprot_annotation:
+            metal_binding_sites = list(
+                set(protein.representative_sequence.letter_annotations['metal ion-binding site']))
+            metal_binding_sites.remove(False)
+
+            numsites = len(metal_binding_sites)
+            if numsites > 0:
+                log.debug('Using metal binding sites as annotated in UniProt')
+                ps = protein.representative_structure.parse_structure()
+
+                all_subseq_resnums = []
+                for metal in metal_binding_sites:
+                    metal_binding_residues, metal_binding_resnums = protein.representative_sequence.get_subsequence_from_property(
+                        property_key='metal ion-binding site',
+                        property_value=metal, condition='=', return_resnums=True)
+                    mapping_to_structure_resnums = protein.map_seqprop_resnums_to_structprop_resnums(
+                        resnums=metal_binding_resnums,
+                        use_representatives=True)
+                    all_residues = []
+                    for resnum in mapping_to_structure_resnums:
+                        try:
+                            target_residue = ps.first_model[protein.representative_chain][resnum]
+                        except KeyError:
+                            log.error('Protein {}, StructProp {}-{}: unable to find {}'.format(protein.id,
+                                                                                               protein.representative_structure.id,
+                                                                                               protein.representative_chain,
+                                                                                               resnum))
+                            continue
+                        all_residues.append(target_residue)
+                    if not all_residues:
+                        log.error('{}->{}-{}: unable to map resnums to structure'.format(metal_binding_resnums,
+                                                                                        protein.representative_structure.id,
+                                                                                        protein.representative_chain))
+                        continue
+                    coords = center_of_mass(all_residues, geometric=True)
+                    subseq, subseq_resnums = protein.representative_structure.get_seqprop_within(
+                        chain_id=protein.representative_chain,
+                        angstroms=within, resnum=None,
+                        custom_coord=coords, return_resnums=True)
+                    all_subseq_resnums.extend(subseq_resnums)
+            else:
+                log.debug('No metal binding sites')
+                return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        # Combine and filter the metal binding site residue numbers for only accessible ones (if desired)
+        if get_only_exposed_residues:
+            all_subseq_resnums = list(set(all_subseq_resnums).intersection(filter_sp_resnums))
+        else:
+            all_subseq_resnums = list(set(all_subseq_resnums))
+
+        # Get the chain subseq so we can save letter annotations later
+        chain_subseq = protein.get_representative_chain.get_subsequence(all_subseq_resnums)
+
+        # Now get the subsequence of the repseq and return it
+        mapping_dict = protein.map_structprop_resnums_to_seqprop_resnums(resnums=all_subseq_resnums,
+                                                                         structprop=protein.representative_structure,
+                                                                         chain_id=protein.representative_chain,
+                                                                         seqprop=protein.representative_sequence)
+        sub_id = '{}-{}->{}_within_{}_{}metalsites_extracted'.format(protein.representative_structure.id,
+                                                                  protein.representative_chain,
+                                                                  protein.representative_sequence.id,
+                                                                  within, numsites)
+        seqprop_resnums = [v for k, v in mapping_dict.items()]
+        new_sp = protein.representative_sequence.get_subsequence(resnums=seqprop_resnums, new_id=sub_id,
+                                                                 copy_letter_annotations=False)
+        try:
+            new_sp.letter_annotations = chain_subseq.letter_annotations
+        except (AttributeError, TypeError):
+            log.error('Protein {}, StructProp {}-{}: unable to copy chain subseq letter annotations'.format(protein.id, protein.representative_structure.id, protein.representative_chain))
+        return {'subseq_len': len(seqprop_resnums), 'subseq': new_sp, 'subseq_resnums': seqprop_resnums}
+
+    def get_allsitesunip_2_5D(protein, within):
+        SITEUNIP_PROPS_2_5D = ['active site', 'binding site', 'site']
+        return protein.get_combo_subseq_within_2_5D(props=SITEUNIP_PROPS_2_5D, within=within)
+
+    def get_dnasitesunip_2_5D(protein, within):
+        DNASITEUNIP_PROPS_2_5D = ['nucleotide phosphate-binding region', 'DNA-binding region']
+        return protein.get_combo_subseq_within_2_5D(props=DNASITEUNIP_PROPS_2_5D, within=within)
+
+    def get_csa_2_5D(protein, within, get_only_exposed_residues=True,
+                     acc_prop_3D='RSA_ALL-freesasa_het', acc_cutoff_3D=10, acc_condition_3D='>'):
+        if not protein.representative_structure:
+            log.error('{}: no representative structure, cannot search for csa region'.format(protein.id))
+            return {'subseq_len': 0, 'subseq': None, 'subseq_resnums': []}
+
+        # If you only want accesible metal binding residues, first get the list of accessible resnums
+        if get_only_exposed_residues:
+            filter_sp, filter_sp_resnums = protein.get_representative_chain.get_subsequence_from_property(
+                    property_key=acc_prop_3D,
+                    property_value=acc_cutoff_3D,
+                    condition=acc_condition_3D,
+                    return_resnums=True) or (None, [])
+            if filter_sp_resnums:
+                return protein.get_generic_subseq_within_2_5D(prop_name='catalyticResidue', within=within,
+                                                          filter_resnums=filter_sp_resnums)
+            else:
+                log.error('Cant find accessible residues for CSA, just getting within')
+                return protein.get_generic_subseq_within_2_5D(prop_name='catalyticResidue', within=within)
+        else:
+            return protein.get_generic_subseq_within_2_5D(prop_name='catalyticResidue', within=within)
+
+    def get_all_subsequences(protein, pdbflex_keys_file, cat_or_metal_within=6, other_sites_within=7):
+        all_subsequences = {}
+
+        if not protein.representative_sequence:
+            log.error('Protein {}: no representative sequence stored, no subsequences to get'.format(protein.id))
+            return
+
+        protein.translate_features_to_letter_annotations()
+
+        surf_acc_depth_3D = protein.get_surface_subseq_3D()
+        all_subsequences['surface_3D'] = surf_acc_depth_3D['surface_3D']
+        all_subsequences['notdeep_3D'] = surf_acc_depth_3D['notdeep_3D']
+        all_subsequences['acc_3D'] = surf_acc_depth_3D['acc_3D']
+
+        all_subsequences['acc_2D'] = protein.get_acc_subseq_2D()
+
+        all_subsequences['ss_disorder_2D'] = protein.get_secstruct_subseq_2D(secstruct_code=['C', 'S', 'T'],
+                                                                             secstruct_condition_2D='in')
+        all_subsequences['ss_disorder_3D'] = protein.get_secstruct_subseq_3D(secstruct_code=['C', 'S', 'T', '-'],
+                                                                             secstruct_condition_3D='in')
+
+        all_subsequences['disorder_2D'] = protein.get_disorder_subseq_2D()
+        all_subsequences['disorder_3D'] = protein.get_disorder_subseq_3D(pdbflex_keys_file=pdbflex_keys_file)
+
+        all_subsequences['tm_2D'] = protein.get_tm_subseq_2D()
+        # all_subsequences['tm_3D'] = protein.get_tm_subseq_3D()
+
+        all_subsequences['metal_3D'] = protein.get_metalbindingregion_subseq_3D(within=cat_or_metal_within,
+                                                                                use_metalpdb=True,
+                                                                                use_uniprot_annotation=False,
+                                                                                use_uniprot_annotation_as_backup=False,
+                                                                                get_only_exposed_residues=True)
+        all_subsequences['metal_2_5D'] = protein.get_metalbindingregion_subseq_3D(within=cat_or_metal_within,
+                                                                                  use_metalpdb=False,
+                                                                                  use_uniprot_annotation=True,
+                                                                                  use_uniprot_annotation_as_backup=True,
+                                                                                  get_only_exposed_residues=True)
+        all_subsequences['csa_2_5D'] = protein.get_csa_2_5D(within=cat_or_metal_within, get_only_exposed_residues=True)
+        all_subsequences['sites_2_5D'] = protein.get_allsitesunip_2_5D(within=other_sites_within)
+        all_subsequences['dna_2_5D'] = protein.get_dnasitesunip_2_5D(within=other_sites_within)
+
+        return all_subsequences
+
+    def get_all_disorder_predictions(self, iupred_path='/home/nathan/software/iupred/',
+                                          iupred_exec='iupred', disembl_cmd='/home/nathan/software/DisEMBL-1.4/DisEMBL.py',
+                                     representative_only=True):
+        """Run Biopython ProteinAnalysis and EMBOSS pepstats to summarize basic statistics of the protein sequences.
+        Results are stored in the protein's respective SeqProp objects at ``.annotations``
+
+        Args:
+            representative_only (bool): If analysis should only be run on the representative sequence
+
+        """
+        if representative_only:
+            # Check if a representative sequence was set
+            if not self.representative_sequence:
+                log.warning('{}: no representative sequence set, cannot get disorder properties'.format(self.id))
+                return
+
+            # Also need to check if a sequence has been stored
+            if not self.representative_sequence.seq:
+                log.warning('{}: representative sequence {} set, but no sequence stored. '
+                            'Cannot get disorder properties.'.format(self.id, self.representative_sequence.id))
+                return
+
+            # self.representative_sequence.store_iupred_disorder_predictions(iupred_path=iupred_path,
+            #                                                                iupred_exec=iupred_exec,
+            #                                                                prediction_type='long')
+            # self.representative_sequence.store_iupred_disorder_predictions(iupred_path=iupred_path,
+            #                                                                iupred_exec=iupred_exec,
+            #                                                                prediction_type='short')
+            self.representative_sequence.store_disembl_disorder_predictions(disembl_cmd=disembl_cmd)
+
+        if not representative_only:
+            for s in self.sequences:
+                # Need to check if a sequence has been stored
+                if not s.seq:
+                    log.warning('{}: no sequence stored. '
+                                'Cannot get disorder properties.'.format(s.id))
+                    continue
+
+                else:
+                    # s.store_iupred_disorder_predictions(iupred_path=iupred_path,
+                    #                                     iupred_exec=iupred_exec,
+                    #                                     prediction_type='long')
+                    # s.store_iupred_disorder_predictions(iupred_path=iupred_path,
+                    #                                     iupred_exec=iupred_exec,
+                    #                                     prediction_type='short')
+                    s.store_disembl_disorder_predictions(disembl_cmd=disembl_cmd)
+
+
+    def get_subseq_props(protein, property_dict, property_name, seqprop):
+        from ssbio.protein.sequence.properties.residues import _aa_property_dict_one
+        if seqprop.id == protein.representative_sequence.id:
+            strain_sub = property_dict['subseq']
+        else:
+            subseq_resnums = property_dict['subseq_resnums']
+            strain_sub_resnum_mapping = protein.map_seqprop_resnums_to_seqprop_resnums(resnums=subseq_resnums,
+                                                                                       seqprop1=protein.id,
+                                                                                       # Strain alignments used this
+                                                                                       seqprop2=seqprop.id)
+            strain_sub_resnums = list(strain_sub_resnum_mapping.values())
+            strain_sub = seqprop.get_subsequence(strain_sub_resnums)
+
+        subseq_infodict = {}
+        if not strain_sub:
+            return subseq_infodict
+
+        strain_sub.get_biopython_pepstats()
+
+        if 'amino_acids_content-biop' not in strain_sub.annotations:
+            return subseq_infodict
+
+        # aa_count
+        subseq_infodict.update({'{}_aa_count_{}'.format(property_name, k): v for k, v in
+                                strain_sub.annotations['amino_acids_content-biop'].items()})
+
+        # # aa_count_charged
+        # subseq_infodict['{}_aa_count_charged'.format(property_name)] = sum(
+        #         [v for k, v in strain_sub.annotations['amino_acids_content-biop'].items() if
+        #          k in _aa_property_dict_one['Charged']])
+
+        # aa_count_total
+        subseq_infodict['{}_aa_count_total'.format(property_name)] = strain_sub.seq_len
+
+        return subseq_infodict
