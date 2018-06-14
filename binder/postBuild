@@ -52,9 +52,9 @@ ln -s $HOME/software/freesasa/freesasa-2.0.2/src/freesasa /srv/venv/bin/freesasa
 # ln -s $HOME/software/scratch/SCRATCH-1D_1.1/bin/run_SCRATCH-1D_predictors.sh /srv/venv/bin/scratch
 
 # Install FATCAT
-mkdir ~/software/fatcat
-cd ~/software/fatcat
-wget http://source.rcsb.org/download/protein-comparison-tool_20150211.tar.gz
-tar -zxf protein-comparison-tool_20150211.tar.gz
-cd biojava-protein-comparison-tool-4.0.0
-ln -s $HOME/software/fatcat/biojava-protein-comparison-tool-4.0.0/runFATCAT.sh /srv/venv/bin/fatcat
+# mkdir ~/software/fatcat
+# cd ~/software/fatcat
+# wget http://source.rcsb.org/download/protein-comparison-tool_20150211.tar.gz
+# tar -zxf protein-comparison-tool_20150211.tar.gz
+# cd biojava-protein-comparison-tool-4.0.0
+# ln -s $HOME/software/fatcat/biojava-protein-comparison-tool-4.0.0/runFATCAT.sh /srv/venv/bin/fatcat
