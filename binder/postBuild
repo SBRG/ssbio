@@ -22,7 +22,7 @@ mkdir ~/software/msms
 cd ~/software/msms
 wget http://mgltools.scripps.edu/downloads/tars/releases/MSMSRELEASE/REL2.6.1/msms_i86_64Linux2_2.6.1.tar.gz
 tar -zxf msms_i86_64Linux2_2.6.1.tar.gz
-ln -s $HOME/software/msms/msms.x86_64Linux2.2.6.1 /srv/venv/bin/msms
+# ln -s $HOME/software/msms/msms.x86_64Linux2.2.6.1 /srv/venv/bin/msms
 
 # Install STRIDE
 # mkdir ~/software/stride
@@ -40,7 +40,7 @@ tar -zxf freesasa-2.0.3.tar.gz
 cd freesasa-2.0.3
 ./configure --disable-json --disable-xml
 make
-ln -s $HOME/software/freesasa/freesasa-2.0.3/src/freesasa /srv/venv/bin/freesasa
+# ln -s $HOME/software/freesasa/freesasa-2.0.3/src/freesasa /srv/venv/bin/freesasa
 
 # Install SCRATCH
 # mkdir ~/software/scratch
