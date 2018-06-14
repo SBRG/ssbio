@@ -526,11 +526,11 @@ class PCAMultiROS():
 
         self.principal_df = principal_df
         self.pca = pca
-        self.principal_observations_df = self.principal_df.join(self.observations_df, how='inner')
-
-        # Make iterable list of markers
-        mks = itertools.cycle(["<", "+", "o", 'D', 'x', '^', '*', '8', 's', 'p', 'v', 'X', '_', 'h'])
-        self.markers = [next(mks) for i in range(len(self.principal_observations_df[self.observation_colname].unique()))]
+        # self.principal_observations_df = self.principal_df.join(self.observations_df, how='inner')
+        #
+        # # Make iterable list of markers
+        # mks = itertools.cycle(["<", "+", "o", 'D', 'x', '^', '*', '8', 's', 'p', 'v', 'X', '_', 'h'])
+        # self.markers = [next(mks) for i in range(len(self.principal_observations_df[self.observation_colname].unique()))]
 
     def make_biplot(self, pc_x=1, pc_y=2, outpath=None, dpi=150, custom_markers=None, custom_order=None):
         if not custom_order:
@@ -995,6 +995,103 @@ def run_all(protgroup, memornot, subsequences, observation, proteomescale, base_
             if ks_worst_pval != -1 and skew_worst_pval != -1:
                 with open(statfile_duo, 'a') as f:
                     f.write(str((protgroup, memornot, subsequences, observation, proteomescale)) + '\t' + str(ks_worst_pval) + '\t' + str(skew_worst_pval) + '\n')
+
+
+def run_all2(protgroup, memornot, subsequences, base_outdir,
+            protgroup_dict, protein_feathers_dir, date, errfile, impute_counts=True,
+            cutoff_num_proteins=0, core_only_genes=None,
+            length_filter_pid=.8, remove_correlated_feats=True,
+            force_rerun_counts=False, force_rerun_percentages=False, force_rerun_pca=False):
+    """run_all but ignoring observations before pca"""
+    import ssbio.utils
+
+    # Need to set multiprocessing limit for scipy/numpy stuff if parallelizing anything
+    import os
+    os.environ['OMP_NUM_THREADS'] = '1'
+
+    # First, filter down the protein group to the membrane/nonmembrane definition
+    prots_filtered_feathers = get_protein_feather_paths(protgroup=protgroup, memornot=memornot,
+                                                        protgroup_dict=protgroup_dict,
+                                                        protein_feathers_dir=protein_feathers_dir,
+                                                        core_only_genes=core_only_genes)
+    num_proteins = len(prots_filtered_feathers)
+    if num_proteins <= cutoff_num_proteins:
+        return
+
+    # Make output directories
+    protscale = 'proteome_unscaled'
+    outdir_d0 = ssbio.utils.make_dir(op.join(base_outdir, protscale))
+    outdir_d1 = ssbio.utils.make_dir(op.join(outdir_d0, '-'.join(memornot)))
+    outdir_final = ssbio.utils.make_dir(op.join(outdir_d1, '-'.join(protgroup)))
+
+    if impute_counts:
+        big_strain_counts_df = get_proteome_counts_impute_missing(prots_filtered_feathers=prots_filtered_feathers,
+                                                                  outpath=op.join(outdir_final,
+                                                                                  '{}-subsequence_proteome_IMP.fthr'.format(
+                                                                                      date)),
+                                                                  length_filter_pid=length_filter_pid,
+                                                                  force_rerun=force_rerun_counts)
+
+        big_strain_percents_df = get_proteome_percentages(counts_df=big_strain_counts_df,
+                                                          outpath=op.join(outdir_final,
+                                                                          '{}-subsequence_proteome_perc_IMP.fthr'.format(
+                                                                                  date)),
+                                                          force_rerun=force_rerun_percentages)
+        pca_pickle = op.join(outdir_final, '{}-subsequence_pca.pckl'.format(date))
+    # Divide by totals to get percentages in a new dataframe
+    else:
+        try:
+            big_strain_percents_df = get_proteome_correct_percentages(prots_filtered_feathers=prots_filtered_feathers,
+                                                                      outpath=op.join(outdir_final,
+                                                                                      '{}-subsequence_proteome_perc_AVG.fthr'.format(
+                                                                                              date)),
+                                                                      length_filter_pid=length_filter_pid,
+                                                                      force_rerun=force_rerun_percentages)
+            pca_pickle = op.join(outdir_final, '{}-subsequence_pca_AVG.pckl'.format(date))
+        except:
+            with open(errfile, "a") as myfile:
+                myfile.write('PERCENTAGES ERR: ' + '-'.join(memornot) + '\t' + '-'.join(protgroup) + "\n")
+            return
+
+
+
+    if ssbio.utils.force_rerun(flag=force_rerun_pca, outfile=pca_pickle):
+
+        # Then, get filters for rows of the loaded feathers for interested subsequences
+        keep_subsequences = get_interested_subsequences(subsequences=subsequences)
+
+        # Some numbers: number of features
+        num_feats = len(big_strain_percents_df)
+
+        # Make an unwieldy title
+        big_title = 'LOC={0}; PROTGROUP={1};\n' \
+                    'NUMPROTS={2}; NUMFEATS={3}'.format('-'.join(memornot),
+                                                                        '-'.join(protgroup),
+                                                                        num_proteins,
+                                                                        num_feats)
+
+        # Run PCA and make plots
+        runner = PCAMultiROS(features_df=big_strain_percents_df, observations_df=pd.DataFrame(), plot_title=big_title)
+        try:
+            runner.clean_data(keep_features=keep_subsequences, remove_correlated_feats=remove_correlated_feats)
+        except:
+            with open(errfile, "a") as myfile:
+                myfile.write(
+                    'CLEAN ERR: ' + '-'.join(memornot) + '\t' + '-'.join(protgroup) + "\n")
+            return
+        # try:
+        runner.run_pca()
+        # except:
+        #     with open(errfile, "a") as myfile:
+        #         myfile.write(
+        #             'PCA ERR: ' + '-'.join(memornot) + '\t' + '-'.join(protgroup) + "\n")
+        #     return
+        with open(pca_pickle, 'wb') as f:
+            pickle.dump(runner, f)
+    else:
+        with open(pca_pickle, 'rb') as f:
+            runner = pickle.load(f)
+
 
 def run_all_simple(protgroup, memornot, subsequences, observation, protgroup_dict, protein_feathers_dir, observation_dict, statfile, cutoff_num_proteins=0):
 
