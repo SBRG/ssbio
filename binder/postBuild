@@ -25,12 +25,12 @@ tar -zxf msms_i86_64Linux2_2.6.1.tar.gz
 ln -s $HOME/software/msms/msms.x86_64Linux2.2.6.1 /srv/venv/bin/msms
 
 # Install STRIDE
-mkdir ~/software/stride
-cd ~/software/stride
-wget http://webclu.bio.wzw.tum.de/stride/stride.tar.gz
-tar -zxf stride.tar.gz
-make
-ln -s $HOME/software/stride/stride /srv/venv/bin/stride
+# mkdir ~/software/stride
+# cd ~/software/stride
+# wget http://webclu.bio.wzw.tum.de/stride/stride.tar.gz
+# tar -zxf stride.tar.gz
+# make
+# ln -s $HOME/software/stride/stride /srv/venv/bin/stride
 
 # Install FreeSASA
 mkdir ~/software/freesasa
