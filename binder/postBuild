@@ -43,13 +43,13 @@ make
 ln -s $HOME/software/freesasa/freesasa-2.0.2/src/freesasa /srv/venv/bin/freesasa
 
 # Install SCRATCH
-mkdir ~/software/scratch
-cd ~/software/scratch
-wget http://download.igb.uci.edu/SCRATCH-1D_1.1.tar.gz
-tar -zxf SCRATCH-1D_1.1.tar.gz
-cd SCRATCH-1D_1.1
-perl install.pl
-ln -s $HOME/software/scratch/SCRATCH-1D_1.1/bin/run_SCRATCH-1D_predictors.sh /srv/venv/bin/scratch
+# mkdir ~/software/scratch
+# cd ~/software/scratch
+# wget http://download.igb.uci.edu/SCRATCH-1D_1.1.tar.gz
+# tar -zxf SCRATCH-1D_1.1.tar.gz
+# cd SCRATCH-1D_1.1
+# perl install.pl
+# ln -s $HOME/software/scratch/SCRATCH-1D_1.1/bin/run_SCRATCH-1D_predictors.sh /srv/venv/bin/scratch
 
 # Install FATCAT
 mkdir ~/software/fatcat
