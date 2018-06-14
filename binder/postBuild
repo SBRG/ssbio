@@ -35,12 +35,12 @@ ln -s $HOME/software/stride/stride /srv/venv/bin/stride
 # Install FreeSASA
 mkdir ~/software/freesasa
 cd ~/software/freesasa
-wget http://freesasa.github.io/freesasa-2.0.2.tar.gz
+wget http://freesasa.github.io/freesasa-2.0.3.tar.gz
 tar -zxf freesasa-2.0.2.tar.gz
 cd freesasa-2.0.2
 ./configure --disable-json --disable-xml
 make
-ln -s $HOME/software/freesasa/freesasa-2.0.2/src/freesasa /srv/venv/bin/freesasa
+ln -s $HOME/software/freesasa/freesasa-2.0.3/src/freesasa /srv/venv/bin/freesasa
 
 # Install SCRATCH
 # mkdir ~/software/scratch
