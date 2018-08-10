@@ -20,7 +20,6 @@ nbsphinx
 bcbio-gff
 biopandas
 more_itertools
-slugify
 bcbio-gff
 scipy
 pytest
