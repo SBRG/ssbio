@@ -1,0 +1,2003 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1991-08-01" modified="2018-07-18" version="208">
+<accession>P21964</accession>
+<accession>A8MPV9</accession>
+<accession>Q6IB07</accession>
+<accession>Q6ICE6</accession>
+<accession>Q9BWC7</accession>
+<name>COMT_HUMAN</name>
+<protein>
+<recommendedName>
+<fullName>Catechol O-methyltransferase</fullName>
+<ecNumber evidence="9 14">2.1.1.6</ecNumber>
+</recommendedName>
+</protein>
+<gene>
+<name type="primary">COMT</name>
+</gene>
+<organism>
+<name type="scientific">Homo sapiens</name>
+<name type="common">Human</name>
+<dbReference type="NCBI Taxonomy" id="9606"/>
+<lineage>
+<taxon>Eukaryota</taxon>
+<taxon>Metazoa</taxon>
+<taxon>Chordata</taxon>
+<taxon>Craniata</taxon>
+<taxon>Vertebrata</taxon>
+<taxon>Euteleostomi</taxon>
+<taxon>Mammalia</taxon>
+<taxon>Eutheria</taxon>
+<taxon>Euarchontoglires</taxon>
+<taxon>Primates</taxon>
+<taxon>Haplorrhini</taxon>
+<taxon>Catarrhini</taxon>
+<taxon>Hominidae</taxon>
+<taxon>Homo</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1991" name="DNA Cell Biol." volume="10" first="181" last="189">
+<title>Cloning and characterization of human placental catechol-O-methyltransferase cDNA.</title>
+<authorList>
+<person name="Lundstroem K."/>
+<person name="Salminen M."/>
+<person name="Jalanko A."/>
+<person name="Savolainen R."/>
+<person name="Ulmanen I."/>
+</authorList>
+<dbReference type="PubMed" id="1707278"/>
+<dbReference type="DOI" id="10.1089/dna.1991.10.181"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA]</scope>
+<source>
+<tissue>Placenta</tissue>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1991" name="Proc. Natl. Acad. Sci. U.S.A." volume="88" first="1416" last="1420">
+<title>Human catechol-O-methyltransferase: cloning and expression of the membrane-associated form.</title>
+<authorList>
+<person name="Bertocci B."/>
+<person name="Miggiano V."/>
+<person name="da Prada M."/>
+<person name="Dembic Z."/>
+<person name="Lahm H.-W."/>
+<person name="Malherbe P."/>
+</authorList>
+<dbReference type="PubMed" id="1847521"/>
+<dbReference type="DOI" id="10.1073/pnas.88.4.1416"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA]</scope>
+<scope>VARIANT SER-34</scope>
+</reference>
+<reference key="3">
+<citation type="journal article" date="1994" name="Eur. J. Biochem." volume="223" first="1049" last="1059">
+<title>Genomic organization of the human catechol O-methyltransferase gene and its expression from two distinct promoters.</title>
+<authorList>
+<person name="Tenhunen J."/>
+<person name="Salminen M."/>
+<person name="Lundstroem K."/>
+<person name="Kiviluoto T."/>
+<person name="Savolainen R."/>
+<person name="Ulmanen I."/>
+</authorList>
+<dbReference type="PubMed" id="8055944"/>
+<dbReference type="DOI" id="10.1111/j.1432-1033.1994.tb19083.x"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+</reference>
+<reference key="4">
+<citation type="submission" date="2008-09" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Li J.Y."/>
+<person name="Wang H.Y."/>
+<person name="Liu J."/>
+<person name="Liu F.J."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA]</scope>
+</reference>
+<reference key="5">
+<citation type="journal article" date="2004" name="Nat. Genet." volume="36" first="40" last="45">
+<title>Complete sequencing and characterization of 21,243 full-length human cDNAs.</title>
+<authorList>
+<person name="Ota T."/>
+<person name="Suzuki Y."/>
+<person name="Nishikawa T."/>
+<person name="Otsuki T."/>
+<person name="Sugiyama T."/>
+<person name="Irie R."/>
+<person name="Wakamatsu A."/>
+<person name="Hayashi K."/>
+<person name="Sato H."/>
+<person name="Nagai K."/>
+<person name="Kimura K."/>
+<person name="Makita H."/>
+<person name="Sekine M."/>
+<person name="Obayashi M."/>
+<person name="Nishi T."/>
+<person name="Shibahara T."/>
+<person name="Tanaka T."/>
+<person name="Ishii S."/>
+<person name="Yamamoto J."/>
+<person name="Saito K."/>
+<person name="Kawai Y."/>
+<person name="Isono Y."/>
+<person name="Nakamura Y."/>
+<person name="Nagahari K."/>
+<person name="Murakami K."/>
+<person name="Yasuda T."/>
+<person name="Iwayanagi T."/>
+<person name="Wagatsuma M."/>
+<person name="Shiratori A."/>
+<person name="Sudo H."/>
+<person name="Hosoiri T."/>
+<person name="Kaku Y."/>
+<person name="Kodaira H."/>
+<person name="Kondo H."/>
+<person name="Sugawara M."/>
+<person name="Takahashi M."/>
+<person name="Kanda K."/>
+<person name="Yokoi T."/>
+<person name="Furuya T."/>
+<person name="Kikkawa E."/>
+<person name="Omura Y."/>
+<person name="Abe K."/>
+<person name="Kamihara K."/>
+<person name="Katsuta N."/>
+<person name="Sato K."/>
+<person name="Tanikawa M."/>
+<person name="Yamazaki M."/>
+<person name="Ninomiya K."/>
+<person name="Ishibashi T."/>
+<person name="Yamashita H."/>
+<person name="Murakawa K."/>
+<person name="Fujimori K."/>
+<person name="Tanai H."/>
+<person name="Kimata M."/>
+<person name="Watanabe M."/>
+<person name="Hiraoka S."/>
+<person name="Chiba Y."/>
+<person name="Ishida S."/>
+<person name="Ono Y."/>
+<person name="Takiguchi S."/>
+<person name="Watanabe S."/>
+<person name="Yosida M."/>
+<person name="Hotuta T."/>
+<person name="Kusano J."/>
+<person name="Kanehori K."/>
+<person name="Takahashi-Fujii A."/>
+<person name="Hara H."/>
+<person name="Tanase T.-O."/>
+<person name="Nomura Y."/>
+<person name="Togiya S."/>
+<person name="Komai F."/>
+<person name="Hara R."/>
+<person name="Takeuchi K."/>
+<person name="Arita M."/>
+<person name="Imose N."/>
+<person name="Musashino K."/>
+<person name="Yuuki H."/>
+<person name="Oshima A."/>
+<person name="Sasaki N."/>
+<person name="Aotsuka S."/>
+<person name="Yoshikawa Y."/>
+<person name="Matsunawa H."/>
+<person name="Ichihara T."/>
+<person name="Shiohata N."/>
+<person name="Sano S."/>
+<person name="Moriya S."/>
+<person name="Momiyama H."/>
+<person name="Satoh N."/>
+<person name="Takami S."/>
+<person name="Terashima Y."/>
+<person name="Suzuki O."/>
+<person name="Nakagawa S."/>
+<person name="Senoh A."/>
+<person name="Mizoguchi H."/>
+<person name="Goto Y."/>
+<person name="Shimizu F."/>
+<person name="Wakebe H."/>
+<person name="Hishigaki H."/>
+<person name="Watanabe T."/>
+<person name="Sugiyama A."/>
+<person name="Takemoto M."/>
+<person name="Kawakami B."/>
+<person name="Yamazaki M."/>
+<person name="Watanabe K."/>
+<person name="Kumagai A."/>
+<person name="Itakura S."/>
+<person name="Fukuzumi Y."/>
+<person name="Fujimori Y."/>
+<person name="Komiyama M."/>
+<person name="Tashiro H."/>
+<person name="Tanigami A."/>
+<person name="Fujiwara T."/>
+<person name="Ono T."/>
+<person name="Yamada K."/>
+<person name="Fujii Y."/>
+<person name="Ozaki K."/>
+<person name="Hirao M."/>
+<person name="Ohmori Y."/>
+<person name="Kawabata A."/>
+<person name="Hikiji T."/>
+<person name="Kobatake N."/>
+<person name="Inagaki H."/>
+<person name="Ikema Y."/>
+<person name="Okamoto S."/>
+<person name="Okitani R."/>
+<person name="Kawakami T."/>
+<person name="Noguchi S."/>
+<person name="Itoh T."/>
+<person name="Shigeta K."/>
+<person name="Senba T."/>
+<person name="Matsumura K."/>
+<person name="Nakajima Y."/>
+<person name="Mizuno T."/>
+<person name="Morinaga M."/>
+<person name="Sasaki M."/>
+<person name="Togashi T."/>
+<person name="Oyama M."/>
+<person name="Hata H."/>
+<person name="Watanabe M."/>
+<person name="Komatsu T."/>
+<person name="Mizushima-Sugano J."/>
+<person name="Satoh T."/>
+<person name="Shirai Y."/>
+<person name="Takahashi Y."/>
+<person name="Nakagawa K."/>
+<person name="Okumura K."/>
+<person name="Nagase T."/>
+<person name="Nomura N."/>
+<person name="Kikuchi H."/>
+<person name="Masuho Y."/>
+<person name="Yamashita R."/>
+<person name="Nakai K."/>
+<person name="Yada T."/>
+<person name="Nakamura Y."/>
+<person name="Ohara O."/>
+<person name="Isogai T."/>
+<person name="Sugano S."/>
+</authorList>
+<dbReference type="PubMed" id="14702039"/>
+<dbReference type="DOI" id="10.1038/ng1285"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA]</scope>
+</reference>
+<reference key="6">
+<citation type="journal article" date="2004" name="Genome Biol." volume="5" first="R84.1" last="R84.11">
+<title>A genome annotation-driven approach to cloning the human ORFeome.</title>
+<authorList>
+<person name="Collins J.E."/>
+<person name="Wright C.L."/>
+<person name="Edwards C.A."/>
+<person name="Davis M.P."/>
+<person name="Grinham J.A."/>
+<person name="Cole C.G."/>
+<person name="Goward M.E."/>
+<person name="Aguado B."/>
+<person name="Mallya M."/>
+<person name="Mokrab Y."/>
+<person name="Huckle E.J."/>
+<person name="Beare D.M."/>
+<person name="Dunham I."/>
+</authorList>
+<dbReference type="PubMed" id="15461802"/>
+<dbReference type="DOI" id="10.1186/gb-2004-5-10-r84"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA]</scope>
+<scope>VARIANT MET-158</scope>
+</reference>
+<reference key="7">
+<citation type="submission" date="2004-06" db="EMBL/GenBank/DDBJ databases">
+<title>Cloning of human full open reading frames in Gateway(TM) system entry vector (pDONR201).</title>
+<authorList>
+<person name="Ebert L."/>
+<person name="Schick M."/>
+<person name="Neubert P."/>
+<person name="Schatten R."/>
+<person name="Henze S."/>
+<person name="Korn B."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA]</scope>
+</reference>
+<reference key="8">
+<citation type="submission" date="2003-07" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<consortium name="NIEHS SNPs program"/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<scope>VARIANTS SER-72 AND MET-158</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="1999" name="Nature" volume="402" first="489" last="495">
+<title>The DNA sequence of human chromosome 22.</title>
+<authorList>
+<person name="Dunham I."/>
+<person name="Hunt A.R."/>
+<person name="Collins J.E."/>
+<person name="Bruskiewich R."/>
+<person name="Beare D.M."/>
+<person name="Clamp M."/>
+<person name="Smink L.J."/>
+<person name="Ainscough R."/>
+<person name="Almeida J.P."/>
+<person name="Babbage A.K."/>
+<person name="Bagguley C."/>
+<person name="Bailey J."/>
+<person name="Barlow K.F."/>
+<person name="Bates K.N."/>
+<person name="Beasley O.P."/>
+<person name="Bird C.P."/>
+<person name="Blakey S.E."/>
+<person name="Bridgeman A.M."/>
+<person name="Buck D."/>
+<person name="Burgess J."/>
+<person name="Burrill W.D."/>
+<person name="Burton J."/>
+<person name="Carder C."/>
+<person name="Carter N.P."/>
+<person name="Chen Y."/>
+<person name="Clark G."/>
+<person name="Clegg S.M."/>
+<person name="Cobley V.E."/>
+<person name="Cole C.G."/>
+<person name="Collier R.E."/>
+<person name="Connor R."/>
+<person name="Conroy D."/>
+<person name="Corby N.R."/>
+<person name="Coville G.J."/>
+<person name="Cox A.V."/>
+<person name="Davis J."/>
+<person name="Dawson E."/>
+<person name="Dhami P.D."/>
+<person name="Dockree C."/>
+<person name="Dodsworth S.J."/>
+<person name="Durbin R.M."/>
+<person name="Ellington A.G."/>
+<person name="Evans K.L."/>
+<person name="Fey J.M."/>
+<person name="Fleming K."/>
+<person name="French L."/>
+<person name="Garner A.A."/>
+<person name="Gilbert J.G.R."/>
+<person name="Goward M.E."/>
+<person name="Grafham D.V."/>
+<person name="Griffiths M.N.D."/>
+<person name="Hall C."/>
+<person name="Hall R.E."/>
+<person name="Hall-Tamlyn G."/>
+<person name="Heathcott R.W."/>
+<person name="Ho S."/>
+<person name="Holmes S."/>
+<person name="Hunt S.E."/>
+<person name="Jones M.C."/>
+<person name="Kershaw J."/>
+<person name="Kimberley A.M."/>
+<person name="King A."/>
+<person name="Laird G.K."/>
+<person name="Langford C.F."/>
+<person name="Leversha M.A."/>
+<person name="Lloyd C."/>
+<person name="Lloyd D.M."/>
+<person name="Martyn I.D."/>
+<person name="Mashreghi-Mohammadi M."/>
+<person name="Matthews L.H."/>
+<person name="Mccann O.T."/>
+<person name="Mcclay J."/>
+<person name="Mclaren S."/>
+<person name="McMurray A.A."/>
+<person name="Milne S.A."/>
+<person name="Mortimore B.J."/>
+<person name="Odell C.N."/>
+<person name="Pavitt R."/>
+<person name="Pearce A.V."/>
+<person name="Pearson D."/>
+<person name="Phillimore B.J.C.T."/>
+<person name="Phillips S.H."/>
+<person name="Plumb R.W."/>
+<person name="Ramsay H."/>
+<person name="Ramsey Y."/>
+<person name="Rogers L."/>
+<person name="Ross M.T."/>
+<person name="Scott C.E."/>
+<person name="Sehra H.K."/>
+<person name="Skuce C.D."/>
+<person name="Smalley S."/>
+<person name="Smith M.L."/>
+<person name="Soderlund C."/>
+<person name="Spragon L."/>
+<person name="Steward C.A."/>
+<person name="Sulston J.E."/>
+<person name="Swann R.M."/>
+<person name="Vaudin M."/>
+<person name="Wall M."/>
+<person name="Wallis J.M."/>
+<person name="Whiteley M.N."/>
+<person name="Willey D.L."/>
+<person name="Williams L."/>
+<person name="Williams S.A."/>
+<person name="Williamson H."/>
+<person name="Wilmer T.E."/>
+<person name="Wilming L."/>
+<person name="Wright C.L."/>
+<person name="Hubbard T."/>
+<person name="Bentley D.R."/>
+<person name="Beck S."/>
+<person name="Rogers J."/>
+<person name="Shimizu N."/>
+<person name="Minoshima S."/>
+<person name="Kawasaki K."/>
+<person name="Sasaki T."/>
+<person name="Asakawa S."/>
+<person name="Kudoh J."/>
+<person name="Shintani A."/>
+<person name="Shibuya K."/>
+<person name="Yoshizaki Y."/>
+<person name="Aoki N."/>
+<person name="Mitsuyama S."/>
+<person name="Roe B.A."/>
+<person name="Chen F."/>
+<person name="Chu L."/>
+<person name="Crabtree J."/>
+<person name="Deschamps S."/>
+<person name="Do A."/>
+<person name="Do T."/>
+<person name="Dorman A."/>
+<person name="Fang F."/>
+<person name="Fu Y."/>
+<person name="Hu P."/>
+<person name="Hua A."/>
+<person name="Kenton S."/>
+<person name="Lai H."/>
+<person name="Lao H.I."/>
+<person name="Lewis J."/>
+<person name="Lewis S."/>
+<person name="Lin S.-P."/>
+<person name="Loh P."/>
+<person name="Malaj E."/>
+<person name="Nguyen T."/>
+<person name="Pan H."/>
+<person name="Phan S."/>
+<person name="Qi S."/>
+<person name="Qian Y."/>
+<person name="Ray L."/>
+<person name="Ren Q."/>
+<person name="Shaull S."/>
+<person name="Sloan D."/>
+<person name="Song L."/>
+<person name="Wang Q."/>
+<person name="Wang Y."/>
+<person name="Wang Z."/>
+<person name="White J."/>
+<person name="Willingham D."/>
+<person name="Wu H."/>
+<person name="Yao Z."/>
+<person name="Zhan M."/>
+<person name="Zhang G."/>
+<person name="Chissoe S."/>
+<person name="Murray J."/>
+<person name="Miller N."/>
+<person name="Minx P."/>
+<person name="Fulton R."/>
+<person name="Johnson D."/>
+<person name="Bemis G."/>
+<person name="Bentley D."/>
+<person name="Bradshaw H."/>
+<person name="Bourne S."/>
+<person name="Cordes M."/>
+<person name="Du Z."/>
+<person name="Fulton L."/>
+<person name="Goela D."/>
+<person name="Graves T."/>
+<person name="Hawkins J."/>
+<person name="Hinds K."/>
+<person name="Kemp K."/>
+<person name="Latreille P."/>
+<person name="Layman D."/>
+<person name="Ozersky P."/>
+<person name="Rohlfing T."/>
+<person name="Scheet P."/>
+<person name="Walker C."/>
+<person name="Wamsley A."/>
+<person name="Wohldmann P."/>
+<person name="Pepin K."/>
+<person name="Nelson J."/>
+<person name="Korf I."/>
+<person name="Bedell J.A."/>
+<person name="Hillier L.W."/>
+<person name="Mardis E."/>
+<person name="Waterston R."/>
+<person name="Wilson R."/>
+<person name="Emanuel B.S."/>
+<person name="Shaikh T."/>
+<person name="Kurahashi H."/>
+<person name="Saitta S."/>
+<person name="Budarf M.L."/>
+<person name="McDermid H.E."/>
+<person name="Johnson A."/>
+<person name="Wong A.C.C."/>
+<person name="Morrow B.E."/>
+<person name="Edelmann L."/>
+<person name="Kim U.J."/>
+<person name="Shizuya H."/>
+<person name="Simon M.I."/>
+<person name="Dumanski J.P."/>
+<person name="Peyrard M."/>
+<person name="Kedra D."/>
+<person name="Seroussi E."/>
+<person name="Fransson I."/>
+<person name="Tapia I."/>
+<person name="Bruder C.E."/>
+<person name="O'Brien K.P."/>
+<person name="Wilkinson P."/>
+<person name="Bodenteich A."/>
+<person name="Hartman K."/>
+<person name="Hu X."/>
+<person name="Khan A.S."/>
+<person name="Lane L."/>
+<person name="Tilahun Y."/>
+<person name="Wright H."/>
+</authorList>
+<dbReference type="PubMed" id="10591208"/>
+<dbReference type="DOI" id="10.1038/990031"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+</reference>
+<reference key="10">
+<citation type="submission" date="2005-09" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Mural R.J."/>
+<person name="Istrail S."/>
+<person name="Sutton G.G."/>
+<person name="Florea L."/>
+<person name="Halpern A.L."/>
+<person name="Mobarry C.M."/>
+<person name="Lippert R."/>
+<person name="Walenz B."/>
+<person name="Shatkay H."/>
+<person name="Dew I."/>
+<person name="Miller J.R."/>
+<person name="Flanigan M.J."/>
+<person name="Edwards N.J."/>
+<person name="Bolanos R."/>
+<person name="Fasulo D."/>
+<person name="Halldorsson B.V."/>
+<person name="Hannenhalli S."/>
+<person name="Turner R."/>
+<person name="Yooseph S."/>
+<person name="Lu F."/>
+<person name="Nusskern D.R."/>
+<person name="Shue B.C."/>
+<person name="Zheng X.H."/>
+<person name="Zhong F."/>
+<person name="Delcher A.L."/>
+<person name="Huson D.H."/>
+<person name="Kravitz S.A."/>
+<person name="Mouchard L."/>
+<person name="Reinert K."/>
+<person name="Remington K.A."/>
+<person name="Clark A.G."/>
+<person name="Waterman M.S."/>
+<person name="Eichler E.E."/>
+<person name="Adams M.D."/>
+<person name="Hunkapiller M.W."/>
+<person name="Myers E.W."/>
+<person name="Venter J.C."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+<scope>VARIANT MET-158</scope>
+</reference>
+<reference key="11">
+<citation type="journal article" date="2004" name="Genome Res." volume="14" first="2121" last="2127">
+<title>The status, quality, and expansion of the NIH full-length cDNA project: the Mammalian Gene Collection (MGC).</title>
+<authorList>
+<consortium name="The MGC Project Team"/>
+</authorList>
+<dbReference type="PubMed" id="15489334"/>
+<dbReference type="DOI" id="10.1101/gr.2596504"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA]</scope>
+<source>
+<tissue>Brain</tissue>
+<tissue>Muscle</tissue>
+<tissue>Skin</tissue>
+</source>
+</reference>
+<reference key="12">
+<citation type="journal article" date="1994" name="Eur. J. Biochem." volume="222" first="377" last="386">
+<title>Mass spectrometric analysis of human soluble catechol O-methyltransferase expressed in Escherichia coli. Identification of a product of ribosomal frameshifting and of reactive cysteines involved in S-adenosyl-L-methionine binding.</title>
+<authorList>
+<person name="Vilbois F."/>
+<person name="Caspers P."/>
+<person name="da Prada M."/>
+<person name="Lang G."/>
+<person name="Karrer C."/>
+<person name="Lahm H.W."/>
+<person name="Cesura A.M."/>
+</authorList>
+<dbReference type="PubMed" id="8020475"/>
+<dbReference type="DOI" id="10.1111/j.1432-1033.1994.tb18876.x"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 52-61</scope>
+<scope>MASS SPECTROMETRY</scope>
+</reference>
+<reference key="13">
+<citation type="journal article" date="1991" name="Biochem. Biophys. Res. Commun." volume="174" first="995" last="1002">
+<title>Purification and partial sequence analysis of the soluble catechol-O-methyltransferase from human placenta: comparison to the rat liver enzyme.</title>
+<authorList>
+<person name="Tilgmann C."/>
+<person name="Kalkkinen N."/>
+</authorList>
+<dbReference type="PubMed" id="1993083"/>
+<dbReference type="DOI" id="10.1016/0006-291X(91)91517-G"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 59-271</scope>
+<source>
+<tissue>Placenta</tissue>
+</source>
+</reference>
+<reference key="14">
+<citation type="journal article" date="1991" name="Eur. J. Biochem." volume="202" first="1013" last="1020">
+<title>Cell-free synthesis of rat and human catechol O-methyltransferase. Insertion of the membrane-bound form into microsomal membranes in vitro.</title>
+<authorList>
+<person name="Ulmanen I."/>
+<person name="Lundstroem K."/>
+</authorList>
+<dbReference type="PubMed" id="1765063"/>
+<dbReference type="DOI" id="10.1111/j.1432-1033.1991.tb16464.x"/>
+</citation>
+<scope>CHARACTERIZATION OF THE TWO FORMS</scope>
+</reference>
+<reference key="15">
+<citation type="journal article" date="2011" name="BMC Syst. Biol." volume="5" first="17" last="17">
+<title>Initial characterization of the human central proteome.</title>
+<authorList>
+<person name="Burkard T.R."/>
+<person name="Planyavsky M."/>
+<person name="Kaupe I."/>
+<person name="Breitwieser F.P."/>
+<person name="Buerckstuemmer T."/>
+<person name="Bennett K.L."/>
+<person name="Superti-Furga G."/>
+<person name="Colinge J."/>
+</authorList>
+<dbReference type="PubMed" id="21269460"/>
+<dbReference type="DOI" id="10.1186/1752-0509-5-17"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="16">
+<citation type="journal article" date="2011" name="J. Biol. Chem." volume="286" first="34752" last="34760">
+<title>Orientation and cellular distribution of membrane-bound catechol-O-methyltransferase in cortical neurons: implications for drug development.</title>
+<authorList>
+<person name="Chen J."/>
+<person name="Song J."/>
+<person name="Yuan P."/>
+<person name="Tian Q."/>
+<person name="Ji Y."/>
+<person name="Ren-Patterson R."/>
+<person name="Liu G."/>
+<person name="Sei Y."/>
+<person name="Weinberger D.R."/>
+</authorList>
+<dbReference type="PubMed" id="21846718"/>
+<dbReference type="DOI" id="10.1074/jbc.M111.262790"/>
+</citation>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>SUBCELLULAR LOCATION</scope>
+<scope>TOPOLOGY</scope>
+</reference>
+<reference key="17">
+<citation type="journal article" date="2014" name="J. Proteomics" volume="96" first="253" last="262">
+<title>An enzyme assisted RP-RPLC approach for in-depth analysis of human liver phosphoproteome.</title>
+<authorList>
+<person name="Bian Y."/>
+<person name="Song C."/>
+<person name="Cheng K."/>
+<person name="Dong M."/>
+<person name="Wang F."/>
+<person name="Huang J."/>
+<person name="Sun D."/>
+<person name="Wang L."/>
+<person name="Ye M."/>
+<person name="Zou H."/>
+</authorList>
+<dbReference type="PubMed" id="24275569"/>
+<dbReference type="DOI" id="10.1016/j.jprot.2013.11.014"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Liver</tissue>
+</source>
+</reference>
+<reference key="18">
+<citation type="journal article" date="2015" name="Proteomics" volume="15" first="2519" last="2524">
+<title>N-terminome analysis of the human mitochondrial proteome.</title>
+<authorList>
+<person name="Vaca Jacome A.S."/>
+<person name="Rabilloud T."/>
+<person name="Schaeffer-Reiss C."/>
+<person name="Rompais M."/>
+<person name="Ayoub D."/>
+<person name="Lane L."/>
+<person name="Bairoch A."/>
+<person name="Van Dorsselaer A."/>
+<person name="Carapito C."/>
+</authorList>
+<dbReference type="PubMed" id="25944712"/>
+<dbReference type="DOI" id="10.1002/pmic.201400617"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="19">
+<citation type="journal article" date="2008" name="J. Mol. Biol." volume="380" first="120" last="130">
+<title>Crystal structures of human 108V and 108M catechol O-methyltransferase.</title>
+<authorList>
+<person name="Rutherford K."/>
+<person name="Le Trong I."/>
+<person name="Stenkamp R.E."/>
+<person name="Parson W.W."/>
+</authorList>
+<dbReference type="PubMed" id="18486144"/>
+<dbReference type="DOI" id="10.1016/j.jmb.2008.04.040"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.3 ANGSTROMS) OF 52-264 OF MUTANTS VAL-108 AND MET-108 IN COMPLEX WITH SUBSTRATE ANALOG 3,5-DINITROCATECHOL; MAGNESIUM AND S-ADENOSYL-L-METHIONINE</scope>
+</reference>
+<reference key="20">
+<citation type="journal article" date="1996" name="Pharmacogenetics" volume="6" first="243" last="250">
+<title>Human catechol-O-methyltransferase pharmacogenetics: description of a functional polymorphism and its potential application to neuropsychiatric disorders.</title>
+<authorList>
+<person name="Lachman H.M."/>
+<person name="Papolos D.F."/>
+<person name="Saito T."/>
+<person name="Yu Y.-M."/>
+<person name="Szumlanski C.L."/>
+<person name="Weinshilboum R.M."/>
+</authorList>
+<dbReference type="PubMed" id="8807664"/>
+</citation>
+<scope>VARIANT COMT*2 MET-158</scope>
+</reference>
+<reference key="21">
+<citation type="journal article" date="1999" name="Mol. Psychiatry" volume="4" first="286" last="289">
+<title>Association between the functional variant of the catechol-O-methyltransferase (COMT) gene and type 1 alcoholism.</title>
+<authorList>
+<person name="Tiihonen J."/>
+<person name="Hallikainen T."/>
+<person name="Lachman H."/>
+<person name="Saito T."/>
+<person name="Volavka J."/>
+<person name="Kauhanen J."/>
+<person name="Salonen J.T."/>
+<person name="Ryynaenen O.-P."/>
+<person name="Koulu M."/>
+<person name="Karvonen M.K."/>
+<person name="Pohjalainen T."/>
+<person name="Syvaelahti E."/>
+<person name="Hietala J."/>
+</authorList>
+<dbReference type="PubMed" id="10395222"/>
+<dbReference type="DOI" id="10.1038/sj.mp.4000509"/>
+</citation>
+<scope>INVOLVEMENT IN SUSCEPTIBILITY TO ALCOHOLISM</scope>
+</reference>
+<reference key="22">
+<citation type="journal article" date="1999" name="Nat. Genet." volume="22" first="231" last="238">
+<title>Characterization of single-nucleotide polymorphisms in coding regions of human genes.</title>
+<authorList>
+<person name="Cargill M."/>
+<person name="Altshuler D."/>
+<person name="Ireland J."/>
+<person name="Sklar P."/>
+<person name="Ardlie K."/>
+<person name="Patil N."/>
+<person name="Shaw N."/>
+<person name="Lane C.R."/>
+<person name="Lim E.P."/>
+<person name="Kalyanaraman N."/>
+<person name="Nemesh J."/>
+<person name="Ziaugra L."/>
+<person name="Friedland L."/>
+<person name="Rolfe A."/>
+<person name="Warrington J."/>
+<person name="Lipshutz R."/>
+<person name="Daley G.Q."/>
+<person name="Lander E.S."/>
+</authorList>
+<dbReference type="PubMed" id="10391209"/>
+<dbReference type="DOI" id="10.1038/10290"/>
+</citation>
+<scope>VARIANTS SER-34 AND SER-72</scope>
+</reference>
+<reference key="23">
+<citation type="journal article" date="1999" name="Nat. Genet." volume="23" first="373" last="373">
+<authorList>
+<person name="Cargill M."/>
+<person name="Altshuler D."/>
+<person name="Ireland J."/>
+<person name="Sklar P."/>
+<person name="Ardlie K."/>
+<person name="Patil N."/>
+<person name="Shaw N."/>
+<person name="Lane C.R."/>
+<person name="Lim E.P."/>
+<person name="Kalyanaraman N."/>
+<person name="Nemesh J."/>
+<person name="Ziaugra L."/>
+<person name="Friedland L."/>
+<person name="Rolfe A."/>
+<person name="Warrington J."/>
+<person name="Lipshutz R."/>
+<person name="Daley G.Q."/>
+<person name="Lander E.S."/>
+</authorList>
+</citation>
+<scope>ERRATUM</scope>
+</reference>
+<reference key="24">
+<citation type="journal article" date="2005" name="Hum. Genet." volume="116" first="319" last="328">
+<title>Association of Ala72Ser polymorphism with COMT enzyme activity and the risk of schizophrenia in Koreans.</title>
+<authorList>
+<person name="Lee S.-G."/>
+<person name="Joo Y."/>
+<person name="Kim B."/>
+<person name="Chung S."/>
+<person name="Kim H.-L."/>
+<person name="Lee I."/>
+<person name="Choi B."/>
+<person name="Kim C."/>
+<person name="Song K."/>
+</authorList>
+<dbReference type="PubMed" id="15645182"/>
+<dbReference type="DOI" id="10.1007/s00439-004-1239-y"/>
+</citation>
+<scope>CHARACTERIZATION OF VARIANT SER-72</scope>
+<scope>INVOLVEMENT IN SCZD</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+</reference>
+<reference key="25">
+<citation type="journal article" date="2008" name="Biochim. Biophys. Acta" volume="1784" first="1098" last="1105">
+<title>The V108M mutation decreases the structural stability of catechol O-methyltransferase.</title>
+<authorList>
+<person name="Rutherford K."/>
+<person name="Alphandery E."/>
+<person name="McMillan A."/>
+<person name="Daggett V."/>
+<person name="Parson W.W."/>
+</authorList>
+<dbReference type="PubMed" id="18474266"/>
+<dbReference type="DOI" id="10.1016/j.bbapap.2008.04.006"/>
+</citation>
+<scope>CHARACTERIZATION OF VARIANT COMT*2 MET-158</scope>
+</reference>
+<reference key="26">
+<citation type="journal article" date="2008" name="Metabolism" volume="57" first="708" last="711">
+<title>Catechol O-methyltransferase val158-met polymorphism is associated with abdominal obesity and blood pressure in men.</title>
+<authorList>
+<person name="Annerbrink K."/>
+<person name="Westberg L."/>
+<person name="Nilsson S."/>
+<person name="Rosmond R."/>
+<person name="Holm G."/>
+<person name="Eriksson E."/>
+</authorList>
+<dbReference type="PubMed" id="18442637"/>
+<dbReference type="DOI" id="10.1016/j.metabol.2008.01.012"/>
+</citation>
+<scope>VARIANT COMT*2 MET-158</scope>
+</reference>
+<comment type="function">
+<text evidence="14">Catalyzes the O-methylation, and thereby the inactivation, of catecholamine neurotransmitters and catechol hormones. Also shortens the biological half-lives of certain neuroactive drugs, like L-DOPA, alpha-methyl DOPA and isoproterenol.</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="9 14">S-adenosyl-L-methionine + a catechol = S-adenosyl-L-homocysteine + a guaiacol.</text>
+</comment>
+<comment type="cofactor">
+<cofactor>
+<name>Mg(2+)</name>
+<dbReference type="ChEBI" id="CHEBI:18420"/>
+</cofactor>
+<text>Binds 1 Mg(2+) ion per subunit.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-10200977"/>
+<interactant intactId="EBI-994813">
+<id>P30260</id>
+<label>CDC27</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-10200977"/>
+<interactant intactId="EBI-948001">
+<id>Q15323</id>
+<label>KRT31</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-10200977"/>
+<interactant intactId="EBI-10171697">
+<id>Q6A162</id>
+<label>KRT40</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-10200977"/>
+<interactant intactId="EBI-3958099">
+<id>P26371</id>
+<label>KRTAP5-9</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-10200977"/>
+<interactant intactId="EBI-358993">
+<id>Q15645</id>
+<label>TRIP13</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="subcellular location">
+<molecule>Isoform Soluble</molecule>
+<subcellularLocation>
+<location>Cytoplasm</location>
+</subcellularLocation>
+</comment>
+<comment type="subcellular location">
+<molecule>Isoform Membrane-bound</molecule>
+<subcellularLocation>
+<location>Cell membrane</location>
+<topology>Single-pass type II membrane protein</topology>
+<orientation evidence="14">Extracellular side</orientation>
+</subcellularLocation>
+</comment>
+<comment type="alternative products">
+<event type="alternative initiation"/>
+<isoform>
+<id>P21964-1</id>
+<name>Membrane-bound</name>
+<name>MB-COMT</name>
+<sequence type="displayed"/>
+</isoform>
+<isoform>
+<id>P21964-2</id>
+<name>Soluble</name>
+<name>S-COMT</name>
+<sequence type="described" ref="VSP_018778"/>
+</isoform>
+</comment>
+<comment type="tissue specificity">
+<text>Brain, liver, placenta, lymphocytes and erythrocytes.</text>
+</comment>
+<comment type="PTM">
+<text>The N-terminus is blocked.</text>
+</comment>
+<comment type="mass spectrometry" mass="24352" method="Electrospray" error="2" evidence="15">
+<location>
+<begin position="52"/>
+<end position="271"/>
+</location>
+</comment>
+<comment type="polymorphism">
+<text evidence="10 11 16">Two alleles, COMT*1 or COMT*H with Val-158 and COMT*2 or COMT*L with Met-158 are responsible for a three to four-fold difference in enzymatic activity.</text>
+</comment>
+<comment type="polymorphism">
+<text evidence="7">Low enzyme activity alleles are associated with genetic susceptibility to alcoholism [MIM:103780].</text>
+</comment>
+<comment type="disease" evidence="9">
+<disease id="DI-03626">
+<name>Schizophrenia</name>
+<acronym>SCZD</acronym>
+<description>A complex, multifactorial psychotic disorder or group of disorders characterized by disturbances in the form and content of thought (e.g. delusions, hallucinations), in mood (e.g. inappropriate affect), in sense of self and relationship to the external world (e.g. loss of ego boundaries, withdrawal), and in behavior (e.g bizarre or apparently purposeless behavior). Although it affects emotions, it is distinguished from mood disorders in which such disturbances are primary. Similarly, there may be mild impairment of cognitive function, and it is distinguished from the dementias in which disturbed cognitive function is considered primary. Some patients manifest schizophrenic as well as bipolar disorder symptoms and are often given the diagnosis of schizoaffective disorder.</description>
+<dbReference type="MIM" id="181500"/>
+</disease>
+<text>Disease susceptibility may be associated with variations affecting the gene represented in this entry.</text>
+</comment>
+<comment type="similarity">
+<text evidence="5">Belongs to the class I-like SAM-binding methyltransferase superfamily. Cation-dependent O-methyltransferase family.</text>
+</comment>
+<comment type="sequence caution" evidence="19">
+<conflict type="erroneous termination">
+<sequence resource="EMBL-CDS" id="AAH00419" version="2"/>
+</conflict>
+<location>
+<position position="85"/>
+</location>
+<text>Translated as Gln.</text>
+</comment>
+<comment type="sequence caution" evidence="19">
+<conflict type="erroneous termination">
+<sequence resource="EMBL-CDS" id="AAH05867" version="1"/>
+</conflict>
+<location>
+<position position="85"/>
+</location>
+<text>Translated as Gln.</text>
+</comment>
+<comment type="sequence caution" evidence="19">
+<conflict type="erroneous termination">
+<sequence resource="EMBL-CDS" id="ACI46037" version="1"/>
+</conflict>
+<location>
+<position position="85"/>
+</location>
+<text>Translated as Gln.</text>
+</comment>
+<comment type="online information" name="NIEHS-SNPs">
+<link uri="http://egp.gs.washington.edu/data/comt/"/>
+</comment>
+<comment type="online information" name="Wikipedia">
+<link uri="https://en.wikipedia.org/wiki/Catechol-O-methyl_transferase"/>
+<text>Catechol-O-methyl transferase entry</text>
+</comment>
+<dbReference type="EC" id="2.1.1.6" evidence="9 14"/>
+<dbReference type="EMBL" id="M65212">
+<property type="protein sequence ID" value="AAA68927.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M65213">
+<property type="protein sequence ID" value="AAA68928.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M58525">
+<property type="protein sequence ID" value="AAA68929.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="Z26491">
+<property type="protein sequence ID" value="CAA81263.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="FJ224345">
+<property type="protein sequence ID" value="ACI46037.1"/>
+<property type="status" value="ALT_TERM"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AK290440">
+<property type="protein sequence ID" value="BAF83129.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="CR456422">
+<property type="protein sequence ID" value="CAG30308.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="CR456997">
+<property type="protein sequence ID" value="CAG33278.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AY341246">
+<property type="protein sequence ID" value="AAP88929.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AC000080">
+<property type="status" value="NOT_ANNOTATED_CDS"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AC000090">
+<property type="status" value="NOT_ANNOTATED_CDS"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AC005663">
+<property type="status" value="NOT_ANNOTATED_CDS"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="CH471176">
+<property type="protein sequence ID" value="EAX03010.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="BC000419">
+<property type="protein sequence ID" value="AAH00419.2"/>
+<property type="status" value="ALT_TERM"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="BC005867">
+<property type="protein sequence ID" value="AAH05867.1"/>
+<property type="status" value="ALT_TERM"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="BC011935">
+<property type="protein sequence ID" value="AAH11935.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="BC100018">
+<property type="protein sequence ID" value="AAI00019.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="CCDS" id="CCDS13770.1">
+<molecule id="P21964-1"/>
+</dbReference>
+<dbReference type="CCDS" id="CCDS46663.1">
+<molecule id="P21964-2"/>
+</dbReference>
+<dbReference type="PIR" id="I37256">
+<property type="entry name" value="A38459"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_000745.1">
+<molecule id="P21964-1"/>
+<property type="nucleotide sequence ID" value="NM_000754.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_001128633.1">
+<molecule id="P21964-1"/>
+<property type="nucleotide sequence ID" value="NM_001135161.1"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_001128634.1">
+<molecule id="P21964-1"/>
+<property type="nucleotide sequence ID" value="NM_001135162.1"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_009294.1">
+<molecule id="P21964-2"/>
+<property type="nucleotide sequence ID" value="NM_007310.2"/>
+</dbReference>
+<dbReference type="RefSeq" id="XP_016884083.1">
+<molecule id="P21964-1"/>
+<property type="nucleotide sequence ID" value="XM_017028594.1"/>
+</dbReference>
+<dbReference type="RefSeq" id="XP_016884084.1">
+<molecule id="P21964-1"/>
+<property type="nucleotide sequence ID" value="XM_017028595.1"/>
+</dbReference>
+<dbReference type="UniGene" id="Hs.370408"/>
+<dbReference type="UniGene" id="Hs.693979"/>
+<dbReference type="UniGene" id="Hs.713616"/>
+<dbReference type="UniGene" id="Hs.738526"/>
+<dbReference type="PDB" id="3A7E">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.80"/>
+<property type="chains" value="A=51-264"/>
+</dbReference>
+<dbReference type="PDB" id="3BWM">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.98"/>
+<property type="chains" value="A=52-265"/>
+</dbReference>
+<dbReference type="PDB" id="3BWY">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.30"/>
+<property type="chains" value="A=52-265"/>
+</dbReference>
+<dbReference type="PDB" id="4PYI">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.35"/>
+<property type="chains" value="A=51-271"/>
+</dbReference>
+<dbReference type="PDB" id="4PYJ">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.90"/>
+<property type="chains" value="A=51-271"/>
+</dbReference>
+<dbReference type="PDB" id="4PYK">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.22"/>
+<property type="chains" value="A=51-271"/>
+</dbReference>
+<dbReference type="PDB" id="4XUC">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.80"/>
+<property type="chains" value="A=48-265"/>
+</dbReference>
+<dbReference type="PDB" id="4XUD">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.40"/>
+<property type="chains" value="A=48-265"/>
+</dbReference>
+<dbReference type="PDB" id="4XUE">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.30"/>
+<property type="chains" value="A/B=52-265"/>
+</dbReference>
+<dbReference type="PDB" id="5LSA">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.50"/>
+<property type="chains" value="A=51-271"/>
+</dbReference>
+<dbReference type="PDBsum" id="3A7E"/>
+<dbReference type="PDBsum" id="3BWM"/>
+<dbReference type="PDBsum" id="3BWY"/>
+<dbReference type="PDBsum" id="4PYI"/>
+<dbReference type="PDBsum" id="4PYJ"/>
+<dbReference type="PDBsum" id="4PYK"/>
+<dbReference type="PDBsum" id="4XUC"/>
+<dbReference type="PDBsum" id="4XUD"/>
+<dbReference type="PDBsum" id="4XUE"/>
+<dbReference type="PDBsum" id="5LSA"/>
+<dbReference type="ProteinModelPortal" id="P21964"/>
+<dbReference type="SMR" id="P21964"/>
+<dbReference type="BioGrid" id="107707">
+<property type="interactions" value="43"/>
+</dbReference>
+<dbReference type="IntAct" id="P21964">
+<property type="interactions" value="78"/>
+</dbReference>
+<dbReference type="MINT" id="P21964"/>
+<dbReference type="STRING" id="9606.ENSP00000354511"/>
+<dbReference type="BindingDB" id="P21964"/>
+<dbReference type="ChEMBL" id="CHEMBL2023"/>
+<dbReference type="DrugBank" id="DB02342">
+<property type="generic name" value="2-Methoxyestradiol"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB03336">
+<property type="generic name" value="BIA"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00286">
+<property type="generic name" value="Conjugated Equine Estrogens"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00255">
+<property type="generic name" value="Diethylstilbestrol"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00841">
+<property type="generic name" value="Dobutamine"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00988">
+<property type="generic name" value="Dopamine"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00494">
+<property type="generic name" value="Entacapone"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00968">
+<property type="generic name" value="Methyldopa"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB01141">
+<property type="generic name" value="Micafungin"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB04820">
+<property type="generic name" value="Nialamide"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00118">
+<property type="generic name" value="S-Adenosylmethionine"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB01420">
+<property type="generic name" value="Testosterone Propionate"/>
+</dbReference>
+<dbReference type="DrugBank" id="DB00323">
+<property type="generic name" value="Tolcapone"/>
+</dbReference>
+<dbReference type="GuidetoPHARMACOLOGY" id="2472"/>
+<dbReference type="SwissLipids" id="SLP:000001714">
+<molecule id="P21964-2"/>
+</dbReference>
+<dbReference type="iPTMnet" id="P21964"/>
+<dbReference type="PhosphoSitePlus" id="P21964"/>
+<dbReference type="SwissPalm" id="P21964"/>
+<dbReference type="BioMuta" id="COMT"/>
+<dbReference type="DMDM" id="116907"/>
+<dbReference type="REPRODUCTION-2DPAGE" id="IPI00375513"/>
+<dbReference type="EPD" id="P21964"/>
+<dbReference type="MaxQB" id="P21964"/>
+<dbReference type="PaxDb" id="P21964"/>
+<dbReference type="PeptideAtlas" id="P21964"/>
+<dbReference type="PRIDE" id="P21964"/>
+<dbReference type="ProteomicsDB" id="53945"/>
+<dbReference type="ProteomicsDB" id="53946">
+<molecule id="P21964-2"/>
+</dbReference>
+<dbReference type="TopDownProteomics" id="P21964-1">
+<molecule id="P21964-1"/>
+</dbReference>
+<dbReference type="TopDownProteomics" id="P21964-2">
+<molecule id="P21964-2"/>
+</dbReference>
+<dbReference type="DNASU" id="1312"/>
+<dbReference type="Ensembl" id="ENST00000361682">
+<molecule id="P21964-1"/>
+<property type="protein sequence ID" value="ENSP00000354511"/>
+<property type="gene ID" value="ENSG00000093010"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000403710">
+<molecule id="P21964-1"/>
+<property type="protein sequence ID" value="ENSP00000385917"/>
+<property type="gene ID" value="ENSG00000093010"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000406520">
+<molecule id="P21964-1"/>
+<property type="protein sequence ID" value="ENSP00000385150"/>
+<property type="gene ID" value="ENSG00000093010"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000407537">
+<molecule id="P21964-1"/>
+<property type="protein sequence ID" value="ENSP00000384654"/>
+<property type="gene ID" value="ENSG00000093010"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000449653">
+<molecule id="P21964-2"/>
+<property type="protein sequence ID" value="ENSP00000416778"/>
+<property type="gene ID" value="ENSG00000093010"/>
+</dbReference>
+<dbReference type="GeneID" id="1312"/>
+<dbReference type="KEGG" id="hsa:1312"/>
+<dbReference type="UCSC" id="uc002zqu.4">
+<molecule id="P21964-1"/>
+<property type="organism name" value="human"/>
+</dbReference>
+<dbReference type="CTD" id="1312"/>
+<dbReference type="DisGeNET" id="1312"/>
+<dbReference type="EuPathDB" id="HostDB:ENSG00000093010.11"/>
+<dbReference type="GeneCards" id="COMT"/>
+<dbReference type="HGNC" id="HGNC:2228">
+<property type="gene designation" value="COMT"/>
+</dbReference>
+<dbReference type="HPA" id="CAB011233"/>
+<dbReference type="HPA" id="HPA001169"/>
+<dbReference type="MalaCards" id="COMT"/>
+<dbReference type="MIM" id="103780">
+<property type="type" value="phenotype"/>
+</dbReference>
+<dbReference type="MIM" id="116790">
+<property type="type" value="gene+phenotype"/>
+</dbReference>
+<dbReference type="MIM" id="181500">
+<property type="type" value="phenotype"/>
+</dbReference>
+<dbReference type="neXtProt" id="NX_P21964"/>
+<dbReference type="OpenTargets" id="ENSG00000093010"/>
+<dbReference type="Orphanet" id="567">
+<property type="disease" value="22q11.2 deletion syndrome"/>
+</dbReference>
+<dbReference type="Orphanet" id="240863">
+<property type="disease" value="Cisplatin toxicity"/>
+</dbReference>
+<dbReference type="Orphanet" id="3140">
+<property type="disease" value="Schizophrenia"/>
+</dbReference>
+<dbReference type="PharmGKB" id="PA117"/>
+<dbReference type="eggNOG" id="KOG1663">
+<property type="taxonomic scope" value="Eukaryota"/>
+</dbReference>
+<dbReference type="eggNOG" id="COG4122">
+<property type="taxonomic scope" value="LUCA"/>
+</dbReference>
+<dbReference type="GeneTree" id="ENSGT00390000011316"/>
+<dbReference type="HOGENOM" id="HOG000046392"/>
+<dbReference type="HOVERGEN" id="HBG005376"/>
+<dbReference type="InParanoid" id="P21964"/>
+<dbReference type="KO" id="K00545"/>
+<dbReference type="OMA" id="SRFECTH"/>
+<dbReference type="OrthoDB" id="EOG091G0GQK"/>
+<dbReference type="PhylomeDB" id="P21964"/>
+<dbReference type="TreeFam" id="TF329140"/>
+<dbReference type="BioCyc" id="MetaCyc:HS01791-MONOMER"/>
+<dbReference type="BRENDA" id="2.1.1.6">
+<property type="organism ID" value="2681"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-156581">
+<property type="pathway name" value="Methylation"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-379397">
+<property type="pathway name" value="Enzymatic degradation of dopamine by COMT"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-379398">
+<property type="pathway name" value="Enzymatic degradation of Dopamine by monoamine oxidase"/>
+</dbReference>
+<dbReference type="SIGNOR" id="P21964"/>
+<dbReference type="ChiTaRS" id="COMT">
+<property type="organism name" value="human"/>
+</dbReference>
+<dbReference type="EvolutionaryTrace" id="P21964"/>
+<dbReference type="GeneWiki" id="Catechol-O-methyl_transferase"/>
+<dbReference type="GenomeRNAi" id="1312"/>
+<dbReference type="PRO" id="PR:P21964"/>
+<dbReference type="Proteomes" id="UP000005640">
+<property type="component" value="Chromosome 22"/>
+</dbReference>
+<dbReference type="Bgee" id="ENSG00000093010"/>
+<dbReference type="CleanEx" id="HS_COMT"/>
+<dbReference type="ExpressionAtlas" id="P21964">
+<property type="expression patterns" value="baseline and differential"/>
+</dbReference>
+<dbReference type="Genevisible" id="P21964">
+<property type="organism ID" value="HS"/>
+</dbReference>
+<dbReference type="GO" id="GO:0030424">
+<property type="term" value="C:axon"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0044297">
+<property type="term" value="C:cell body"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005829">
+<property type="term" value="C:cytosol"/>
+<property type="evidence" value="ECO:0000304"/>
+<property type="project" value="Reactome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0043197">
+<property type="term" value="C:dendritic spine"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0070062">
+<property type="term" value="C:extracellular exosome"/>
+<property type="evidence" value="ECO:0007005"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016021">
+<property type="term" value="C:integral component of membrane"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0043231">
+<property type="term" value="C:intracellular membrane-bounded organelle"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="HPA"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016020">
+<property type="term" value="C:membrane"/>
+<property type="evidence" value="ECO:0007005"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005886">
+<property type="term" value="C:plasma membrane"/>
+<property type="evidence" value="ECO:0000304"/>
+<property type="project" value="Reactome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0045211">
+<property type="term" value="C:postsynaptic membrane"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016206">
+<property type="term" value="F:catechol O-methyltransferase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0102084">
+<property type="term" value="F:L-dopa O-methyltransferase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-EC"/>
+</dbReference>
+<dbReference type="GO" id="GO:0000287">
+<property type="term" value="F:magnesium ion binding"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="InterPro"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008168">
+<property type="term" value="F:methyltransferase activity"/>
+<property type="evidence" value="ECO:0000304"/>
+<property type="project" value="Reactome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008171">
+<property type="term" value="F:O-methyltransferase activity"/>
+<property type="evidence" value="ECO:0000304"/>
+<property type="project" value="ProtInc"/>
+</dbReference>
+<dbReference type="GO" id="GO:0102938">
+<property type="term" value="F:orcinol O-methyltransferase activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-EC"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042424">
+<property type="term" value="P:catecholamine catabolic process"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0016036">
+<property type="term" value="P:cellular response to phosphate starvation"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0032502">
+<property type="term" value="P:developmental process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042420">
+<property type="term" value="P:dopamine catabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0008210">
+<property type="term" value="P:estrogen metabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0007565">
+<property type="term" value="P:female pregnancy"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0007612">
+<property type="term" value="P:learning"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0032259">
+<property type="term" value="P:methylation"/>
+<property type="evidence" value="ECO:0000304"/>
+<property type="project" value="Reactome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0048609">
+<property type="term" value="P:multicellular organismal reproductive process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0045963">
+<property type="term" value="P:negative regulation of dopamine metabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0035814">
+<property type="term" value="P:negative regulation of renal sodium excretion"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0048662">
+<property type="term" value="P:negative regulation of smooth muscle cell proliferation"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042135">
+<property type="term" value="P:neurotransmitter catabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0050668">
+<property type="term" value="P:positive regulation of homocysteine metabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0051930">
+<property type="term" value="P:regulation of sensory perception of pain"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0042493">
+<property type="term" value="P:response to drug"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0043627">
+<property type="term" value="P:response to estrogen"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0032496">
+<property type="term" value="P:response to lipopolysaccharide"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0014070">
+<property type="term" value="P:response to organic cyclic compound"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0048265">
+<property type="term" value="P:response to pain"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0007614">
+<property type="term" value="P:short-term memory"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR017128">
+<property type="entry name" value="Catechol_O-MeTrfase_euk"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR002935">
+<property type="entry name" value="O-MeTrfase_3"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR029063">
+<property type="entry name" value="SAM-dependent_MTases"/>
+</dbReference>
+<dbReference type="Pfam" id="PF01596">
+<property type="entry name" value="Methyltransf_3"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PIRSF" id="PIRSF037177">
+<property type="entry name" value="Catechol_O-mtfrase_euk"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF53335">
+<property type="entry name" value="SSF53335"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="PROSITE" id="PS51682">
+<property type="entry name" value="SAM_OMT_I"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0024">Alternative initiation</keyword>
+<keyword id="KW-0128">Catecholamine metabolism</keyword>
+<keyword id="KW-1003">Cell membrane</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0963">Cytoplasm</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0460">Magnesium</keyword>
+<keyword id="KW-0472">Membrane</keyword>
+<keyword id="KW-0479">Metal-binding</keyword>
+<keyword id="KW-0489">Methyltransferase</keyword>
+<keyword id="KW-0531">Neurotransmitter degradation</keyword>
+<keyword id="KW-0597">Phosphoprotein</keyword>
+<keyword id="KW-0621">Polymorphism</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0949">S-adenosyl-L-methionine</keyword>
+<keyword id="KW-1211">Schizophrenia</keyword>
+<keyword id="KW-0735">Signal-anchor</keyword>
+<keyword id="KW-0808">Transferase</keyword>
+<keyword id="KW-0812">Transmembrane</keyword>
+<keyword id="KW-1133">Transmembrane helix</keyword>
+<feature type="chain" description="Catechol O-methyltransferase" id="PRO_0000020971">
+<location>
+<begin position="1"/>
+<end position="271"/>
+</location>
+</feature>
+<feature type="topological domain" description="Cytoplasmic" evidence="4">
+<location>
+<begin position="1"/>
+<end position="6"/>
+</location>
+</feature>
+<feature type="transmembrane region" description="Helical; Signal-anchor for type II membrane protein" evidence="4">
+<location>
+<begin position="7"/>
+<end position="26"/>
+</location>
+</feature>
+<feature type="topological domain" description="Extracellular" evidence="4">
+<location>
+<begin position="27"/>
+<end position="271"/>
+</location>
+</feature>
+<feature type="region of interest" description="S-adenosyl-L-methionine binding">
+<location>
+<begin position="167"/>
+<end position="170"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="13">
+<location>
+<position position="191"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="13">
+<location>
+<position position="219"/>
+</location>
+</feature>
+<feature type="metal ion-binding site" description="Magnesium" evidence="13">
+<location>
+<position position="220"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine; via amide nitrogen" evidence="5 13">
+<location>
+<position position="92"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine" evidence="5">
+<location>
+<position position="114"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine" evidence="5 13">
+<location>
+<position position="122"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine" evidence="5 13">
+<location>
+<position position="140"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine; via amide nitrogen" evidence="5">
+<location>
+<position position="141"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine; via amide nitrogen" evidence="5">
+<location>
+<position position="169"/>
+</location>
+</feature>
+<feature type="binding site" description="S-adenosyl-L-methionine" evidence="5 13">
+<location>
+<position position="191"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate">
+<location>
+<position position="194"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate">
+<location>
+<position position="220"/>
+</location>
+</feature>
+<feature type="binding site" description="Substrate">
+<location>
+<position position="249"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphoserine" evidence="3">
+<location>
+<position position="267"/>
+</location>
+</feature>
+<feature type="splice variant" description="In isoform Soluble." id="VSP_018778" evidence="19">
+<location>
+<begin position="1"/>
+<end position="50"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In dbSNP:rs6270." id="VAR_013925" evidence="6 12">
+<original>C</original>
+<variation>S</variation>
+<location>
+<position position="34"/>
+</location>
+</feature>
+<feature type="sequence variant" description="Correlated with reduced enzyme activity; associated with increased risk for schizophrenia; dbSNP:rs6267." id="VAR_013926" evidence="6 9 18">
+<original>A</original>
+<variation>S</variation>
+<location>
+<position position="72"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In dbSNP:rs5031015." id="VAR_020274">
+<original>A</original>
+<variation>T</variation>
+<location>
+<position position="102"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In dbSNP:rs4986871." id="VAR_020275">
+<original>A</original>
+<variation>V</variation>
+<location>
+<position position="146"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In allele COMT*2; associated with low enzyme activity and thermolability; may increase the tendency to develop high blood pressure and abdominal obesity; dbSNP:rs4680." id="VAR_005139" evidence="8 10 11 16 17 18">
+<original>V</original>
+<variation>M</variation>
+<location>
+<position position="158"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 13; AA sequence." ref="13" evidence="19">
+<original>Q</original>
+<variation>N</variation>
+<location>
+<position position="245"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="55"/>
+<end position="66"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="72"/>
+<end position="85"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="93"/>
+<end position="107"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="110"/>
+<end position="115"/>
+</location>
+</feature>
+<feature type="strand" evidence="2">
+<location>
+<begin position="118"/>
+<end position="120"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="121"/>
+<end position="127"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="135"/>
+<end position="141"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="143"/>
+<end position="155"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="159"/>
+<end position="161"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="162"/>
+<end position="167"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="169"/>
+<end position="172"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="173"/>
+<end position="175"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="176"/>
+<end position="180"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="185"/>
+<end position="190"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="194"/>
+<end position="196"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="197"/>
+<end position="206"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="210"/>
+<end position="219"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="221"/>
+<end position="225"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="227"/>
+<end position="235"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="239"/>
+<end position="247"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="251"/>
+<end position="262"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3BWY"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="4PYJ"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000250">
+<source>
+<dbReference type="UniProtKB" id="P22734"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000255"/>
+<evidence key="5" type="ECO:0000255">
+<source>
+<dbReference type="PROSITE-ProRule" id="PRU01019"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10391209"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10395222"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="15461802"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="15645182"/>
+</source>
+</evidence>
+<evidence key="10" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18442637"/>
+</source>
+</evidence>
+<evidence key="11" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18474266"/>
+</source>
+</evidence>
+<evidence key="12" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1847521"/>
+</source>
+</evidence>
+<evidence key="13" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="18486144"/>
+</source>
+</evidence>
+<evidence key="14" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="21846718"/>
+</source>
+</evidence>
+<evidence key="15" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8020475"/>
+</source>
+</evidence>
+<evidence key="16" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8807664"/>
+</source>
+</evidence>
+<evidence key="17" type="ECO:0000269">
+<source ref="10"/>
+</evidence>
+<evidence key="18" type="ECO:0000269">
+<source ref="8"/>
+</evidence>
+<evidence key="19" type="ECO:0000305"/>
+<sequence length="271" mass="30037" checksum="D2547A1C399AC758" modified="1992-05-01" version="2">
+MPEAPPLLLAAVLLGLVLLVVLLLLLRHWGWGLCLIGWNEFILQPIHNLLMGDTKEQRIL
+NHVLQHAEPGNAQSVLEAIDTYCEQKEWAMNVGDKKGKIVDAVIQEHQPSVLLELGAYCG
+YSAVRMARLLSPGARLITIEINPDCAAITQRMVDFAGVKDKVTLVVGASQDIIPQLKKKY
+DVDTLDMVFLDHWKDRYLPDTLLLEECGLLRKGTVLLADNVICPGAPDFLAHVRGSSCFE
+CTHYQSFLEYREVVDGLEKAIYKGPGSEAGP
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution (CC BY 4.0) License
+</copyright>
+</uniprot>

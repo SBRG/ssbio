@@ -1,5 +1,84 @@
 import pytest
 from ssbio.core.protein import Protein
+import os.path as op
+
+
+@pytest.fixture(scope='class')
+def test2(test_files_sequences, test_files_structures, test_files_outputs):
+    """Protein with confusing mappings between residue numbers"""
+    p = Protein(ident='P21964', root_dir=test_files_outputs)
+    p.load_uniprot(uniprot_id='P21964',
+                   uniprot_seq_file=op.join(test_files_sequences, 'P21964.fasta'),
+                   uniprot_xml_file=op.join(test_files_sequences, 'P21964.xml'),
+                   download=False, set_as_representative=True)
+    p.load_pdb(pdb_id='3bwm', mapped_chains=['A'], pdb_file=op.join(test_files_structures, '3bwm.pdb'),
+               file_type='pdb', representative_chain='A', set_as_representative=True)
+    p.align_seqprop_to_structprop(seqprop=p.sequences.get_by_id('P21964'),
+                                  structprop=p.structures.get_by_id('3bwm'),
+                                  chain_id='A')
+    return p
+
+
+
+@pytest.fixture(scope='class')
+def straightforward_resnum_mapping(test_files_sequences, test_files_structures, test_files_outputs):
+    """Protein with confusing mappings between residue numbers"""
+    p = Protein(ident='P0ABP8', root_dir=test_files_outputs)
+    p.load_uniprot(uniprot_id='P0ABP8',
+                   uniprot_seq_file=op.join(test_files_sequences, 'P0ABP8.fasta'),
+                   uniprot_xml_file=op.join(test_files_sequences, 'P0ABP8.xml'),
+                   download=False, set_as_representative=True)
+    p.load_pdb(pdb_id='1a69', mapped_chains=['A'], pdb_file=op.join(test_files_structures, '1a69.pdb'),
+               file_type='pdb', representative_chain='A', set_as_representative=True)
+    p.align_seqprop_to_structprop(seqprop=p.sequences.get_by_id('P0ABP8'),
+                                  structprop=p.structures.get_by_id('1a69'),
+                                  chain_id='A')
+    return p
+
+
+@pytest.fixture(scope='class')
+def confusing_resnum_mapping(test_files_sequences, test_files_structures, test_files_outputs):
+    """Protein with confusing mappings between residue numbers"""
+    p = Protein(ident='P08559', root_dir=test_files_outputs)
+    p.load_uniprot(uniprot_id='P08559',
+                   uniprot_seq_file=op.join(test_files_sequences, 'P08559.fasta'),
+                   uniprot_xml_file=op.join(test_files_sequences, 'P08559.xml'),
+                   download=False, set_as_representative=True)
+    p.load_pdb(pdb_id='3exf_bio1', mapped_chains=['A', 'C'], pdb_file=op.join(test_files_structures, '3exf_bio1.pdb'),
+               file_type='pdb', representative_chain='A', set_as_representative=True)
+    p.align_seqprop_to_structprop(seqprop=p.sequences.get_by_id('P08559'),
+                                  structprop=p.structures.get_by_id('3exf_bio1'),
+                                  chain_id='A')
+    return p
+
+def test__map_seqprop_resnums_to_structprop_chain_index(test2, straightforward_resnum_mapping, confusing_resnum_mapping):
+    assert test2._map_seqprop_resnums_to_structprop_chain_index(resnums=52, use_representatives=True) == {52: 1}
+
+    assert straightforward_resnum_mapping._map_seqprop_resnums_to_structprop_chain_index(resnums=3,
+                                                                                         use_representatives=True) == {3: 1}
+
+    assert confusing_resnum_mapping._map_seqprop_resnums_to_structprop_chain_index(resnums=29,
+                                                                                   use_representatives=True) == {29: 0}
+
+
+def test_map_seqprop_resnums_to_structprop_resnums(test2, straightforward_resnum_mapping, confusing_resnum_mapping):
+    assert test2.map_seqprop_resnums_to_structprop_resnums(resnums=52, use_representatives=True) == {52: 2}
+
+    assert straightforward_resnum_mapping.map_seqprop_resnums_to_structprop_resnums(resnums=2,
+                                                                                    use_representatives=True) == {2: 1}
+
+    assert confusing_resnum_mapping.map_seqprop_resnums_to_structprop_resnums(resnums=[29,30,196],
+                                                                              use_representatives=True) == {29: 0, 30: 1, 196: 167}
+
+def test_map_structprop_resnums_to_seqprop_resnums(test2, straightforward_resnum_mapping, confusing_resnum_mapping):
+    assert test2.map_structprop_resnums_to_seqprop_resnums(resnums=2, use_representatives=True) == {2: 52}
+
+    assert straightforward_resnum_mapping.map_structprop_resnums_to_seqprop_resnums(resnums=1,
+                                                                                    use_representatives=True) == {1: 2}
+
+    assert confusing_resnum_mapping.map_structprop_resnums_to_seqprop_resnums(resnums=[0, 1, 167],
+                                                                              use_representatives=True) == {0: 29, 1: 30, 167: 196}
+
 
 # import os.path as op
 # import unittest

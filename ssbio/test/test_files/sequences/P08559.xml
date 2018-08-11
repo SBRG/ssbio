@@ -1,0 +1,2885 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uniprot xmlns="http://uniprot.org/uniprot" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd">
+<entry dataset="Swiss-Prot" created="1988-08-01" modified="2018-07-18" version="222">
+<accession>P08559</accession>
+<accession>A5YVE9</accession>
+<accession>B2R5P7</accession>
+<accession>B7Z3T7</accession>
+<accession>B7Z3X5</accession>
+<accession>Q53H41</accession>
+<accession>Q5JPT8</accession>
+<accession>Q9NP12</accession>
+<accession>Q9UBJ8</accession>
+<accession>Q9UBU0</accession>
+<accession>Q9UNG4</accession>
+<accession>Q9UNG5</accession>
+<name>ODPA_HUMAN</name>
+<protein>
+<recommendedName>
+<fullName>Pyruvate dehydrogenase E1 component subunit alpha, somatic form, mitochondrial</fullName>
+<ecNumber>1.2.4.1</ecNumber>
+</recommendedName>
+<alternativeName>
+<fullName>PDHE1-A type I</fullName>
+</alternativeName>
+</protein>
+<gene>
+<name type="primary">PDHA1</name>
+<name type="synonym">PHE1A</name>
+</gene>
+<organism>
+<name type="scientific">Homo sapiens</name>
+<name type="common">Human</name>
+<dbReference type="NCBI Taxonomy" id="9606"/>
+<lineage>
+<taxon>Eukaryota</taxon>
+<taxon>Metazoa</taxon>
+<taxon>Chordata</taxon>
+<taxon>Craniata</taxon>
+<taxon>Vertebrata</taxon>
+<taxon>Euteleostomi</taxon>
+<taxon>Mammalia</taxon>
+<taxon>Eutheria</taxon>
+<taxon>Euarchontoglires</taxon>
+<taxon>Primates</taxon>
+<taxon>Haplorrhini</taxon>
+<taxon>Catarrhini</taxon>
+<taxon>Hominidae</taxon>
+<taxon>Homo</taxon>
+</lineage>
+</organism>
+<reference key="1">
+<citation type="journal article" date="1990" name="Gene" volume="93" first="307" last="311">
+<title>Characterization and nucleotide sequence of the gene encoding the human pyruvate dehydrogenase alpha-subunit.</title>
+<authorList>
+<person name="Koike K."/>
+<person name="Urata Y."/>
+<person name="Matsuo S."/>
+<person name="Koike M."/>
+</authorList>
+<dbReference type="PubMed" id="2227443"/>
+<dbReference type="DOI" id="10.1016/0378-1119(90)90241-I"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA]</scope>
+<source>
+<tissue>Leukocyte</tissue>
+</source>
+</reference>
+<reference key="2">
+<citation type="journal article" date="1989" name="Proc. Natl. Acad. Sci. U.S.A." volume="86" first="5330" last="5334">
+<title>Characterization of cDNAs encoding human pyruvate dehydrogenase alpha subunit.</title>
+<authorList>
+<person name="Ho L."/>
+<person name="Wexler I.D."/>
+<person name="Liu T.C."/>
+<person name="Thekkumkara T.J."/>
+<person name="Patel M.S."/>
+</authorList>
+<dbReference type="PubMed" id="2748588"/>
+<dbReference type="DOI" id="10.1073/pnas.86.14.5330"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1)</scope>
+</reference>
+<reference key="3">
+<citation type="submission" date="1990-04" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Huh T.L."/>
+<person name="Chi Y.T."/>
+<person name="Casazza J.P."/>
+<person name="Veech R.L."/>
+<person name="Song B.J."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1)</scope>
+<source>
+<tissue>Brain</tissue>
+<tissue>Liver</tissue>
+</source>
+</reference>
+<reference key="4">
+<citation type="journal article" date="1987" name="J. Biol. Chem." volume="262" first="7398" last="7403">
+<title>The human pyruvate dehydrogenase complex. Isolation of cDNA clones for the E1 alpha subunit, sequence analysis, and characterization of the mRNA.</title>
+<authorList>
+<person name="Dahl H.-H.M."/>
+<person name="Hunt S.M."/>
+<person name="Hutchison W.M."/>
+<person name="Brown G.K."/>
+</authorList>
+<dbReference type="PubMed" id="3034892"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1)</scope>
+</reference>
+<reference key="5">
+<citation type="journal article" date="1989" name="J. Biol. Chem." volume="264" first="12294" last="12298">
+<title>Structural organization of the gene for the E1 alpha subunit of the human pyruvate dehydrogenase complex.</title>
+<authorList>
+<person name="Maragos C."/>
+<person name="Hutchinson W.M."/>
+<person name="Hayasaki K."/>
+<person name="Brown G.K."/>
+<person name="Dahl H.-H.M."/>
+</authorList>
+<dbReference type="PubMed" id="2745444"/>
+</citation>
+<scope>SEQUENCE REVISION</scope>
+</reference>
+<reference key="6">
+<citation type="journal article" date="1988" name="J. Biol. Chem." volume="263" first="1991" last="1995">
+<title>Isolation of a full-length complementary DNA coding for human E1 alpha subunit of the pyruvate dehydrogenase complex.</title>
+<authorList>
+<person name="de Meirleir L."/>
+<person name="MacKay N."/>
+<person name="Wah A.M.L.H."/>
+<person name="Robinson B.H."/>
+</authorList>
+<dbReference type="PubMed" id="2828359"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1)</scope>
+</reference>
+<reference key="7">
+<citation type="journal article" date="1988" name="Proc. Natl. Acad. Sci. U.S.A." volume="85" first="41" last="45">
+<title>Cloning and sequencing of cDNAs encoding alpha and beta subunits of human pyruvate dehydrogenase.</title>
+<authorList>
+<person name="Koike K."/>
+<person name="Ohta S."/>
+<person name="Urata Y."/>
+<person name="Kagawa Y."/>
+<person name="Koike M."/>
+</authorList>
+<dbReference type="PubMed" id="3422424"/>
+<dbReference type="DOI" id="10.1073/pnas.85.1.41"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1)</scope>
+</reference>
+<reference key="8">
+<citation type="submission" date="2007-05" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Okajima K."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 4)</scope>
+</reference>
+<reference key="9">
+<citation type="journal article" date="2004" name="Nat. Genet." volume="36" first="40" last="45">
+<title>Complete sequencing and characterization of 21,243 full-length human cDNAs.</title>
+<authorList>
+<person name="Ota T."/>
+<person name="Suzuki Y."/>
+<person name="Nishikawa T."/>
+<person name="Otsuki T."/>
+<person name="Sugiyama T."/>
+<person name="Irie R."/>
+<person name="Wakamatsu A."/>
+<person name="Hayashi K."/>
+<person name="Sato H."/>
+<person name="Nagai K."/>
+<person name="Kimura K."/>
+<person name="Makita H."/>
+<person name="Sekine M."/>
+<person name="Obayashi M."/>
+<person name="Nishi T."/>
+<person name="Shibahara T."/>
+<person name="Tanaka T."/>
+<person name="Ishii S."/>
+<person name="Yamamoto J."/>
+<person name="Saito K."/>
+<person name="Kawai Y."/>
+<person name="Isono Y."/>
+<person name="Nakamura Y."/>
+<person name="Nagahari K."/>
+<person name="Murakami K."/>
+<person name="Yasuda T."/>
+<person name="Iwayanagi T."/>
+<person name="Wagatsuma M."/>
+<person name="Shiratori A."/>
+<person name="Sudo H."/>
+<person name="Hosoiri T."/>
+<person name="Kaku Y."/>
+<person name="Kodaira H."/>
+<person name="Kondo H."/>
+<person name="Sugawara M."/>
+<person name="Takahashi M."/>
+<person name="Kanda K."/>
+<person name="Yokoi T."/>
+<person name="Furuya T."/>
+<person name="Kikkawa E."/>
+<person name="Omura Y."/>
+<person name="Abe K."/>
+<person name="Kamihara K."/>
+<person name="Katsuta N."/>
+<person name="Sato K."/>
+<person name="Tanikawa M."/>
+<person name="Yamazaki M."/>
+<person name="Ninomiya K."/>
+<person name="Ishibashi T."/>
+<person name="Yamashita H."/>
+<person name="Murakawa K."/>
+<person name="Fujimori K."/>
+<person name="Tanai H."/>
+<person name="Kimata M."/>
+<person name="Watanabe M."/>
+<person name="Hiraoka S."/>
+<person name="Chiba Y."/>
+<person name="Ishida S."/>
+<person name="Ono Y."/>
+<person name="Takiguchi S."/>
+<person name="Watanabe S."/>
+<person name="Yosida M."/>
+<person name="Hotuta T."/>
+<person name="Kusano J."/>
+<person name="Kanehori K."/>
+<person name="Takahashi-Fujii A."/>
+<person name="Hara H."/>
+<person name="Tanase T.-O."/>
+<person name="Nomura Y."/>
+<person name="Togiya S."/>
+<person name="Komai F."/>
+<person name="Hara R."/>
+<person name="Takeuchi K."/>
+<person name="Arita M."/>
+<person name="Imose N."/>
+<person name="Musashino K."/>
+<person name="Yuuki H."/>
+<person name="Oshima A."/>
+<person name="Sasaki N."/>
+<person name="Aotsuka S."/>
+<person name="Yoshikawa Y."/>
+<person name="Matsunawa H."/>
+<person name="Ichihara T."/>
+<person name="Shiohata N."/>
+<person name="Sano S."/>
+<person name="Moriya S."/>
+<person name="Momiyama H."/>
+<person name="Satoh N."/>
+<person name="Takami S."/>
+<person name="Terashima Y."/>
+<person name="Suzuki O."/>
+<person name="Nakagawa S."/>
+<person name="Senoh A."/>
+<person name="Mizoguchi H."/>
+<person name="Goto Y."/>
+<person name="Shimizu F."/>
+<person name="Wakebe H."/>
+<person name="Hishigaki H."/>
+<person name="Watanabe T."/>
+<person name="Sugiyama A."/>
+<person name="Takemoto M."/>
+<person name="Kawakami B."/>
+<person name="Yamazaki M."/>
+<person name="Watanabe K."/>
+<person name="Kumagai A."/>
+<person name="Itakura S."/>
+<person name="Fukuzumi Y."/>
+<person name="Fujimori Y."/>
+<person name="Komiyama M."/>
+<person name="Tashiro H."/>
+<person name="Tanigami A."/>
+<person name="Fujiwara T."/>
+<person name="Ono T."/>
+<person name="Yamada K."/>
+<person name="Fujii Y."/>
+<person name="Ozaki K."/>
+<person name="Hirao M."/>
+<person name="Ohmori Y."/>
+<person name="Kawabata A."/>
+<person name="Hikiji T."/>
+<person name="Kobatake N."/>
+<person name="Inagaki H."/>
+<person name="Ikema Y."/>
+<person name="Okamoto S."/>
+<person name="Okitani R."/>
+<person name="Kawakami T."/>
+<person name="Noguchi S."/>
+<person name="Itoh T."/>
+<person name="Shigeta K."/>
+<person name="Senba T."/>
+<person name="Matsumura K."/>
+<person name="Nakajima Y."/>
+<person name="Mizuno T."/>
+<person name="Morinaga M."/>
+<person name="Sasaki M."/>
+<person name="Togashi T."/>
+<person name="Oyama M."/>
+<person name="Hata H."/>
+<person name="Watanabe M."/>
+<person name="Komatsu T."/>
+<person name="Mizushima-Sugano J."/>
+<person name="Satoh T."/>
+<person name="Shirai Y."/>
+<person name="Takahashi Y."/>
+<person name="Nakagawa K."/>
+<person name="Okumura K."/>
+<person name="Nagase T."/>
+<person name="Nomura N."/>
+<person name="Kikuchi H."/>
+<person name="Masuho Y."/>
+<person name="Yamashita R."/>
+<person name="Nakai K."/>
+<person name="Yada T."/>
+<person name="Nakamura Y."/>
+<person name="Ohara O."/>
+<person name="Isogai T."/>
+<person name="Sugano S."/>
+</authorList>
+<dbReference type="PubMed" id="14702039"/>
+<dbReference type="DOI" id="10.1038/ng1285"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORMS 1; 2; 3 AND 4)</scope>
+<source>
+<tissue>Thalamus</tissue>
+</source>
+</reference>
+<reference key="10">
+<citation type="submission" date="2005-04" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Suzuki Y."/>
+<person name="Sugano S."/>
+<person name="Totoki Y."/>
+<person name="Toyoda A."/>
+<person name="Takeda T."/>
+<person name="Sakaki Y."/>
+<person name="Tanaka A."/>
+<person name="Yokoyama S."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORM 1)</scope>
+<scope>VARIANT LEU-282</scope>
+<source>
+<tissue>Dermoid cancer</tissue>
+</source>
+</reference>
+<reference key="11">
+<citation type="journal article" date="2005" name="Nature" volume="434" first="325" last="337">
+<title>The DNA sequence of the human X chromosome.</title>
+<authorList>
+<person name="Ross M.T."/>
+<person name="Grafham D.V."/>
+<person name="Coffey A.J."/>
+<person name="Scherer S."/>
+<person name="McLay K."/>
+<person name="Muzny D."/>
+<person name="Platzer M."/>
+<person name="Howell G.R."/>
+<person name="Burrows C."/>
+<person name="Bird C.P."/>
+<person name="Frankish A."/>
+<person name="Lovell F.L."/>
+<person name="Howe K.L."/>
+<person name="Ashurst J.L."/>
+<person name="Fulton R.S."/>
+<person name="Sudbrak R."/>
+<person name="Wen G."/>
+<person name="Jones M.C."/>
+<person name="Hurles M.E."/>
+<person name="Andrews T.D."/>
+<person name="Scott C.E."/>
+<person name="Searle S."/>
+<person name="Ramser J."/>
+<person name="Whittaker A."/>
+<person name="Deadman R."/>
+<person name="Carter N.P."/>
+<person name="Hunt S.E."/>
+<person name="Chen R."/>
+<person name="Cree A."/>
+<person name="Gunaratne P."/>
+<person name="Havlak P."/>
+<person name="Hodgson A."/>
+<person name="Metzker M.L."/>
+<person name="Richards S."/>
+<person name="Scott G."/>
+<person name="Steffen D."/>
+<person name="Sodergren E."/>
+<person name="Wheeler D.A."/>
+<person name="Worley K.C."/>
+<person name="Ainscough R."/>
+<person name="Ambrose K.D."/>
+<person name="Ansari-Lari M.A."/>
+<person name="Aradhya S."/>
+<person name="Ashwell R.I."/>
+<person name="Babbage A.K."/>
+<person name="Bagguley C.L."/>
+<person name="Ballabio A."/>
+<person name="Banerjee R."/>
+<person name="Barker G.E."/>
+<person name="Barlow K.F."/>
+<person name="Barrett I.P."/>
+<person name="Bates K.N."/>
+<person name="Beare D.M."/>
+<person name="Beasley H."/>
+<person name="Beasley O."/>
+<person name="Beck A."/>
+<person name="Bethel G."/>
+<person name="Blechschmidt K."/>
+<person name="Brady N."/>
+<person name="Bray-Allen S."/>
+<person name="Bridgeman A.M."/>
+<person name="Brown A.J."/>
+<person name="Brown M.J."/>
+<person name="Bonnin D."/>
+<person name="Bruford E.A."/>
+<person name="Buhay C."/>
+<person name="Burch P."/>
+<person name="Burford D."/>
+<person name="Burgess J."/>
+<person name="Burrill W."/>
+<person name="Burton J."/>
+<person name="Bye J.M."/>
+<person name="Carder C."/>
+<person name="Carrel L."/>
+<person name="Chako J."/>
+<person name="Chapman J.C."/>
+<person name="Chavez D."/>
+<person name="Chen E."/>
+<person name="Chen G."/>
+<person name="Chen Y."/>
+<person name="Chen Z."/>
+<person name="Chinault C."/>
+<person name="Ciccodicola A."/>
+<person name="Clark S.Y."/>
+<person name="Clarke G."/>
+<person name="Clee C.M."/>
+<person name="Clegg S."/>
+<person name="Clerc-Blankenburg K."/>
+<person name="Clifford K."/>
+<person name="Cobley V."/>
+<person name="Cole C.G."/>
+<person name="Conquer J.S."/>
+<person name="Corby N."/>
+<person name="Connor R.E."/>
+<person name="David R."/>
+<person name="Davies J."/>
+<person name="Davis C."/>
+<person name="Davis J."/>
+<person name="Delgado O."/>
+<person name="Deshazo D."/>
+<person name="Dhami P."/>
+<person name="Ding Y."/>
+<person name="Dinh H."/>
+<person name="Dodsworth S."/>
+<person name="Draper H."/>
+<person name="Dugan-Rocha S."/>
+<person name="Dunham A."/>
+<person name="Dunn M."/>
+<person name="Durbin K.J."/>
+<person name="Dutta I."/>
+<person name="Eades T."/>
+<person name="Ellwood M."/>
+<person name="Emery-Cohen A."/>
+<person name="Errington H."/>
+<person name="Evans K.L."/>
+<person name="Faulkner L."/>
+<person name="Francis F."/>
+<person name="Frankland J."/>
+<person name="Fraser A.E."/>
+<person name="Galgoczy P."/>
+<person name="Gilbert J."/>
+<person name="Gill R."/>
+<person name="Gloeckner G."/>
+<person name="Gregory S.G."/>
+<person name="Gribble S."/>
+<person name="Griffiths C."/>
+<person name="Grocock R."/>
+<person name="Gu Y."/>
+<person name="Gwilliam R."/>
+<person name="Hamilton C."/>
+<person name="Hart E.A."/>
+<person name="Hawes A."/>
+<person name="Heath P.D."/>
+<person name="Heitmann K."/>
+<person name="Hennig S."/>
+<person name="Hernandez J."/>
+<person name="Hinzmann B."/>
+<person name="Ho S."/>
+<person name="Hoffs M."/>
+<person name="Howden P.J."/>
+<person name="Huckle E.J."/>
+<person name="Hume J."/>
+<person name="Hunt P.J."/>
+<person name="Hunt A.R."/>
+<person name="Isherwood J."/>
+<person name="Jacob L."/>
+<person name="Johnson D."/>
+<person name="Jones S."/>
+<person name="de Jong P.J."/>
+<person name="Joseph S.S."/>
+<person name="Keenan S."/>
+<person name="Kelly S."/>
+<person name="Kershaw J.K."/>
+<person name="Khan Z."/>
+<person name="Kioschis P."/>
+<person name="Klages S."/>
+<person name="Knights A.J."/>
+<person name="Kosiura A."/>
+<person name="Kovar-Smith C."/>
+<person name="Laird G.K."/>
+<person name="Langford C."/>
+<person name="Lawlor S."/>
+<person name="Leversha M."/>
+<person name="Lewis L."/>
+<person name="Liu W."/>
+<person name="Lloyd C."/>
+<person name="Lloyd D.M."/>
+<person name="Loulseged H."/>
+<person name="Loveland J.E."/>
+<person name="Lovell J.D."/>
+<person name="Lozado R."/>
+<person name="Lu J."/>
+<person name="Lyne R."/>
+<person name="Ma J."/>
+<person name="Maheshwari M."/>
+<person name="Matthews L.H."/>
+<person name="McDowall J."/>
+<person name="McLaren S."/>
+<person name="McMurray A."/>
+<person name="Meidl P."/>
+<person name="Meitinger T."/>
+<person name="Milne S."/>
+<person name="Miner G."/>
+<person name="Mistry S.L."/>
+<person name="Morgan M."/>
+<person name="Morris S."/>
+<person name="Mueller I."/>
+<person name="Mullikin J.C."/>
+<person name="Nguyen N."/>
+<person name="Nordsiek G."/>
+<person name="Nyakatura G."/>
+<person name="O'dell C.N."/>
+<person name="Okwuonu G."/>
+<person name="Palmer S."/>
+<person name="Pandian R."/>
+<person name="Parker D."/>
+<person name="Parrish J."/>
+<person name="Pasternak S."/>
+<person name="Patel D."/>
+<person name="Pearce A.V."/>
+<person name="Pearson D.M."/>
+<person name="Pelan S.E."/>
+<person name="Perez L."/>
+<person name="Porter K.M."/>
+<person name="Ramsey Y."/>
+<person name="Reichwald K."/>
+<person name="Rhodes S."/>
+<person name="Ridler K.A."/>
+<person name="Schlessinger D."/>
+<person name="Schueler M.G."/>
+<person name="Sehra H.K."/>
+<person name="Shaw-Smith C."/>
+<person name="Shen H."/>
+<person name="Sheridan E.M."/>
+<person name="Shownkeen R."/>
+<person name="Skuce C.D."/>
+<person name="Smith M.L."/>
+<person name="Sotheran E.C."/>
+<person name="Steingruber H.E."/>
+<person name="Steward C.A."/>
+<person name="Storey R."/>
+<person name="Swann R.M."/>
+<person name="Swarbreck D."/>
+<person name="Tabor P.E."/>
+<person name="Taudien S."/>
+<person name="Taylor T."/>
+<person name="Teague B."/>
+<person name="Thomas K."/>
+<person name="Thorpe A."/>
+<person name="Timms K."/>
+<person name="Tracey A."/>
+<person name="Trevanion S."/>
+<person name="Tromans A.C."/>
+<person name="d'Urso M."/>
+<person name="Verduzco D."/>
+<person name="Villasana D."/>
+<person name="Waldron L."/>
+<person name="Wall M."/>
+<person name="Wang Q."/>
+<person name="Warren J."/>
+<person name="Warry G.L."/>
+<person name="Wei X."/>
+<person name="West A."/>
+<person name="Whitehead S.L."/>
+<person name="Whiteley M.N."/>
+<person name="Wilkinson J.E."/>
+<person name="Willey D.L."/>
+<person name="Williams G."/>
+<person name="Williams L."/>
+<person name="Williamson A."/>
+<person name="Williamson H."/>
+<person name="Wilming L."/>
+<person name="Woodmansey R.L."/>
+<person name="Wray P.W."/>
+<person name="Yen J."/>
+<person name="Zhang J."/>
+<person name="Zhou J."/>
+<person name="Zoghbi H."/>
+<person name="Zorilla S."/>
+<person name="Buck D."/>
+<person name="Reinhardt R."/>
+<person name="Poustka A."/>
+<person name="Rosenthal A."/>
+<person name="Lehrach H."/>
+<person name="Meindl A."/>
+<person name="Minx P.J."/>
+<person name="Hillier L.W."/>
+<person name="Willard H.F."/>
+<person name="Wilson R.K."/>
+<person name="Waterston R.H."/>
+<person name="Rice C.M."/>
+<person name="Vaudin M."/>
+<person name="Coulson A."/>
+<person name="Nelson D.L."/>
+<person name="Weinstock G."/>
+<person name="Sulston J.E."/>
+<person name="Durbin R.M."/>
+<person name="Hubbard T."/>
+<person name="Gibbs R.A."/>
+<person name="Beck S."/>
+<person name="Rogers J."/>
+<person name="Bentley D.R."/>
+</authorList>
+<dbReference type="PubMed" id="15772651"/>
+<dbReference type="DOI" id="10.1038/nature03440"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+</reference>
+<reference key="12">
+<citation type="submission" date="2005-07" db="EMBL/GenBank/DDBJ databases">
+<authorList>
+<person name="Mural R.J."/>
+<person name="Istrail S."/>
+<person name="Sutton G.G."/>
+<person name="Florea L."/>
+<person name="Halpern A.L."/>
+<person name="Mobarry C.M."/>
+<person name="Lippert R."/>
+<person name="Walenz B."/>
+<person name="Shatkay H."/>
+<person name="Dew I."/>
+<person name="Miller J.R."/>
+<person name="Flanigan M.J."/>
+<person name="Edwards N.J."/>
+<person name="Bolanos R."/>
+<person name="Fasulo D."/>
+<person name="Halldorsson B.V."/>
+<person name="Hannenhalli S."/>
+<person name="Turner R."/>
+<person name="Yooseph S."/>
+<person name="Lu F."/>
+<person name="Nusskern D.R."/>
+<person name="Shue B.C."/>
+<person name="Zheng X.H."/>
+<person name="Zhong F."/>
+<person name="Delcher A.L."/>
+<person name="Huson D.H."/>
+<person name="Kravitz S.A."/>
+<person name="Mouchard L."/>
+<person name="Reinert K."/>
+<person name="Remington K.A."/>
+<person name="Clark A.G."/>
+<person name="Waterman M.S."/>
+<person name="Eichler E.E."/>
+<person name="Adams M.D."/>
+<person name="Hunkapiller M.W."/>
+<person name="Myers E.W."/>
+<person name="Venter J.C."/>
+</authorList>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA]</scope>
+</reference>
+<reference key="13">
+<citation type="journal article" date="2004" name="Genome Res." volume="14" first="2121" last="2127">
+<title>The status, quality, and expansion of the NIH full-length cDNA project: the Mammalian Gene Collection (MGC).</title>
+<authorList>
+<consortium name="The MGC Project Team"/>
+</authorList>
+<dbReference type="PubMed" id="15489334"/>
+<dbReference type="DOI" id="10.1101/gr.2596504"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORM 1)</scope>
+<source>
+<tissue>Muscle</tissue>
+</source>
+</reference>
+<reference key="14">
+<citation type="journal article" date="2013" name="Anal. Biochem." volume="434" first="44" last="51">
+<title>Experimental determination of organelle targeting-peptide cleavage sites using transient expression of green fluorescent protein translational fusions.</title>
+<authorList>
+<person name="Candat A."/>
+<person name="Poupart P."/>
+<person name="Andrieu J.P."/>
+<person name="Chevrollier A."/>
+<person name="Reynier P."/>
+<person name="Rogniaux H."/>
+<person name="Avelange-Macherel M.H."/>
+<person name="Macherel D."/>
+</authorList>
+<dbReference type="PubMed" id="23146587"/>
+<dbReference type="DOI" id="10.1016/j.ab.2012.10.040"/>
+</citation>
+<scope>PROTEIN SEQUENCE OF 31-37</scope>
+<scope>TRANSIT PEPTIDE</scope>
+</reference>
+<reference key="15">
+<citation type="journal article" date="1999" name="Proc. Natl. Acad. Sci. U.S.A." volume="96" first="3320" last="3324">
+<title>X chromosome evidence for ancient human histories.</title>
+<authorList>
+<person name="Harris E.E."/>
+<person name="Hey J."/>
+</authorList>
+<dbReference type="PubMed" id="10077682"/>
+<dbReference type="DOI" id="10.1073/pnas.96.6.3320"/>
+</citation>
+<scope>NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 202-336</scope>
+<scope>VARIANT LEU-282</scope>
+</reference>
+<reference key="16">
+<citation type="journal article" date="1992" name="J. Inherit. Metab. Dis." volume="15" first="848" last="856">
+<title>Mutation of E1 alpha gene in a female patient with pyruvate dehydrogenase deficiency due to rapid degradation of E1 protein.</title>
+<authorList>
+<person name="Ito M."/>
+<person name="Huq A.H."/>
+<person name="Naito E."/>
+<person name="Saijo T."/>
+<person name="Takeda E."/>
+<person name="Kuroda Y."/>
+</authorList>
+<dbReference type="PubMed" id="1338114"/>
+<dbReference type="DOI" id="10.1007/BF01800220"/>
+</citation>
+<scope>INVOLVEMENT IN PDHAD</scope>
+</reference>
+<reference key="17">
+<citation type="journal article" date="1995" name="J. Biol. Chem." volume="270" first="14297" last="14304">
+<title>Mutagenesis studies of the phosphorylation sites of recombinant human pyruvate dehydrogenase. Site-specific regulation.</title>
+<authorList>
+<person name="Korotchkina L.G."/>
+<person name="Patel M.S."/>
+</authorList>
+<dbReference type="PubMed" id="7782287"/>
+<dbReference type="DOI" id="10.1074/jbc.270.24.14297"/>
+</citation>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>FUNCTION</scope>
+<scope>ENZYME REGULATION</scope>
+<scope>MUTAGENESIS OF SER-232; SER-293 AND SER-300</scope>
+</reference>
+<reference key="18">
+<citation type="journal article" date="2001" name="J. Biol. Chem." volume="276" first="37223" last="37229">
+<title>Site specificity of four pyruvate dehydrogenase kinase isoenzymes toward the three phosphorylation sites of human pyruvate dehydrogenase.</title>
+<authorList>
+<person name="Korotchkina L.G."/>
+<person name="Patel M.S."/>
+</authorList>
+<dbReference type="PubMed" id="11486000"/>
+<dbReference type="DOI" id="10.1074/jbc.M103069200"/>
+</citation>
+<scope>PHOSPHORYLATION AT SER-232; SER-293 AND SER-300</scope>
+</reference>
+<reference key="19">
+<citation type="journal article" date="2004" name="J. Biol. Chem." volume="279" first="6921" last="6933">
+<title>Organization of the cores of the mammalian pyruvate dehydrogenase complex formed by E2 and E2 plus the E3-binding protein and their capacities to bind the E1 and E3 components.</title>
+<authorList>
+<person name="Hiromasa Y."/>
+<person name="Fujisawa T."/>
+<person name="Aso Y."/>
+<person name="Roche T.E."/>
+</authorList>
+<dbReference type="PubMed" id="14638692"/>
+<dbReference type="DOI" id="10.1074/jbc.M308172200"/>
+</citation>
+<scope>SUBUNIT</scope>
+</reference>
+<reference key="20">
+<citation type="journal article" date="2006" name="Cell" volume="127" first="635" last="648">
+<title>Global, in vivo, and site-specific phosphorylation dynamics in signaling networks.</title>
+<authorList>
+<person name="Olsen J.V."/>
+<person name="Blagoev B."/>
+<person name="Gnad F."/>
+<person name="Macek B."/>
+<person name="Kumar C."/>
+<person name="Mortensen P."/>
+<person name="Mann M."/>
+</authorList>
+<dbReference type="PubMed" id="17081983"/>
+<dbReference type="DOI" id="10.1016/j.cell.2006.09.026"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Cervix carcinoma</tissue>
+</source>
+</reference>
+<reference key="21">
+<citation type="journal article" date="2008" name="J. Proteome Res." volume="7" first="526" last="534">
+<title>Phosphoproteome of resting human platelets.</title>
+<authorList>
+<person name="Zahedi R.P."/>
+<person name="Lewandrowski U."/>
+<person name="Wiesner J."/>
+<person name="Wortelkamp S."/>
+<person name="Moebius J."/>
+<person name="Schuetz C."/>
+<person name="Walter U."/>
+<person name="Gambaryan S."/>
+<person name="Sickmann A."/>
+</authorList>
+<dbReference type="PubMed" id="18088087"/>
+<dbReference type="DOI" id="10.1021/pr0704130"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Platelet</tissue>
+</source>
+</reference>
+<reference key="22">
+<citation type="journal article" date="2008" name="Mol. Cell" volume="31" first="438" last="448">
+<title>Kinase-selective enrichment enables quantitative phosphoproteomics of the kinome across the cell cycle.</title>
+<authorList>
+<person name="Daub H."/>
+<person name="Olsen J.V."/>
+<person name="Bairlein M."/>
+<person name="Gnad F."/>
+<person name="Oppermann F.S."/>
+<person name="Korner R."/>
+<person name="Greff Z."/>
+<person name="Keri G."/>
+<person name="Stemmann O."/>
+<person name="Mann M."/>
+</authorList>
+<dbReference type="PubMed" id="18691976"/>
+<dbReference type="DOI" id="10.1016/j.molcel.2008.07.007"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Cervix carcinoma</tissue>
+</source>
+</reference>
+<reference key="23">
+<citation type="journal article" date="2008" name="Proc. Natl. Acad. Sci. U.S.A." volume="105" first="10762" last="10767">
+<title>A quantitative atlas of mitotic phosphorylation.</title>
+<authorList>
+<person name="Dephoure N."/>
+<person name="Zhou C."/>
+<person name="Villen J."/>
+<person name="Beausoleil S.A."/>
+<person name="Bakalarski C.E."/>
+<person name="Elledge S.J."/>
+<person name="Gygi S.P."/>
+</authorList>
+<dbReference type="PubMed" id="18669648"/>
+<dbReference type="DOI" id="10.1073/pnas.0805139105"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Cervix carcinoma</tissue>
+</source>
+</reference>
+<reference key="24">
+<citation type="journal article" date="2009" name="Anal. Chem." volume="81" first="4493" last="4501">
+<title>Lys-N and trypsin cover complementary parts of the phosphoproteome in a refined SCX-based approach.</title>
+<authorList>
+<person name="Gauci S."/>
+<person name="Helbig A.O."/>
+<person name="Slijper M."/>
+<person name="Krijgsveld J."/>
+<person name="Heck A.J."/>
+<person name="Mohammed S."/>
+</authorList>
+<dbReference type="PubMed" id="19413330"/>
+<dbReference type="DOI" id="10.1021/ac9004309"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="25">
+<citation type="journal article" date="2009" name="Science" volume="325" first="834" last="840">
+<title>Lysine acetylation targets protein complexes and co-regulates major cellular functions.</title>
+<authorList>
+<person name="Choudhary C."/>
+<person name="Kumar C."/>
+<person name="Gnad F."/>
+<person name="Nielsen M.L."/>
+<person name="Rehman M."/>
+<person name="Walther T.C."/>
+<person name="Olsen J.V."/>
+<person name="Mann M."/>
+</authorList>
+<dbReference type="PubMed" id="19608861"/>
+<dbReference type="DOI" id="10.1126/science.1175371"/>
+</citation>
+<scope>ACETYLATION [LARGE SCALE ANALYSIS] AT LYS-321</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="26">
+<citation type="journal article" date="2010" name="Sci. Signal." volume="3" first="RA3" last="RA3">
+<title>Quantitative phosphoproteomics reveals widespread full phosphorylation site occupancy during mitosis.</title>
+<authorList>
+<person name="Olsen J.V."/>
+<person name="Vermeulen M."/>
+<person name="Santamaria A."/>
+<person name="Kumar C."/>
+<person name="Miller M.L."/>
+<person name="Jensen L.J."/>
+<person name="Gnad F."/>
+<person name="Cox J."/>
+<person name="Jensen T.S."/>
+<person name="Nigg E.A."/>
+<person name="Brunak S."/>
+<person name="Mann M."/>
+</authorList>
+<dbReference type="PubMed" id="20068231"/>
+<dbReference type="DOI" id="10.1126/scisignal.2000475"/>
+</citation>
+<scope>PHOSPHORYLATION [LARGE SCALE ANALYSIS] AT SER-232</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Cervix carcinoma</tissue>
+</source>
+</reference>
+<reference key="27">
+<citation type="journal article" date="2011" name="BMC Syst. Biol." volume="5" first="17" last="17">
+<title>Initial characterization of the human central proteome.</title>
+<authorList>
+<person name="Burkard T.R."/>
+<person name="Planyavsky M."/>
+<person name="Kaupe I."/>
+<person name="Breitwieser F.P."/>
+<person name="Buerckstuemmer T."/>
+<person name="Bennett K.L."/>
+<person name="Superti-Furga G."/>
+<person name="Colinge J."/>
+</authorList>
+<dbReference type="PubMed" id="21269460"/>
+<dbReference type="DOI" id="10.1186/1752-0509-5-17"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="28">
+<citation type="journal article" date="2011" name="Sci. Signal." volume="4" first="RS3" last="RS3">
+<title>System-wide temporal characterization of the proteome and phosphoproteome of human embryonic stem cell differentiation.</title>
+<authorList>
+<person name="Rigbolt K.T."/>
+<person name="Prokhorova T.A."/>
+<person name="Akimov V."/>
+<person name="Henningsen J."/>
+<person name="Johansen P.T."/>
+<person name="Kratchmarova I."/>
+<person name="Kassem M."/>
+<person name="Mann M."/>
+<person name="Olsen J.V."/>
+<person name="Blagoev B."/>
+</authorList>
+<dbReference type="PubMed" id="21406692"/>
+<dbReference type="DOI" id="10.1126/scisignal.2001570"/>
+</citation>
+<scope>PHOSPHORYLATION [LARGE SCALE ANALYSIS] AT SER-232</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="29">
+<citation type="journal article" date="2013" name="J. Proteome Res." volume="12" first="260" last="271">
+<title>Toward a comprehensive characterization of a human cancer cell phosphoproteome.</title>
+<authorList>
+<person name="Zhou H."/>
+<person name="Di Palma S."/>
+<person name="Preisinger C."/>
+<person name="Peng M."/>
+<person name="Polat A.N."/>
+<person name="Heck A.J."/>
+<person name="Mohammed S."/>
+</authorList>
+<dbReference type="PubMed" id="23186163"/>
+<dbReference type="DOI" id="10.1021/pr300630k"/>
+</citation>
+<scope>PHOSPHORYLATION [LARGE SCALE ANALYSIS] AT SER-232</scope>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Cervix carcinoma</tissue>
+<tissue>Erythroleukemia</tissue>
+</source>
+</reference>
+<reference key="30">
+<citation type="journal article" date="2014" name="J. Proteomics" volume="96" first="253" last="262">
+<title>An enzyme assisted RP-RPLC approach for in-depth analysis of human liver phosphoproteome.</title>
+<authorList>
+<person name="Bian Y."/>
+<person name="Song C."/>
+<person name="Cheng K."/>
+<person name="Dong M."/>
+<person name="Wang F."/>
+<person name="Huang J."/>
+<person name="Sun D."/>
+<person name="Wang L."/>
+<person name="Ye M."/>
+<person name="Zou H."/>
+</authorList>
+<dbReference type="PubMed" id="24275569"/>
+<dbReference type="DOI" id="10.1016/j.jprot.2013.11.014"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+<source>
+<tissue>Liver</tissue>
+</source>
+</reference>
+<reference key="31">
+<citation type="journal article" date="2015" name="Proteomics" volume="15" first="2519" last="2524">
+<title>N-terminome analysis of the human mitochondrial proteome.</title>
+<authorList>
+<person name="Vaca Jacome A.S."/>
+<person name="Rabilloud T."/>
+<person name="Schaeffer-Reiss C."/>
+<person name="Rompais M."/>
+<person name="Ayoub D."/>
+<person name="Lane L."/>
+<person name="Bairoch A."/>
+<person name="Van Dorsselaer A."/>
+<person name="Carapito C."/>
+</authorList>
+<dbReference type="PubMed" id="25944712"/>
+<dbReference type="DOI" id="10.1002/pmic.201400617"/>
+</citation>
+<scope>IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS]</scope>
+</reference>
+<reference key="32">
+<citation type="journal article" date="2003" name="J. Biol. Chem." volume="278" first="21240" last="21246">
+<title>Structural basis for flip-flop action of thiamin pyrophosphate-dependent enzymes revealed by human pyruvate dehydrogenase.</title>
+<authorList>
+<person name="Ciszak E.M."/>
+<person name="Korotchkina L.G."/>
+<person name="Dominiak P.M."/>
+<person name="Sidhu S."/>
+<person name="Patel M.S."/>
+</authorList>
+<dbReference type="PubMed" id="12651851"/>
+<dbReference type="DOI" id="10.1074/jbc.M300339200"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.95 ANGSTROMS) IN COMPLEX WITH THIAMINE PYROPHOSPHATE</scope>
+<scope>COFACTOR</scope>
+</reference>
+<reference key="33">
+<citation type="journal article" date="1992" name="Hum. Mutat." volume="1" first="97" last="102">
+<title>Mutations and polymorphisms in the pyruvate dehydrogenase E1 alpha gene.</title>
+<authorList>
+<person name="Dahl H.-H.M."/>
+<person name="Brown G.K."/>
+<person name="Brown R.M."/>
+<person name="Hansen L.L."/>
+<person name="Kerr D.S."/>
+<person name="Wexler I.D."/>
+<person name="Patel M.S."/>
+<person name="de Meirleir L."/>
+<person name="Lissens W."/>
+<person name="Chun K."/>
+<person name="McKay N."/>
+<person name="Robinson B.H."/>
+</authorList>
+<dbReference type="PubMed" id="1301207"/>
+<dbReference type="DOI" id="10.1002/humu.1380010203"/>
+</citation>
+<scope>REVIEW ON VARIANTS</scope>
+</reference>
+<reference key="34">
+<citation type="journal article" date="2007" name="Biochemistry" volume="46" first="6277" last="6287">
+<title>Phosphorylation of serine 264 impedes active site accessibility in the E1 component of the human pyruvate dehydrogenase multienzyme complex.</title>
+<authorList>
+<person name="Seifert F."/>
+<person name="Ciszak E."/>
+<person name="Korotchkina L."/>
+<person name="Golbik R."/>
+<person name="Spinka M."/>
+<person name="Dominiak P."/>
+<person name="Sidhu S."/>
+<person name="Brauer J."/>
+<person name="Patel M.S."/>
+<person name="Tittmann K."/>
+</authorList>
+<dbReference type="PubMed" id="17474719"/>
+<dbReference type="DOI" id="10.1021/bi700083z"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.9 ANGSTROMS) OF 30-390</scope>
+<scope>ENZYME REGULATION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>MUTAGENESIS OF SER-293</scope>
+<scope>PHOSPHORYLATION AT SER-293</scope>
+</reference>
+<reference key="35">
+<citation type="journal article" date="2008" name="Structure" volume="16" first="1849" last="1859">
+<title>Structural basis for inactivation of the human pyruvate dehydrogenase complex by phosphorylation: role of disordered phosphorylation loops.</title>
+<authorList>
+<person name="Kato M."/>
+<person name="Wynn R.M."/>
+<person name="Chuang J.L."/>
+<person name="Tso S.C."/>
+<person name="Machius M."/>
+<person name="Li J."/>
+<person name="Chuang D.T."/>
+</authorList>
+<dbReference type="PubMed" id="19081061"/>
+<dbReference type="DOI" id="10.1016/j.str.2008.10.010"/>
+</citation>
+<scope>X-RAY CRYSTALLOGRAPHY (1.98 ANGSTROMS) OF 30-390 IN COMPLEX WITH PDHB</scope>
+<scope>SUBUNIT</scope>
+<scope>FUNCTION</scope>
+<scope>CATALYTIC ACTIVITY</scope>
+<scope>COFACTOR</scope>
+<scope>ENZYME REGULATION</scope>
+<scope>PHOSPHORYLATION AT SER-293 AND SER-300 BY PDK4</scope>
+</reference>
+<reference key="36">
+<citation type="journal article" date="1991" name="J. Inherit. Metab. Dis." volume="14" first="140" last="151">
+<title>Characterization of the mutations in three patients with pyruvate dehydrogenase E1 alpha deficiency.</title>
+<authorList>
+<person name="Hansen L.L."/>
+<person name="Brown G.K."/>
+<person name="Kirby D.M."/>
+<person name="Dahl H.-H.M."/>
+</authorList>
+<dbReference type="PubMed" id="1909401"/>
+<dbReference type="DOI" id="10.1007/BF01800586"/>
+</citation>
+<scope>VARIANTS PDHAD LYS-313 DEL AND HIS-378</scope>
+</reference>
+<reference key="37">
+<citation type="journal article" date="1992" name="Hum. Genet." volume="88" first="649" last="652">
+<title>Pyruvate dehydrogenase (PDH) deficiency caused by a 21-base pair insertion mutation in the E1 alpha subunit.</title>
+<authorList>
+<person name="De Meirleir L."/>
+<person name="Lissens W."/>
+<person name="Vamos E."/>
+<person name="Liebaers I."/>
+</authorList>
+<dbReference type="PubMed" id="1551669"/>
+<dbReference type="DOI" id="10.1007/BF02265291"/>
+</citation>
+<scope>VARIANT PDHAD ASP-SER-TYR-ARG-THR-ARG-GLU-305 INS</scope>
+</reference>
+<reference key="38">
+<citation type="journal article" date="1992" name="J. Inherit. Metab. Dis." volume="15" first="835" last="847">
+<title>X-linked pyruvate dehydrogenase E1 alpha subunit deficiency in heterozygous females: variable manifestation of the same mutation.</title>
+<authorList>
+<person name="Dahl H.-H.M."/>
+<person name="Hansen L.L."/>
+<person name="Brown R.M."/>
+<person name="Danks D.M."/>
+<person name="Rogers J.G."/>
+<person name="Brown G.K."/>
+</authorList>
+<dbReference type="PubMed" id="1293379"/>
+<dbReference type="DOI" id="10.1007/BF01800219"/>
+</citation>
+<scope>VARIANT PDHAD CYS-302</scope>
+</reference>
+<reference key="39">
+<citation type="journal article" date="1993" name="Ann. Neurol." volume="33" first="652" last="655">
+<title>Molecular genetic characterization of an X-linked form of Leigh's syndrome.</title>
+<authorList>
+<person name="Matthews P.M."/>
+<person name="Marchington D.R."/>
+<person name="Squier M."/>
+<person name="Land J."/>
+<person name="Brown R.M."/>
+<person name="Brown G.K."/>
+</authorList>
+<dbReference type="PubMed" id="8498846"/>
+<dbReference type="DOI" id="10.1002/ana.410330616"/>
+</citation>
+<scope>VARIANT PDHAD ALA-258</scope>
+</reference>
+<reference key="40">
+<citation type="journal article" date="1993" name="Hum. Mol. Genet." volume="2" first="449" last="454">
+<title>Mutations in the X-linked E1 alpha subunit of pyruvate dehydrogenase leading to deficiency of the pyruvate dehydrogenase complex.</title>
+<authorList>
+<person name="Chun K."/>
+<person name="McKay N."/>
+<person name="Petrova-Benedict R."/>
+<person name="Robinson B.H."/>
+</authorList>
+<dbReference type="PubMed" id="8504306"/>
+<dbReference type="DOI" id="10.1093/hmg/2.4.449"/>
+</citation>
+<scope>VARIANTS PDHAD MET-167; THR-199; ALA-231; GLY-263 AND LEU-292</scope>
+</reference>
+<reference key="41">
+<citation type="journal article" date="1994" name="Brain" volume="117" first="435" last="443">
+<title>Pyruvate dehydrogenase deficiency. Clinical presentation and molecular genetic characterization of five new patients.</title>
+<authorList>
+<person name="Matthews P.M."/>
+<person name="Brown R.M."/>
+<person name="Otero L.J."/>
+<person name="Marchington D.R."/>
+<person name="LeGris M."/>
+<person name="Howes R."/>
+<person name="Meadows L.S."/>
+<person name="Shevell M."/>
+<person name="Scriver C.R."/>
+<person name="Brown G.K."/>
+</authorList>
+<dbReference type="PubMed" id="8032855"/>
+<dbReference type="DOI" id="10.1093/brain/117.3.435"/>
+</citation>
+<scope>VARIANTS PDHAD ASN-243; ASN-315 AND HIS-378</scope>
+<scope>VARIANT LEU-282</scope>
+</reference>
+<reference key="42">
+<citation type="journal article" date="1994" name="Hum. Mol. Genet." volume="3" first="1021" last="1022">
+<title>Pyruvate dehydrogenase deficiency caused by a 33 base pair duplication in the PDH E1 alpha subunit.</title>
+<authorList>
+<person name="Hansen L.L."/>
+<person name="Horn N."/>
+<person name="Dahl H.-H.M."/>
+<person name="Kruse T.A."/>
+</authorList>
+<dbReference type="PubMed" id="7545958"/>
+<dbReference type="DOI" id="10.1093/hmg/3.6.1021"/>
+</citation>
+<scope>VARIANT PDHAD PRO-PRO-HIS-SER-TYR-ARG-THR-ARG-GLU-GLU-ILE-307 INS</scope>
+</reference>
+<reference key="43">
+<citation type="journal article" date="1994" name="Hum. Mutat." volume="3" first="152" last="155">
+<title>Pyruvate dehydrogenase deficiency in a male caused by a point mutation (F205L) in the E1 alpha subunit.</title>
+<authorList>
+<person name="Dahl H.-H.M."/>
+<person name="Brown G.K."/>
+</authorList>
+<dbReference type="PubMed" id="8199595"/>
+<dbReference type="DOI" id="10.1002/humu.1380030210"/>
+</citation>
+<scope>VARIANT PDHAD LEU-205</scope>
+</reference>
+<reference key="44">
+<citation type="journal article" date="1994" name="J. Inherit. Metab. Dis." volume="17" first="189" last="195">
+<title>Characterization of a point mutation in the pyruvate dehydrogenase E1 alpha gene from two boys with primary lactic acidaemia.</title>
+<authorList>
+<person name="Awata H."/>
+<person name="Endo F."/>
+<person name="Tanoue A."/>
+<person name="Kitano A."/>
+<person name="Matsuda I."/>
+</authorList>
+<dbReference type="PubMed" id="7967473"/>
+<dbReference type="DOI" id="10.1007/BF00711616"/>
+</citation>
+<scope>VARIANT PDHAD GLN-263</scope>
+</reference>
+<reference key="45">
+<citation type="journal article" date="1995" name="Am. J. Hum. Genet." volume="56" first="558" last="569">
+<title>Mutations in the X-linked E1 alpha subunit of pyruvate dehydrogenase: exon skipping, insertion of duplicate sequence, and missense mutations leading to the deficiency of the pyruvate dehydrogenase complex.</title>
+<authorList>
+<person name="Chun K."/>
+<person name="MacKay N."/>
+<person name="Petrova-Benedict R."/>
+<person name="Federico A."/>
+<person name="Fois A."/>
+<person name="Cole D.E.C."/>
+<person name="Robertson E."/>
+<person name="Robinson B.H."/>
+</authorList>
+<dbReference type="PubMed" id="7887409"/>
+</citation>
+<scope>VARIANTS PDHAD CYS-72; LEU-205; GLY-263; ARG-311 DEL AND HIS-378</scope>
+</reference>
+<reference key="46">
+<citation type="journal article" date="1995" name="Am. J. Hum. Genet." volume="57" first="772" last="780">
+<title>An amino acid substitution in the pyruvate dehydrogenase E1 alpha gene, affecting mitochondrial import of the precursor protein.</title>
+<authorList>
+<person name="Takakubo F."/>
+<person name="Cartwright P."/>
+<person name="Hoogenraad N."/>
+<person name="Thorburn D.R."/>
+<person name="Collins F."/>
+<person name="Lithgow T."/>
+<person name="Dahl H.-H.M."/>
+</authorList>
+<dbReference type="PubMed" id="7573035"/>
+</citation>
+<scope>VARIANT PDHAD PRO-10</scope>
+</reference>
+<reference key="47">
+<citation type="journal article" date="1995" name="Hum. Mol. Genet." volume="4" first="315" last="318">
+<title>Pyruvate dehydrogenase complex deficiency due to a point mutation (P188L) within the thiamine pyrophosphate binding loop of the E1 alpha subunit.</title>
+<authorList>
+<person name="Hemalatha S.G."/>
+<person name="Kerr D.S."/>
+<person name="Wexler I.D."/>
+<person name="Lusk M.M."/>
+<person name="Kaung M."/>
+<person name="Du Y."/>
+<person name="Kolli M."/>
+<person name="Schelper R.L."/>
+<person name="Patel M.S."/>
+</authorList>
+<dbReference type="PubMed" id="7757088"/>
+<dbReference type="DOI" id="10.1093/hmg/4.2.315"/>
+</citation>
+<scope>VARIANT PDHAD LEU-217</scope>
+</reference>
+<reference key="48">
+<citation type="journal article" date="1996" name="Hum. Mutat." volume="7" first="46" last="51">
+<title>Mutation analysis of the pyruvate dehydrogenase E1 alpha gene in eight patients with a pyruvate dehydrogenase complex deficiency.</title>
+<authorList>
+<person name="Lissens W."/>
+<person name="de Meirleir L."/>
+<person name="Seneca S."/>
+<person name="Benelli C."/>
+<person name="Marsac C."/>
+<person name="Poll-The B.T."/>
+<person name="Briones P."/>
+<person name="Ruitenbeek W."/>
+<person name="van Diggelen O."/>
+<person name="Chaigne D."/>
+<person name="Ramaekers V."/>
+<person name="Liebaers I."/>
+</authorList>
+<dbReference type="PubMed" id="8664900"/>
+<dbReference type="DOI" id="10.1002/(SICI)1098-1004(1996)7:1&lt;46::AID-HUMU6>3.3.CO;2-2"/>
+</citation>
+<scope>VARIANTS PDHAD CYS-72; ASP-113; ARG-162; GLY-263; HIS-288 AND CYS-302</scope>
+</reference>
+<reference key="49">
+<citation type="journal article" date="1996" name="Hum. Mutat." volume="8" first="180" last="182">
+<title>Three new mutations of the pyruvate dehydrogenase alpha subunit: a point mutation (M181V), 3 bp deletion (-R282), and 16 bp insertion/frameshift (K358SVS-->TVDQS).</title>
+<authorList>
+<person name="Tripatara A."/>
+<person name="Kerr D.S."/>
+<person name="Lusk M.M."/>
+<person name="Kolli M."/>
+<person name="Tan J."/>
+<person name="Patel M.S."/>
+</authorList>
+<dbReference type="PubMed" id="8844217"/>
+<dbReference type="DOI" id="10.1002/(SICI)1098-1004(1996)8:2&lt;180::AID-HUMU11>3.3.CO;2-O"/>
+</citation>
+<scope>VARIANTS PDHAD VAL-210 AND ARG-311 DEL</scope>
+</reference>
+<reference key="50">
+<citation type="journal article" date="1997" name="J. Inherit. Metab. Dis." volume="20" first="539" last="548">
+<title>Biochemical and molecular analysis of an X-linked case of Leigh syndrome associated with thiamin-responsive pyruvate dehydrogenase deficiency.</title>
+<authorList>
+<person name="Naito E."/>
+<person name="Ito M."/>
+<person name="Yokota I."/>
+<person name="Saijo T."/>
+<person name="Matsuda J."/>
+<person name="Osaka H."/>
+<person name="Kimura S."/>
+<person name="Kuroda Y."/>
+</authorList>
+<dbReference type="PubMed" id="9266390"/>
+<dbReference type="DOI" id="10.1023/A:1005305614374"/>
+</citation>
+<scope>VARIANT PDHAD GLY-263</scope>
+</reference>
+<reference key="51">
+<citation type="journal article" date="1998" name="Hum. Mutat." volume="12" first="114" last="121">
+<title>Arginine 302 mutations in the pyruvate dehydrogenase E1alpha subunit gene: identification of further patients and in vitro demonstration of pathogenicity.</title>
+<authorList>
+<person name="Otero L.J."/>
+<person name="Brown R.M."/>
+<person name="Brown G.K."/>
+</authorList>
+<dbReference type="PubMed" id="9671272"/>
+<dbReference type="DOI" id="10.1002/(SICI)1098-1004(1998)12:2&lt;114::AID-HUMU6>3.0.CO;2-#"/>
+</citation>
+<scope>VARIANTS PDHAD CYS-302 AND HIS-302</scope>
+</reference>
+<reference key="52">
+<citation type="journal article" date="2012" name="N. Engl. J. Med." volume="367" first="1921" last="1929">
+<title>Diagnostic exome sequencing in persons with severe intellectual disability.</title>
+<authorList>
+<person name="de Ligt J."/>
+<person name="Willemsen M.H."/>
+<person name="van Bon B.W."/>
+<person name="Kleefstra T."/>
+<person name="Yntema H.G."/>
+<person name="Kroes T."/>
+<person name="Vulto-van Silfhout A.T."/>
+<person name="Koolen D.A."/>
+<person name="de Vries P."/>
+<person name="Gilissen C."/>
+<person name="del Rosario M."/>
+<person name="Hoischen A."/>
+<person name="Scheffer H."/>
+<person name="de Vries B.B."/>
+<person name="Brunner H.G."/>
+<person name="Veltman J.A."/>
+<person name="Vissers L.E."/>
+</authorList>
+<dbReference type="PubMed" id="23033978"/>
+<dbReference type="DOI" id="10.1056/NEJMoa1206524"/>
+</citation>
+<scope>VARIANT THR-136</scope>
+</reference>
+<reference key="53">
+<citation type="journal article" date="2017" name="Hum. Mutat." volume="38" first="216" last="225">
+<title>Diagnostic targeted resequencing in 349 patients with drug-resistant pediatric epilepsies identifies causative mutations in 30 different genes.</title>
+<authorList>
+<consortium name="Clinical Study Group"/>
+<person name="Parrini E."/>
+<person name="Marini C."/>
+<person name="Mei D."/>
+<person name="Galuppi A."/>
+<person name="Cellini E."/>
+<person name="Pucatti D."/>
+<person name="Chiti L."/>
+<person name="Rutigliano D."/>
+<person name="Bianchini C."/>
+<person name="Virdo S."/>
+<person name="De Vita D."/>
+<person name="Bigoni S."/>
+<person name="Barba C."/>
+<person name="Mari F."/>
+<person name="Montomoli M."/>
+<person name="Pisano T."/>
+<person name="Rosati A."/>
+<person name="Guerrini R."/>
+</authorList>
+<dbReference type="PubMed" id="27864847"/>
+<dbReference type="DOI" id="10.1002/humu.23149"/>
+</citation>
+<scope>VARIANT PDHAD CYS-302</scope>
+</reference>
+<comment type="function">
+<text evidence="19 27">The pyruvate dehydrogenase complex catalyzes the overall conversion of pyruvate to acetyl-CoA and CO(2), and thereby links the glycolytic pathway to the tricarboxylic cycle.</text>
+</comment>
+<comment type="catalytic activity">
+<text evidence="18 19 27">Pyruvate + [dihydrolipoyllysine-residue acetyltransferase] lipoyllysine = [dihydrolipoyllysine-residue acetyltransferase] S-acetyldihydrolipoyllysine + CO(2).</text>
+</comment>
+<comment type="cofactor">
+<cofactor evidence="13 19">
+<name>thiamine diphosphate</name>
+<dbReference type="ChEBI" id="CHEBI:58937"/>
+</cofactor>
+</comment>
+<comment type="enzyme regulation">
+<text evidence="18 19 27">Pyruvate dehydrogenase activity is inhibited by phosphorylation of PDHA1; it is reactivated by dephosphorylation.</text>
+</comment>
+<comment type="subunit">
+<text evidence="13 16 19">Heterotetramer of two PDHA1 and two PDHB subunits. The heterotetramer interacts with DLAT, and is part of the multimeric pyruvate dehydrogenase complex that contains multiple copies of pyruvate dehydrogenase (E1), dihydrolipoamide acetyltransferase (DLAT, E2) and lipoamide dehydrogenase (DLD, E3). These subunits are bound to an inner core composed of about 48 DLAT and 12 PDHX molecules.</text>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-715747"/>
+<interactant intactId="EBI-1035872">
+<id>P11177</id>
+<label>PDHB</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>3</experiments>
+</comment>
+<comment type="interaction">
+<interactant intactId="EBI-715747"/>
+<interactant intactId="EBI-7016221">
+<id>Q15118</id>
+<label>PDK1</label>
+</interactant>
+<organismsDiffer>false</organismsDiffer>
+<experiments>2</experiments>
+</comment>
+<comment type="subcellular location">
+<subcellularLocation>
+<location>Mitochondrion matrix</location>
+</subcellularLocation>
+</comment>
+<comment type="alternative products">
+<event type="alternative splicing"/>
+<isoform>
+<id>P08559-1</id>
+<name>1</name>
+<sequence type="displayed"/>
+</isoform>
+<isoform>
+<id>P08559-2</id>
+<name>2</name>
+<sequence type="described" ref="VSP_042569"/>
+<text>No experimental confirmation available.</text>
+</isoform>
+<isoform>
+<id>P08559-3</id>
+<name>3</name>
+<sequence type="described" ref="VSP_042570"/>
+<text>No experimental confirmation available.</text>
+</isoform>
+<isoform>
+<id>P08559-4</id>
+<name>4</name>
+<sequence type="described" ref="VSP_043363"/>
+</isoform>
+</comment>
+<comment type="tissue specificity">
+<text>Ubiquitous.</text>
+</comment>
+<comment type="PTM">
+<text evidence="12 18 19">Phosphorylation at Ser-232, Ser-293 and Ser-300 by PDK family kinases inactivates the enzyme; for this phosphorylation at a single site is sufficient. Dephosphorylation at all three sites, i.e. at Ser-232, Ser-293 and Ser-300, is required for reactivation.</text>
+</comment>
+<comment type="PTM">
+<text evidence="9">Acetylation alters the phosphorylation pattern. Deacetylated by SIRT3 (By similarity).</text>
+</comment>
+<comment type="disease" evidence="14 15 17 20 23 24 25 26 28 29 30 31 32 33 34 35 36 37">
+<disease id="DI-02238">
+<name>Pyruvate dehydrogenase E1-alpha deficiency</name>
+<acronym>PDHAD</acronym>
+<description>An enzymatic defect causing primary lactic acidosis in children. It is associated with a broad clinical spectrum ranging from fatal lactic acidosis in the newborn to chronic neurologic dysfunction with structural abnormalities in the central nervous system without systemic acidosis.</description>
+<dbReference type="MIM" id="312170"/>
+</disease>
+<text>The disease is caused by mutations affecting the gene represented in this entry.</text>
+</comment>
+<comment type="sequence caution" evidence="41">
+<conflict type="erroneous initiation">
+<sequence resource="EMBL-CDS" id="AAA60055" version="1"/>
+</conflict>
+<text>Translation N-terminally shortened.</text>
+</comment>
+<comment type="sequence caution" evidence="41">
+<conflict type="frameshift">
+<sequence resource="EMBL-CDS" id="AAB59581" version="1"/>
+</conflict>
+<location>
+<position position="106"/>
+</location>
+<location>
+<position position="175"/>
+</location>
+</comment>
+<dbReference type="EC" id="1.2.4.1"/>
+<dbReference type="EMBL" id="D90084">
+<property type="protein sequence ID" value="BAA14121.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M24848">
+<property type="protein sequence ID" value="AAA36533.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="X52709">
+<property type="protein sequence ID" value="CAA36933.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="X52710">
+<property type="protein sequence ID" value="CAA36934.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M27257">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29155">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29156">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29157">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29158">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29159">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29160">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29161">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29162">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29163">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="M29164">
+<property type="protein sequence ID" value="AAA60051.1"/>
+<property type="status" value="JOINED"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="L13318">
+<property type="protein sequence ID" value="AAA60227.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="J03503">
+<property type="protein sequence ID" value="AAA60055.1"/>
+<property type="status" value="ALT_INIT"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="J03575">
+<property type="protein sequence ID" value="AAA60050.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="L48690">
+<property type="protein sequence ID" value="AAB59581.1"/>
+<property type="status" value="ALT_FRAME"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="EF590117">
+<property type="protein sequence ID" value="ABQ59099.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AK293250">
+<property type="protein sequence ID" value="BAH11476.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AK296457">
+<property type="protein sequence ID" value="BAH12361.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AK312263">
+<property type="protein sequence ID" value="BAG35194.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AK296341">
+<property type="protein sequence ID" value="BAH12323.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AK222740">
+<property type="protein sequence ID" value="BAD96460.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AL732326">
+<property type="status" value="NOT_ANNOTATED_CDS"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="CH471074">
+<property type="protein sequence ID" value="EAW98960.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="BC002406">
+<property type="protein sequence ID" value="AAH02406.1"/>
+<property type="molecule type" value="mRNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125053">
+<property type="protein sequence ID" value="AAD23841.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125054">
+<property type="protein sequence ID" value="AAD23842.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125055">
+<property type="protein sequence ID" value="AAD23843.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125056">
+<property type="protein sequence ID" value="AAD23844.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125057">
+<property type="protein sequence ID" value="AAD23845.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125058">
+<property type="protein sequence ID" value="AAD23846.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125059">
+<property type="protein sequence ID" value="AAD23847.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125060">
+<property type="protein sequence ID" value="AAD23848.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125061">
+<property type="protein sequence ID" value="AAD23849.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125062">
+<property type="protein sequence ID" value="AAD23850.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125063">
+<property type="protein sequence ID" value="AAD23851.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125064">
+<property type="protein sequence ID" value="AAD23852.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125065">
+<property type="protein sequence ID" value="AAD23853.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125066">
+<property type="protein sequence ID" value="AAD23854.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125067">
+<property type="protein sequence ID" value="AAD23855.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125068">
+<property type="protein sequence ID" value="AAD23856.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125069">
+<property type="protein sequence ID" value="AAD23857.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125070">
+<property type="protein sequence ID" value="AAD23858.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125071">
+<property type="protein sequence ID" value="AAD23859.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125072">
+<property type="protein sequence ID" value="AAD23860.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125073">
+<property type="protein sequence ID" value="AAD23861.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125074">
+<property type="protein sequence ID" value="AAD23862.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125075">
+<property type="protein sequence ID" value="AAD23863.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125076">
+<property type="protein sequence ID" value="AAD23864.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125078">
+<property type="protein sequence ID" value="AAD23866.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125079">
+<property type="protein sequence ID" value="AAD23867.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125080">
+<property type="protein sequence ID" value="AAD23868.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125081">
+<property type="protein sequence ID" value="AAD23869.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125082">
+<property type="protein sequence ID" value="AAD23870.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125083">
+<property type="protein sequence ID" value="AAD23871.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125084">
+<property type="protein sequence ID" value="AAD23872.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125085">
+<property type="protein sequence ID" value="AAD23873.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125086">
+<property type="protein sequence ID" value="AAD23874.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125087">
+<property type="protein sequence ID" value="AAD23875.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="EMBL" id="AF125088">
+<property type="protein sequence ID" value="AAD23876.1"/>
+<property type="molecule type" value="Genomic_DNA"/>
+</dbReference>
+<dbReference type="CCDS" id="CCDS14192.1">
+<molecule id="P08559-1"/>
+</dbReference>
+<dbReference type="CCDS" id="CCDS55380.1">
+<molecule id="P08559-4"/>
+</dbReference>
+<dbReference type="CCDS" id="CCDS55381.1">
+<molecule id="P08559-2"/>
+</dbReference>
+<dbReference type="CCDS" id="CCDS55382.1">
+<molecule id="P08559-3"/>
+</dbReference>
+<dbReference type="PIR" id="JQ0770">
+<property type="entry name" value="DEHUPA"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_000275.1">
+<molecule id="P08559-1"/>
+<property type="nucleotide sequence ID" value="NM_000284.3"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_001166925.1">
+<molecule id="P08559-4"/>
+<property type="nucleotide sequence ID" value="NM_001173454.1"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_001166926.1">
+<molecule id="P08559-2"/>
+<property type="nucleotide sequence ID" value="NM_001173455.1"/>
+</dbReference>
+<dbReference type="RefSeq" id="NP_001166927.1">
+<molecule id="P08559-3"/>
+<property type="nucleotide sequence ID" value="NM_001173456.1"/>
+</dbReference>
+<dbReference type="UniGene" id="Hs.530331"/>
+<dbReference type="PDB" id="1NI4">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.95"/>
+<property type="chains" value="A/C=30-390"/>
+</dbReference>
+<dbReference type="PDB" id="2OZL">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.90"/>
+<property type="chains" value="A/C=30-390"/>
+</dbReference>
+<dbReference type="PDB" id="3EXE">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="1.98"/>
+<property type="chains" value="A/C/E/G=30-390"/>
+</dbReference>
+<dbReference type="PDB" id="3EXF">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="3.00"/>
+<property type="chains" value="A/C/E/G=30-390"/>
+</dbReference>
+<dbReference type="PDB" id="3EXG">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="3.01"/>
+<property type="chains" value="1/3/5/A/C/E/G/I/K/M/O/Q/S/U/W/Y=30-390"/>
+</dbReference>
+<dbReference type="PDB" id="3EXH">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.44"/>
+<property type="chains" value="A/C/E/G=30-390"/>
+</dbReference>
+<dbReference type="PDB" id="3EXI">
+<property type="method" value="X-ray"/>
+<property type="resolution" value="2.20"/>
+<property type="chains" value="A=30-390"/>
+</dbReference>
+<dbReference type="PDBsum" id="1NI4"/>
+<dbReference type="PDBsum" id="2OZL"/>
+<dbReference type="PDBsum" id="3EXE"/>
+<dbReference type="PDBsum" id="3EXF"/>
+<dbReference type="PDBsum" id="3EXG"/>
+<dbReference type="PDBsum" id="3EXH"/>
+<dbReference type="PDBsum" id="3EXI"/>
+<dbReference type="ProteinModelPortal" id="P08559"/>
+<dbReference type="SMR" id="P08559"/>
+<dbReference type="BioGrid" id="111186">
+<property type="interactions" value="307"/>
+</dbReference>
+<dbReference type="ComplexPortal" id="CPX-376">
+<property type="entry name" value="Pyruvate dehydrogenase E1 heterotetramer"/>
+</dbReference>
+<dbReference type="CORUM" id="P08559"/>
+<dbReference type="DIP" id="DIP-37652N"/>
+<dbReference type="IntAct" id="P08559">
+<property type="interactions" value="23"/>
+</dbReference>
+<dbReference type="MINT" id="P08559"/>
+<dbReference type="DrugBank" id="DB00157">
+<property type="generic name" value="NADH"/>
+</dbReference>
+<dbReference type="iPTMnet" id="P08559"/>
+<dbReference type="PhosphoSitePlus" id="P08559"/>
+<dbReference type="SwissPalm" id="P08559"/>
+<dbReference type="BioMuta" id="PDHA1"/>
+<dbReference type="DMDM" id="129063"/>
+<dbReference type="REPRODUCTION-2DPAGE" id="IPI00306301"/>
+<dbReference type="UCD-2DPAGE" id="P08559"/>
+<dbReference type="EPD" id="P08559"/>
+<dbReference type="MaxQB" id="P08559"/>
+<dbReference type="PeptideAtlas" id="P08559"/>
+<dbReference type="PRIDE" id="P08559"/>
+<dbReference type="ProteomicsDB" id="52117"/>
+<dbReference type="ProteomicsDB" id="52118">
+<molecule id="P08559-2"/>
+</dbReference>
+<dbReference type="ProteomicsDB" id="52119">
+<molecule id="P08559-3"/>
+</dbReference>
+<dbReference type="ProteomicsDB" id="52120">
+<molecule id="P08559-4"/>
+</dbReference>
+<dbReference type="TopDownProteomics" id="P08559-3">
+<molecule id="P08559-3"/>
+</dbReference>
+<dbReference type="TopDownProteomics" id="P08559-4">
+<molecule id="P08559-4"/>
+</dbReference>
+<dbReference type="DNASU" id="5160"/>
+<dbReference type="Ensembl" id="ENST00000379806">
+<molecule id="P08559-4"/>
+<property type="protein sequence ID" value="ENSP00000369134"/>
+<property type="gene ID" value="ENSG00000131828"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000422285">
+<molecule id="P08559-1"/>
+<property type="protein sequence ID" value="ENSP00000394382"/>
+<property type="gene ID" value="ENSG00000131828"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000540249">
+<molecule id="P08559-3"/>
+<property type="protein sequence ID" value="ENSP00000440761"/>
+<property type="gene ID" value="ENSG00000131828"/>
+</dbReference>
+<dbReference type="Ensembl" id="ENST00000545074">
+<molecule id="P08559-2"/>
+<property type="protein sequence ID" value="ENSP00000438550"/>
+<property type="gene ID" value="ENSG00000131828"/>
+</dbReference>
+<dbReference type="GeneID" id="5160"/>
+<dbReference type="KEGG" id="hsa:5160"/>
+<dbReference type="UCSC" id="uc004czg.5">
+<molecule id="P08559-1"/>
+<property type="organism name" value="human"/>
+</dbReference>
+<dbReference type="CTD" id="5160"/>
+<dbReference type="DisGeNET" id="5160"/>
+<dbReference type="EuPathDB" id="HostDB:ENSG00000131828.13"/>
+<dbReference type="GeneCards" id="PDHA1"/>
+<dbReference type="HGNC" id="HGNC:8806">
+<property type="gene designation" value="PDHA1"/>
+</dbReference>
+<dbReference type="HPA" id="HPA047487"/>
+<dbReference type="HPA" id="HPA047864"/>
+<dbReference type="HPA" id="HPA063053"/>
+<dbReference type="MalaCards" id="PDHA1"/>
+<dbReference type="MIM" id="300502">
+<property type="type" value="gene"/>
+</dbReference>
+<dbReference type="MIM" id="312170">
+<property type="type" value="phenotype"/>
+</dbReference>
+<dbReference type="neXtProt" id="NX_P08559"/>
+<dbReference type="OpenTargets" id="ENSG00000131828"/>
+<dbReference type="Orphanet" id="70474">
+<property type="disease" value="Leigh syndrome with cardiomyopathy"/>
+</dbReference>
+<dbReference type="Orphanet" id="79243">
+<property type="disease" value="Pyruvate dehydrogenase E1-alpha deficiency"/>
+</dbReference>
+<dbReference type="PharmGKB" id="PA33150"/>
+<dbReference type="GeneTree" id="ENSGT00530000063174"/>
+<dbReference type="HOGENOM" id="HOG000281336"/>
+<dbReference type="HOVERGEN" id="HBG001863"/>
+<dbReference type="InParanoid" id="P08559"/>
+<dbReference type="KO" id="K00161"/>
+<dbReference type="OMA" id="RRFEDKC"/>
+<dbReference type="OrthoDB" id="EOG091G0966"/>
+<dbReference type="PhylomeDB" id="P08559"/>
+<dbReference type="TreeFam" id="TF300742"/>
+<dbReference type="BioCyc" id="MetaCyc:HS05573-MONOMER"/>
+<dbReference type="BRENDA" id="1.2.4.1">
+<property type="organism ID" value="2681"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-204174">
+<property type="pathway name" value="Regulation of pyruvate dehydrogenase (PDH) complex"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-389661">
+<property type="pathway name" value="Glyoxylate metabolism and glycine degradation"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-5362517">
+<property type="pathway name" value="Signaling by Retinoic Acid"/>
+</dbReference>
+<dbReference type="Reactome" id="R-HSA-70268">
+<property type="pathway name" value="Pyruvate metabolism"/>
+</dbReference>
+<dbReference type="SABIO-RK" id="P08559"/>
+<dbReference type="SIGNOR" id="P08559"/>
+<dbReference type="ChiTaRS" id="PDHA1">
+<property type="organism name" value="human"/>
+</dbReference>
+<dbReference type="EvolutionaryTrace" id="P08559"/>
+<dbReference type="GeneWiki" id="Pyruvate_dehydrogenase_(lipoamide)_alpha_1"/>
+<dbReference type="GenomeRNAi" id="5160"/>
+<dbReference type="PRO" id="PR:P08559"/>
+<dbReference type="Proteomes" id="UP000005640">
+<property type="component" value="Chromosome X"/>
+</dbReference>
+<dbReference type="Bgee" id="ENSG00000131828"/>
+<dbReference type="CleanEx" id="HS_PDHA1"/>
+<dbReference type="ExpressionAtlas" id="P08559">
+<property type="expression patterns" value="baseline and differential"/>
+</dbReference>
+<dbReference type="Genevisible" id="P08559">
+<property type="organism ID" value="HS"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005759">
+<property type="term" value="C:mitochondrial matrix"/>
+<property type="evidence" value="ECO:0000304"/>
+<property type="project" value="Reactome"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005739">
+<property type="term" value="C:mitochondrion"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="HPA"/>
+</dbReference>
+<dbReference type="GO" id="GO:0043209">
+<property type="term" value="C:myelin sheath"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005730">
+<property type="term" value="C:nucleolus"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="HPA"/>
+</dbReference>
+<dbReference type="GO" id="GO:0005634">
+<property type="term" value="C:nucleus"/>
+<property type="evidence" value="ECO:0007005"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0045254">
+<property type="term" value="C:pyruvate dehydrogenase complex"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004739">
+<property type="term" value="F:pyruvate dehydrogenase (acetyl-transferring) activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-EC"/>
+</dbReference>
+<dbReference type="GO" id="GO:0034604">
+<property type="term" value="F:pyruvate dehydrogenase (NAD+) activity"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0004738">
+<property type="term" value="F:pyruvate dehydrogenase activity"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006086">
+<property type="term" value="P:acetyl-CoA biosynthetic process from pyruvate"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006006">
+<property type="term" value="P:glucose metabolic process"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="UniProtKB-KW"/>
+</dbReference>
+<dbReference type="GO" id="GO:0061732">
+<property type="term" value="P:mitochondrial acetyl-CoA biosynthetic process from pyruvate"/>
+<property type="evidence" value="ECO:0000501"/>
+<property type="project" value="Ensembl"/>
+</dbReference>
+<dbReference type="GO" id="GO:0006099">
+<property type="term" value="P:tricarboxylic acid cycle"/>
+<property type="evidence" value="ECO:0000314"/>
+<property type="project" value="UniProtKB"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR001017">
+<property type="entry name" value="DH_E1"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR017597">
+<property type="entry name" value="Pyrv_DH_E1_asu_subgrp-y"/>
+</dbReference>
+<dbReference type="InterPro" id="IPR029061">
+<property type="entry name" value="THDP-binding"/>
+</dbReference>
+<dbReference type="Pfam" id="PF00676">
+<property type="entry name" value="E1_dh"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="SUPFAM" id="SSF52518">
+<property type="entry name" value="SSF52518"/>
+<property type="match status" value="1"/>
+</dbReference>
+<dbReference type="TIGRFAMs" id="TIGR03182">
+<property type="entry name" value="PDH_E1_alph_y"/>
+<property type="match status" value="1"/>
+</dbReference>
+<proteinExistence type="evidence at protein level"/>
+<keyword id="KW-0002">3D-structure</keyword>
+<keyword id="KW-0007">Acetylation</keyword>
+<keyword id="KW-0025">Alternative splicing</keyword>
+<keyword id="KW-0119">Carbohydrate metabolism</keyword>
+<keyword id="KW-0181">Complete proteome</keyword>
+<keyword id="KW-0903">Direct protein sequencing</keyword>
+<keyword id="KW-0225">Disease mutation</keyword>
+<keyword id="KW-0313">Glucose metabolism</keyword>
+<keyword id="KW-0431">Leigh syndrome</keyword>
+<keyword id="KW-0496">Mitochondrion</keyword>
+<keyword id="KW-0560">Oxidoreductase</keyword>
+<keyword id="KW-0597">Phosphoprotein</keyword>
+<keyword id="KW-0621">Polymorphism</keyword>
+<keyword id="KW-1274">Primary mitochondrial disease</keyword>
+<keyword id="KW-0670">Pyruvate</keyword>
+<keyword id="KW-1185">Reference proteome</keyword>
+<keyword id="KW-0786">Thiamine pyrophosphate</keyword>
+<keyword id="KW-0809">Transit peptide</keyword>
+<keyword id="KW-0816">Tricarboxylic acid cycle</keyword>
+<feature type="transit peptide" description="Mitochondrion" evidence="22">
+<location>
+<begin position="1"/>
+<end position="30"/>
+</location>
+</feature>
+<feature type="chain" description="Pyruvate dehydrogenase E1 component subunit alpha, somatic form, mitochondrial" id="PRO_0000020440">
+<location>
+<begin position="31"/>
+<end position="390"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine; alternate" evidence="10">
+<location>
+<position position="63"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine; alternate" evidence="10">
+<location>
+<position position="63"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphoserine; by PDK1" evidence="6 7 8 12">
+<location>
+<position position="232"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine; alternate" evidence="10">
+<location>
+<position position="244"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine; alternate" evidence="10">
+<location>
+<position position="244"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="10">
+<location>
+<position position="277"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphoserine; by PDK1, PDK2, PDK3 and PDK4" evidence="12 18 19">
+<location>
+<position position="293"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphoserine" evidence="10">
+<location>
+<position position="295"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphoserine; by PDK1, PDK2, PDK3 and PDK4" evidence="12 19">
+<location>
+<position position="300"/>
+</location>
+</feature>
+<feature type="modified residue" description="Phosphotyrosine" evidence="10">
+<location>
+<position position="301"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine; alternate" evidence="10">
+<location>
+<position position="313"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine; alternate" evidence="10">
+<location>
+<position position="313"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="5">
+<location>
+<position position="321"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-acetyllysine" evidence="10">
+<location>
+<position position="336"/>
+</location>
+</feature>
+<feature type="modified residue" description="N6-succinyllysine" evidence="10">
+<location>
+<position position="385"/>
+</location>
+</feature>
+<feature type="splice variant" description="In isoform 4." id="VSP_043363" evidence="39 40">
+<original>P</original>
+<variation>PRHGLATLPSLVSISRLKQSSHLGLPKCWDYSHSLKTRQ</variation>
+<location>
+<position position="19"/>
+</location>
+</feature>
+<feature type="splice variant" description="In isoform 2." id="VSP_042569" evidence="39">
+<original>G</original>
+<variation>GQFLLPLT</variation>
+<location>
+<position position="96"/>
+</location>
+</feature>
+<feature type="splice variant" description="In isoform 3." id="VSP_042570" evidence="39">
+<location>
+<begin position="170"/>
+<end position="200"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; affects mitochondrial import of precursor protein; dbSNP:rs137853257." id="VAR_010238" evidence="25">
+<original>R</original>
+<variation>P</variation>
+<location>
+<position position="10"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs863224148." id="VAR_004949" evidence="28 34">
+<original>R</original>
+<variation>C</variation>
+<location>
+<position position="72"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004950" evidence="34">
+<original>H</original>
+<variation>D</variation>
+<location>
+<position position="113"/>
+</location>
+</feature>
+<feature type="sequence variant" description="Probable disease-associated mutation found in a patient with moderate developmental delay, mild dysmorphism and mildly elevated serum lactate; dbSNP:rs138727886." id="VAR_069381" evidence="21">
+<original>A</original>
+<variation>T</variation>
+<location>
+<position position="136"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs866868610." id="VAR_004951" evidence="34">
+<original>G</original>
+<variation>R</variation>
+<location>
+<position position="162"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004952" evidence="33">
+<original>V</original>
+<variation>M</variation>
+<location>
+<position position="167"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004953" evidence="33">
+<original>A</original>
+<variation>T</variation>
+<location>
+<position position="199"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853254." id="VAR_004954" evidence="28 31">
+<original>F</original>
+<variation>L</variation>
+<location>
+<position position="205"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs794727843." id="VAR_004955" evidence="35">
+<original>M</original>
+<variation>V</variation>
+<location>
+<position position="210"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs1131691792." id="VAR_004956" evidence="26">
+<original>P</original>
+<variation>L</variation>
+<location>
+<position position="217"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004957" evidence="33">
+<original>T</original>
+<variation>A</variation>
+<location>
+<position position="231"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853255." id="VAR_021053" evidence="30">
+<original>Y</original>
+<variation>N</variation>
+<location>
+<position position="243"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853253." id="VAR_004958" evidence="32">
+<original>D</original>
+<variation>A</variation>
+<location>
+<position position="258"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853259." id="VAR_004959" evidence="28 33 34 36">
+<original>R</original>
+<variation>G</variation>
+<location>
+<position position="263"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004960" evidence="29">
+<original>R</original>
+<variation>Q</variation>
+<location>
+<position position="263"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In dbSNP:rs2229137." id="VAR_021054" evidence="11 30 38">
+<original>M</original>
+<variation>L</variation>
+<location>
+<position position="282"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853258." id="VAR_021055" evidence="34">
+<original>R</original>
+<variation>H</variation>
+<location>
+<position position="288"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004961" evidence="33">
+<original>H</original>
+<variation>L</variation>
+<location>
+<position position="292"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; loss of activity; common mutation; dbSNP:rs137853252." id="VAR_004962" evidence="14 23 34 37">
+<original>R</original>
+<variation>C</variation>
+<location>
+<position position="302"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs1064794149." id="VAR_004963" evidence="37">
+<original>R</original>
+<variation>H</variation>
+<location>
+<position position="302"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_020908" evidence="17">
+<original>E</original>
+<variation>EDSYRTRE</variation>
+<location>
+<position position="305"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_020909" evidence="24">
+<original>I</original>
+<variation>IPPHSYRTREEI</variation>
+<location>
+<position position="307"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004964" evidence="28 35">
+<location>
+<position position="311"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD." id="VAR_004965" evidence="20">
+<location>
+<position position="313"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853256." id="VAR_021056" evidence="30">
+<original>D</original>
+<variation>N</variation>
+<location>
+<position position="315"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In dbSNP:rs2228067." id="VAR_050436">
+<original>E</original>
+<variation>D</variation>
+<location>
+<position position="333"/>
+</location>
+</feature>
+<feature type="sequence variant" description="In PDHAD; dbSNP:rs137853250." id="VAR_004966" evidence="20 28 30">
+<original>R</original>
+<variation>H</variation>
+<location>
+<position position="378"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Abolishes inactivation by phosphorylation; when associated with A-293 and A-300." evidence="27">
+<original>S</original>
+<variation>A</variation>
+<location>
+<position position="232"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Reduces enzyme activity. Abolishes inactivation by phosphorylation; when associated with A-232 and A-300." evidence="18 27">
+<original>S</original>
+<variation>A</variation>
+<location>
+<position position="293"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Interferes with substrate binding." evidence="18 27">
+<original>S</original>
+<variation>E</variation>
+<location>
+<position position="293"/>
+</location>
+</feature>
+<feature type="mutagenesis site" description="Abolishes inactivation by phosphorylation; when associated with A-232 and A-293." evidence="27">
+<original>S</original>
+<variation>A</variation>
+<location>
+<position position="300"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 9; BAG35194." ref="9" evidence="41">
+<original>G</original>
+<variation>E</variation>
+<location>
+<position position="278"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 15; AAD23857." ref="15" evidence="41">
+<original>Y</original>
+<variation>S</variation>
+<location>
+<position position="301"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 15; AAD23857." ref="15" evidence="41">
+<original>E</original>
+<variation>D</variation>
+<location>
+<position position="306"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 6; AAA60055." ref="6" evidence="41">
+<original>A</original>
+<variation>P</variation>
+<location>
+<position position="349"/>
+</location>
+</feature>
+<feature type="sequence conflict" description="In Ref. 6; AAA60055." ref="6" evidence="41">
+<original>T</original>
+<variation>A</variation>
+<location>
+<position position="354"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="32"/>
+<end position="37"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="42"/>
+<end position="45"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="52"/>
+<end position="57"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="58"/>
+<end position="83"/>
+</location>
+</feature>
+<feature type="strand" evidence="3">
+<location>
+<begin position="85"/>
+<end position="87"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="98"/>
+<end position="106"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="112"/>
+<end position="115"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="121"/>
+<end position="126"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="131"/>
+<end position="138"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="145"/>
+<end position="148"/>
+</location>
+</feature>
+<feature type="helix" evidence="2">
+<location>
+<begin position="151"/>
+<end position="153"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="167"/>
+<end position="169"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="170"/>
+<end position="184"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="190"/>
+<end position="195"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="198"/>
+<end position="200"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="202"/>
+<end position="213"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="218"/>
+<end position="224"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="226"/>
+<end position="228"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="233"/>
+<end position="236"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="242"/>
+<end position="244"/>
+</location>
+</feature>
+<feature type="turn" evidence="1">
+<location>
+<begin position="245"/>
+<end position="248"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="251"/>
+<end position="255"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="259"/>
+<end position="274"/>
+</location>
+</feature>
+<feature type="turn" evidence="4">
+<location>
+<begin position="275"/>
+<end position="277"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="280"/>
+<end position="285"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="300"/>
+<end position="302"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="304"/>
+<end position="314"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="316"/>
+<end position="326"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="332"/>
+<end position="355"/>
+</location>
+</feature>
+<feature type="helix" evidence="1">
+<location>
+<begin position="361"/>
+<end position="363"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="367"/>
+<end position="371"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="375"/>
+<end position="378"/>
+</location>
+</feature>
+<feature type="strand" evidence="1">
+<location>
+<begin position="385"/>
+<end position="388"/>
+</location>
+</feature>
+<evidence key="1" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="2OZL"/>
+</source>
+</evidence>
+<evidence key="2" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3EXE"/>
+</source>
+</evidence>
+<evidence key="3" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3EXF"/>
+</source>
+</evidence>
+<evidence key="4" type="ECO:0000244">
+<source>
+<dbReference type="PDB" id="3EXG"/>
+</source>
+</evidence>
+<evidence key="5" type="ECO:0000244">
+<source>
+<dbReference type="PubMed" id="19608861"/>
+</source>
+</evidence>
+<evidence key="6" type="ECO:0000244">
+<source>
+<dbReference type="PubMed" id="20068231"/>
+</source>
+</evidence>
+<evidence key="7" type="ECO:0000244">
+<source>
+<dbReference type="PubMed" id="21406692"/>
+</source>
+</evidence>
+<evidence key="8" type="ECO:0000244">
+<source>
+<dbReference type="PubMed" id="23186163"/>
+</source>
+</evidence>
+<evidence key="9" type="ECO:0000250"/>
+<evidence key="10" type="ECO:0000250">
+<source>
+<dbReference type="UniProtKB" id="P35486"/>
+</source>
+</evidence>
+<evidence key="11" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="10077682"/>
+</source>
+</evidence>
+<evidence key="12" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="11486000"/>
+</source>
+</evidence>
+<evidence key="13" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="12651851"/>
+</source>
+</evidence>
+<evidence key="14" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1293379"/>
+</source>
+</evidence>
+<evidence key="15" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1338114"/>
+</source>
+</evidence>
+<evidence key="16" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="14638692"/>
+</source>
+</evidence>
+<evidence key="17" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1551669"/>
+</source>
+</evidence>
+<evidence key="18" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="17474719"/>
+</source>
+</evidence>
+<evidence key="19" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="19081061"/>
+</source>
+</evidence>
+<evidence key="20" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="1909401"/>
+</source>
+</evidence>
+<evidence key="21" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="23033978"/>
+</source>
+</evidence>
+<evidence key="22" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="23146587"/>
+</source>
+</evidence>
+<evidence key="23" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="27864847"/>
+</source>
+</evidence>
+<evidence key="24" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7545958"/>
+</source>
+</evidence>
+<evidence key="25" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7573035"/>
+</source>
+</evidence>
+<evidence key="26" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7757088"/>
+</source>
+</evidence>
+<evidence key="27" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7782287"/>
+</source>
+</evidence>
+<evidence key="28" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7887409"/>
+</source>
+</evidence>
+<evidence key="29" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="7967473"/>
+</source>
+</evidence>
+<evidence key="30" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8032855"/>
+</source>
+</evidence>
+<evidence key="31" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8199595"/>
+</source>
+</evidence>
+<evidence key="32" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8498846"/>
+</source>
+</evidence>
+<evidence key="33" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8504306"/>
+</source>
+</evidence>
+<evidence key="34" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8664900"/>
+</source>
+</evidence>
+<evidence key="35" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="8844217"/>
+</source>
+</evidence>
+<evidence key="36" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="9266390"/>
+</source>
+</evidence>
+<evidence key="37" type="ECO:0000269">
+<source>
+<dbReference type="PubMed" id="9671272"/>
+</source>
+</evidence>
+<evidence key="38" type="ECO:0000269">
+<source ref="10"/>
+</evidence>
+<evidence key="39" type="ECO:0000303">
+<source>
+<dbReference type="PubMed" id="14702039"/>
+</source>
+</evidence>
+<evidence key="40" type="ECO:0000303">
+<source ref="8"/>
+</evidence>
+<evidence key="41" type="ECO:0000305"/>
+<sequence length="390" mass="43296" checksum="4D685BBE44A92D4B" modified="1992-05-01" version="3" precursor="true">
+MRKMLAAVSRVLSGASQKPASRVLVASRNFANDATFEIKKCDLHRLEEGPPVTTVLTRED
+GLKYYRMMQTVRRMELKADQLYKQKIIRGFCHLCDGQEACCVGLEAGINPTDHLITAYRA
+HGFTFTRGLSVREILAELTGRKGGCAKGKGGSMHMYAKNFYGGNGIVGAQVPLGAGIALA
+CKYNGKDEVCLTLYGDGAANQGQIFEAYNMAALWKLPCIFICENNRYGMGTSVERAAAST
+DYYKRGDFIPGLRVDGMDILCVREATRFAAAYCRSGKGPILMELQTYRYHGHSMSDPGVS
+YRTREEIQEVRSKSDPIMLLKDRMVNSNLASVEELKEIDVEVRKEIEDAAQFATADPEPP
+LEELGYHIYSSDPPFEVRGANQWIKFKSVS
+</sequence>
+</entry>
+<copyright>
+Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution (CC BY 4.0) License
+</copyright>
+</uniprot>

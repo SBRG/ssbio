@@ -1681,6 +1681,7 @@ class Protein(Object):
             else:
                 rn = int(rn)
                 final_mapping[k] = rn
+                index_of_structure_resnum = chain_structure_resnum_mapping.index(rn)
 
                 # Additionally report if residues are the same - they could be different in the structure though
                 format_data = {'seqprop_id'       : seqprop.id,
@@ -1688,10 +1689,10 @@ class Protein(Object):
                                'seqprop_resnum'   : k,
                                'structprop_id'    : structprop.id,
                                'structprop_chid'  : chain_id,
-                               'structprop_resid' : chain.seq_record[rn - 1],
+                               'structprop_resid' : chain.seq_record[index_of_structure_resnum],
                                'structprop_resnum': rn}
 
-                if seqprop[k-1] != chain.seq_record[rn-1]:
+                if seqprop[k-1] != chain.seq_record[index_of_structure_resnum]:
                     log.warning('Sequence {seqprop_id} residue {seqprop_resid}{seqprop_resnum} does not match to '
                                 'structure {structprop_id}-{structprop_chid} residue '
                                 '{structprop_resid}{structprop_resnum}. NOTE: this may be due to '
@@ -1743,18 +1744,24 @@ class Protein(Object):
                 '{}: structure mapping {} not available in sequence letter annotations. Was alignment parsed? '
                 'Run ``align_seqprop_to_structprop`` with ``parse=True``.'.format(access_key, aln_id))
 
+        chain = structprop.chains.get_by_id(chain_id)
+        chain_structure_resnum_mapping = chain.seq_record.letter_annotations['structure_resnums']
+
         final_mapping = {}
         for resnum in resnums:
             resnum = int(resnum)
 
-            struct_res_singleaa = structprop.chains.get_by_id(chain_id).seq_record[resnum - 1]
-            if resnum not in seqprop.letter_annotations[access_key]:
-                log.warning('{}-{} -> {}: unable to map residue {} from structure to sequence, '
-                            'skipping'.format(structprop.id, chain_id, seqprop.id, resnum))
-                continue
-            sp_idx = seqprop.letter_annotations[access_key].index(resnum)
-            seq_res_singleaa = seqprop[sp_idx]
-            sp_resnum = sp_idx + 1
+            resnum_index = chain_structure_resnum_mapping.index(resnum)
+            struct_res_singleaa = structprop.chains.get_by_id(chain_id).seq_record[resnum_index]
+
+            # if resnum not in seqprop.letter_annotations[access_key]:
+            #     log.warning('{}-{} -> {}: unable to map residue {} from structure to sequence, '
+            #                 'skipping'.format(structprop.id, chain_id, seqprop.id, resnum))
+            #     continue
+            what = seqprop.letter_annotations[access_key].index(resnum_index+1)
+            # TODO in progress...
+            seq_res_singleaa = seqprop[what]
+            sp_resnum = what + 1
 
             final_mapping[resnum] = sp_resnum
 
