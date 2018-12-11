@@ -24,3 +24,4 @@ bcbio-gff
 scipy
 pytest
 deprecation
+networkx
