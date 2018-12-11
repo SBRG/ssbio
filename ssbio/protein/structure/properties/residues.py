@@ -79,6 +79,16 @@ def search_ss_bonds(model, threshold=3.0):
     return infodict
 
 
+def residue_distances(res_1_num, res_1_chain, res_2_num, res_2_chain, model):
+    """Distance between the last atom of 2 residues"""
+
+    res1 = model[res_1_chain][res_1_num].child_list[-1]
+    res2 = model[res_2_chain][res_2_num].child_list[-1]
+    distance = res1 - res2
+
+    return distance
+
+
 def resname_in_proximity(resname, model, chains, resnums, threshold=5):
     """Search within the proximity of a defined list of residue numbers and their chains for any specifed residue name.
 
