@@ -511,6 +511,8 @@ def map_resnum_a_to_resnum_b(resnums, a_aln, b_aln):
     {}
     >>> map_resnum_a_to_resnum_b(5, 'ABCDEF--', 'ABCD--GH')
     {}
+    >>> map_resnum_a_to_resnum_b([9,10], '--MKCDLHRLE-E', 'VSNEYSFEGYKLD')
+    {9: 11, 10: 13}
 
     Args:
         resnums (int, list): Residue number or numbers in the first aligned sequence
