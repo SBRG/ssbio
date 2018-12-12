@@ -137,10 +137,10 @@ def parse_mmtf_header(infile):
     mmtf_decoder = mmtf.parse(infile)
     infodict['date'] = mmtf_decoder.deposition_date
     infodict['release_date'] = mmtf_decoder.release_date
-    if isinstance(mmtf_decoder.experimental_methods, str):
-        infodict['experimental_method'] = x
-    else:
+    try:
         infodict['experimental_method'] = [x.decode() for x in mmtf_decoder.experimental_methods]
+    except AttributeError:
+        infodict['experimental_method'] = [x for x in mmtf_decoder.experimental_methods]
     infodict['resolution'] = mmtf_decoder.resolution
     infodict['description'] = mmtf_decoder.title
 
