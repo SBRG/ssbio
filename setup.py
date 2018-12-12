@@ -5,12 +5,12 @@ with open('requirements.txt') as f:
 
 setup(
         name='ssbio',
-        version='0.9.9.6',
+        version='0.9.9.7',
         author='Nathan Mih',
         author_email='nmih@ucsd.edu',
         license='MIT',
         url='http://github.com/SBRG/ssbio',
-        download_url = 'https://github.com/SBRG/ssbio/archive/v0.9.9.6.tar.gz',
+        download_url = 'https://github.com/SBRG/ssbio/archive/v0.9.9.7.tar.gz',
         description='Tools to enable structural systems biology',
         packages=find_packages(),
         package_dir={'ssbio': 'ssbio'},
