@@ -1,3 +1,4 @@
+from Bio import PDB
 from Bio.PDB.PDBIO import PDBIO
 from Bio.PDB.PDBIO import Select
 from Bio.PDB.PDBParser import PDBParser
@@ -93,7 +94,7 @@ class StructureIO(PDBIO):
 
         """
         if not custom_selection:
-            custom_selection = Select()
+            custom_selection = ModelSelection([0])
 
         # If no output directory, custom name, or suffix is specified, add a suffix "_new"
         if not out_dir or not custom_name:
@@ -116,3 +117,18 @@ class StructureIO(PDBIO):
             raise TypeError(e)
 
         return outfile
+
+
+class ModelSelection(PDB.Select):
+    """Selection rule to keep only a specified model of a PDB file."""
+
+    def __init__(self, models_to_keep):
+        self.models_to_keep = models_to_keep
+
+    def accept_model(self, model):
+        if model.id == model:
+            return True
+        elif model.id in self.models_to_keep:
+            return True
+        else:
+            return False

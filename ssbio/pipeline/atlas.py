@@ -217,9 +217,9 @@ class ATLAS(Object):
             strain_genome_file (str): Path to strain genome file
 
         """
-        logging.disable(logging.WARNING)
-        strain_gp = GEMPRO(gem_name=strain_id, genome_path=strain_genome_file)
-        logging.disable(logging.NOTSET)
+        # logging.disable(logging.WARNING)
+        strain_gp = GEMPRO(gem_name=strain_id, genome_path=strain_genome_file, write_protein_fasta_files=False)
+        # logging.disable(logging.NOTSET)
 
         self.strains.append(strain_gp)
         return self.strains.get_by_id(strain_id)

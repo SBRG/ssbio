@@ -48,7 +48,7 @@ def save_pickle(obj, outfile, protocol=2):
     return outfile
 
 
-def load_pickle(file):
+def load_pickle(file, encoding=None):
     """Load a pickle file.
 
     Args:
@@ -58,5 +58,10 @@ def load_pickle(file):
         object: Loaded object from pickle file
 
     """
+    # TODO: test set encoding='latin1' for 2/3 incompatibility
+    if encoding:
+        with open(file, 'rb') as f:
+            return pickle.load(f, encoding=encoding)
+
     with open(file, 'rb') as f:
        return pickle.load(f)

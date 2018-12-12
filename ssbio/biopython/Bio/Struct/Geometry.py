@@ -9,6 +9,7 @@ macromolecules.
 """
 
 from Bio.PDB import Entity
+import numpy as np
 
 def center_of_mass(entity, geometric=False):
     """
@@ -19,6 +20,11 @@ def center_of_mass(entity, geometric=False):
     # Structure, Model, Chain, Residue
     if isinstance(entity, Entity.Entity):
         atom_list = entity.get_atoms()
+    # List of Residues, added 2018-03-17 by Nathan
+    elif hasattr(entity, '__iter__') and [x for x in entity if x.level == 'R']:
+        atom_list = []
+        for res in entity:
+            atom_list.extend(list(res.get_atoms()))
     # List of Atoms
     elif hasattr(entity, '__iter__') and [x for x in entity if x.level == 'A']:
         atom_list = entity
@@ -32,7 +38,7 @@ def center_of_mass(entity, geometric=False):
     for atom in atom_list:
         masses.append(atom.mass)
         
-        for i, coord in enumerate(atom.coord.tolist()):
+        for i, coord in enumerate(np.array(atom.coord).tolist()):
             positions[i].append(coord)
 
     # If there is a single atom with undefined mass complain loudly.

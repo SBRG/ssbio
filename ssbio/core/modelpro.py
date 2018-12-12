@@ -9,6 +9,8 @@ from cobra.core import Gene
 from cobra.core import Reaction
 from cobra.core import DictList
 from ssbio.core.genepro import GenePro
+import numpy as np
+import networkx as nx
 
 
 class ModelPro(Model):
@@ -57,6 +59,82 @@ class ModelPro(Model):
         for k, v in attrs.items():
             if k in {'id', 'name', 'notes', 'compartments', 'annotation'}:
                 setattr(self, k, v)
+
+    def store_network_representations(self, exclude_mets=None):
+        # Remove highly connected metabolites
+        excluded_mets_tmp = ['atp', 'adp', 'amp', 'pi', 'ppi', 'co2',
+                             'h', 'nad', 'nadp', 'coa', 'glu__L', 'glu__D',
+                             'nadph', 'nadphx__R', 'nadphx__S', 'h2o', 'nh4', 'nadh']
+        excluded_mets = []
+        for x in excluded_mets_tmp:
+            excluded_mets.append(x + '_c')
+            excluded_mets.append(x + '_e')
+            excluded_mets.append(x + '_p')
+
+        if exclude_mets:
+            assert isinstance(exclude_mets, list)
+            excluded_mets.extend(exclude_mets)
+
+        # Create gene to metabolite (product or reactant) dictionary
+        g_to_met_dict = {}
+        for g in self.genes:
+            g_rxns = [r for r in list(g.reactions)]
+            g_mets = []
+            for r in g_rxns:
+                for m in r.metabolites:
+                    if m.id not in excluded_mets:
+                        g_mets.append(m.id)
+            g_to_met_dict[g.id] = g_mets
+
+        # Genes as nodes, metabolites as edges
+        GG = nx.Graph()
+        for g1, g1_mets in g_to_met_dict.items():
+            for g2, g2_mets in g_to_met_dict.items():
+                if g1 != g2:
+                    incommon = list(set(g1_mets).intersection(g2_mets))
+                    if len(incommon) > 0:
+                        # Just create edge if there's anything in common
+                        GG.add_edge(g1, g2, object=incommon)
+        self.gene_met_network = GG
+
+        # Metabolites as nodes, reactions as edges
+        GM = nx.DiGraph()
+        for r in self.reactions:
+            # Can carry forward flux?
+            if r.upper_bound > 0:
+                for reactant in r.reactants:
+                    for product in r.products:
+                        if reactant.id in excluded_mets or product.id in excluded_mets:
+                            continue
+                        GM.add_edge(reactant.id, product.id, object=r.id)
+            # Can carry reverse flux?
+            if r.lower_bound > 0:
+                for reactant in r.reactants:
+                    for product in r.products:
+                        if reactant.id in excluded_mets or product.id in excluded_mets:
+                            continue
+                        GM.add_edge(product.id, reactant.id, object=r.id)
+        self.met_rxn_network = GM
+
+    def network_distance_between_genes(self, gene1_id, gene2_id, shortest=True):
+        all_shortest_paths = []
+        for i, path in enumerate(nx.all_shortest_paths(self.gene_met_network, gene1_id, gene2_id)):
+            edges_in_path = zip(path[0:], path[1:])
+            full_info = [(u, v, self.gene_met_network[u][v]['object']) for (u, v) in edges_in_path]
+            if shortest:
+                return full_info
+            all_shortest_paths.append(full_info)
+        return all_shortest_paths
+
+    def network_distance_between_mets(self, met1_id, met2_id, shortest=True):
+        all_shortest_paths = []
+        for i, path in enumerate(nx.all_shortest_paths(self.met_rxn_network, met1_id, met2_id)):
+            edges_in_path = zip(path[0:], path[1:])
+            full_info = [(u, v, self.met_rxn_network[u][v]['object']) for (u, v) in edges_in_path]
+            if shortest:
+                return full_info
+            all_shortest_paths.append(full_info)
+        return all_shortest_paths
 
 
 def model_loader(gem_file_path, gem_file_type):

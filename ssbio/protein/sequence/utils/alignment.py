@@ -80,6 +80,7 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
 
     if engine == 'needle':
         alignment_file = run_needle_alignment(seq_a=a_seq, seq_b=b_seq, gapopen=gapopen, gapextend=gapextend,
+                                              write_outfile=True,  # Has to be true, AlignIO parses files on disk
                                               outdir=outdir, outfile=outfile, force_rerun=force_rerun)
         log.debug('Needle alignment at {}'.format(alignment_file))
 
@@ -87,28 +88,29 @@ def pairwise_sequence_alignment(a_seq, b_seq, engine, a_seq_id=None, b_seq_id=No
             raise ValueError('{}: needle alignment file does not exist'.format(alignment_file))
 
         # Use AlignIO to parse the needle alignment, alignments[0] is the first alignment (the only one in pairwise)
-        alignments = list(AlignIO.parse(alignment_file, "emboss"))
-        alignment = alignments[0]
+        # alignments = list(AlignIO.parse(alignment_file, "emboss"))
+        # alignment = alignments[0]
+        alignment = needle_statistics_alignio(alignment_file)
 
         # Rename the sequence IDs
         alignment[0].id = a_seq_id
         alignment[1].id = b_seq_id
 
-        # Add needle statistics as annotations in the alignment object
-        stats = needle_statistics(alignment_file)
-        alignment_ids = list(stats.keys())
-        if len(alignment_ids) > 1:
-            raise ValueError('Needle alignment file contains more than one pairwise alignment')
-        needle_id = alignment_ids[0]
-        alignment.annotations['percent_identity'] = stats[needle_id]['percent_identity']
-        alignment.annotations['percent_similarity'] = stats[needle_id]['percent_similarity']
-        alignment.annotations['percent_gaps'] = stats[needle_id]['percent_gaps']
-        alignment.annotations['score'] = stats[needle_id]['score']
+        # # Add needle statistics as annotations in the alignment object
+        # stats = needle_statistics(alignment_file)
+        # alignment_ids = list(stats.keys())
+        # if len(alignment_ids) > 1:
+        #     raise ValueError('Needle alignment file contains more than one pairwise alignment')
+        # needle_id = alignment_ids[0]
+        # alignment.annotations['percent_identity'] = stats[needle_id]['percent_identity']
+        # alignment.annotations['percent_similarity'] = stats[needle_id]['percent_similarity']
+        # alignment.annotations['percent_gaps'] = stats[needle_id]['percent_gaps']
+        # alignment.annotations['score'] = stats[needle_id]['score']
 
         return alignment
 
 
-def run_needle_alignment(seq_a, seq_b, gapopen=10, gapextend=0.5,
+def run_needle_alignment(seq_a, seq_b, gapopen=10, gapextend=0.5, write_outfile=True,
                          outdir=None, outfile=None, force_rerun=False):
     """Run the needle alignment program for two strings and return the raw alignment result.
 
@@ -139,28 +141,34 @@ def run_needle_alignment(seq_a, seq_b, gapopen=10, gapextend=0.5,
 
     # TODO: rewrite using utils functions - does not report error if needle is not installed currently
     # TODO: rethink outdir/outfile, also if this should return the tempfile or just a file object or whatever
-    if not outfile:
-        outfile = op.join(tempfile.gettempdir(), 'temp_alignment.needle')
-    else:
-        outfile = op.join(outdir, outfile)
-
-    # Check if the outfile already exists, if so just return the filename
-    if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+    if write_outfile:
         seq_a = ssbio.protein.sequence.utils.cast_to_str(seq_a)
         seq_b = ssbio.protein.sequence.utils.cast_to_str(seq_b)
 
-        cmd = 'needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(outfile, seq_a, seq_b, gapopen, gapextend)
-        command = subprocess.Popen(cmd,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   shell=True)
-        out, err = command.communicate()
-        # needle_cline = NeedleCommandline(asequence="asis::"+seq_a, bsequence="asis::"+seq_b,
-        #                                  gapopen=gapopen, gapextend=gapextend,
-        #                                  outfile=outfile)
-        # stdout, stderr = needle_cline()
+        if not outfile:
+            outfile = op.join(tempfile.gettempdir(), 'temp_alignment.needle')
+        else:
+            outfile = op.join(outdir, outfile)
 
-    return outfile
+        if ssbio.utils.force_rerun(flag=force_rerun, outfile=outfile):
+            cmd = 'needle -outfile="{}" -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(
+                outfile, seq_a, seq_b, gapopen, gapextend)
+            command = subprocess.Popen(cmd,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE,
+                                       shell=True)
+            out, err = command.communicate()
+
+        return outfile
+
+    else:
+        seq_a = ssbio.protein.sequence.utils.cast_to_str(seq_a)
+        seq_b = ssbio.protein.sequence.utils.cast_to_str(seq_b)
+
+        cmd = 'needle -auto -stdout -asequence=asis::{} -bsequence=asis::{} -gapopen={} -gapextend={}'.format(seq_a, seq_b, gapopen, gapextend)
+        command = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        stdout = command.stdout.read()
+        return stdout
 
 
 def run_needle_alignment_on_files(id_a, faa_a, id_b, faa_b, gapopen=10, gapextend=0.5,
@@ -631,3 +639,63 @@ def needle_statistics(infile):
                 line = f.readline()
 
     return alignment_properties
+
+
+def needle_statistics_alignio(infile):
+    """Reads in a needle alignment file and returns an AlignIO object with annotations
+
+    Args:
+        infile (str): Alignment file name
+
+    Returns:
+        AlignIO: annotated AlignIO object
+
+    """
+
+    alignments = list(AlignIO.parse(infile, "emboss"))
+
+    if len(alignments) > 1:
+        raise ValueError('Alignment file contains more than one pairwise alignment')
+
+    alignment = alignments[0]
+
+    with open(infile) as f:
+        line = f.readline()
+
+        for i in range(len(alignments)):
+            while line.rstrip() != "#=======================================":
+                line = f.readline()
+                if not line:
+                    raise StopIteration
+
+            while line[0] == "#":
+                # Read in the rest of this alignment header,
+                # try and discover the number of records expected and their length
+                parts = line[1:].split(":", 1)
+                key = parts[0].lower().strip()
+                if key == 'identity':
+                    ident_parse = parts[1].strip().replace('(','').replace(')','').replace('%','').split()
+                    ident_num = int(ident_parse[0].split('/')[0])
+                    ident_percent = float(ident_parse[1])
+                    alignment.annotations['identity'] = ident_num
+                    alignment.annotations['percent_identity'] = ident_percent
+                if key == 'similarity':
+                    sim_parse = parts[1].strip().replace('(','').replace(')','').replace('%','').split()
+                    sim_num = int(sim_parse[0].split('/')[0])
+                    sim_percent = float(sim_parse[1])
+                    alignment.annotations['similarity'] = sim_num
+                    alignment.annotations['percent_similarity'] = sim_percent
+                if key == 'gaps':
+                    gap_parse = parts[1].strip().replace('(','').replace(')','').replace('%','').split()
+                    gap_num = int(gap_parse[0].split('/')[0])
+                    gap_percent = float(gap_parse[1])
+                    alignment.annotations['gaps'] = gap_num
+                    alignment.annotations['percent_gaps'] = gap_percent
+                if key == 'score':
+                    score = float(parts[1].strip())
+                    alignment.annotations['score'] = score
+
+                # And read in another line...
+                line = f.readline()
+
+    return alignment

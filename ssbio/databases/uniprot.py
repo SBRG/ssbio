@@ -174,6 +174,26 @@ class UniProtProp(SeqProp):
             parsed = parse_uniprot_xml_metadata(tmp_sr)
             self.update(parsed, overwrite=True)
 
+    def metadata_path_unset(self):
+        """Copy features to memory and remove the association of the metadata file."""
+        if not self.metadata_file:
+            raise IOError('No metadata file to unset')
+
+        log.debug('{}: reading from metadata file {}'.format(self.id, self.metadata_path))
+        tmp_sr = SeqIO.read(self.metadata_path, 'uniprot-xml')
+        tmp_feats = tmp_sr.features
+
+        # TODO: should this be in separate unset functions?
+        self.metadata_dir = None
+        self.metadata_file = None
+        self.features = tmp_feats
+
+        if self.sequence_file:
+            tmp_sr = tmp_sr.seq
+            self.sequence_dir = None
+            self.sequence_file = None
+            self.seq = tmp_sr
+
     def download_seq_file(self, outdir, force_rerun=False):
         """Download and load the UniProt FASTA file"""
 

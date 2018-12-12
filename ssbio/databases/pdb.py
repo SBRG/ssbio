@@ -137,7 +137,10 @@ def parse_mmtf_header(infile):
     mmtf_decoder = mmtf.parse(infile)
     infodict['date'] = mmtf_decoder.deposition_date
     infodict['release_date'] = mmtf_decoder.release_date
-    infodict['experimental_method'] = [x.decode() for x in mmtf_decoder.experimental_methods]
+    try:
+        infodict['experimental_method'] = [x.decode() for x in mmtf_decoder.experimental_methods]
+    except AttributeError:
+        infodict['experimental_method'] = [x for x in mmtf_decoder.experimental_methods]
     infodict['resolution'] = mmtf_decoder.resolution
     infodict['description'] = mmtf_decoder.title
 
@@ -159,6 +162,7 @@ def download_mmcif_header(pdb_id, outdir='', force_rerun=False):
         str: Path to outfile
 
     """
+    # TODO: keep an eye on https://github.com/biopython/biopython/pull/943 Biopython PR#493 for functionality of this
     # method in biopython. extra file types have not been added to biopython download yet
 
     pdb_id = pdb_id.lower()

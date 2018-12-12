@@ -12,7 +12,9 @@ from Bio.PDB import Polypeptide
 from Bio.PDB.HSExposure import ExposureCN, HSExposureCA, HSExposureCB
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-
+import numpy as np
+from Bio.PDB import Selection
+from Bio.PDB import NeighborSearch
 import ssbio.protein.sequence.utils
 from ssbio.protein.structure.utils.structureio import StructureIO
 
@@ -116,6 +118,42 @@ def resname_in_proximity(resname, model, chains, resnums, threshold=5):
                     return True
 
     return False
+
+
+def within(resnum, angstroms, chain_id, model, use_ca=False, custom_coord=None):
+    """See: https://www.biostars.org/p/1816/ https://www.biostars.org/p/269579/
+
+    Args:
+        resnum (int):
+        angstroms (float):
+        chain_id (str):
+        model (Model):
+        use_ca (bool): If the alpha-carbon atom should be used for the search, otherwise use the last atom of the residue
+        custom_coord (list): Custom XYZ coordinate to get within
+
+    Returns:
+        list: List of Bio.PDB.Residue.Residue objects
+
+    """
+    # XTODO: documentation
+    # TODO: should have separate method for within a normal residue (can use "resnum" with a int) or a custom coord,
+    # where you don't need to specify resnum
+    atom_list = Selection.unfold_entities(model, 'A')
+    ns = NeighborSearch(atom_list)
+
+    if custom_coord:  # a list of XYZ coord
+        target_atom_coord = np.array(custom_coord, 'f')
+    else:
+        target_residue = model[chain_id][resnum]
+        if use_ca:
+            target_atom = target_residue['CA']
+        else:
+            target_atom = target_residue.child_list[-1]
+        target_atom_coord = np.array(target_atom.get_coord(), 'f')
+    neighbors = ns.search(target_atom_coord, angstroms)
+    residue_list = Selection.unfold_entities(neighbors, 'R')
+
+    return residue_list
 
 
 def get_structure_seqrecords(model):
@@ -381,6 +419,8 @@ def hse_output(pdb_file, file_type):
     exp_fs = ExposureCN(model)
 
     return
+
+
 # def magni(a, b, c):
 #     """Calculate the magnitude of distance vector
 #     """

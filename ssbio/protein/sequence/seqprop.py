@@ -5,11 +5,13 @@ SeqProp
 
 import os.path as op
 import pandas as pd
+import tempfile
 import requests
 import logging
 from copy import copy, deepcopy
 from slugify import Slugify
-
+import os
+import subprocess
 from Bio import SeqIO
 from BCBio import GFF
 from Bio.Seq import Seq
@@ -25,6 +27,10 @@ import ssbio.protein.sequence.properties.residues
 
 custom_slugify = Slugify(safe_chars='-_.')
 log = logging.getLogger(__name__)
+
+
+class SeqPropException(Exception):
+    pass
 
 
 class SeqProp(SeqRecord):
@@ -518,7 +524,7 @@ class SeqProp(SeqRecord):
 
         self.feature_path = outfile
 
-    def add_point_feature(self, resnum, feat_type=None, feat_id=None):
+    def add_point_feature(self, resnum, feat_type=None, feat_id=None, qualifiers=None):
         """Add a feature to the features list describing a single residue.
 
         Args:
@@ -535,11 +541,12 @@ class SeqProp(SeqRecord):
             feat_type = 'Manually added protein sequence single residue feature'
         newfeat = SeqFeature(location=FeatureLocation(ExactPosition(resnum-1), ExactPosition(resnum)),
                              type=feat_type,
-                             id=feat_id)
+                             id=feat_id,
+                             qualifiers=qualifiers)
 
         self.features.append(newfeat)
 
-    def add_region_feature(self, start_resnum, end_resnum, feat_type=None, feat_id=None):
+    def add_region_feature(self, start_resnum, end_resnum, feat_type=None, feat_id=None, qualifiers=None):
         """Add a feature to the features list describing a region of the protein sequence.
 
         Args:
@@ -557,25 +564,46 @@ class SeqProp(SeqRecord):
             feat_type = 'Manually added protein sequence region feature'
         newfeat = SeqFeature(location=FeatureLocation(start_resnum-1, end_resnum),
                              type=feat_type,
-                             id=feat_id)
+                             id=feat_id,
+                             qualifiers=qualifiers)
 
         self.features.append(newfeat)
 
-    def get_subsequence(self, resnums):
+    def get_subsequence(self, resnums, new_id=None, copy_letter_annotations=True):
         """Get a subsequence as a new SeqProp object given a list of residue numbers"""
+        # XTODO: documentation
         biop_compound_list = []
         for resnum in resnums:
+            # XTODO can be sped up by separating into ranges based on continuous resnums
             feat = FeatureLocation(resnum - 1, resnum)
             biop_compound_list.append(feat)
 
-        sub_feature_location = CompoundLocation(biop_compound_list)
-        sub_feature = sub_feature_location.extract(self)
+        if len(biop_compound_list) == 0:
+            log.debug('Zero length subsequence')
+            return
+        elif len(biop_compound_list) == 1:
+            log.debug('Subsequence only one residue long')
+            sub_feature_location = biop_compound_list[0]
+        else:
+            sub_feature_location = CompoundLocation(biop_compound_list)
 
-        new_sp = SeqProp(id='{}_subseq'.format(self.id), seq=sub_feature)
-        new_sp.letter_annotations = sub_feature.letter_annotations
+        try:
+            sub_feature = sub_feature_location.extract(self)
+        except TypeError:
+            log.critical('SeqProp {}: unknown error when trying to get subsequence - please investigate! '
+                          'Try using a feature to extract a subsequence from the SeqProp'.format(self.id))
+            return
+
+        if not new_id:
+            new_id = '{}_subseq'.format(self.id)
+
+        new_sp = SeqProp(id=new_id, seq=sub_feature.seq)
+        if copy_letter_annotations:
+            new_sp.letter_annotations = sub_feature.letter_annotations
         return new_sp
 
-    def get_subsequence_from_property(self, property_key, property_value, condition, return_resnums=False):
+    def get_subsequence_from_property(self, property_key, property_value, condition,
+                                      return_resnums=False, copy_letter_annotations=True):
         """Get a subsequence as a new SeqProp object given a certain property you want to find in the
         original SeqProp's letter_annotation
 
@@ -606,34 +634,39 @@ class SeqProp(SeqRecord):
         """
 
         if property_key not in self.letter_annotations:
-            raise KeyError('{}: {} not contained in the letter annotations'.format(self.id, property_key))
+            log.error('{}: {} not contained in the letter annotations'.format(self.id, property_key))
+            return
 
-        subfeat_indices = list(
-            locate(self.letter_annotations[property_key], lambda x: ssbio.utils.check_condition(x, condition, property_value)))
+        if condition == 'in':
+            subfeat_indices = list(locate(self.letter_annotations[property_key],
+                                          lambda x: x in property_value))
+        else:
+            subfeat_indices = list(
+                locate(self.letter_annotations[property_key], lambda x: ssbio.utils.check_condition(x, condition, property_value)))
+        subfeat_resnums = [x+1 for x in subfeat_indices]
 
-        biop_compound_list = []
-        for idx in subfeat_indices:
-            feat = FeatureLocation(idx, idx + 1)
-            biop_compound_list.append(feat)
-
-        sub_feature_location = CompoundLocation(biop_compound_list)
-        sub_feature = sub_feature_location.extract(self)
-
-        new_sp = SeqProp(id='{}_{}_{}_{}_extracted'.format(self.id, property_key, condition, property_value),
-                         seq=sub_feature)
-        new_sp.letter_annotations = sub_feature.letter_annotations
+        new_sp = self.get_subsequence(resnums=subfeat_resnums, new_id='{}_{}_{}_{}_extracted'.format(self.id,
+                                                                                                    property_key,
+                                                                                                    condition,
+                                                                                                    property_value),
+                                      copy_letter_annotations=copy_letter_annotations)
 
         if return_resnums:
-            return new_sp, [x + 1 for x in subfeat_indices]
+            return new_sp, subfeat_resnums
         else:
             return new_sp
 
-    def get_biopython_pepstats(self):
+    def get_biopython_pepstats(self, clean_seq=False):
         """Run Biopython's built in ProteinAnalysis module and store statistics in the ``annotations`` attribute."""
 
         if self.seq:
+            if clean_seq:  # TODO: can make this a property of the SeqProp class
+                seq = self.seq_str.replace('X', '').replace('U', '')
+            else:
+                seq = self.seq_str
+
             try:
-                pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(self.seq_str)
+                pepstats = ssbio.protein.sequence.properties.residues.biopython_protein_analysis(seq)
             except KeyError as e:
                 log.error('{}: unable to run ProteinAnalysis module, unknown amino acid {}'.format(self.id, e))
                 return
@@ -664,8 +697,13 @@ class SeqProp(SeqRecord):
         Todo:
             - Add and document all scales available to set
         """
-
+        # XTODO: documentation
         if self.seq:
+            # if clean_seq:  # TODO: can't do this because letter_annotations will complain about differing seqlen
+            #     seq = self.seq_str.replace('X', '').replace('U', '')
+            # else:
+            #     seq = self.seq_str
+
             try:
                 prop = ssbio.protein.sequence.properties.residues.biopython_protein_scale(self.seq_str,
                                                                                           scale=scale,
@@ -782,3 +820,74 @@ class SeqProp(SeqRecord):
 
         dG = ts.get_dG_at_T(seq=self, temp=at_temp)
         self.annotations['thermostability_{}_C-{}'.format(at_temp, dG[2].lower())] = (dG[0], dG[1])
+
+
+    ########################################################################################################
+    ########################################################################################################
+    # DEVELOPMENT CODE BELOW
+    # DEVELOPMENT CODE BELOW
+    # DEVELOPMENT CODE BELOW
+    # DEVELOPMENT CODE BELOW
+    ########################################################################################################
+    ########################################################################################################
+
+
+    def store_iupred_disorder_predictions(seqprop, iupred_path,
+                                          iupred_exec, prediction_type, force_rerun=False):
+        """Scores above 0.5 indicate disorder"""
+        os.environ['IUPred_PATH'] = iupred_path
+        stored_key = 'disorder-{}-iupred'.format(prediction_type)
+        if stored_key not in seqprop.letter_annotations or force_rerun:
+            if not seqprop.sequence_file:
+                with tempfile.NamedTemporaryFile(delete=True) as f:
+                    SeqIO.write(seqprop, f.name, "fasta")
+                    command = '{} {} {}'.format(iupred_exec, f.name, prediction_type)
+                    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=None, shell=True)
+                    output = process.communicate()
+                    iupred = [float(x.split()[2]) for x in output[0].decode().split('\n') if
+                              not x.startswith('#') and len(x) > 0]
+                    seqprop.letter_annotations[stored_key] = iupred
+            else:
+                command = '{} {} {}'.format(iupred_exec, seqprop.sequence_path, prediction_type)
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=None, shell=True)
+                output = process.communicate()
+                iupred = [float(x.split()[2]) for x in output[0].decode().split('\n') if
+                          not x.startswith('#') and len(x) > 0]
+                seqprop.letter_annotations[stored_key] = iupred
+
+    def store_disembl_disorder_predictions(seqprop, disembl_cmd,
+                                           force_rerun=False):
+        def zeroorone(x):
+            import string
+            if x in string.ascii_uppercase:
+                return 1
+            else:
+                return 0
+
+        stored_key = 'disorder-coils-disembl'
+        if stored_key not in seqprop.letter_annotations or force_rerun:
+            if not seqprop.sequence_file:
+                with tempfile.NamedTemporaryFile(delete=True) as f:
+                    SeqIO.write(seqprop, f.name, "fasta")
+                    out = subprocess.check_output(
+                            [disembl_cmd, '8', '8', '4', '1.2', '1.4', '1.2', f.name])
+                    out2 = out.decode().split('\n')
+
+                    coils = list(map(lambda x: zeroorone(x), out2[9]))
+                    rem465 = list(map(lambda x: zeroorone(x), out2[11]))
+                    hotloops = list(map(lambda x: zeroorone(x), out2[13]))
+
+                    seqprop.letter_annotations['disorder-coils-disembl'] = coils
+                    seqprop.letter_annotations['disorder-rem465-disembl'] = rem465
+                    seqprop.letter_annotations['disorder-hotloops-disembl'] = hotloops
+            else:
+                out = subprocess.check_output([disembl_cmd, '8', '8', '4', '1.2', '1.4', '1.2', seqprop.sequence_path])
+                out2 = out.decode().split('\n')
+
+                coils = list(map(lambda x: zeroorone(x), out2[9]))
+                rem465 = list(map(lambda x: zeroorone(x), out2[11]))
+                hotloops = list(map(lambda x: zeroorone(x), out2[13]))
+
+                seqprop.letter_annotations['disorder-coils-disembl'] = coils
+                seqprop.letter_annotations['disorder-rem465-disembl'] = rem465
+                seqprop.letter_annotations['disorder-hotloops-disembl'] = hotloops
