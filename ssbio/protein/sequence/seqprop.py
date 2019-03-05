@@ -18,9 +18,10 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.SeqFeature import SeqFeature, FeatureLocation, ExactPosition, CompoundLocation
 from more_itertools import locate
+
+import ssbio.databases.pdb_seq
 from ssbio.core.object import Object
 import ssbio.utils
-import ssbio.databases.pdb
 import ssbio.protein.sequence.utils
 import ssbio.protein.sequence.utils.fasta
 import ssbio.protein.sequence.properties.residues
@@ -731,13 +732,13 @@ class SeqProp(SeqRecord):
             return None
 
         try:
-            blast_results = ssbio.databases.pdb.blast_pdb(self.seq_str,
-                                                          outfile='{}_blast_pdb.xml'.format(custom_slugify(self.id)),
-                                                          outdir=outdir,
-                                                          force_rerun=force_rerun,
-                                                          evalue=evalue,
-                                                          seq_ident_cutoff=seq_ident_cutoff,
-                                                          link=display_link)
+            blast_results = ssbio.databases.pdb_seq.blast_pdb(self.seq_str,
+                                                              outfile='{}_blast_pdb.xml'.format(custom_slugify(self.id)),
+                                                              outdir=outdir,
+                                                              force_rerun=force_rerun,
+                                                              evalue=evalue,
+                                                              seq_ident_cutoff=seq_ident_cutoff,
+                                                              link=display_link)
         except requests.ConnectionError as e:
             log.error('{}: BLAST request timed out'.format(self.id))
             print(e)
