@@ -25,3 +25,4 @@ scipy
 pytest
 deprecation
 networkx
+joblib
