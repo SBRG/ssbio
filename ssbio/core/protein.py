@@ -1234,8 +1234,11 @@ class Protein(Object):
         # Download the PDBs
         for s in self.get_experimental_structures():
             log.debug('{}: downloading structure file from the PDB...'.format(s.id))
-            s.download_structure_file(outdir=outdir, file_type=pdb_file_type, force_rerun=force_rerun, load_header_metadata=True)
-            downloaded_pdb_ids.append(s.id)
+            try:
+                s.download_structure_file(outdir=outdir, file_type=pdb_file_type, force_rerun=force_rerun, load_header_metadata=True)
+                downloaded_pdb_ids.append(s.id)
+            except URLError:
+                log.error('{}: PDB not available to download'.format(s.id))
 
         return downloaded_pdb_ids
 
@@ -1260,9 +1263,13 @@ class Protein(Object):
         # Download the PDBs
         for s in self.get_experimental_structures():
             log.debug('{}: downloading structure file from the PDB...'.format(s.id))
-            s.download_structure_file(outdir=outdir, file_type=pdb_file_type,
-                                      load_header_metadata=load_metadata, force_rerun=force_rerun)
-            downloaded_pdb_ids.append(s.id)
+            try:
+                s.download_structure_file(outdir=outdir, file_type=pdb_file_type,
+                                          load_header_metadata=load_metadata, force_rerun=force_rerun)
+                downloaded_pdb_ids.append(s.id)
+            except URLError:
+                log.error('{}: PDB not available to download'.format(s.id))
+
 
         return downloaded_pdb_ids
 

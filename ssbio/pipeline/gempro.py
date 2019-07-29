@@ -918,11 +918,17 @@ class GEMPRO(Object):
                 continue
 
             # BLAST the sequence to the PDB
-            new_pdbs = g.protein.blast_representative_sequence_to_pdb(seq_ident_cutoff=seq_ident_cutoff,
-                                                                   evalue=evalue,
-                                                                   display_link=display_link,
-                                                                   outdir=outdir,
-                                                                   force_rerun=force_rerun)
+            try:
+                new_pdbs = g.protein.blast_representative_sequence_to_pdb(
+                        seq_ident_cutoff=seq_ident_cutoff,
+                        evalue=evalue,
+                        display_link=display_link,
+                        outdir=outdir,
+                        force_rerun=force_rerun
+                )
+            except ValueError as e:
+                log.error(e)
+                continue
 
             if new_pdbs:
                 counter += 1
