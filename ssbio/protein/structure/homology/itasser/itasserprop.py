@@ -502,9 +502,11 @@ def parse_coach_ec_df(infile):
 
     """
 
-    ec_df = pd.read_table(infile, delim_whitespace=True,
-                          names=['pdb_template', 'tm_score', 'rmsd', 'seq_ident', 'seq_coverage',
-                                 'c_score', 'ec_number', 'binding_residues'])
+    ec_df = pd.read_csv(
+            infile,
+            delim_whitespace=True,
+            names=['pdb_template', 'tm_score', 'rmsd', 'seq_ident', 'seq_coverage', 'c_score', 'ec_number', 'binding_residues']
+    )
 
     ec_df['pdb_template_id'] = ec_df['pdb_template'].apply(lambda x: x[:4])
     ec_df['pdb_template_chain'] = ec_df['pdb_template'].apply(lambda x: x[4])
