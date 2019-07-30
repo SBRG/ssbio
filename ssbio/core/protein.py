@@ -600,7 +600,7 @@ class Protein(Object):
                 raise ValueError('Output directory must be specified')
 
         for seq in self.sequences:
-            aln_id = '{}_{}'.format(self.id, seq.id)
+            aln_id = '{}_{}'.format(self.representative_sequence.id, seq.id)
             outfile = '{}.needle'.format(aln_id)
 
             if self.sequence_alignments.has_id(aln_id):
