@@ -1288,29 +1288,10 @@ class Protein(Object):
 
         return downloaded_pdb_ids
 
-    def parse_all_stored_structures(self, outdir=None, pdb_file_type=None, force_rerun=False):
+    def parse_all_stored_structures(self, store_in_memory=False):
         """Runs parse_structure for any stored structure with a file available"""
-        if not outdir:
-            outdir = self.structure_dir
-            if not outdir:
-                raise ValueError('Output directory must be specified')
-
-        if not pdb_file_type:
-            pdb_file_type = self.pdb_file_type
-
-        # Check if we have any PDBs
-        if self.num_structures_experimental == 0:
-            log.debug('{}: no structures available - nothing will be downloaded'.format(self.id))
-            return
-
-        downloaded_pdb_ids = []
-        # Download the PDBs
-        for s in self.get_experimental_structures():
-            log.debug('{}: downloading structure file from the PDB...'.format(s.id))
-            s.download_structure_file(outdir=outdir, file_type=pdb_file_type, force_rerun=force_rerun)
-            downloaded_pdb_ids.append(s.id)
-
-        return downloaded_pdb_ids
+        for x in self.structures:
+            x.parse_structure(store_in_memory=store_in_memory)
 
     @property
     def df_pdb_metadata(self):
