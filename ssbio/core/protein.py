@@ -14,6 +14,7 @@ import seaborn as sns
 from slugify import Slugify
 from collections import defaultdict
 from six.moves.urllib.error import URLError
+import deprecation
 
 from Bio.Seq import Seq
 from Bio import SeqIO
@@ -1201,6 +1202,8 @@ class Protein(Object):
         df = pd.DataFrame.from_records(itasser_pre_df, columns=df_cols).set_index('id')
         return ssbio.utils.clean_df(df)
 
+    @deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
+                            details="Use download_all_pdbs function instead")
     def pdb_downloader_and_metadata(self, outdir=None, pdb_file_type=None, force_rerun=False):
         """Download ALL mapped experimental structures to the protein structures directory.
 
@@ -1213,8 +1216,7 @@ class Protein(Object):
         Returns:
             list: List of PDB IDs that were downloaded
 
-        Todo:
-            * Parse mmtf or PDB file for header information, rather than always getting the cif file for header info
+
 
         """
         if not outdir:
@@ -1244,8 +1246,22 @@ class Protein(Object):
 
     def download_all_pdbs(self, outdir=None, pdb_file_type=None, load_metadata=False, force_rerun=False):
         """Downloads all structures from the PDB. load_metadata flag sets if metadata should be parsed and stored in
-        StructProp, otherwise filepaths are just linked"""
-        # TODO: will replace pdb_downloader_and_metadata function
+        StructProp, otherwise filepaths are just linked
+
+        Args:
+            outdir (str): Path to output directory, if protein structures directory not set or other output directory is
+                desired
+            pdb_file_type (str): Type of PDB file to download, if not already set or other format is desired
+            load_metadata (bool): If metadata should be parsed and stored in the StructProp objects
+            force_rerun (bool): If files should be re-downloaded if they already exist
+
+        Returns:
+            list: List of PDB IDs that were downloaded
+
+        """
+
+        # TODO: Parse mmtf or PDB file for header information, rather than always getting the cif file for header info
+
         if not outdir:
             outdir = self.structure_dir
             if not outdir:
@@ -1270,12 +1286,10 @@ class Protein(Object):
             except URLError:
                 log.error('{}: PDB not available to download'.format(s.id))
 
-
         return downloaded_pdb_ids
 
     def parse_all_stored_structures(self, outdir=None, pdb_file_type=None, force_rerun=False):
         """Runs parse_structure for any stored structure with a file available"""
-        # TODO: will replace pdb_downloader_and_metadata function
         if not outdir:
             outdir = self.structure_dir
             if not outdir:
@@ -1311,7 +1325,7 @@ class Protein(Object):
         for p in self.get_experimental_structures():
             if not p.structure_file:
                 not_showing_info.append(p.id)
-                log.debug('{}: PDB file has not been downloaded, run "pdb_downloader_and_metadata" \
+                log.debug('{}: PDB file has not been downloaded, run "download_all_pdbs" \
                     to download all structures'.format(p.id))
                 continue
 
@@ -1319,7 +1333,7 @@ class Protein(Object):
             infodict['pdb_id'] = p.id
             pdb_pre_df.append(infodict)
 
-        log.warning('Not showing info for mapped PDB entries, as they have not been downloaded yet. Run pdb_downloader_and_metadata')
+        log.warning('Not showing info for mapped PDB entries, as they have not been downloaded yet. Run download_all_pdbs')
 
         cols = ['pdb_id', 'pdb_title', 'description', 'experimental_method', 'mapped_chains',
                 'resolution', 'chemicals', 'date', 'taxonomy_name',

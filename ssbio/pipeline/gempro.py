@@ -8,6 +8,7 @@ import os
 import os.path as op
 import shutil
 from copy import copy
+import deprecation
 
 import pandas as pd
 from Bio import SeqIO
@@ -1339,6 +1340,8 @@ class GEMPRO(Object):
         log.info('Prepared I-TASSER modeling folders for {} genes in folder {}'.format(counter,
                                                                                        self.homology_models_dir))
 
+    @deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
+                            details="Use download_all_pdbs function instead")
     def pdb_downloader_and_metadata(self, outdir=None, pdb_file_type=None, force_rerun=False):
         """Download ALL mapped experimental structures to each protein's structures directory.
 
