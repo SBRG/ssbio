@@ -1910,7 +1910,7 @@ class Protein(Object):
         # Save the original structure ID as an extra attribute
         self.representative_structure.original_structure_id = structprop.id
 
-        # Also need to parse the clean structure and save its sequence..
+        # Also need to parse the clean structure and save its sequence
         self.representative_structure.parse_structure()
 
         # And finally add it to the list of structures
