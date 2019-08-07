@@ -7,9 +7,6 @@ import numpy as np
 import os
 import pandas as pd
 
-__author__ = "Anand Sastry"
-__email__ = "avsastry@eng.ucsd.edu"
-
 
 def run_fatcat(structure_path_1, structure_path_2, fatcat_sh, outdir='', silent=False, print_cmd=False, force_rerun=False):
     """Run FATCAT on two PDB files, and return the path of the XML result file.
