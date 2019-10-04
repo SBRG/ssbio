@@ -450,9 +450,7 @@ class SeqProp(SeqRecord):
             if k in keys:
                 v = deepcopy(orig_v)
                 if df_format:
-                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v,
-                                                                                                  float) and not isinstance(
-                            v, bool):
+                    if v and not isinstance(v, str) and not isinstance(v, int) and not isinstance(v, float) and not isinstance(v, bool):
                         try:
                             df_dict[k] = ssbio.utils.force_string(deepcopy(v))
                         except TypeError:
