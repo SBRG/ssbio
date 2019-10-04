@@ -12,6 +12,7 @@ import deprecation
 
 import pandas as pd
 from Bio import SeqIO
+from Bio.PDB.PDBExceptions import PDBConstructionException
 from bioservices import KEGG
 from bioservices import UniProt
 from cobra.core import DictList
