@@ -1,11 +1,18 @@
 import pytest
 from ssbio.core.protein import Protein
 import os.path as op
+from pathlib import Path
+
+from ssbio.databases.kegg import KEGGProp
+from ssbio.databases.pdb import PDBProp
+from ssbio.databases.uniprot import UniProtProp
+from ssbio.protein.sequence.seqprop import SeqProp
+from ssbio.protein.structure.homology.itasser.itasserprop import ITASSERProp
 
 
 @pytest.fixture(scope='class')
-def test2(test_files_sequences, test_files_structures, test_files_outputs):
-    """Protein with confusing mappings between residue numbers"""
+def FixtProtein(test_files_sequences, test_files_structures, test_files_outputs):
+    """General Protein"""
     p = Protein(ident='P21964', root_dir=test_files_outputs)
     p.load_uniprot(uniprot_id='P21964',
                    uniprot_seq_file=op.join(test_files_sequences, 'P21964.fasta'),
@@ -19,10 +26,9 @@ def test2(test_files_sequences, test_files_structures, test_files_outputs):
     return p
 
 
-
 @pytest.fixture(scope='class')
-def straightforward_resnum_mapping(test_files_sequences, test_files_structures, test_files_outputs):
-    """Protein with confusing mappings between residue numbers"""
+def FixtProtein_straightforwardmapping(test_files_sequences, test_files_structures, test_files_outputs):
+    """Protein with straightforward mappings between residue numbers"""
     p = Protein(ident='P0ABP8', root_dir=test_files_outputs)
     p.load_uniprot(uniprot_id='P0ABP8',
                    uniprot_seq_file=op.join(test_files_sequences, 'P0ABP8.fasta'),
@@ -37,7 +43,7 @@ def straightforward_resnum_mapping(test_files_sequences, test_files_structures, 
 
 
 @pytest.fixture(scope='class')
-def confusing_resnum_mapping(test_files_sequences, test_files_structures, test_files_outputs):
+def FixtProtein_confusingmapping(test_files_sequences, test_files_structures, test_files_outputs):
     """Protein with confusing mappings between residue numbers"""
     p = Protein(ident='P08559', root_dir=test_files_outputs)
     p.load_uniprot(uniprot_id='P08559',
@@ -51,139 +57,157 @@ def confusing_resnum_mapping(test_files_sequences, test_files_structures, test_f
                                   chain_id='A')
     return p
 
-def test__map_seqprop_resnums_to_structprop_chain_index(test2, straightforward_resnum_mapping, confusing_resnum_mapping):
-    assert test2._map_seqprop_resnums_to_structprop_chain_index(resnums=52, use_representatives=True) == {52: 1}
 
-    assert straightforward_resnum_mapping._map_seqprop_resnums_to_structprop_chain_index(resnums=3,
-                                                                                         use_representatives=True) == {3: 1}
+def test_map_seqprop_resnums_to_structprop_chain_index(FixtProtein, FixtProtein_straightforwardmapping, FixtProtein_confusingmapping):
+    assert FixtProtein._map_seqprop_resnums_to_structprop_chain_index(
+        resnums=52,
+        use_representatives=True) == {52: 1}
 
-    assert confusing_resnum_mapping._map_seqprop_resnums_to_structprop_chain_index(resnums=29,
-                                                                                   use_representatives=True) == {29: 0}
+    assert FixtProtein_straightforwardmapping._map_seqprop_resnums_to_structprop_chain_index(
+        resnums=3,
+        use_representatives=True) == {3: 1}
 
-
-def test_map_seqprop_resnums_to_structprop_resnums(test2, straightforward_resnum_mapping, confusing_resnum_mapping):
-    assert test2.map_seqprop_resnums_to_structprop_resnums(resnums=52, use_representatives=True) == {52: 2}
-
-    assert straightforward_resnum_mapping.map_seqprop_resnums_to_structprop_resnums(resnums=2,
-                                                                                    use_representatives=True) == {2: 1}
-
-    assert confusing_resnum_mapping.map_seqprop_resnums_to_structprop_resnums(resnums=[29,30,196],
-                                                                              use_representatives=True) == {29: 0, 30: 1, 196: 167}
-
-def test_map_structprop_resnums_to_seqprop_resnums(test2, straightforward_resnum_mapping, confusing_resnum_mapping):
-    assert test2.map_structprop_resnums_to_seqprop_resnums(resnums=2, use_representatives=True) == {2: 52}
-
-    assert straightforward_resnum_mapping.map_structprop_resnums_to_seqprop_resnums(resnums=1,
-                                                                                    use_representatives=True) == {1: 2}
-
-    assert confusing_resnum_mapping.map_structprop_resnums_to_seqprop_resnums(resnums=[0, 1, 167],
-                                                                              use_representatives=True) == {0: 29, 1: 30, 167: 196}
+    assert FixtProtein_confusingmapping._map_seqprop_resnums_to_structprop_chain_index(
+        resnums=29,
+        use_representatives=True) == {29: 0}
 
 
-# import os.path as op
-# import unittest
+def test_map_seqprop_resnums_to_structprop_resnums(FixtProtein, FixtProtein_straightforwardmapping, FixtProtein_confusingmapping):
+    assert FixtProtein.map_seqprop_resnums_to_structprop_resnums(
+        resnums=52,
+        use_representatives=True) == {52: 2}
+
+    assert FixtProtein_straightforwardmapping.map_seqprop_resnums_to_structprop_resnums(
+        resnums=2,
+        use_representatives=True) == {2: 1}
+
+    assert FixtProtein_confusingmapping.map_seqprop_resnums_to_structprop_resnums(
+        resnums=[29,30,196],
+        use_representatives=True) == {29: 0, 30: 1, 196: 167}
+
+
+def test_map_structprop_resnums_to_seqprop_resnums(FixtProtein, FixtProtein_straightforwardmapping, FixtProtein_confusingmapping):
+    assert FixtProtein.map_structprop_resnums_to_seqprop_resnums(
+        resnums=2,
+        use_representatives=True) == {2: 52}
+
+    assert FixtProtein_straightforwardmapping.map_structprop_resnums_to_seqprop_resnums(
+        resnums=1,
+        use_representatives=True) == {1: 2}
+
+    assert FixtProtein_confusingmapping.map_structprop_resnums_to_seqprop_resnums(
+        resnums=[0, 1, 167],
+        use_representatives=True) == {0: 29, 1: 30, 167: 196}
+
+
+@pytest.fixture(scope='class')
+def FixtProtein_comprehensive(test_files_sequences, test_files_structures, test_files_outputs):
+    """General Protein 2"""
+    p = Protein(ident='b4384', root_dir=test_files_outputs)
+
+    kegg_seq_file = Path(test_files_sequences) / "eco-b4384.faa"
+    kegg_metadata_file = Path(test_files_sequences) / "eco-b4384.kegg"
+    new_kegg = p.load_kegg(
+        'eco:b4384',
+        kegg_seq_file=kegg_seq_file,
+        kegg_metadata_file=kegg_metadata_file)
+
+    uniprot_seq_file = Path(test_files_sequences) / 'P0ABP8.fasta'
+    uniprot_xml_file = Path(test_files_sequences) / 'P0ABP8.xml'
+    new_uniprot = p.load_uniprot(
+        'P0ABP8',
+        uniprot_seq_file=uniprot_seq_file,
+        uniprot_xml_file=uniprot_xml_file)
+
+    pdb_file = Path(test_files_structures) / '1ecp.pdb'
+    newpdb = p.load_pdb(
+        '1ecp',
+        pdb_file=pdb_file,
+        file_type='pdb')
+
+    return p, new_kegg, new_uniprot, newpdb
+
+
+def test_load_kegg(FixtProtein_comprehensive):
+    assert FixtProtein_comprehensive[0].sequences.has_id('eco:b4384')
+    assert isinstance(FixtProtein_comprehensive[1], KEGGProp)
+
+
+def test_load_uniprot(FixtProtein_comprehensive):
+    assert FixtProtein_comprehensive[0].sequences.has_id('P0ABP8')
+    assert isinstance(FixtProtein_comprehensive[2], UniProtProp)
+
+
+def test_filter_sequences(FixtProtein_comprehensive):
+    FixtProtein_comprehensive[0].load_kegg('keggdummy')
+    FixtProtein_comprehensive[0].load_uniprot('P0OOR0')
+
+    only_kegg = FixtProtein_comprehensive[0].filter_sequences(KEGGProp)
+    for k in only_kegg:
+        assert isinstance(k, KEGGProp)
+
+    only_uniprot = FixtProtein_comprehensive[0].filter_sequences(UniProtProp)
+    for k in only_uniprot:
+        assert isinstance(k, UniProtProp)
+
+
+def test_load_manual_sequence_file(FixtProtein_comprehensive, test_files_sequences):
+    new_manual = FixtProtein_comprehensive[0].load_manual_sequence_file('tester', Path(test_files_sequences) / 'P0ABP8.fasta')
+    assert FixtProtein_comprehensive[0].sequences.has_id('tester')
+    assert isinstance(new_manual, SeqProp)
+
+
+def test_load_manual_sequence(FixtProtein_comprehensive, test_files_outputs):
+    new_manual = FixtProtein_comprehensive[0].load_manual_sequence(ident='tester2', seq='ALALALAL', outdir=test_files_outputs)
+    assert FixtProtein_comprehensive[0].sequences.has_id('tester2')
+    assert isinstance(new_manual, SeqProp)
+
+
+def test_set_representative_sequence(FixtProtein_comprehensive):
+    FixtProtein_comprehensive[0].set_representative_sequence()
+    assert FixtProtein_comprehensive[0].representative_sequence.id == 'P0ABP8'
+    assert FixtProtein_comprehensive[0].representative_sequence.num_pdbs > 0
+
+
+def test_align_sequences_to_representative(FixtProtein_comprehensive):
+    # TODO: unittests for this method
+    # this is only true when you dont add more sequences
+    # self.assertEqual(len(FixtProtein_comprehensive.representative_sequence.alignments), len(FixtProtein_comprehensive.sequences))
+    pass
+
+
+def test_load_pdb(FixtProtein_comprehensive):
+    assert FixtProtein_comprehensive[0].structures.has_id('1ecp')
+    assert isinstance(FixtProtein_comprehensive[3], PDBProp)
+
 #
-# from ssbio.protein.structure.structprop import StructProp
+# def test_load_itasser_folder(FixtProtein_comprehensive):
+#     self.assertRaises(OSError, FixtProtein_comprehensive.load_itasser_folder, 'sdfsdfsdf', itasser_folder='sdfsdfsdf/structures/P9WG73')
 #
-# from ssbio.core.protein import Protein
-# from ssbio.databases.kegg import KEGGProp
-# from ssbio.databases.pdb import PDBProp
-# from ssbio.databases.uniprot import UniProtProp
-# from ssbio.protein.sequence.seqprop import SeqProp
-# from ssbio.protein.structure.homology.itasser.itasserprop import ITASSERProp
+#     newitasser = FixtProtein_comprehensive.load_itasser_folder('P9WG73', itasser_folder='test_files/structures/P9WG73')
+#     assert FixtProtein_comprehensive.structures.has_id('P9WG73')
+#     assert isinstance(newitasser, ITASSERProp)
+#     self.assertEqual(newitasser.structure_file, 'model1.pdb')
 #
+#     # newitasser.copy_results(copy_to_dir='test_files/structures/test_out/', rename_model_to='haha', force_rerun=True)
+
+# def test_load_homology_model(FixtProtein_comprehensive):
+#     newprot = FixtProtein_comprehensive.load_pdb_file('DEOD', pdb_file='test_files/structures/DEOD_ECOLI_model1.pdb')
+#     assert FixtProtein_comprehensive.structures.has_id('DEOD')
+#     assert isinstance(newprot, StructProp)
 #
-# class TestProtein(unittest.TestCase):
-#     """Unit tests for Protein"""
+# def test_num_structures(FixtProtein_comprehensive):
+#     self.assertNotEqual(FixtProtein_comprehensive.num_structures, 0)
 #
-#     @classmethod
-#     def setUpClass(self):
-#         self.prot = Protein(ident='b4384')
+# def test_num_structures_experimental(FixtProtein_comprehensive):
+#     self.assertNotEqual(FixtProtein_comprehensive.num_structures_experimental, 0)
 #
-#     def test_load_kegg(self):
-#         new_kegg = self.prot.load_kegg('eco:b4384',
-#                                        kegg_seq_file='test_files/sequences/eco-b4384.faa',
-#                                        kegg_metadata_file='test_files/sequences/eco-b4384.kegg')
-#         self.assertTrue(self.prot.sequences.has_id('eco:b4384'))
-#         self.assertTrue(isinstance(new_kegg, KEGGProp))
+# def test_num_structures_homology(FixtProtein_comprehensive):
+#     self.assertNotEqual(FixtProtein_comprehensive.num_structures_homology, 0)
 #
-#     def test_load_uniprot(self):
-#         new_uniprot = self.prot.load_uniprot('P0ABP8',
-#                                              uniprot_seq_file='test_files/sequences/P0ABP8.fasta',
-#                                              uniprot_xml_file='test_files/sequences/P0ABP8.txt')
-#         self.assertTrue(self.prot.sequences.has_id('P0ABP8'))
-#         self.assertTrue(isinstance(new_uniprot, UniProtProp))
-#
-#     def test_filter_sequences(self):
-#         self.prot.load_kegg('keggdummy')
-#         self.prot.load_uniprot('P0OOR0')
-#
-#         only_kegg = self.prot.filter_sequences(KEGGProp)
-#         for k in only_kegg:
-#             self.assertTrue(isinstance(k, KEGGProp))
-#
-#         only_uniprot = self.prot.filter_sequences(UniProtProp)
-#         for k in only_uniprot:
-#             self.assertTrue(isinstance(k, UniProtProp))
-#
-#     def test_load_manual_sequence_file(self):
-#         new_manual = self.prot.load_manual_sequence_file('tester', 'test_files/sequences/P0ABP8.fasta')
-#         self.assertTrue(self.prot.sequences.has_id('tester'))
-#         self.assertTrue(isinstance(new_manual, SeqProp))
-#
-#     def test_load_manual_sequence(self):
-#         new_manual = self.prot.load_manual_sequence(ident='tester2', seq='ALALALAL', outdir='test_files/out/')
-#         self.assertTrue(self.prot.sequences.has_id('tester2'))
-#         self.assertTrue(isinstance(new_manual, SeqProp))
-#
-#     def test_set_representative_sequence(self):
-#         self.prot.set_representative_sequence()
-#         self.assertEqual(self.prot.representative_sequence.id, 'P0ABP8')
-#         self.assertTrue(self.prot.representative_sequence.num_pdbs > 0)
-#
-#     def test_align_sequences_to_representative(self):
-#         # TODO: unittests for this method
-#         # this is only true when you dont add more sequences
-#         # self.assertEqual(len(self.prot.representative_sequence.alignments), len(self.prot.sequences))
-#         pass
-#
-#     def test_load_pdb(self):
-#         new_uniprot = self.prot.load_uniprot('P0ABP8',
-#                                              uniprot_seq_file='test_files/sequences/P0ABP8.fasta',
-#                                              uniprot_xml_file='test_files/sequences/P0ABP8.txt',
-#                                              set_as_representative=True)
-#
-#         newpdb = self.prot.load_pdb('1ecp', pdb_file='test_files/structures/1ecp.pdb', file_type='pdb')
-#         self.assertTrue(self.prot.structures.has_id('1ecp'))
-#         self.assertTrue(isinstance(newpdb, PDBProp))
-#
-#     def test_load_itasser_folder(self):
-#         self.assertRaises(OSError, self.prot.load_itasser_folder, 'sdfsdfsdf', itasser_folder='sdfsdfsdf/structures/P9WG73')
-#
-#         newitasser = self.prot.load_itasser_folder('P9WG73', itasser_folder='test_files/structures/P9WG73')
-#         self.assertTrue(self.prot.structures.has_id('P9WG73'))
-#         self.assertTrue(isinstance(newitasser, ITASSERProp))
-#         self.assertEqual(newitasser.structure_file, 'model1.pdb')
-#
-#         # newitasser.copy_results(copy_to_dir='test_files/structures/test_out/', rename_model_to='haha', force_rerun=True)
-#
-#     def test_load_homology_model(self):
-#         newprot = self.prot.load_pdb_file('DEOD', pdb_file='test_files/structures/DEOD_ECOLI_model1.pdb')
-#         self.assertTrue(self.prot.structures.has_id('DEOD'))
-#         self.assertTrue(isinstance(newprot, StructProp))
-#
-#     def test_num_structures(self):
-#         self.assertNotEqual(self.prot.num_structures, 0)
-#
-#     def test_num_structures_experimental(self):
-#         self.assertNotEqual(self.prot.num_structures_experimental, 0)
-#
-#     def test_num_structures_homology(self):
-#         self.assertNotEqual(self.prot.num_structures_homology, 0)
-#
-#     def test_set_representative_structure(self):
-#         prot_to_set = self.prot.structures.get_by_id('1ecp')
-#         self.prot.set_representative_structure(seq_outdir=op.join('test_files','out'),
-#                                                struct_outdir=op.join('test_files','out'),
-#                                                pdb_file_type='cif')
-#         self.assertEqual('1ecp-A', self.prot.representative_structure.id)
+# def test_set_representative_structure(FixtProtein_comprehensive):
+#     prot_to_set = FixtProtein_comprehensive.structures.get_by_id('1ecp')
+#     FixtProtein_comprehensive.set_representative_structure(seq_outdir=op.join('test_files','out'),
+#                                            struct_outdir=op.join('test_files','out'),
+#                                            pdb_file_type='cif')
+#     self.assertEqual('1ecp-A', FixtProtein_comprehensive.representative_structure.id)

@@ -12,6 +12,7 @@ import deprecation
 
 import pandas as pd
 from Bio import SeqIO
+from Bio.PDB.PDBExceptions import PDBConstructionException
 from bioservices import KEGG
 from bioservices import UniProt
 from cobra.core import DictList
@@ -1075,8 +1076,14 @@ class GEMPRO(Object):
                                                   file_type=hdict['file_type'], is_experimental=False)
 
                 if clean:
-                    new_homology.load_structure_path(new_homology.clean_structure(outdir=outdir, force_rerun=force_rerun),
-                                                     hdict['file_type'])
+                    try:
+                        new_homology.load_structure_path(new_homology.clean_structure(
+                            outdir=outdir,
+                            force_rerun=force_rerun),
+                            hdict['file_type'])
+                    except PDBConstructionException as e:
+                        log.error('{}, {}, {}: Unable to read PDB file, actual error was:'.format(g.id, hid, hdict['model_file']))
+                        log.exception(e)
                 else:
                     copy_to = op.join(outdir, op.basename(hdict['model_file']))
                     if ssbio.utils.force_rerun(force_rerun, copy_to):
